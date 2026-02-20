@@ -1,3 +1,4 @@
+# PROOF: [S2/Mekhanē] <- mekhane/ochema/ Ochema Component
 # PURPOSE: Antigravity LS の ConnectRPC proto 定義を一元管理する
 # REASON: scripts/ (実験) と ochema/ (正式) が同じ v8 proto 知識を共有し、
 #         Creator が proto を更新するとき 1 箇所だけ変えれば済むようにする
@@ -66,6 +67,7 @@ POLL_INTERVAL = 1.0  # seconds
 
 # --- Payload Builders (v8) ---
 
+# PURPOSE: build_start_cascade
 def build_start_cascade() -> dict:
     """StartCascade ペイロードを構築する。
 
@@ -79,6 +81,7 @@ def build_start_cascade() -> dict:
     }
 
 
+# PURPOSE: build_send_message
 def build_send_message(cascade_id: str, text: str, model: str) -> dict:
     """SendUserCascadeMessage ペイロードを構築する。
 
@@ -99,6 +102,7 @@ def build_send_message(cascade_id: str, text: str, model: str) -> dict:
     }
 
 
+# PURPOSE: build_get_status
 def build_get_status() -> dict:
     """GetUserStatus ペイロードを構築する。"""
     return {
@@ -110,6 +114,7 @@ def build_get_status() -> dict:
     }
 
 
+# PURPOSE: build_get_steps
 def build_get_steps(cascade_id: str, trajectory_id: str) -> dict:
     """GetCascadeTrajectorySteps ペイロードを構築する。"""
     return {
@@ -128,6 +133,7 @@ STEP_STATUS_DONE = "CORTEX_STEP_STATUS_DONE"
 TURN_STATES_DONE = ("", "TURN_STATE_WAITING_FOR_USER")
 
 
+# PURPOSE: extract_planner_response
 def extract_planner_response(step: dict) -> dict:
     """PLANNER_RESPONSE ステップからテキスト・thinking・model を抽出する。
 
@@ -153,6 +159,7 @@ def extract_planner_response(step: dict) -> dict:
     }
 
 
+# PURPOSE: resolve_model
 def resolve_model(name: str) -> str:
     """モデルエイリアスを proto enum に解決する。"""
     if name in MODEL_ALIASES:

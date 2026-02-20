@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] <- mekhane/basanos/ Basanos L2
 # PURPOSE: G_semantic — LLM で HGK 専門用語を一般学術用語に翻訳する
 # REASON: G = G_struct ∘ G_semantic の G_semantic 部分。外部比較のために HGK 語彙を汎化する
 """G_semantic: LLM-based translation of HGK terms to general academic terms.
@@ -59,6 +60,7 @@ STATIC_TRANSLATIONS: dict[str, str] = {
 }
 
 
+# PURPOSE: GSemantic
 class GSemantic:
     """Translate HGK-specific terms to general academic vocabulary.
 
@@ -67,6 +69,7 @@ class GSemantic:
     2. Dynamic: Use Gemini API for unknown terms (slower, more flexible)
     """
 
+    # PURPOSE: __init__
     def __init__(self, use_llm: bool = False) -> None:
         """Initialize GSemantic.
 
@@ -76,6 +79,7 @@ class GSemantic:
         """
         self.use_llm = use_llm
 
+    # PURPOSE: translate
     def translate(self, external_form: ExternalForm) -> ExternalForm:
         """Translate HGK terms in ExternalForm to general terms.
 
@@ -96,6 +100,7 @@ class GSemantic:
             claims=translated_claims,
         )
 
+    # PURPOSE: _translate_term
     def _translate_term(self, term: str) -> str:
         """Translate a single term."""
         # Try static translation first
@@ -111,6 +116,7 @@ class GSemantic:
 
         return term  # Return unchanged if no translation found
 
+    # PURPOSE: _llm_translate
     def _llm_translate(self, term: str) -> Optional[str]:
         """Use Gemini to translate an HGK-specific term."""
         prompt = (

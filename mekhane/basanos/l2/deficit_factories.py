@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] <- mekhane/basanos/ Basanos L2
 # PURPOSE: 3種の deficit (η, ε, Δε/Δt) を検出するファクトリ群
 # REASON: F⊣G 随伴構造の「破れ」を自動検出し、問いに変換するため
 # PROOF: 41/41 テスト (tests/test_l2.py, tests/test_extensions.py) + CLI scan 0 deficit
@@ -26,6 +27,7 @@ from mekhane.basanos.l2.models import Deficit, DeficitType, ExternalForm, HGKCon
 # ---------------------------------------------------------------------------
 
 
+# PURPOSE: EtaDeficitFactory
 class EtaDeficitFactory:
     # PURPOSE: 外部知識の未吸収を検出する η deficit ファクトリ
     """Detect η deficit: external knowledge not absorbed into HGK.
@@ -35,11 +37,13 @@ class EtaDeficitFactory:
     that's an η deficit — knowledge lost during /eat.
     """
 
+    # PURPOSE: __init__
     def __init__(self, g_struct: GStruct, project_root: Path | str) -> None:
         self.g_struct = g_struct
         self.project_root = Path(project_root)
         self._hgk_keywords: Optional[set[str]] = None
 
+    # PURPOSE: detect
     def detect(self, paper_keywords: list[str], paper_title: str) -> list[Deficit]:
         # PURPOSE: 論文キーワードと HGK kernel/ を照合し、未吸収概念を deficit として返す
         """Detect η deficits by comparing paper keywords against HGK.
@@ -72,6 +76,7 @@ class EtaDeficitFactory:
 
         return deficits
 
+    # PURPOSE: _get_hgk_keywords
     def _get_hgk_keywords(self) -> set[str]:
         """Cache and return all HGK keywords from kernel/."""
         if self._hgk_keywords is not None:
@@ -94,6 +99,7 @@ class EtaDeficitFactory:
 # ---------------------------------------------------------------------------
 
 
+# PURPOSE: EpsilonDeficitFactory
 class EpsilonDeficitFactory:
     # PURPOSE: HGK の主張に実装/根拠がない ε deficit を検出するファクトリ
     """Detect ε deficit: HGK claims lacking implementation or justification.
@@ -123,11 +129,13 @@ class EpsilonDeficitFactory:
         "A1": ["pat"], "A2": ["dia"], "A3": ["gno"], "A4": ["epi"],
     }
 
+    # PURPOSE: __init__
     def __init__(self, g_struct: GStruct, project_root: Path | str) -> None:
         self.g_struct = g_struct
         self.project_root = Path(project_root)
         self.THEOREM_TO_WF = self._build_theorem_to_wf()
 
+    # PURPOSE: _build_theorem_to_wf
     def _build_theorem_to_wf(self) -> dict[str, list[str]]:
         """Auto-generate THEOREM_TO_WF from .agent/workflows/ frontmatter.
 
@@ -187,6 +195,7 @@ class EpsilonDeficitFactory:
         result.update(mapping)
         return result
 
+    # PURPOSE: detect_impl_deficits
     def detect_impl_deficits(self) -> list[Deficit]:
         # PURPOSE: kernel/ 定義に対応する WF/mekhane 実装の有無を検査
         """Detect ε-impl: kernel definitions without implementations."""
@@ -226,6 +235,7 @@ class EpsilonDeficitFactory:
 
         return deficits
 
+    # PURPOSE: _has_implementation
     def _has_implementation(self, theorem_id: str, series: str) -> bool:
         """Check if a theorem has any implementation (WF, skill, or code)."""
         # 1. Check known WF mapping (fast, deterministic)
@@ -244,6 +254,7 @@ class EpsilonDeficitFactory:
 
         return False
 
+    # PURPOSE: detect_justification_deficits
     def detect_justification_deficits(
         self, gnosis_keywords: set[str]
     ) -> list[Deficit]:
@@ -283,6 +294,7 @@ class EpsilonDeficitFactory:
 
         return deficits
 
+    # PURPOSE: _find_reference
     def _find_reference(self, directory: Path, theorem_id: str) -> bool:
         """Check if a theorem ID is referenced in any file under directory."""
         try:
@@ -302,6 +314,7 @@ class EpsilonDeficitFactory:
 # ---------------------------------------------------------------------------
 
 
+# PURPOSE: DeltaDeficitFactory
 class DeltaDeficitFactory:
     # PURPOSE: git 変更差分から構造的不整合を検出する Δε/Δt ファクトリ
     """Detect Δε/Δt: changes that introduce structural discrepancies.
@@ -310,9 +323,11 @@ class DeltaDeficitFactory:
     then checks if those changes break consistency.
     """
 
+    # PURPOSE: __init__
     def __init__(self, project_root: Path | str) -> None:
         self.project_root = Path(project_root)
 
+    # PURPOSE: detect
     def detect(self, since: str = "HEAD~5") -> list[Deficit]:
         # PURPOSE: 直近の git コミットから kernel/mekhane 間の不整合を検出
         """Detect change-induced deficits from recent git history.
@@ -351,6 +366,7 @@ class DeltaDeficitFactory:
 
         return deficits
 
+    # PURPOSE: _get_changed_files
     def _get_changed_files(self, since: str, prefix: str) -> list[str]:
         """Get list of files changed since given revision under prefix."""
         try:
@@ -376,6 +392,7 @@ class DeltaDeficitFactory:
         except (subprocess.TimeoutExpired, OSError):
             return []
 
+    # PURPOSE: _detect_series_from_path
     def _detect_series_from_path(self, path: str) -> Optional[str]:
         """Detect series from file path."""
         basename = Path(path).stem.lower()
@@ -392,6 +409,7 @@ class DeltaDeficitFactory:
                 return series
         return None
 
+    # PURPOSE: _is_related
     def _is_related(self, series: str, mekhane_path: str) -> bool:
         """Check if a mekhane path is related to a series."""
         related_dirs = EpsilonDeficitFactory.IMPL_DIRS.get(series, [])

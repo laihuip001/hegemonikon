@@ -1,3 +1,4 @@
+# PROOF: [S2/Mekhanē] <- mekhane/periskope/ Deep Research Engine
 """
 Query expander for Periskopē.
 
@@ -26,6 +27,7 @@ _CJK_RANGES = (
 )
 
 
+# PURPOSE: _is_japanese
 def _is_japanese(text: str) -> bool:
     """Detect if text contains Japanese characters."""
     for char in text:
@@ -35,12 +37,14 @@ def _is_japanese(text: str) -> bool:
     return False
 
 
+# PURPOSE: QueryExpander
 class QueryExpander:
     """Expand search queries via translation and synonym generation.
 
     Uses Cortex API (Gemini Flash) for fast, cost-effective translation.
     """
 
+    # PURPOSE: __init__
     def __init__(
         self,
         cortex_base_url: str = "http://localhost:8765",
@@ -51,6 +55,7 @@ class QueryExpander:
         self.model = model
         self.timeout = timeout
 
+    # PURPOSE: expand
     async def expand(self, query: str) -> list[str]:
         """Expand query via bilingual translation.
 
@@ -77,6 +82,7 @@ class QueryExpander:
 
         return queries
 
+    # PURPOSE: _translate
     async def _translate(
         self,
         text: str,

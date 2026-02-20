@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] <- mekhane/mcp/ MCP Component
 #!/usr/bin/env python3
 """
 MCP Base Module — Hegemonikón MCP Server Common Infrastructure
@@ -16,9 +17,11 @@ Usage:
     server = base.server
     log = base.log
 
+    # PURPOSE: list_tools
     @server.list_tools()
     async def list_tools(): ...
 
+    # PURPOSE: call_tool
     @server.call_tool()
     async def call_tool(name, arguments): ...
 
@@ -40,6 +43,7 @@ if sys.platform == "win32":
 _original_stdout = sys.stdout
 
 
+# PURPOSE: StdoutSuppressor
 class StdoutSuppressor:
     """Suppress stdout during imports to prevent MCP protocol pollution.
 
@@ -48,15 +52,18 @@ class StdoutSuppressor:
     a StringIO buffer during the suppressed block.
     """
 
+    # PURPOSE: __init__
     def __init__(self):
         self._null = io.StringIO()
         self._old_stdout = None
 
+    # PURPOSE: __enter__
     def __enter__(self):
         self._old_stdout = sys.stdout
         sys.stdout = self._null
         return self
 
+    # PURPOSE: __exit__
     def __exit__(self, *args):
         sys.stdout = self._old_stdout
         captured = self._null.getvalue()
@@ -68,6 +75,7 @@ class StdoutSuppressor:
             )
 
 
+# PURPOSE: MCPBase
 class MCPBase:
     """Common infrastructure for all Hegemonikón MCP servers.
 
@@ -79,6 +87,7 @@ class MCPBase:
       - Main run loop
     """
 
+    # PURPOSE: __init__
     def __init__(self, name: str, version: str, instructions: str):
         self.name = name
         self.version = version
@@ -107,6 +116,7 @@ class MCPBase:
         )
         self._log("Server initialized")
 
+    # PURPOSE: _setup_paths
     def _setup_paths(self):
         """Add project root and mekhane dir to sys.path."""
         # mekhane/mcp/mcp_base.py → mekhane/ → hegemonikon/
@@ -118,10 +128,12 @@ class MCPBase:
             if p not in sys.path:
                 sys.path.insert(0, p)
 
+    # PURPOSE: _log
     def _log(self, msg: str):
         """Log to stderr with server name prefix."""
         print(f"[{self.name}] {msg}", file=sys.stderr, flush=True)
 
+    # PURPOSE: log
     @property
     def log(self):
         """Provide log function for external use."""
@@ -129,6 +141,7 @@ class MCPBase:
 
 
 
+    # PURPOSE: _main
     async def _main(self):
         """MCP server main loop."""
         self._log("Starting stdio server...")
@@ -144,6 +157,7 @@ class MCPBase:
             self._log(f"Server error: {e}")
             raise
 
+    # PURPOSE: run
     def run(self):
         """Run the MCP server (blocking)."""
         self._log("Running main...")

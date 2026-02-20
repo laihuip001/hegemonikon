@@ -1,3 +1,4 @@
+# PROOF: [S2/Mekhanē] <- mekhane/periskope/ Deep Research Engine
 """
 SearXNG search client for Periskopē.
 
@@ -39,6 +40,7 @@ DOMAIN_BLACKLIST: set[str] = {
 }
 
 
+# PURPOSE: SearXNGSearcher
 class SearXNGSearcher:
     """Client for SearXNG meta-search engine.
 
@@ -46,6 +48,7 @@ class SearXNGSearcher:
     Results are returned in JSON format with relevance scoring.
     """
 
+    # PURPOSE: __init__
     def __init__(
         self,
         base_url: str = "http://localhost:8888",
@@ -61,16 +64,19 @@ class SearXNGSearcher:
         self.domain_blacklist = domain_blacklist or DOMAIN_BLACKLIST
         self._client: httpx.AsyncClient | None = None
 
+    # PURPOSE: _get_client
     async def _get_client(self) -> httpx.AsyncClient:
         if self._client is None or self._client.is_closed:
             self._client = httpx.AsyncClient(timeout=self.timeout)
         return self._client
 
+    # PURPOSE: close
     async def close(self) -> None:
         if self._client and not self._client.is_closed:
             await self._client.aclose()
             self._client = None
 
+    # PURPOSE: search
     async def search(
         self,
         query: str,
@@ -170,6 +176,7 @@ class SearXNGSearcher:
 
         return results
 
+    # PURPOSE: search_academic
     async def search_academic(
         self,
         query: str,
@@ -183,6 +190,7 @@ class SearXNGSearcher:
             engines=["google scholar", "semantic scholar", "arxiv"],
         )
 
+    # PURPOSE: search_news
     async def search_news(
         self,
         query: str,
@@ -197,6 +205,7 @@ class SearXNGSearcher:
             time_range=time_range,
         )
 
+    # PURPOSE: health_check
     async def health_check(self) -> bool:
         """Check if SearXNG is reachable."""
         try:
@@ -206,6 +215,7 @@ class SearXNGSearcher:
         except Exception:
             return False
 
+    # PURPOSE: search_multi_category
     async def search_multi_category(
         self,
         query: str,
@@ -272,6 +282,7 @@ class SearXNGSearcher:
         )
         return result_list
 
+    # PURPOSE: _preprocess_query
     def _preprocess_query(self, query: str) -> str:
         """Preprocess search query for better results.
 
@@ -282,6 +293,7 @@ class SearXNGSearcher:
         query = re.sub(r'\s+', ' ', query.strip())
         return query
 
+    # PURPOSE: _is_blacklisted
     def _is_blacklisted(self, url: str) -> bool:
         """Check if URL domain is in the blacklist."""
         if not url:
@@ -293,6 +305,7 @@ class SearXNGSearcher:
             return False
 
 
+# PURPOSE: _calculate_relevance
 def _calculate_relevance(index: int, total: int) -> float:
     """Calculate relevance score based on position (0-indexed)."""
     if total == 0:
@@ -300,6 +313,7 @@ def _calculate_relevance(index: int, total: int) -> float:
     return max(0.0, 1.0 - (index / max(total, 1)))
 
 
+# PURPOSE: _truncate
 def _truncate(text: str, max_len: int) -> str:
     """Truncate text to max_len characters."""
     if len(text) <= max_len:

@@ -1,7 +1,9 @@
+# PROOF: [S2/Mekhanē] <- mekhane/periskope/ Deep Research Engine
 """
 Periskopē searchers — pluggable search source adapters.
 
 Each searcher implements the same async interface:
+    # PURPOSE: search
     async def search(query: str, max_results: int) -> list[SearchResult]
 """
 

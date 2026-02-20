@@ -1,3 +1,4 @@
+# PROOF: [S2/Mekhanē] <- mekhane/periskope/ Deep Research Engine
 """
 Semantic Scholar API client for Periskopē.
 
@@ -25,6 +26,7 @@ _S2_API_URL = "https://api.semanticscholar.org/graph/v1"
 _S2_SEARCH_URL = f"{_S2_API_URL}/paper/search"
 
 
+# PURPOSE: SemanticScholarSearcher
 class SemanticScholarSearcher:
     """Client for Semantic Scholar API.
 
@@ -37,15 +39,18 @@ class SemanticScholarSearcher:
     Optional: S2_API_KEY environment variable for higher limits.
     """
 
+    # PURPOSE: __init__
     def __init__(self, timeout: float = 10.0) -> None:
         self._api_key = os.getenv("S2_API_KEY") or os.getenv("SEMANTIC_SCHOLAR_API_KEY", "")
         self._timeout = timeout
 
+    # PURPOSE: available
     @property
     def available(self) -> bool:
         """Always available (no key required, key is optional)."""
         return True
 
+    # PURPOSE: search
     async def search(
         self,
         query: str,
@@ -161,6 +166,7 @@ class SemanticScholarSearcher:
         return results
 
 
+# PURPOSE: _truncate
 def _truncate(text: str, max_len: int) -> str:
     if len(text) <= max_len:
         return text

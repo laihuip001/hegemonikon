@@ -1,3 +1,4 @@
+# PROOF: [S2/Mekhanē] <- mekhane/periskope/ Deep Research Engine
 """
 Periskopē Deep Research Engine — Orchestrator.
 
@@ -50,6 +51,7 @@ from mekhane.periskope.page_fetcher import PageFetcher, INTERNAL_SOURCES
 logger = logging.getLogger(__name__)
 
 
+# PURPOSE: _llm_ask
 async def _llm_ask(prompt: str, model: str = "gemini-2.0-flash", max_tokens: int = 256) -> str:
     """Lightweight LLM call via OchemaService for internal pipeline steps.
 
@@ -68,6 +70,7 @@ async def _llm_ask(prompt: str, model: str = "gemini-2.0-flash", max_tokens: int
         return ""
 
 
+# PURPOSE: _phi1_blind_spot_analysis
 async def _phi1_blind_spot_analysis(
     query: str,
     context: str = "",
@@ -122,6 +125,7 @@ async def _phi1_blind_spot_analysis(
     return blind_spot_queries
 
 
+# PURPOSE: DecisionFrame
 @dataclass
 class DecisionFrame:
     """Φ4: 収束思考 — Structured decision support frame.
@@ -137,6 +141,7 @@ class DecisionFrame:
     blind_spots_addressed: int = 0
 
 
+# PURPOSE: _phi4_convergent_framing
 async def _phi4_convergent_framing(
     query: str,
     synthesis_text: str,
@@ -210,6 +215,7 @@ async def _phi4_convergent_framing(
     return frame
 
 
+# PURPOSE: ResearchReport
 @dataclass
 class ResearchReport:
     """Complete research report from Periskopē."""
@@ -223,6 +229,7 @@ class ResearchReport:
     elapsed_seconds: float = 0.0
     source_counts: dict[str, int] = field(default_factory=dict)
 
+    # PURPOSE: markdown
     def markdown(self) -> str:
         """Generate a Markdown report."""
         lines = [
@@ -306,6 +313,7 @@ class ResearchReport:
         return "\n".join(lines)
 
 
+# PURPOSE: PeriskopeEngine
 class PeriskopeEngine:
     """Orchestrate the full Periskopē deep research pipeline.
 
@@ -317,6 +325,7 @@ class PeriskopeEngine:
     - Deep: All searchers + multi-model + citation verification
     """
 
+    # PURPOSE: __init__
     def __init__(
         self,
         searxng_url: str = "http://localhost:8888",
@@ -371,6 +380,7 @@ class PeriskopeEngine:
         # Search result cache (P4: avoid duplicate queries in multi-pass)
         self._search_cache: dict[str, tuple[list[SearchResult], dict[str, int]]] = {}
 
+    # PURPOSE: _load_config
     @staticmethod
     def _load_config() -> dict:
         """P8: Load config.yaml from package directory."""
@@ -383,6 +393,7 @@ class PeriskopeEngine:
         return {}
 
 
+    # PURPOSE: research
     async def research(
         self,
         query: str,
@@ -667,6 +678,7 @@ class PeriskopeEngine:
 
         return report
 
+    # PURPOSE: _phase_search
     async def _phase_search(
         self,
         query: str,
@@ -732,6 +744,7 @@ class PeriskopeEngine:
 
         return all_results, source_counts
 
+    # PURPOSE: _normalize_url
     @staticmethod
     def _normalize_url(url: str) -> str:
         """Normalize URL for deduplication."""
@@ -744,6 +757,7 @@ class PeriskopeEngine:
             return base
         return url
 
+    # PURPOSE: _deduplicate_results
     def _deduplicate_results(
         self, results: list[SearchResult],
     ) -> list[SearchResult]:
@@ -759,6 +773,7 @@ class PeriskopeEngine:
 
         return deduped
 
+    # PURPOSE: _rerank_results
     def _rerank_results(
         self,
         query: str,
@@ -792,6 +807,7 @@ class PeriskopeEngine:
 
         return results
 
+    # PURPOSE: _generate_refinement_queries
     async def _generate_refinement_queries(
         self,
         original_query: str,
@@ -842,6 +858,7 @@ class PeriskopeEngine:
             logger.warning("W6: Refinement query generation failed: %s", e)
             return []
 
+    # PURPOSE: _select_urls_for_deep_read
     async def _select_urls_for_deep_read(
         self,
         query: str,
@@ -937,6 +954,7 @@ class PeriskopeEngine:
                 if r.url
             ]
 
+    # PURPOSE: _classify_query
     @staticmethod
     def _classify_query(query: str) -> str:
         """F12: Classify query type for adaptive source selection.
@@ -958,6 +976,7 @@ class PeriskopeEngine:
             return "implementation"
         return "concept"
 
+    # PURPOSE: select_sources
     @classmethod
     def select_sources(cls, query: str) -> list[str]:
         """F12: Suggest optimal sources based on query classification."""
@@ -974,6 +993,7 @@ class PeriskopeEngine:
 
 
 
+    # PURPOSE: _phase_digest
     def _phase_digest(self, report: ResearchReport, depth: str = "quick") -> Path | None:
         """Phase 4: Write research results to Digestor incoming.
 
@@ -1098,6 +1118,7 @@ depth: {depth}
             logger.error("Auto-digest failed: %s", e)
             return None
 
+    # PURPOSE: _quick_template
     @staticmethod
     def _quick_template() -> str:
         """Quick /eat- template — minimal Phase 0."""
@@ -1110,6 +1131,7 @@ depth: {depth}
 | F (取込) | <!-- Ext → Int --> |
 | G (忘却) | <!-- Int → Ext --> |"""
 
+    # PURPOSE: _standard_template
     @staticmethod
     def _standard_template() -> str:
         """Standard /eat template — Phase 0 + /fit checklist."""
@@ -1130,6 +1152,7 @@ depth: {depth}
 - [ ] ε 検証: HGK 既存構造との整合性確認
 - [ ] Drift 測定: 1-ε の許容範囲内"""
 
+    # PURPOSE: _deep_template
     @staticmethod
     def _deep_template() -> str:
         """Deep /eat+ template — full 7-phase digestion."""

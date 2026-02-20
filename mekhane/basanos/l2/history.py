@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] <- mekhane/basanos/ Basanos L2
 #!/usr/bin/env python3
 # PURPOSE: Basanos L2 deficit 履歴の永続化 — JSONL 形式で時系列追跡
 # REASON: deficit の推移を記録し、体系の健全性トレンドを可視化するため
@@ -27,6 +28,7 @@ _DEFAULT_HISTORY_DIR = Path(os.environ.get(
 _HISTORY_FILE = "l2_history.jsonl"
 
 
+# PURPOSE: _serialize_deficit
 def _serialize_deficit(d: Deficit) -> dict[str, Any]:
     """Serialize a Deficit to a JSON-safe dict."""
     return {
@@ -40,6 +42,7 @@ def _serialize_deficit(d: Deficit) -> dict[str, Any]:
     }
 
 
+# PURPOSE: _deserialize_deficit
 def _deserialize_deficit(data: dict[str, Any]) -> Deficit:
     """Deserialize a dict back into a Deficit."""
     type_map = {t.value: t for t in DeficitType}
@@ -54,6 +57,7 @@ def _deserialize_deficit(data: dict[str, Any]) -> Deficit:
     )
 
 
+# PURPOSE: record_scan
 def record_scan(
     deficits: list[Deficit],
     history_dir: Optional[Path] = None,
@@ -93,6 +97,7 @@ def record_scan(
     return filepath
 
 
+# PURPOSE: load_history
 def load_history(
     history_dir: Optional[Path] = None,
     limit: int = 50,
@@ -128,6 +133,7 @@ def load_history(
     return records[:limit]
 
 
+# PURPOSE: get_trend
 def get_trend(
     history_dir: Optional[Path] = None,
     window: int = 10,

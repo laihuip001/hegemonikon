@@ -1,3 +1,4 @@
+# PROOF: [S2/Mekhanē] <- mekhane/periskope/ Deep Research Engine
 """
 Page Fetcher — 選択的全文クロール for Periskopē.
 
@@ -29,6 +30,7 @@ BLOCKED_DOMAINS = {
 }
 
 
+# PURPOSE: PageFetcher
 class PageFetcher:
     """Fetch and extract full text from web pages.
 
@@ -37,6 +39,7 @@ class PageFetcher:
       2. If httpx fails or JS required → PlaywrightSearcher fallback
     """
 
+    # PURPOSE: __init__
     def __init__(
         self,
         timeout: float = 10.0,
@@ -51,6 +54,7 @@ class PageFetcher:
         self._playwright = None  # Lazy-init
         self._cache: dict[str, str | None] = {}  # URL → content cache
 
+    # PURPOSE: fetch_one
     async def fetch_one(self, url: str) -> str | None:
         """Fetch a single URL and extract text content.
 
@@ -87,6 +91,7 @@ class PageFetcher:
         self._cache[url] = None
         return None
 
+    # PURPOSE: fetch_many
     async def fetch_many(
         self,
         urls: list[str],
@@ -103,6 +108,7 @@ class PageFetcher:
         """
         sem = asyncio.Semaphore(concurrency)
 
+        # PURPOSE: _limited_fetch
         async def _limited_fetch(url: str) -> tuple[str, str | None]:
             async with sem:
                 text = await self.fetch_one(url)
@@ -126,6 +132,7 @@ class PageFetcher:
         )
         return fetched
 
+    # PURPOSE: _fetch_httpx
     async def _fetch_httpx(self, url: str) -> str | None:
         """Fast path: httpx GET + content-type routing.
 
@@ -180,6 +187,7 @@ class PageFetcher:
             logger.debug("httpx fetch failed for %s: %s", url[:60], e)
             return None
 
+    # PURPOSE: _extract_pdf
     @staticmethod
     def _extract_pdf(pdf_bytes: bytes) -> str | None:
         """Extract text from PDF bytes using pymupdf.
@@ -205,6 +213,7 @@ class PageFetcher:
             logger.debug("PDF extraction failed: %s", e)
             return None
 
+    # PURPOSE: _extract_text
     @staticmethod
     def _extract_text(html: str, url: str = "") -> str | None:
         """Extract main text from HTML using trafilatura.
@@ -238,6 +247,7 @@ class PageFetcher:
             logger.debug("trafilatura extraction failed: %s", e)
             return None
 
+    # PURPOSE: _fetch_playwright
     async def _fetch_playwright(self, url: str) -> str | None:
         """Fallback: use Playwright for JS-rendered pages."""
         try:

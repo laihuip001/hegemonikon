@@ -44,7 +44,7 @@ jobs:
                   # 1. Install base dependencies from PyPI
                   pip install pytest pytest-asyncio pytest-timeout pyyaml pydantic lancedb numpy scipy \
                               networkx pandas tabulate requests httpx schedule \
-                              fastapi aiohttp jinja2 sympy
+                              fastapi aiohttp jinja2 sympy python-dotenv
 
                   # 2. Install PyTorch CPU version explicitly
                   pip install torch --index-url https://download.pytorch.org/whl/cpu

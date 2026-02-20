@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhanē] <- mekhane/periskope/ A0→モデル定義が必要→PeriskopeModelsが担う
 """
 Periskopē data models.
 
@@ -73,6 +74,7 @@ class Citation:
 
     @property
     def is_trustworthy(self) -> bool:
+        """Is this citation trustworthy (SOURCE level)."""
         return self.taint_level == TaintLevel.SOURCE
 
 

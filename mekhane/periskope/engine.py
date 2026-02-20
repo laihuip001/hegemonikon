@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhanē] <- mekhane/periskope/ A0→オーケストレーションが必要→PeriskopeEngineが担う
 """
 Periskopē Deep Research Engine — Orchestrator.
 

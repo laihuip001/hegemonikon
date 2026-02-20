@@ -1,4 +1,4 @@
-# PROOF: [P4/Periskope] <- mekhane/periskope/searchers/ A0->SearxNG
+# PROOF: [L2/Periskope] <- mekhane/periskope/searchers/ A0->SearxNG
 """
 SearXNG search client for Periskopē.
 

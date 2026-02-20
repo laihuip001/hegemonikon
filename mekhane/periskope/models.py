@@ -1,4 +1,4 @@
-# PROOF: [P4/Periskope] <- mekhane/periskope/ A0->Models
+# PROOF: [L2/Periskope] <- mekhane/periskope/ A0->Models
 """
 Periskopē data models.
 

@@ -1,4 +1,4 @@
-# PROOF: [P4/Periskope] <- mekhane/periskope/searchers/ A0->SemanticScholar
+# PROOF: [L2/Periskope] <- mekhane/periskope/searchers/ A0->SemanticScholar
 """
 Semantic Scholar API client for Periskopē.
 

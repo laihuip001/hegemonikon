@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/ A0→実装には存在証明が必要→(Auto-generated)
 import os
 import logging
 from google import genai

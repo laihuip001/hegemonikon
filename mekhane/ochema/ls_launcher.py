@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] <- mekhane/ A0→Fixing CI failure
 #!/usr/bin/env python3
 """LS Standalone Launcher — IDE なしで Language Server を直接起動する。
 

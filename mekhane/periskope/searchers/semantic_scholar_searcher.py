@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] <- mekhane/ A0→Fixing CI failure
 """
 Semantic Scholar API client for Periskopē.
 

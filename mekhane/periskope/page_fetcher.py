@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] <- mekhane/ A0→Fixing CI failure
 """
 Page Fetcher — 選択的全文クロール for Periskopē.
 

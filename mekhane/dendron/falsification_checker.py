@@ -1,3 +1,4 @@
+# PROOF: [L2/Dendron] <- mekhane/dendron/ A4→Verification→Falsification Logic
 """
 S7: Falsification Condition Checker
 

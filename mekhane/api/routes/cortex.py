@@ -1,3 +1,4 @@
+# PROOF: [L3/API] <- mekhane/api/ O1→Cognition→Cortex API
 from typing import Any, AsyncGenerator
 
 import asyncio

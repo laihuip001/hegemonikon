@@ -1,3 +1,4 @@
+# PROOF: [L3/MCP] <- mekhane/mcp/ S2→Integration→MCP Safety & Base
 """
 MCP Guard — ゾンビプロセス防止の自己防衛モジュール
 

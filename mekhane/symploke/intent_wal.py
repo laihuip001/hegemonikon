@@ -27,6 +27,7 @@ CONTEXT_HEALTH_LEVELS = ("green", "yellow", "orange", "red")
 
 
 @dataclass
+# PURPOSE: A single progress log entry (append-only).
 class ProgressEntry:
     """A single progress log entry (append-only)."""
 
@@ -36,6 +37,7 @@ class ProgressEntry:
     status: str  # pending | in_progress | done | blocked
     detail: str = ""
 
+    # PURPOSE: Serialize to dict
     def to_dict(self) -> dict:
         d = {
             "timestamp": self.timestamp,
@@ -49,6 +51,7 @@ class ProgressEntry:
 
 
 @dataclass
+# PURPOSE: Intent-WAL data structure.
 class IntentWAL:
     """Intent-WAL data structure."""
 
@@ -77,6 +80,7 @@ class IntentWAL:
     savepoint: Optional[str] = None
     recommendation: Optional[str] = None
 
+    # PURPOSE: Post-init hook
     def __post_init__(self):
         now = datetime.now().astimezone().isoformat()
         if not self.created_at:
@@ -84,6 +88,7 @@ class IntentWAL:
         if not self.updated_at:
             self.updated_at = now
 
+    # PURPOSE: Serialize to YAML-compatible dict.
     def to_dict(self) -> dict:
         """Serialize to YAML-compatible dict."""
         return {
@@ -114,6 +119,7 @@ class IntentWAL:
         }
 
     @classmethod
+    # PURPOSE: Deserialize from YAML dict.
     def from_dict(cls, data: dict) -> IntentWAL:
         """Deserialize from YAML dict."""
         meta = data.get("meta", {})
@@ -152,15 +158,18 @@ class IntentWAL:
         )
 
 
+# PURPOSE: Manages Intent-WAL lifecycle: create, update, load, convert.
 class IntentWALManager:
     """Manages Intent-WAL lifecycle: create, update, load, convert."""
 
+    # PURPOSE: Initialize manager
     def __init__(self, wal_dir: Path = WAL_DIR):
         self.wal_dir = wal_dir
         self.wal_dir.mkdir(parents=True, exist_ok=True)
         self._current: Optional[IntentWAL] = None
         self._current_path: Optional[Path] = None
 
+    # PURPOSE: Create a new WAL file.
     def create(
         self,
         session_goal: str,
@@ -187,6 +196,7 @@ class IntentWALManager:
         self._current_path = path
         return wal, path
 
+    # PURPOSE: Append a progress entry.
     def update_progress(
         self,
         step: int,
@@ -212,6 +222,7 @@ class IntentWALManager:
         self._write(self._current, self._current_path)
         return self._current
 
+    # PURPOSE: Update context health.
     def update_context_health(
         self,
         level: str,
@@ -236,6 +247,7 @@ class IntentWALManager:
         self._write(self._current, self._current_path)
         return self._current
 
+    # PURPOSE: Update recovery information.
     def update_recovery(
         self,
         last_file_edited: Optional[str] = None,
@@ -258,6 +270,7 @@ class IntentWALManager:
         self._write(self._current, self._current_path)
         return self._current
 
+    # PURPOSE: Load a WAL from file.
     def load(self, path: Path) -> IntentWAL:
         """Load a WAL from file."""
         with open(path, encoding="utf-8") as f:
@@ -267,6 +280,7 @@ class IntentWALManager:
         self._current_path = path
         return wal
 
+    # PURPOSE: Load the most recent WAL file.
     def load_latest(self) -> Optional[IntentWAL]:
         """Load the most recent WAL file."""
         files = sorted(self.wal_dir.glob("intent_*.yaml"), reverse=True)
@@ -274,6 +288,7 @@ class IntentWALManager:
             return None
         return self.load(files[0])
 
+    # PURPOSE: Convert current WAL to a Handoff-compatible section.
     def to_handoff_section(self) -> str:
         """Convert current WAL to a Handoff-compatible section."""
         if not self._current:
@@ -307,6 +322,7 @@ class IntentWALManager:
 
         return "\n".join(lines)
 
+    # PURPOSE: Convert current WAL to a Boot Report section.
     def to_boot_section(self) -> str:
         """Convert current WAL to a Boot Report section (for /boot integration)."""
         if not self._current:
@@ -328,15 +344,18 @@ class IntentWALManager:
         return "\n".join(lines)
 
     @property
+    # PURPOSE: Get current WAL.
     def current(self) -> Optional[IntentWAL]:
         """Get current WAL."""
         return self._current
 
     @property
+    # PURPOSE: Get current WAL file path.
     def current_path(self) -> Optional[Path]:
         """Get current WAL file path."""
         return self._current_path
 
+    # PURPOSE: Write WAL to YAML file.
     def _write(self, wal: IntentWAL, path: Path) -> None:
         """Write WAL to YAML file."""
         data = wal.to_dict()

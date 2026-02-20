@@ -1,3 +1,4 @@
+# PROOF: [L2/Ochema] <- mekhane/ochema/ A0→LLMルーティングが必要→ochemaが担う
 #!/usr/bin/env python3
 """LS Standalone Launcher — IDE なしで Language Server を直接起動する。
 

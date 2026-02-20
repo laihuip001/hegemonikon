@@ -1,3 +1,4 @@
+# PROOF: [L2/MCP] <- mekhane/mcp/ A0→外部ツール統合が必要→mcpが担う
 #!/usr/bin/env python3
 """
 MCP Base Module — Hegemonikón MCP Server Common Infrastructure

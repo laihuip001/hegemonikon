@@ -1,3 +1,4 @@
+# PROOF: [L2/Symploke] <- mekhane/symploke/ A0→レビュー統合が必要→symplokeが担う
 #!/usr/bin/env python3
 """Intent-WAL (Write-Ahead Log) Manager.
 

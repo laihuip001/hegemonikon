@@ -1,3 +1,4 @@
+# PROOF: [L2/API] <- mekhane/api/routes/ A0→APIエンドポイントが必要→routesが担う
 from typing import Any, AsyncGenerator
 
 import asyncio

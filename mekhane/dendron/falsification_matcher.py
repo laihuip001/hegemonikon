@@ -1,3 +1,4 @@
+# PROOF: [L2/品質] <- mekhane/dendron/ A3→構造維持が必要→Dendronが担う
 """
 Falsification Matcher — 消化論文の主張と epistemic_status.yaml の反証条件を照合
 

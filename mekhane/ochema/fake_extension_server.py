@@ -1,3 +1,4 @@
+# PROOF: [L2/LLM] <- mekhane/ochema/ S2→LLM駆動が必要→Ochemaが担う
 """Fake Extension Server — ConnectRPC over HTTP.
 
 LS は ConnectRPC (extension_server_go_proto_connect) で Extension Server に接続する。

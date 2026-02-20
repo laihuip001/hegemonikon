@@ -1,3 +1,4 @@
+# PROOF: [L2/API] <- mekhane/api/ P2→外部接続が必要→APIが担う
 from typing import Any, AsyncGenerator
 
 import asyncio

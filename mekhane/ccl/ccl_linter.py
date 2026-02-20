@@ -1,3 +1,4 @@
+# PROOF: [L2/CCL] <- mekhane/ccl/ S1→マクロ展開が必要→CCL拡張が担う
 """CCL Linter — CCL 式の静的検証。
 
 operators.md (SSOT) に基づいて CCL 式を検証し、

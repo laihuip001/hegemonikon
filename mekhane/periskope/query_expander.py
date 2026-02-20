@@ -1,3 +1,4 @@
+# PROOF: [L3/Sophia] <- mekhane/periskope/ K4→Search→Query
 """
 Query expander for Periskopē.
 

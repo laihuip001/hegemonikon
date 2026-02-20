@@ -1,3 +1,4 @@
+# PROOF: [L3/Sophia] <- mekhane/periskope/ K4→Search→Engine
 """
 Periskopē Deep Research Engine — Orchestrator.
 

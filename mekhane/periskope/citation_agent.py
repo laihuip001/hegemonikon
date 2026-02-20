@@ -1,3 +1,4 @@
+# PROOF: [L3/Sophia] <- mekhane/periskope/ K4→Search→Citation
 """
 Citation verification agent for Periskopē.
 

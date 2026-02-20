@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L3/Sophia] <- mekhane/periskope/ K4→Search→CLI
 """
 Periskopē CLI — Deep Research from the command line.
 

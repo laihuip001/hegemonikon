@@ -1,3 +1,4 @@
+# PROOF: [L3/Sophia] <- mekhane/periskope/ K4→Search→Init
 """
 Periskopē — HGK Deep Research Engine
 

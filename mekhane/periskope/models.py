@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/periskope/ A4→Verification→Periskope Search Engine
 """
 Periskopē data models.
 

@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] <- mekhane/api/ P1→空間が必要→api が担う
 from typing import Any, AsyncGenerator
 
 import asyncio

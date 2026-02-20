@@ -1,3 +1,4 @@
+# PROOF: [L1/言語] <- mekhane/ccl/ S1→解釈が必要→ccl が担う
 """CCL Linter — CCL 式の静的検証。
 
 operators.md (SSOT) に基づいて CCL 式を検証し、

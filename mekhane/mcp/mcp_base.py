@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/インフラ] <- mekhane/mcp/ P1→空間が必要→mcp が担う
 """
 MCP Base Module — Hegemonikón MCP Server Common Infrastructure
 

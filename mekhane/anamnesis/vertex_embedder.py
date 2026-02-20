@@ -1,3 +1,4 @@
+# PROOF: [L3/文脈] <- mekhane/anamnesis/ K3→想起が必要→anamnesis が担う
 import os
 import logging
 from google import genai

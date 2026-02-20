@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/インフラ] <- mekhane/basanos/ A2→判定が必要→basanos が担う
 # PURPOSE: Basanos L3 自動解決ループ — deficit→問い→解決策の自動生成
 # REASON: deficit を検出するだけでなく、解決への道筋を自動提案するため
 """Auto-resolution loop for Basanos L3.

@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] <- mekhane/ A0→実装責任
 """
 Query expander for Periskopē.
 

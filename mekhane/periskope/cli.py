@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/外部検索] <- mekhane/periskope/ O3→外部知見が必要→Periskopeが担う
 """
 Periskopē CLI — Deep Research from the command line.
 

@@ -1,3 +1,4 @@
+# PROOF: [L2/MCP] <- mekhane/mcp/ P1→ツール連携が必要→MCPが担う
 """
 MCP Guard — ゾンビプロセス防止の自己防衛モジュール
 

@@ -256,6 +256,7 @@ class DocStalenessChecker:
         return self._results
 
     # PURPOSE: 有向グラフの循環辺を検出し、CIRCULAR ステータスの判定材料にする
+    # PURPOSE: 循環依存を検出する
     @staticmethod
     def _detect_circular(edges: dict[str, set[str]]) -> set[tuple[str, str]]:
         """循環する辺ペアの集合を返す."""

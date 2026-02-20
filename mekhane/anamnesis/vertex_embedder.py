@@ -1,3 +1,4 @@
+# PROOF: [L2/埋め込み] <- mekhane/anamnesis/ K3→ベクトル化が必要→VertexEmbedderが担う
 import os
 import logging
 from google import genai

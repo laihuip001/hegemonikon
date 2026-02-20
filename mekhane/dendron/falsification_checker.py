@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] <- mekhane/dendron/ A0→健全性確認→S7反証条件のチェック
 """
 S7: Falsification Condition Checker
 

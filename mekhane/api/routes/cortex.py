@@ -1,3 +1,4 @@
+# PROOF: [L2/API] <- mekhane/api/ A0→APIエンドポイントが必要→cortex.pyが担う
 from typing import Any, AsyncGenerator
 
 import asyncio

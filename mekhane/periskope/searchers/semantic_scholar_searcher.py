@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/periskope/ A0→検索機能が必要→semantic_scholar_searcher.pyが担う
 """
 Semantic Scholar API client for Periskopē.
 

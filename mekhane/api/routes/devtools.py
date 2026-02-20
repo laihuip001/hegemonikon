@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- (Auto-fix) CI check compliance
 """
 DevTools API routes — ファイル操作・ターミナル・Ochema (AI) をフロントエンド DevTools ビューに提供。
 

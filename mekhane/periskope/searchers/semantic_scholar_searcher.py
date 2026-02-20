@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- (Auto-fix) CI check compliance
 """
 Semantic Scholar API client for Periskopē.
 

@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- (Auto-fix) CI check compliance
 """
 Page Fetcher — 選択的全文クロール for Periskopē.
 

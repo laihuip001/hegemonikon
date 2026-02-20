@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Periskope] <- kernel/axiom.md Axiom→DeepSearch
 """
 Periskopē CLI — Deep Research from the command line.
 

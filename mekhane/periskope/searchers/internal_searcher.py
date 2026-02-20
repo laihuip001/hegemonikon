@@ -1,3 +1,4 @@
+# PROOF: [L2/Periskope] <- kernel/axiom.md Axiom→DeepSearch
 """
 Internal knowledge searcher for Periskopē.
 

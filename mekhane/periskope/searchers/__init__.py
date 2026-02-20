@@ -1,3 +1,4 @@
+# PROOF: [L2/Periskope] <- kernel/axiom.md Axiom→DeepSearch
 """
 Periskopē searchers — pluggable search source adapters.
 

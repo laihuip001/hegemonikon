@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] <- mekhane/ A0→実装責任
 """
 Page Fetcher — 選択的全文クロール for Periskopē.
 

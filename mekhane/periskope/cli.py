@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Mekhanē] <- mekhane/ P1→Auto-fix
 """
 Periskopē CLI — Deep Research from the command line.
 

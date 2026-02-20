@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhanē] <- mekhane/ P1→Auto-fix
 """
 Periskopē data models.
 

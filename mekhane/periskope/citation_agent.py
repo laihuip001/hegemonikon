@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhanē] <- mekhane/ P1→Auto-fix
 """
 Citation verification agent for Periskopē.
 

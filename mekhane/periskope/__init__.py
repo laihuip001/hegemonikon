@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/periskope/ A0→検索機能が必要→__init__.pyが担う
 """
 Periskopē — HGK Deep Research Engine
 

@@ -1,3 +1,4 @@
+# PROOF: [L2/Dendron] <- mekhane/dendron/ A0→構造検証が必要→falsification_checker.pyが担う
 """
 S7: Falsification Condition Checker
 

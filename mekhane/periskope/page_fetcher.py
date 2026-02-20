@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/periskope/ A0→検索機能が必要→page_fetcher.pyが担う
 """
 Page Fetcher — 選択的全文クロール for Periskopē.
 

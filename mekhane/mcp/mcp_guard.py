@@ -1,3 +1,4 @@
+# PROOF: [L2/Infra] <- mekhane/mcp/ A0→MCP統合が必要→mcp_guard.pyが担う
 """
 MCP Guard — ゾンビプロセス防止の自己防衛モジュール
 

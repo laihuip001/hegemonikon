@@ -1,3 +1,4 @@
+# PROOF: [L1/Hermeneus] <- mekhane/ccl/ A0→CCL処理が必要→ccl_linter.pyが担う
 """CCL Linter — CCL 式の静的検証。
 
 operators.md (SSOT) に基づいて CCL 式を検証し、

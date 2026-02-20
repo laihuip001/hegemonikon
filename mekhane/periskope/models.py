@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/periskope/ A0→モデルが必要→modelsが担う
 """
 Periskopē data models.
 

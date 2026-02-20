@@ -1,3 +1,4 @@
+# PROOF: [L1/Hermeneus] <- mekhane/ccl/ A0→CCL処理が必要→operator_loader.pyが担う
 """operators.md の SSOT パーサー。
 
 operators.md の Markdown テーブルから演算子定義を抽出し、

@@ -1,3 +1,4 @@
+# PROOF: [L2/Ochema] <- mekhane/ochema/ A0→LLM統合が必要→ls_launcher.pyが担う
 #!/usr/bin/env python3
 """LS Standalone Launcher — IDE なしで Language Server を直接起動する。
 

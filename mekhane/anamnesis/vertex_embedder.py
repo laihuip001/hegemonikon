@@ -1,3 +1,4 @@
+# PROOF: [L3/Anamnesis] <- mekhane/anamnesis/ A0→記憶検索が必要→vertex_embedder.pyが担う
 import os
 import logging
 from google import genai

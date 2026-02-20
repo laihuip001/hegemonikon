@@ -345,6 +345,7 @@ class SchemaProver(ProverInterface):
         start: float
     ) -> ProofResult:
         """フォールバック検証"""
+        import time  # Local import to fix NameError without polluting top-level
         required = schema.get("required", [])
         missing = [f for f in required if f not in data]
         

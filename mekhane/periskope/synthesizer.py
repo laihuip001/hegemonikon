@@ -1,3 +1,4 @@
+# PROOF: [L3/機能] <- mekhane/periskope/ O3→探求手段が必要→periskopeが担う
 """
 Multi-model synthesizer for Periskopē.
 

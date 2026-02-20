@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L3/インターフェース] <- mekhane/mcp/ A0→コンテキスト統合が必要→mcpが担う
 """
 MCP Base Module — Hegemonikón MCP Server Common Infrastructure
 

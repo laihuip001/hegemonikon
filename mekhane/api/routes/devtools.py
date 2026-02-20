@@ -1,3 +1,4 @@
+# PROOF: [L3/インターフェース] <- mekhane/api/ A0→外部接続が必要→routesが担う
 """
 DevTools API routes — ファイル操作・ターミナル・Ochema (AI) をフロントエンド DevTools ビューに提供。
 

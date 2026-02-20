@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/検査] <- mekhane/basanos/ A2→試金石が必要→basanosが担う
 # PURPOSE: Basanos L2 問い生成 CLI — deficit 検出→問い生成→優先度表示
 # REASON: 全 deficit factory を統合実行し、HGK の構造的ズレを対話的に発見する
 """Basanos L2 CLI: Structural deficit detection and question generation.

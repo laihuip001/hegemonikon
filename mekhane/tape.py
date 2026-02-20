@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhanē] <- mekhane/ Auto-generated header
 """
 Tape Writer — WF 実行トレースを JSONL として記録する。
 

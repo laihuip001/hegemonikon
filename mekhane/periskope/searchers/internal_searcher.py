@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhanē] <- mekhane/ Auto-generated header
 """
 Internal knowledge searcher for Periskopē.
 

@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhanē] <- mekhane/ Auto-generated header
 """
 Page Fetcher — 選択的全文クロール for Periskopē.
 

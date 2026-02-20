@@ -1,3 +1,4 @@
+# PROOF: [L2/Impl] <- mekhane/periskope/ A0→実装が必要→synthesizer.py が担う
 """
 Multi-model synthesizer for Periskopē.
 

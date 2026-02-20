@@ -1,3 +1,4 @@
+# PROOF: [L2/Impl] <- mekhane/periskope/searchers/ A0→実装が必要→internal_searcher.py が担う
 """
 Internal knowledge searcher for Periskopē.
 

@@ -1,3 +1,4 @@
+# PROOF: [L2/Impl] <- mekhane/periskope/ A0→実装が必要→query_expander.py が担う
 """
 Query expander for Periskopē.
 

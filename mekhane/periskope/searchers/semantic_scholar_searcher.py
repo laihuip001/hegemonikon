@@ -1,3 +1,4 @@
+# PROOF: [L2/Impl] <- mekhane/periskope/searchers/ A0→実装が必要→semantic_scholar_searcher.py が担う
 """
 Semantic Scholar API client for Periskopē.
 

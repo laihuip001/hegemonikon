@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Impl] <- mekhane/periskope/ A0→実装が必要→cli.py が担う
 """
 Periskopē CLI — Deep Research from the command line.
 

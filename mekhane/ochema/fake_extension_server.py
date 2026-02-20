@@ -1,3 +1,4 @@
+# PROOF: [L2/Impl] <- mekhane/ochema/ A0→実装が必要→fake_extension_server.py が担う
 """Fake Extension Server — ConnectRPC over HTTP.
 
 LS は ConnectRPC (extension_server_go_proto_connect) で Extension Server に接続する。

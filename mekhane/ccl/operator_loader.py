@@ -1,3 +1,4 @@
+# PROOF: [L2/Impl] <- mekhane/ccl/ A0→実装が必要→operator_loader.py が担う
 """operators.md の SSOT パーサー。
 
 operators.md の Markdown テーブルから演算子定義を抽出し、

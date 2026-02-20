@@ -1,3 +1,4 @@
+# PROOF: [L2/Impl] <- mekhane/periskope/searchers/ A0→実装が必要→playwright_searcher.py が担う
 """
 Playwright-based searcher for Periskopē.
 

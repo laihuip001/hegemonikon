@@ -1,3 +1,4 @@
+# PROOF: [L2/Impl] <- mekhane/periskope/ A0→実装が必要→__init__.py が担う
 """
 Periskopē — HGK Deep Research Engine
 

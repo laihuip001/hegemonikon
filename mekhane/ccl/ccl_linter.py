@@ -1,3 +1,4 @@
+# PROOF: [L2/Impl] <- mekhane/ccl/ A0→実装が必要→ccl_linter.py が担う
 """CCL Linter — CCL 式の静的検証。
 
 operators.md (SSOT) に基づいて CCL 式を検証し、

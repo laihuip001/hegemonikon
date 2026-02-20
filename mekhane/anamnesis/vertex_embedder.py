@@ -1,3 +1,4 @@
+# PROOF: [L2/Impl] <- mekhane/anamnesis/ A0→実装が必要→vertex_embedder.py が担う
 import os
 import logging
 from google import genai

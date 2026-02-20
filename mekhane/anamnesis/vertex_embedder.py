@@ -1,3 +1,4 @@
+# PROOF: [K3/Anamnēsis] <- mekhane/anamnesis/
 import os
 import logging
 from google import genai

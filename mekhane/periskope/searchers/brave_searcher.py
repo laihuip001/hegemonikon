@@ -1,3 +1,4 @@
+# PROOF: [L2/Impl] <- mekhane/ Missing proof retrofitting via CI fix
 """
 Brave Search API client for Periskopē.
 

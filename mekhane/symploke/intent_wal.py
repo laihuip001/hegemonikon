@@ -26,8 +26,8 @@ WAL_DIR = Path.home() / "oikos" / "mneme" / ".hegemonikon" / "wal"
 CONTEXT_HEALTH_LEVELS = ("green", "yellow", "orange", "red")
 
 
-@dataclass
 # PURPOSE: A single progress log entry (append-only).
+@dataclass
 class ProgressEntry:
     """A single progress log entry (append-only)."""
 
@@ -50,8 +50,8 @@ class ProgressEntry:
         return d
 
 
-@dataclass
 # PURPOSE: Intent-WAL data structure.
+@dataclass
 class IntentWAL:
     """Intent-WAL data structure."""
 

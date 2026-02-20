@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/api/routes/ O3→Zētēsis→Cortex API
 from typing import Any, AsyncGenerator
 
 import asyncio

@@ -1,3 +1,4 @@
+# PROOF: [L3/機能] <- mekhane/anamnesis/ K3→記憶検索が必要→anamnesisが担う
 import os
 import logging
 from google import genai

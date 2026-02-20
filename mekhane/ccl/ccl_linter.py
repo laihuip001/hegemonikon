@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] <- mekhane/ccl/ S1→言語基盤が必要→cclモジュールが担う
 """CCL Linter — CCL 式の静的検証。
 
 operators.md (SSOT) に基づいて CCL 式を検証し、

@@ -1,3 +1,4 @@
+# PROOF: [L2/品質] <- mekhane/dendron/ A2→自己検証が必要→dendronが担う
 """
 S7: Falsification Condition Checker
 

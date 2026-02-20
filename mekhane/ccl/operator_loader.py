@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] <- mekhane/ccl/ S1→言語基盤が必要→cclモジュールが担う
 """operators.md の SSOT パーサー。
 
 operators.md の Markdown テーブルから演算子定義を抽出し、

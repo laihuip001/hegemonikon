@@ -1,3 +1,4 @@
+# PROOF: [L3/インターフェース] <- mekhane/api/ A0→外部接続が必要→routesが担う
 from typing import Any, AsyncGenerator
 
 import asyncio

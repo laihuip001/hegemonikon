@@ -1,4 +1,4 @@
-# PROOF: [L2/Basanos] <- mekhane/basanos/l2/deficit_factories.py 41/41 テスト (tests/test_l2.py, tests/test_extensions.py) + CLI scan 0 deficit
+# PROOF: [L2/Basanos] <- mekhane/basanos/l2/ REASON: 41/41 テスト + CLI scan 0 deficit
 # PURPOSE: 3種の deficit (η, ε, Δε/Δt) を検出するファクトリ群
 # REASON: F⊣G 随伴構造の「破れ」を自動検出し、問いに変換するため
 """Deficit factories for Basanos L2.

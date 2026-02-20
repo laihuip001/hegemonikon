@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/ Missing proof filled by CI fix
 #!/usr/bin/env python3
 """
 MCP Base Module — Hegemonikón MCP Server Common Infrastructure

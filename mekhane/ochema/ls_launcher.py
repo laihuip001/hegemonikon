@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/ Missing proof filled by CI fix
 #!/usr/bin/env python3
 """LS Standalone Launcher — IDE なしで Language Server を直接起動する。
 

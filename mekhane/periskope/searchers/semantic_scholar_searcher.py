@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/ Missing proof filled by CI fix
 """
 Semantic Scholar API client for Periskopē.
 

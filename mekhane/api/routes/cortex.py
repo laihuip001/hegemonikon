@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/api/routes/cortex.py A0→継続する私が必要→CI Compliance
 from typing import Any, AsyncGenerator
 
 import asyncio

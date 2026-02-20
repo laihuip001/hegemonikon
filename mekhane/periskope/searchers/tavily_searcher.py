@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/periskope/searchers/tavily_searcher.py A0→継続する私が必要→CI Compliance
 """
 Tavily Search API client for Periskopē.
 

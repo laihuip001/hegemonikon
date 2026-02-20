@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/periskope/searchers/__init__.py A0→継続する私が必要→CI Compliance
 """
 Periskopē searchers — pluggable search source adapters.
 

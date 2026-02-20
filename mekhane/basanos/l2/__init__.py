@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/basanos/l2/__init__.py A0→継続する私が必要→CI Compliance
 # PURPOSE: L2 問い生成機構 — 構造的差分検出によるズレの発見
 # REASON: F⊣G 随伴構造の ε/η deficit を具象化し、自動的に問いを生成するため
 """

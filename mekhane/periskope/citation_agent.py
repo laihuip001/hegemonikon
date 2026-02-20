@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/periskope/citation_agent.py A0→継続する私が必要→CI Compliance
 """
 Citation verification agent for Periskopē.
 

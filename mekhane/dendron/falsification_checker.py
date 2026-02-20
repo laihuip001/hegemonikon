@@ -1,3 +1,4 @@
+# PROOF: [L2/品質] <- mekhane/dendron/ A2→反証可能性の確保→falsification_checkerが担う
 """
 S7: Falsification Condition Checker
 

@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] <- mekhane/periskope/searchers/ A0→継続する私が必要→initが担う
 """
 Periskopē searchers — pluggable search source adapters.
 

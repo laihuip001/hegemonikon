@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] <- mekhane/periskope/ A0→継続する私が必要→engineが担う
 """
 Periskopē Deep Research Engine — Orchestrator.
 

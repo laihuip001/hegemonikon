@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] <- mekhane/anamnesis/ A0→継続する私が必要→vertex_embedderが担う
 import os
 import logging
 from google import genai

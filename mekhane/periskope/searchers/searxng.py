@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] <- mekhane/periskope/searchers/ A0→継続する私が必要→searxngが担う
 """
 SearXNG search client for Periskopē.
 

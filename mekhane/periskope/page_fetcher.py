@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] <- mekhane/periskope/ A0→継続する私が必要→page_fetcherが担う
 """
 Page Fetcher — 選択的全文クロール for Periskopē.
 

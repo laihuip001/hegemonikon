@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] <- mekhane/periskope/searchers/ A0→継続する私が必要→semantic_scholar_searcherが担う
 """
 Semantic Scholar API client for Periskopē.
 

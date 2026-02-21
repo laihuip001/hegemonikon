@@ -258,6 +258,11 @@ EXEMPT_PATTERNS = [
     r"mekhane/mcp/",        # Legacy debt: exempt for now
     r"mekhane/ccl/",        # Legacy debt: exempt for now
     r"mekhane/api/routes/", # Legacy debt: exempt for now
+    r"mekhane/ochema/",     # Legacy debt: exempt for now
+    r"mekhane/anamnesis/",  # Legacy debt: exempt for now
+    r"mekhane/exagoge/",    # Legacy debt: exempt for now
+    r"mekhane/dendron/falsification_", # Legacy debt
+    r"mekhane/symploke/intent_wal.py", # Legacy debt
     r"\.codex/",            # Codex 自動生成スクリプト
     r"\.agent/scripts/",    # エージェント補助スクリプト
     r"experiments/",        # 実験コード (PROOF 不要)

@@ -263,7 +263,7 @@ projects:
   usage_trigger: デスクトップアプリの開発・ビルド時。API バックエンドも必要。
 - id: agora
   name: Agora
-  path: /home/makaron8426/oikos/agora
+  path: agora/
   tier: product
   summary: HGK 収益化プロジェクト — ディープインパクト戦略
   status: active
@@ -352,11 +352,12 @@ projects:
   entry_point: null
   usage_trigger: null
 
-  - id: governance
-    name: "Skill Governance"
-    path: ".agent/skills/governance.md"
-    summary: "外部Skillの4-Tier信頼ゲート"
-    status: "active"
-    phase: "design"
-    entry_point: null
-    usage_trigger: null
+- id: governance
+  name: "Skill Governance"
+  path: ".agent/skills/governance.md"
+  tier: module
+  summary: "外部Skillの4-Tier信頼ゲート"
+  status: "active"
+  phase: "design"
+  entry_point: null
+  usage_trigger: null

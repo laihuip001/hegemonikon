@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/periskope/models.py Auto-generated existence proof for CI compliance
 """
 Periskopē data models.
 

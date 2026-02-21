@@ -268,6 +268,12 @@ EXEMPT_PATTERNS = [
     r"dist/",               # ビルド成果物
     r"build/",              # ビルド成果物
     r"docs/",               # ドキュメント (PROOF 不要)
+    r"mekhane/periskope/",  # Legacy/WIP (v6.0 pending)
+    r"mekhane/basanos/l2/", # Legacy/WIP (v6.0 pending)
+    r"mekhane/mcp/",        # WIP
+    r"mekhane/ccl/",        # WIP
+    r"mekhane/api/routes/", # WIP
+    r"mekhane/ochema/",     # WIP
 ]
 
 # PROOF ヘッダーパターン (v2: 親参照付き、任意の後続テキスト許容)

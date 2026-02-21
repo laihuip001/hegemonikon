@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Impl] <- mekhane/mcp/ Automated fix for CI
 """
 MCP Base Module — Hegemonikón MCP Server Common Infrastructure
 

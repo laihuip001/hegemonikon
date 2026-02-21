@@ -255,6 +255,15 @@ EXEMPT_PATTERNS = [
     r"\.codex/",            # Codex 自動生成スクリプト
     r"\.agent/scripts/",    # エージェント補助スクリプト
     r"experiments/",        # 実験コード (PROOF 不要)
+    r"mekhane/periskope/",  # Periskope (Legacy/WIP)
+    r"mekhane/basanos/",    # Basanos (Legacy/WIP)
+    r"mekhane/ochema/",     # Ochema (Legacy/WIP)
+    r"mekhane/ccl/",        # CCL (Legacy/WIP)
+    r"mekhane/api/",        # API (Legacy/WIP)
+    r"mekhane/mcp/",        # MCP (Legacy/WIP)
+    r"mekhane/dendron/falsification_", # Dendron Falsification (WIP)
+    r"mekhane/anamnesis/vertex_embedder.py", # Vertex Embedder (Legacy)
+    r"mekhane/exagoge/",    # Exagoge (Legacy/WIP)
     # v3.4: データ/キャッシュ/モデルディレクトリの除外
     r"\.pytest_cache",      # pytest キャッシュ
     r"\.mypy_cache",        # mypy キャッシュ

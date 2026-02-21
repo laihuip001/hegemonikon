@@ -351,12 +351,12 @@ projects:
   phase: "design"
   entry_point: null
   usage_trigger: null
-
-  - id: governance
-    name: "Skill Governance"
-    path: ".agent/skills/governance.md"
-    summary: "外部Skillの4-Tier信頼ゲート"
-    status: "active"
-    phase: "design"
-    entry_point: null
-    usage_trigger: null
+- id: governance
+  name: "Skill Governance"
+  path: ".agent/skills/governance.md"
+  tier: concept
+  summary: "外部Skillの4-Tier信頼ゲート"
+  status: "active"
+  phase: "design"
+  entry_point: null
+  usage_trigger: null

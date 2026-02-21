@@ -268,6 +268,8 @@ EXEMPT_PATTERNS = [
     r"dist/",               # ビルド成果物
     r"build/",              # ビルド成果物
     r"docs/",               # ドキュメント (PROOF 不要)
+    r"_pb2\.py$",           # Protobuf 生成コード
+    r"_pb2_grpc\.py$",      # gRPC 生成コード
 ]
 
 # PROOF ヘッダーパターン (v2: 親参照付き、任意の後続テキスト許容)

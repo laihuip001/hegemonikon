@@ -1,3 +1,4 @@
+# PROOF: [L2/Anamnesis] <- mekhane/anamnesis/ A0→Foundational→Module
 import os
 import logging
 from google import genai

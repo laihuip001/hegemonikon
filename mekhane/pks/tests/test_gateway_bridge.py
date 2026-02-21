@@ -1,3 +1,4 @@
+# PROOF: [L2/Impl] <- mekhane/ Automated fix for CI
 """
 GatewayBridge テスト — E2E + 単体テスト
 

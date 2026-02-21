@@ -1,3 +1,4 @@
+# PROOF: [L2/Impl] <- mekhane/ Automated fix for CI
 """Tests for pw_adapter.py — L1↔L2 PW bridge."""
 
 import pytest

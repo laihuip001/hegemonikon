@@ -1,3 +1,4 @@
+# PROOF: [L2/Impl] <- mekhane/ Automated fix for CI
 """
 Tests for PageFetcher (W7: selective full-page crawling).
 """

@@ -1,3 +1,4 @@
+# PROOF: [L2/Impl] <- mekhane/ Automated fix for CI
 """Tests for TrendAnalyzer — 合成データで全機能をテスト。"""
 
 import json

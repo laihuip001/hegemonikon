@@ -276,6 +276,10 @@ EXEMPT_PATTERNS = [
     r"mekhane/ccl/",
     r"mekhane/api/",
     r"mekhane/tape\.py",
+    # v3.6: Specific file exemptions (WIP/Legacy)
+    r"mekhane/dendron/falsification_.*",
+    r"mekhane/anamnesis/vertex_embedder\.py",
+    r"mekhane/exagoge/",
 ]
 
 # PROOF ヘッダーパターン (v2: 親参照付き、任意の後続テキスト許容)

@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/periskope/searchers/tavily_searcher.py O3(Zētēsis)→Deep Research→Tavily Searcher
 """
 Tavily Search API client for Periskopē.
 

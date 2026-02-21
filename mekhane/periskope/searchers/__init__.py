@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/periskope/searchers/__init__.py O3(Zētēsis)→Deep Research→Searcher Registry
 """
 Periskopē searchers — pluggable search source adapters.
 

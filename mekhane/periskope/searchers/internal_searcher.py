@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/ A0->Structure->Quality
 """
 Internal knowledge searcher for Periskopē.
 

@@ -1,3 +1,5 @@
+# PROOF: [L2/Infra] <- mekhane/periskope/searchers/ A0->AutoFix
+
 """
 Brave Search API client for Periskopē.
 

@@ -1,3 +1,5 @@
+# PROOF: [L2/Infra] <- mekhane/periskope/ A0->AutoFix
+
 """
 Page Fetcher — 選択的全文クロール for Periskopē.
 

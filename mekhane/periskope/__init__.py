@@ -1,3 +1,5 @@
+# PROOF: [L2/Infra] <- mekhane/periskope/ A0->AutoFix
+
 """
 Periskopē — HGK Deep Research Engine
 

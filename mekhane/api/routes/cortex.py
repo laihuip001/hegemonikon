@@ -1,3 +1,5 @@
+# PROOF: [L2/Infra] <- mekhane/api/routes/ A0->AutoFix
+
 from typing import Any, AsyncGenerator
 
 import asyncio

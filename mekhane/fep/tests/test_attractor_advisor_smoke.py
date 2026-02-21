@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] <- mekhane/fep/tests/ 自動生成された証明
 """Smoke test: attractor_advisor.py が import 可能であることを保証する。
 
 /dia+ で指摘された死角:

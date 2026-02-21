@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/インフラ] <- mekhane/ergasterion/tekhne/tests/ 自動生成された証明
 """
 Tests for Sweep Engine and Deep Engine — Cortex Refine Integration
 

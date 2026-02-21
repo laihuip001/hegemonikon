@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] <- mekhane/ochema/tests/ 自動生成された証明
 """Ochema AI Tool Use — Unit Tests.
 
 Tests for tools.py: 7 tools + Claude parser + system templates + audit log.

@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] <- mekhane/basanos/tests/ 自動生成された証明
 """Tests for GitMetrics — git 履歴からのリスク予兆検出。"""
 
 import subprocess

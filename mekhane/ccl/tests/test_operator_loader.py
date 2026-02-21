@@ -1,3 +1,4 @@
+# PROOF: [L2/言語] <- mekhane/ccl/tests/ 自動生成された証明
 """G6: dispatch E2E テスト + G9: Linter テスト + operator_loader テスト。"""
 
 import pytest

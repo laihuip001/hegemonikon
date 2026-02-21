@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] <- mekhane/basanos/gateway/tests/ 自動生成された証明
 """
 Injection Regression Test Suite — 6攻撃ベクタによるセキュリティ検証
 

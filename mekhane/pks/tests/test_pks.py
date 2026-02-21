@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] <- mekhane/pks/tests/ 自動生成された証明
 # PURPOSE: PKS v2 全モジュールの pytest テスト
 """
 PKS v2 テストスイート

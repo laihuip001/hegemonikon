@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] <- mekhane/pks/tests/ 自動生成された証明
 """
 GatewayBridge テスト — E2E + 単体テスト
 

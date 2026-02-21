@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/インフラ] <- mekhane/ochema/tests/ 自動生成された証明
 """F0 Tool Use — 手動検証スクリプト.
 
 Usage:

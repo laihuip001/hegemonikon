@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/インフラ] <- mekhane/fep/tests/ 自動生成された証明
 """Tests for two_cell.py — Weak 2-category structure."""
 
 import sys

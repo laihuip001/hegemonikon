@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] <- mekhane/api/tests/ 自動生成された証明
 """
 Tests for Timeline, Kalon, and Symploke Mnēmē API routes.
 """

@@ -1,3 +1,4 @@
+# PROOF: [L2/Impl] <- mekhane/ccl/ Automated fix for CI
 """CCL Linter — CCL 式の静的検証。
 
 operators.md (SSOT) に基づいて CCL 式を検証し、

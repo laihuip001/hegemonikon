@@ -1,0 +1,29 @@
+Metadata-Version: 2.4
+Name: hegemonikon
+Version: 0.1.0
+Summary: FEP-based cognitive hypervisor framework
+Requires-Python: >=3.11
+License-File: LICENSE
+Requires-Dist: fastapi
+Requires-Dist: uvicorn
+Requires-Dist: pydantic
+Requires-Dist: pyyaml
+Requires-Dist: requests
+Requires-Dist: httpx
+Requires-Dist: sentence-transformers
+Requires-Dist: lancedb
+Requires-Dist: numpy
+Requires-Dist: scipy
+Requires-Dist: pandas
+Requires-Dist: networkx
+Requires-Dist: tabulate
+Requires-Dist: schedule
+Requires-Dist: pytest
+Requires-Dist: pytest-asyncio
+Requires-Dist: pytest-timeout
+Provides-Extra: test
+Requires-Dist: pytest; extra == "test"
+Requires-Dist: pytest-asyncio; extra == "test"
+Requires-Dist: pytest-timeout; extra == "test"
+Requires-Dist: httpx; extra == "test"
+Dynamic: license-file

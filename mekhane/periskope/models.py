@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/periskope/models.py Auto-generated for CI
 """
 Periskopē data models.
 

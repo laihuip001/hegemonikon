@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/periskope/__init__.py Auto-generated for CI
 """
 Periskopē — HGK Deep Research Engine
 

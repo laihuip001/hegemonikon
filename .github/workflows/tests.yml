@@ -44,8 +44,10 @@ jobs:
                   # Install PyTorch CPU first to avoid pulling large GPU wheels
                   pip install torch --index-url https://download.pytorch.org/whl/cpu
                   # Install other dependencies
+                  # Added fastapi, aiohttp, python-dotenv, filelock for TestClient and PKS/Symploke tests
                   pip install pytest pytest-asyncio pytest-timeout pyyaml pydantic lancedb numpy scipy \
                               networkx pandas tabulate requests httpx schedule \
+                              fastapi aiohttp python-dotenv filelock \
                               sentence-transformers
                   # Install project in development mode if setup exists
                   pip install -e ".[test]" 2>/dev/null || true

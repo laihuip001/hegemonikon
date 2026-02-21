@@ -100,6 +100,7 @@ class DocStalenessChecker:
         "node_modules", ".pytest_cache",
     })
 
+    # PURPOSE: インスタンスを初期化し、結果格納用リストを準備する
     def __init__(self) -> None:
         self._docs: Dict[str, DocInfo] = {}
         self._results: List[StalenessResult] = []

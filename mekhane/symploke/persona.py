@@ -20,10 +20,8 @@ import yaml
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 
-PERSONA_PATH = Path("/home/makaron8426/oikos/mneme/.hegemonikon/persona.yaml")
-CREATOR_PROFILE_PATH = Path(
-    "/home/makaron8426/oikos/mneme/.hegemonikon/creator_profile.yaml"
-)
+PERSONA_PATH = Path.home() / "oikos" / "mneme" / ".hegemonikon" / "persona.yaml"
+CREATOR_PROFILE_PATH = Path.home() / "oikos" / "mneme" / ".hegemonikon" / "creator_profile.yaml"
 
 # デフォルトの persona
 DEFAULT_PERSONA = {

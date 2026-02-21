@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] <- mekhane/api/routes/ 自動生成された証明
 from typing import Any, AsyncGenerator
 
 import asyncio

@@ -1,3 +1,4 @@
+# PROOF: [L2/品質] <- mekhane/dendron/ 自動生成された証明
 """
 S7: Falsification Condition Checker
 

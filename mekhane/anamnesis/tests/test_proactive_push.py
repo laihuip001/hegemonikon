@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] <- mekhane/anamnesis/tests/ 自動生成された証明
 """Proactive Push + Link Graph のテスト."""
 
 import json

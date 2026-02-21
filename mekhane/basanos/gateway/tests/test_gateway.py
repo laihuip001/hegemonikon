@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] <- mekhane/basanos/gateway/tests/ 自動生成された証明
 """
 MCP Gateway — 統合テスト
 

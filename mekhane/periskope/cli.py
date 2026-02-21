@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/検索] <- mekhane/periskope/ 自動生成された証明
 """
 Periskopē CLI — Deep Research from the command line.
 

@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/インフラ] <- mekhane/pks/tests/ 自動生成された証明
 """F6c: Gateway Stats API endpoint tests."""
 
 import pytest

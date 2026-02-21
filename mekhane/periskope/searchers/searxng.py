@@ -1,3 +1,4 @@
+# PROOF: [L2/検索] <- mekhane/periskope/searchers/ 自動生成された証明
 """
 SearXNG search client for Periskopē.
 

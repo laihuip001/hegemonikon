@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/統合] <- mekhane/symploke/ 自動生成された証明
 """Intent-WAL (Write-Ahead Log) Manager.
 
 Manages session intent WAL files for crash recovery and context continuity.

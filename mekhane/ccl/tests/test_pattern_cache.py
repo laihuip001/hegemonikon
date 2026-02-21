@@ -1,3 +1,4 @@
+# PROOF: [L2/言語] <- mekhane/ccl/tests/ 自動生成された証明
 """Tests for mekhane.ccl.pattern_cache.PatternCache."""
 
 import unittest

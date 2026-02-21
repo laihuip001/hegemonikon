@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] <- mekhane/poiema/flow/tests/ 自動生成された証明
 """
 Poiema __init__.py 統合テスト
 

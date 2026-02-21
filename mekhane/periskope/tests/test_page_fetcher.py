@@ -1,3 +1,4 @@
+# PROOF: [L2/検索] <- mekhane/periskope/tests/ 自動生成された証明
 """
 Tests for PageFetcher (W7: selective full-page crawling).
 """

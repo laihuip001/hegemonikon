@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] <- mekhane/fep/tests/ 自動生成された証明
 """Tests for mekhane.fep.universality — Kalon (圏論的普遍性検証)."""
 
 import json

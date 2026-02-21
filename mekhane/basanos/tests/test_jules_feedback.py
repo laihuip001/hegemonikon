@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] <- mekhane/basanos/tests/ 自動生成された証明
 """Tests for JulesFeedback — L2結果→L0精度フィードバック。"""
 
 import json

@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] <- mekhane/ochema/ 自動生成された証明
 """Fake Extension Server — ConnectRPC over HTTP.
 
 LS は ConnectRPC (extension_server_go_proto_connect) で Extension Server に接続する。

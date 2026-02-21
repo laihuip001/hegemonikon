@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] <- mekhane/fep/tests/ 自動生成された証明
 """UML Phase 2 — SEL 統合テスト"""
 
 import pytest

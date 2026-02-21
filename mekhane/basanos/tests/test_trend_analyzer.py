@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] <- mekhane/basanos/tests/ 自動生成された証明
 """Tests for TrendAnalyzer — 合成データで全機能をテスト。"""
 
 import json

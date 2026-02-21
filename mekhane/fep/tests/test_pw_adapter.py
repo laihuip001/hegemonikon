@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] <- mekhane/fep/tests/ 自動生成された証明
 """Tests for pw_adapter.py — L1↔L2 PW bridge."""
 
 import pytest

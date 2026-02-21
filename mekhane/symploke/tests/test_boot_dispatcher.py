@@ -1,3 +1,4 @@
+# PROOF: [L2/統合] <- mekhane/symploke/tests/ 自動生成された証明
 """
 Tests for Dispatcher integration in boot_integration.py
 

@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] <- mekhane/synteleia/tests/ 自動生成された証明
 """
 Tests for SemanticAgent (L2)
 """

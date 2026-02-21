@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/統合] <- mekhane/symploke/tests/ 自動生成された証明
 """Tests for boot_integration template generation and postcheck."""
 
 import sys

@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] <- mekhane/synteleia/tests/ 自動生成された証明
 # PURPOSE: MultiSemanticAgent のテスト (Layer B: Nous)
 """
 Tests for Multi-LLM Ensemble Audit Agent.

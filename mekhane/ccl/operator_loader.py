@@ -1,3 +1,4 @@
+# PROOF: [L2/言語] <- mekhane/ccl/ 自動生成された証明
 """operators.md の SSOT パーサー。
 
 operators.md の Markdown テーブルから演算子定義を抽出し、

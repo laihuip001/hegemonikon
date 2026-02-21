@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/MCP] <- mekhane/mcp/tests/ 自動生成された証明
 """
 L1 動的セキュリティテスト — hgk_gateway
 

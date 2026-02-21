@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] <- mekhane/ochema/tests/ 自動生成された証明
 """Ochēma unit tests: context_health, _select_model, archive_sessions.
 
 LS 非接続環境でもテスト可能。AntigravityClient のメソッドを

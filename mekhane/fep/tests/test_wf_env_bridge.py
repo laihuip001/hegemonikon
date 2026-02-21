@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] <- mekhane/fep/tests/ 自動生成された証明
 """Tests for wf_env_bridge — WF turbo inter-step context store."""
 
 import json

@@ -26,7 +26,12 @@ from typing import Optional, List
 import json
 
 # Default persistence path
-TRACES_PATH = Path("/home/makaron8426/oikos/mneme/.hegemonikon/meaningful_traces.json")
+# Use home directory to support CI and multiple users
+TRACES_PATH = Path.home() / "oikos/mneme/.hegemonikon/meaningful_traces.json"
+
+# CI/Container fallback
+if not TRACES_PATH.parent.parent.parent.exists() and Path("/tmp").exists():
+    TRACES_PATH = Path("/tmp/hegemonikon/meaningful_traces.json")
 
 
 # PURPOSE: の統一的インターフェースを実現する
@@ -53,9 +58,10 @@ class MeaningfulTrace:
 # PURPOSE: Ensure the persistence directory exists.
 
 
-def ensure_traces_dir() -> None:
+def ensure_traces_dir(path: Optional[Path] = None) -> None:
     """Ensure the persistence directory exists."""
-    TRACES_PATH.parent.mkdir(parents=True, exist_ok=True)
+    target = path or TRACES_PATH
+    target.parent.mkdir(parents=True, exist_ok=True)
 # PURPOSE: Mark a moment as meaningful.
 
 
@@ -125,7 +131,7 @@ def save_traces(path: Optional[Path] = None) -> Path:
         Path where traces were saved
     """
     target_path = path or TRACES_PATH
-    ensure_traces_dir()
+    ensure_traces_dir(target_path)
 
     # Load existing traces
     existing = load_traces(target_path)

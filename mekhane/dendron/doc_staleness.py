@@ -100,11 +100,13 @@ class DocStalenessChecker:
         "node_modules", ".pytest_cache",
     })
 
+    # PURPOSE: インスタンスを初期化し、結果格納用リストを準備する
     def __init__(self) -> None:
         self._docs: Dict[str, DocInfo] = {}
         self._results: List[StalenessResult] = []
         self._warnings: List[str] = []
 
+    # PURPOSE: scan 時に発生した警告一覧を取得し、レポートに含める
     @property
     def warnings(self) -> List[str]:
         """scan 時の警告 (doc_id 重複等)."""

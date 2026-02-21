@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/ A0->Structure->Quality
 from typing import Any, AsyncGenerator
 
 import asyncio

@@ -45,10 +45,10 @@ function createPaletteHTML(): string {
       <div class="cp-dialog">
         <div class="cp-input-wrapper">
           <span class="cp-icon">⌘</span>
-          <input type="text" id="cp-input" class="cp-input" placeholder="Type a workflow name or CCL expression..." autocomplete="off" />
+          <input type="text" id="cp-input" class="cp-input" placeholder="Type a workflow name or CCL expression..." autocomplete="off" role="combobox" aria-expanded="true" aria-haspopup="listbox" aria-controls="cp-results" aria-label="Command Palette" />
           <kbd class="cp-kbd">ESC</kbd>
         </div>
-        <div class="cp-results" id="cp-results"></div>
+        <div class="cp-results" id="cp-results" role="listbox" aria-label="Search Results"></div>
         <div class="cp-footer">
           <span>↑↓ Navigate</span>
           <span>↵ Execute</span>
@@ -381,10 +381,43 @@ let activeIdx = 0;
 function updateActive(resultsEl: HTMLElement, delta: number): void {
   const items = resultsEl.querySelectorAll('.cp-item');
   if (items.length === 0) return;
-  items[activeIdx]?.classList.remove('cp-item-active');
+
+  // Remove active state
+  const current = items[activeIdx];
+  current?.classList.remove('cp-item-active');
+  current?.setAttribute('aria-selected', 'false');
+
   activeIdx = Math.max(0, Math.min(items.length - 1, activeIdx + delta));
-  items[activeIdx]?.classList.add('cp-item-active');
-  (items[activeIdx] as HTMLElement)?.scrollIntoView({ block: 'nearest' });
+
+  // Add active state
+  const next = items[activeIdx] as HTMLElement;
+  next?.classList.add('cp-item-active');
+  next?.setAttribute('aria-selected', 'true');
+  next?.scrollIntoView({ block: 'nearest' });
+
+  // Update aria-activedescendant
+  const input = document.getElementById('cp-input');
+  if (input && next.id) input.setAttribute('aria-activedescendant', next.id);
+}
+
+function setupA11yItems(input: HTMLInputElement, resultsEl: HTMLElement) {
+  const allItems = resultsEl.querySelectorAll('.cp-item');
+  if (allItems.length === 0) {
+    input.removeAttribute('aria-activedescendant');
+    return;
+  }
+  allItems.forEach((el, i) => {
+    el.id = `cp-item-${i}`;
+    el.setAttribute('role', 'option');
+    if (i === 0) {
+      el.classList.add('cp-item-active');
+      el.setAttribute('aria-selected', 'true');
+      input.setAttribute('aria-activedescendant', el.id);
+    } else {
+      el.classList.remove('cp-item-active');
+      el.setAttribute('aria-selected', 'false');
+    }
+  });
 }
 
 async function handleInput(input: HTMLInputElement, resultsEl: HTMLElement): Promise<void> {
@@ -409,11 +442,13 @@ async function handleInput(input: HTMLInputElement, resultsEl: HTMLElement): Pro
         </div>`;
       const btn = resultsEl.querySelector('#cp-quick-exec');
       btn?.addEventListener('click', () => match.action(arg));
+      setupA11yItems(input, resultsEl);
       return;
     }
     // Show filtered quick actions
     resultsEl.innerHTML = renderQuickActions(cmd);
     activeIdx = 0;
+    setupA11yItems(input, resultsEl);
     // Click handlers for quick action items
     resultsEl.querySelectorAll('.cp-quick-action').forEach(item => {
       item.addEventListener('click', () => {
@@ -471,6 +506,8 @@ async function handleInput(input: HTMLInputElement, resultsEl: HTMLElement): Pro
   resultsEl.innerHTML = routeSection +
     (filtered.length > 0 ? `<div class="cp-section-label">ワークフロー</div>` : '') +
     renderWFItems(filtered);
+
+  setupA11yItems(input, resultsEl);
 
   // Click handlers — routes
   resultsEl.querySelectorAll('.cp-route-item').forEach(item => {

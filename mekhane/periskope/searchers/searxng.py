@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/periskope/searchers/ A0->Module
 """
 SearXNG search client for Periskopē.
 

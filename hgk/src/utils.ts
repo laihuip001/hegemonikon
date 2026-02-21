@@ -45,20 +45,24 @@ export function animateCountUp(el: HTMLElement, target: number, duration = 800):
 
 /** Apply count-up animation to all [data-count-target] elements within a container */
 export function applyCountUpAnimations(container: HTMLElement): void {
-    container.querySelectorAll('[data-count-target]').forEach(el => {
-        const target = parseFloat((el as HTMLElement).dataset.countTarget || '0');
-        if (target > 0) {
-            const observer = new IntersectionObserver(entries => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        animateCountUp(el as HTMLElement, target);
-                        observer.disconnect();
-                    }
-                });
-            });
-            observer.observe(el);
-        }
+    const elements = container.querySelectorAll('[data-count-target]');
+    if (elements.length === 0) return;
+
+    // Use a single observer for all elements (Bolt Optimization: O(N) observers -> O(1))
+    const observer = new IntersectionObserver((entries, obs) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const el = entry.target as HTMLElement;
+                const target = parseFloat(el.dataset.countTarget || '0');
+                if (target > 0) {
+                    animateCountUp(el, target);
+                }
+                obs.unobserve(el);
+            }
+        });
     });
+
+    elements.forEach(el => observer.observe(el));
 }
 
 /** Apply staggered fade-in to cards within a container */

@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/tape.py S2(Mekhanē)→Session Continuity→Tape
 """
 Tape Writer — WF 実行トレースを JSONL として記録する。
 

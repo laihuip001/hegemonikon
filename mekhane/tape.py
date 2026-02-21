@@ -1,3 +1,4 @@
+# PROOF: [L2/Core] <- mekhane/tape.py A0→Storage→Tape Mechanism
 """
 Tape Writer — WF 実行トレースを JSONL として記録する。
 

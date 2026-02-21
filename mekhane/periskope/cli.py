@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Mekhane] <- mekhane/periskope/ S2->Search
 """
 Periskopē CLI — Deep Research from the command line.
 

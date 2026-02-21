@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] <- mekhane/tape.py A0→証跡→TapeWriter
 """
 Tape Writer — WF 実行トレースを JSONL として記録する。
 

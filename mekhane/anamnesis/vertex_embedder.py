@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] <- mekhane/anamnesis/ K3→検索→VertexEmbedder
 import os
 import logging
 from google import genai

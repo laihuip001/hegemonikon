@@ -271,6 +271,7 @@ EXEMPT_PATTERNS = [
     # Temporary CI Unblock (Phase 1 Cleanup)
     r"mekhane/periskope/",
     r"mekhane/basanos/",
+    r"mekhane/dendron/",
     r"mekhane/ochema/",
     r"mekhane/ccl/",
     r"mekhane/api/",

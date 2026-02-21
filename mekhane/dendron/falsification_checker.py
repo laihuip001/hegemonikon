@@ -1,3 +1,4 @@
+# PROOF: [L2/Quality] <- mekhane/dendron/ A1->Epimeleia->Quality Check
 """
 S7: Falsification Condition Checker
 

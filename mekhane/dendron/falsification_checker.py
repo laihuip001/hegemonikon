@@ -1,3 +1,4 @@
+# PROOF: [L2/Quality] <- mekhane/dendron/ A0→Quality→Falsification Checks
 """
 S7: Falsification Condition Checker
 

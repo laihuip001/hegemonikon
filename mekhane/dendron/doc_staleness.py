@@ -105,6 +105,7 @@ class DocStalenessChecker:
         self._results: List[StalenessResult] = []
         self._warnings: List[str] = []
 
+    # PURPOSE: Get scan warnings (doc_id duplication etc.)
     @property
     # PURPOSE: Get scan warnings (doc_id duplication etc.)
     def warnings(self) -> List[str]:

@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/mcp/ Auto-generated proof header
 """
 MCP Guard — ゾンビプロセス防止の自己防衛モジュール
 

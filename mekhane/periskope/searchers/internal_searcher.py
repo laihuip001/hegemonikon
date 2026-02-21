@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/periskope/searchers/ Auto-generated proof header
 """
 Internal knowledge searcher for Periskopē.
 

@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/periskope/searchers/ Auto-generated proof header
 """
 Semantic Scholar API client for Periskopē.
 

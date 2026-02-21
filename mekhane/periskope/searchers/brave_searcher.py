@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/periskope/searchers/ Auto-generated proof header
 """
 Brave Search API client for Periskopē.
 

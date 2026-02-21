@@ -1,3 +1,4 @@
+# PROOF: [L2/Impl] <- mekhane/ Automated fix for CI
 """
 Guardian Integration Tests — /bou ② テスト守護者
 

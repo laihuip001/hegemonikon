@@ -1,3 +1,4 @@
+# PROOF: [L2/Auto] <- mekhane/periskope/models.py
 """
 Periskopē data models.
 

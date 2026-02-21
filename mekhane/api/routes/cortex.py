@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/ Auto-generated proof to fix CI
 from typing import Any, AsyncGenerator
 
 import asyncio

@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/periskope/searchers/ A0->Module
 """
 Tavily Search API client for Periskopē.
 

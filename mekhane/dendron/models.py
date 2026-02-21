@@ -266,6 +266,7 @@ EXEMPT_PATTERNS = [
     r"mekhane/exagoge/",    # Exagoge
     r"mekhane/tape.py",     # Legacy debt
     r"mekhane/symploke/intent_wal.py", # Legacy debt
+    r"mekhane/dendron/falsification_", # Falsification modules
     # v3.4: データ/キャッシュ/モデルディレクトリの除外
     r"\.pytest_cache",      # pytest キャッシュ
     r"\.mypy_cache",        # mypy キャッシュ

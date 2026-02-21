@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/ Auto-fix
 #!/usr/bin/env python3
 """Intent-WAL (Write-Ahead Log) Manager.
 

@@ -1,3 +1,4 @@
+# PROOF: [L2/Periskope] <- mekhane/periskope/ O3->Init
 """
 Periskopē — HGK Deep Research Engine
 

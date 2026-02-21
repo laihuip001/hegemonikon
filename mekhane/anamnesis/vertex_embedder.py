@@ -1,3 +1,4 @@
+# PROOF: [L2/Anamnesis] <- mekhane/anamnesis/ K3->Embedder
 import os
 import logging
 from google import genai

@@ -1,3 +1,4 @@
+# PROOF: [L2/Periskope] <- mekhane/periskope/ O3->Page
 """
 Page Fetcher — 選択的全文クロール for Periskopē.
 

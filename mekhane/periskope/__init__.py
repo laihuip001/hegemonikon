@@ -1,3 +1,4 @@
+# PROOF: [L2/Periskope] <- mekhane/periskope/ P3->Search
 """
 Periskopē — HGK Deep Research Engine
 

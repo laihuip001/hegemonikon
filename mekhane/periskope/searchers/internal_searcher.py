@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- auto-generated
 """
 Internal knowledge searcher for Periskopē.
 

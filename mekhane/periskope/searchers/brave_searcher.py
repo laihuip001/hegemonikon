@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- auto-generated
 """
 Brave Search API client for Periskopē.
 

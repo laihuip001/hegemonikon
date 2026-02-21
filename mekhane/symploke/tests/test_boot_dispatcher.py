@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- auto-generated
 """
 Tests for Dispatcher integration in boot_integration.py
 

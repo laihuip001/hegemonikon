@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- auto-generated
 """Tests for Credit Assignment — Teacher Signal for FEP Agent."""
 
 import json

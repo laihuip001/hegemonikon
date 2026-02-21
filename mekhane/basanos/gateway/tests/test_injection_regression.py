@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- auto-generated
 """
 Injection Regression Test Suite — 6攻撃ベクタによるセキュリティ検証
 

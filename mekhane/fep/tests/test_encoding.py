@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- auto-generated
 """Tests for mekhane.fep.encoding — FEP encoding helpers."""
 
 import unittest

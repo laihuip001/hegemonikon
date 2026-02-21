@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- auto-generated
 """Tests for JulesFeedback — L2結果→L0精度フィードバック。"""
 
 import json

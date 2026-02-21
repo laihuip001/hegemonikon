@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- auto-generated
 # PURPOSE: PKS v2 全モジュールの pytest テスト
 """
 PKS v2 テストスイート

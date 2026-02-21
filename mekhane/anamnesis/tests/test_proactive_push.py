@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- auto-generated
 """Proactive Push + Link Graph のテスト."""
 
 import json

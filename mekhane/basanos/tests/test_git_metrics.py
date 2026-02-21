@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- auto-generated
 """Tests for GitMetrics — git 履歴からのリスク予兆検出。"""
 
 import subprocess

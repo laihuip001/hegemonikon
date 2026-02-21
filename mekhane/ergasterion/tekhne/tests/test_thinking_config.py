@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- auto-generated
 """Tests for thinking config resolution (HGK depth -> model params)."""
 
 import pytest

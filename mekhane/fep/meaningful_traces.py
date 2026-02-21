@@ -26,7 +26,7 @@ from typing import Optional, List
 import json
 
 # Default persistence path
-TRACES_PATH = Path("/home/makaron8426/oikos/mneme/.hegemonikon/meaningful_traces.json")
+TRACES_PATH = Path.home() / "oikos" / "mneme" / ".hegemonikon" / "meaningful_traces.json"
 
 
 # PURPOSE: の統一的インターフェースを実現する
@@ -125,7 +125,11 @@ def save_traces(path: Optional[Path] = None) -> Path:
         Path where traces were saved
     """
     target_path = path or TRACES_PATH
-    ensure_traces_dir()
+
+    if target_path == TRACES_PATH:
+        ensure_traces_dir()
+    else:
+        target_path.parent.mkdir(parents=True, exist_ok=True)
 
     # Load existing traces
     existing = load_traces(target_path)

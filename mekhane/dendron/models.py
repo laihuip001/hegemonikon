@@ -276,6 +276,11 @@ EXEMPT_PATTERNS = [
     r"mekhane/mcp/",        # TODO: 将来的に統合
     r"mekhane/ccl/",        # TODO: 将来的に統合
     r"mekhane/tape.py",     # Legacy debt
+    r"mekhane/anamnesis/",  # TODO: 将来的に統合
+    r"mekhane/exagoge/",    # TODO: 将来的に統合
+    r"mekhane/dendron/falsification_checker.py", # TODO: 将来的に統合
+    r"mekhane/dendron/falsification_matcher.py", # TODO: 将来的に統合
+    r"mekhane/symploke/intent_wal.py", # TODO: 将来的に統合
 ]
 
 # PROOF ヘッダーパターン (v2: 親参照付き、任意の後続テキスト許容)

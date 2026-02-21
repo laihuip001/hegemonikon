@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/ Auto-fix
 """
 Internal knowledge searcher for Periskopē.
 

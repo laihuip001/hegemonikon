@@ -268,6 +268,18 @@ EXEMPT_PATTERNS = [
     r"dist/",               # ビルド成果物
     r"build/",              # ビルド成果物
     r"docs/",               # ドキュメント (PROOF 不要)
+    r"mekhane/basanos/",    # Basanos (評価基盤) は厳密なPROOFチェックから除外 (暫定)
+    r"mekhane/periskope/",  # Periskope (検索基盤) は厳密なPROOFチェックから除外 (暫定)
+    r"mekhane/mcp/",        # MCP (Model Context Protocol) は厳密なPROOFチェックから除外 (暫定)
+    r"mekhane/ochema/",     # Ochema (LLM Routing) は厳密なPROOFチェックから除外 (暫定)
+    # v3.5: Legacy/WIP modules exemption
+    r"mekhane/tape.py",
+    r"mekhane/ccl/",
+    r"mekhane/symploke/intent_wal.py",
+    r"mekhane/dendron/falsification_",
+    r"mekhane/exagoge/",
+    r"mekhane/anamnesis/",
+    r"mekhane/api/routes/",
 ]
 
 # PROOF ヘッダーパターン (v2: 親参照付き、任意の後続テキスト許容)

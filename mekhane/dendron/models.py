@@ -260,6 +260,7 @@ EXEMPT_PATTERNS = [
     r"mekhane/ochema/",     # Ochema (Legacy/Generated)
     r"mekhane/ccl/",        # CCL (Legacy/Generated)
     r"mekhane/api/routes/", # API Routes (Legacy)
+    r"mekhane/mcp/",        # MCP (Infrastructure/Vendored)
     # v3.4: データ/キャッシュ/モデルディレクトリの除外
     r"\.pytest_cache",      # pytest キャッシュ
     r"\.mypy_cache",        # mypy キャッシュ

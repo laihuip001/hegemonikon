@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/periskope/__init__.py Auto-generated existence proof for CI compliance
 """
 Periskopē — HGK Deep Research Engine
 

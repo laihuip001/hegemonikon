@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/dendron/falsification_checker.py Auto-generated existence proof for CI compliance
 """
 S7: Falsification Condition Checker
 

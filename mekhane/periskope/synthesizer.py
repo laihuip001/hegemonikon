@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/periskope/ Auto-generated proof for CI compliance
 """
 Multi-model synthesizer for Periskopē.
 

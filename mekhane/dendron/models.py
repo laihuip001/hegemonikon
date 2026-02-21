@@ -252,6 +252,7 @@ EXEMPT_PATTERNS = [
     r"\.venv",              # 仮想環境を除外
     r"tests/",              # テストコードは Purpose 対象外
     r"test_",               # テストファイル
+    r"hermeneus/tests/",    # Hermeneus テスト
     r"\.codex/",            # Codex 自動生成スクリプト
     r"\.agent/scripts/",    # エージェント補助スクリプト
     r"experiments/",        # 実験コード (PROOF 不要)

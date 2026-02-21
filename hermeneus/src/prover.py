@@ -147,7 +147,6 @@ class MypyProver(ProverInterface):
         **kwargs
     ) -> ProofResult:
         """Python コードの型チェック"""
-        import time
         start = time.time()
         
         if not self._mypy_available:
@@ -288,7 +287,6 @@ class SchemaProver(ProverInterface):
         **kwargs
     ) -> ProofResult:
         """JSON をスキーマで検証"""
-        import time
         start = time.time()
         
         if not schema:
@@ -420,7 +418,6 @@ class Lean4Prover(ProverInterface):
         **kwargs
     ) -> ProofResult:
         """形式証明"""
-        import time
         start = time.time()
         
         if not self._lean_available:

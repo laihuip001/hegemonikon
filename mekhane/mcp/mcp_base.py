@@ -1,5 +1,5 @@
-# PROOF: [L2/MCP] <- mekhane/mcp/ S2->Interface
 #!/usr/bin/env python3
+# PROOF: [L2/MCP] <- mekhane/mcp/ S2->Interface
 """
 MCP Base Module — Hegemonikón MCP Server Common Infrastructure
 

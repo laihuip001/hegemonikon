@@ -1,3 +1,4 @@
+# PROOF: [L2/API] <- mekhane/api/ A0→Foundational→Module
 from typing import Any, AsyncGenerator
 
 import asyncio

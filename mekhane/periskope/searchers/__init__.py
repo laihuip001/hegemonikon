@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/periskope/ S2->Search
 """
 Periskopē searchers — pluggable search source adapters.
 

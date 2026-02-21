@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PURPOSE: Fix missing PROOF headers in Python files
 # PROOF: [L2/Mekhane] <- scripts/fix_missing_proofs.py Auto-generated proof header
 """
 Fix missing PROOF headers in Python files.
@@ -7,7 +8,8 @@ Fix missing PROOF headers in Python files.
 import sys
 from pathlib import Path
 
-def main():
+# PURPOSE: Main execution
+def main() -> None:
     if len(sys.argv) < 2:
         print("Usage: python scripts/fix_missing_proofs.py <file1> <file2> ...")
         sys.exit(1)

@@ -15,8 +15,8 @@ from fastapi import APIRouter
 from pydantic import BaseModel
 
 # PURPOSE: 重みファイルパス
-EVOLVED_WEIGHTS = Path("/home/makaron8426/oikos/mneme/.hegemonikon/evolved_weights.json")
-FEEDBACK_JSON = Path("/home/makaron8426/oikos/mneme/.hegemonikon/feedback.json")
+EVOLVED_WEIGHTS = Path.home() / "oikos" / "mneme" / ".hegemonikon" / "evolved_weights.json"
+FEEDBACK_JSON = Path.home() / "oikos" / "mneme" / ".hegemonikon" / "feedback.json"
 
 router = APIRouter(prefix="/aristos", tags=["aristos"])
 

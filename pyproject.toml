@@ -25,6 +25,8 @@ dependencies = [
     "pytest",
     "pytest-asyncio",
     "pytest-timeout",
+    "aiohttp",
+    "python-dotenv",
 ]
 
 [project.optional-dependencies]
@@ -33,6 +35,7 @@ test = [
     "pytest-asyncio",
     "pytest-timeout",
     "httpx",  # for TestClient
+    "aiohttp", # for JulesClient tests
 ]
 
 [tool.setuptools.packages.find]

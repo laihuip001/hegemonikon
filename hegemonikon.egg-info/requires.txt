@@ -15,9 +15,12 @@ schedule
 pytest
 pytest-asyncio
 pytest-timeout
+aiohttp
+python-dotenv
 
 [test]
 pytest
 pytest-asyncio
 pytest-timeout
 httpx
+aiohttp

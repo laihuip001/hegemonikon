@@ -21,9 +21,12 @@ Requires-Dist: schedule
 Requires-Dist: pytest
 Requires-Dist: pytest-asyncio
 Requires-Dist: pytest-timeout
+Requires-Dist: aiohttp
+Requires-Dist: python-dotenv
 Provides-Extra: test
 Requires-Dist: pytest; extra == "test"
 Requires-Dist: pytest-asyncio; extra == "test"
 Requires-Dist: pytest-timeout; extra == "test"
 Requires-Dist: httpx; extra == "test"
+Requires-Dist: aiohttp; extra == "test"
 Dynamic: license-file

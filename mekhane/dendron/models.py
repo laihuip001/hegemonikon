@@ -251,6 +251,7 @@ EXEMPT_PATTERNS = [
     r"\.egg-info",
     r"\.venv",              # 仮想環境を除外
     r"hermeneus/",          # Legacy: 外部モジュール (PROOF 対象外)
+    r"mekhane/symploke/reviews/", # Reviews (PROOF 対象外)
     r"tests/",              # テストコードは Purpose 対象外
     r"test_",               # テストファイル
     r"\.codex/",            # Codex 自動生成スクリプト

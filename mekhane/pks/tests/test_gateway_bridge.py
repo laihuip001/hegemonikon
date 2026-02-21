@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- auto-generated
 """
 GatewayBridge テスト — E2E + 単体テスト
 

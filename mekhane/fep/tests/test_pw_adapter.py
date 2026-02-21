@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- auto-generated
 """Tests for pw_adapter.py — L1↔L2 PW bridge."""
 
 import pytest

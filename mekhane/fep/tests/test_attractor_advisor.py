@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- auto-generated
 """Tests for attractor_advisor helper functions."""
 
 import unittest

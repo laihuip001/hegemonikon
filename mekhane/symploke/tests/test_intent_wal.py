@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Mekhane] <- auto-generated
 """Tests for Intent-WAL Manager."""
 
 import sys

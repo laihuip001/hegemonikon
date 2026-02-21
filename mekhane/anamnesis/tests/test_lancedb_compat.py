@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- auto-generated
 """Tests for mekhane.anamnesis.lancedb_compat."""
 
 import unittest

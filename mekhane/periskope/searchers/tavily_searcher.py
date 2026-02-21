@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/periskope/searchers/tavily_searcher.py Auto-generated for CI
 """
 Tavily Search API client for Periskopē.
 

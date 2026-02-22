@@ -1,3 +1,4 @@
+# PROOF: [L2-auto] <- mekhane/periskope/query_expander.py Automatic fix for CI failure
 """
 Query expander for Periskopē.
 

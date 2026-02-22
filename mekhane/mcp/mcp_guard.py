@@ -1,3 +1,4 @@
+# PROOF: [L2-auto] <- mekhane/mcp/mcp_guard.py Automatic fix for CI failure
 """
 MCP Guard — ゾンビプロセス防止の自己防衛モジュール
 

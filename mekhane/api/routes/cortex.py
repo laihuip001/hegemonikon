@@ -1,3 +1,4 @@
+# PROOF: [L2-auto] <- mekhane/api/routes/cortex.py Automatic fix for CI failure
 from typing import Any, AsyncGenerator
 
 import asyncio

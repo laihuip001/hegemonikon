@@ -1,3 +1,4 @@
+# PROOF: [L2-auto] <- mekhane/periskope/searchers/brave_searcher.py Automatic fix for CI failure
 """
 Brave Search API client for Periskopē.
 

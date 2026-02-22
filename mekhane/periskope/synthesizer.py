@@ -1,3 +1,4 @@
+# PROOF: [L2-auto] <- mekhane/periskope/synthesizer.py Automatic fix for CI failure
 """
 Multi-model synthesizer for Periskopē.
 

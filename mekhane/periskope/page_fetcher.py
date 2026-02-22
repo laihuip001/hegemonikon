@@ -1,3 +1,4 @@
+# PROOF: [L2-auto] <- mekhane/periskope/page_fetcher.py Automatic fix for CI failure
 """
 Page Fetcher — 選択的全文クロール for Periskopē.
 

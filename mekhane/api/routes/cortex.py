@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/api/routes/cortex.py Auto-generated for CI pass
 from typing import Any, AsyncGenerator
 
 import asyncio

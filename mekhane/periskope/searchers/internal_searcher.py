@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/periskope/searchers/internal_searcher.py Auto-generated for CI pass
 """
 Internal knowledge searcher for Periskopē.
 

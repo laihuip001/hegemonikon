@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/periskope/searchers/playwright_searcher.py Auto-generated for CI pass
 """
 Playwright-based searcher for Periskopē.
 

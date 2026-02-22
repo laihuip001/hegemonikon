@@ -1,18 +1,27 @@
+# PROOF: [L3/Test] <- mekhane/pks/tests/ F6c→Test→GatewayStats
 #!/usr/bin/env python3
 """F6c: Gateway Stats API endpoint tests."""
 
 import pytest
 from unittest.mock import patch, MagicMock
-from fastapi.testclient import TestClient
+
+try:
+    from fastapi.testclient import TestClient
+    from mekhane.api.server import app
+except ImportError:
+    TestClient = None
+    app = None
 
 
 @pytest.fixture
 def client():
     """TestClient for the API without starting PKSEngine."""
-    from mekhane.api.server import app
+    if not TestClient or not app:
+        pytest.skip("FastAPI not installed")
     return TestClient(app)
 
 
+@pytest.mark.skipif(TestClient is None, reason="FastAPI not installed")
 class TestGatewayStatsEndpoint:
     """GET /api/pks/gateway-stats のテスト。"""
 

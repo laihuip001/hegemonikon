@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/basanos/gateway/tests/ A0->Existence
 """
 MCP Gateway — 統合テスト
 

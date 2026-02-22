@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhanē] <- ccl/ A0→Need→This module fills it
 """operators.md の SSOT パーサー。
 
 operators.md の Markdown テーブルから演算子定義を抽出し、

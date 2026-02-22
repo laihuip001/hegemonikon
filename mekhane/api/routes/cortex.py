@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhanē] <- routes/ A0→Need→This module fills it
 from typing import Any, AsyncGenerator
 
 import asyncio

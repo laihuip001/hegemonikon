@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Mekhanē] <- mcp/ A0→Need→This module fills it
 """
 MCP Base Module — Hegemonikón MCP Server Common Infrastructure
 

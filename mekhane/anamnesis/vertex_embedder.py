@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhanē] <- anamnesis/ A0→Need→This module fills it
 import os
 import logging
 from google import genai

@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhanē] <- dendron/ A0→Need→This module fills it
 """
 Falsification Matcher — 消化論文の主張と epistemic_status.yaml の反証条件を照合
 

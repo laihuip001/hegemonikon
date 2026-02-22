@@ -27,7 +27,7 @@ from pydantic import BaseModel, Field
 logger = logging.getLogger("hegemonikon.api.sympatheia")
 
 # PURPOSE: State ファイルのベースパス
-MNEME = Path(os.getenv("HGK_MNEME", "/home/makaron8426/oikos/mneme/.hegemonikon"))
+MNEME = Path(os.getenv("HGK_MNEME", str(Path.home() / "oikos/mneme/.hegemonikon")))
 
 router = APIRouter(prefix="/sympatheia", tags=["sympatheia"])
 

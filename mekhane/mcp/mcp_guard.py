@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/auto_fix/ CI Compliance
 """
 MCP Guard — ゾンビプロセス防止の自己防衛モジュール
 

@@ -278,6 +278,7 @@ EXEMPT_PATTERNS = [
     r"mekhane/api/routes/", # v3.5: API Routes (実験)
     r"mekhane/symploke/intent_wal.py", # v3.5: Intent WAL (実験)
     r"mekhane/exagoge/",    # v3.5: Exagoge (実験)
+    r"mekhane/dendron/falsification_", # v3.5: Falsification (実験)
 ]
 
 # PROOF ヘッダーパターン (v2: 親参照付き、任意の後続テキスト許容)

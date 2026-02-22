@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/periskope/searchers/searxng.py Automating existence
 """
 SearXNG search client for Periskopē.
 

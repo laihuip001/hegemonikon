@@ -1,4 +1,4 @@
-# PROOF: [L2/インフラ] <- hermeneus/src/ Formal Prover Interface
+# PROOF: [L2/Impl] <- hermeneus/src/ Automated fix for CI
 """
 Hermēneus Prover — 形式的正確性検証
 

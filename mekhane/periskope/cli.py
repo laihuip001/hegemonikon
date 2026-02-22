@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/periskope/cli.py A0→Necessity
 #!/usr/bin/env python3
 """
 Periskopē CLI — Deep Research from the command line.

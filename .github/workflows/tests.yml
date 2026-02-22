@@ -42,9 +42,9 @@ jobs:
               run: |
                   python -m pip install --upgrade pip
                   # Install core test dependencies (PyPI first)
-                  # Added fastapi and uvicorn as they are required by tests (e.g. mekhane/pks/tests/test_gateway_stats.py)
+                  # Added fastapi, uvicorn, aiohttp, python-dotenv as they are required by tests
                   pip install pytest pytest-asyncio pytest-timeout pyyaml pydantic lancedb numpy scipy \
-                              networkx pandas tabulate requests httpx schedule fastapi uvicorn
+                              networkx pandas tabulate requests httpx schedule fastapi uvicorn aiohttp python-dotenv
                   # Install torch (CPU-only)
                   pip install torch --index-url https://download.pytorch.org/whl/cpu
                   # Install sentence-transformers (depends on torch)

@@ -13,7 +13,6 @@ import json
 import sqlite3
 import subprocess
 import tempfile
-import time
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
@@ -346,6 +345,7 @@ class SchemaProver(ProverInterface):
         start: float
     ) -> ProofResult:
         """フォールバック検証"""
+        import time
         required = schema.get("required", [])
         missing = [f for f in required if f not in data]
         

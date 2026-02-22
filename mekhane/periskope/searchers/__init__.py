@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/ Dendron CI check pass
 """
 Periskopē searchers — pluggable search source adapters.
 

@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/ Dendron CI check pass
 """
 MCP Guard — ゾンビプロセス防止の自己防衛モジュール
 

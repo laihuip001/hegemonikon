@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/api/routes/ Auto-generated
 from typing import Any, AsyncGenerator
 
 import asyncio

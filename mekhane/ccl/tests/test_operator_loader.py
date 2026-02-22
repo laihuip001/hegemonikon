@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/ccl/tests/ Auto-generated
 """G6: dispatch E2E テスト + G9: Linter テスト + operator_loader テスト。"""
 
 import pytest

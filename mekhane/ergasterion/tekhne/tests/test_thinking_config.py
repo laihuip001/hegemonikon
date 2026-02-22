@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/ergasterion/tekhne/tests/ Auto-generated
 """Tests for thinking config resolution (HGK depth -> model params)."""
 
 import pytest

@@ -47,7 +47,7 @@ jobs:
                   # 2. Install general dependencies from PyPI
                   pip install pytest pytest-asyncio pytest-timeout pyyaml pydantic lancedb numpy scipy \
                               networkx pandas tabulate requests httpx schedule sentence-transformers \
-                              fastapi uvicorn
+                              fastapi uvicorn aiohttp python-dotenv filelock
                   # Install project in development mode if setup exists
                   pip install -e ".[test]" 2>/dev/null || true
 

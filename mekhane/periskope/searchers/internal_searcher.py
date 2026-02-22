@@ -1,3 +1,4 @@
+# PROOF: [L2-auto] <- mekhane/periskope/searchers/internal_searcher.py Automatic fix for CI failure
 """
 Internal knowledge searcher for Periskopē.
 

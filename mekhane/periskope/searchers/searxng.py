@@ -1,3 +1,4 @@
+# PROOF: [L2-auto] <- mekhane/periskope/searchers/searxng.py Automatic fix for CI failure
 """
 SearXNG search client for Periskopē.
 

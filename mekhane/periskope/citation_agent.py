@@ -1,3 +1,4 @@
+# PROOF: [L2-auto] <- mekhane/periskope/citation_agent.py Automatic fix for CI failure
 """
 Citation verification agent for Periskopē.
 

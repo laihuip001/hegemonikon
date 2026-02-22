@@ -1,3 +1,4 @@
+# PROOF: [L2-auto] <- mekhane/tape.py Automatic fix for CI failure
 """
 Tape Writer — WF 実行トレースを JSONL として記録する。
 

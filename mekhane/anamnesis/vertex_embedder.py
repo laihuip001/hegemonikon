@@ -1,3 +1,4 @@
+# PROOF: [L2-auto] <- mekhane/anamnesis/vertex_embedder.py Automatic fix for CI failure
 import os
 import logging
 from google import genai

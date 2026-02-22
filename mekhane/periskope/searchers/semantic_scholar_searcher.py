@@ -1,3 +1,4 @@
+# PROOF: [L2-auto] <- mekhane/periskope/searchers/semantic_scholar_searcher.py Automatic fix for CI failure
 """
 Semantic Scholar API client for Periskopē.
 

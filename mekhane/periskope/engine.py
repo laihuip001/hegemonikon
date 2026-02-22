@@ -1,3 +1,4 @@
+# PROOF: [L2-auto] <- mekhane/periskope/engine.py Automatic fix for CI failure
 """
 Periskopē Deep Research Engine — Orchestrator.
 

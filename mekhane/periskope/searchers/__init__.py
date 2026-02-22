@@ -1,3 +1,4 @@
+# PROOF: [L2-auto] <- mekhane/periskope/searchers/__init__.py Automatic fix for CI failure
 """
 Periskopē searchers — pluggable search source adapters.
 

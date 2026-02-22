@@ -1,3 +1,4 @@
+# PROOF: [L2-auto] <- mekhane/periskope/searchers/playwright_searcher.py Automatic fix for CI failure
 """
 Playwright-based searcher for Periskopē.
 

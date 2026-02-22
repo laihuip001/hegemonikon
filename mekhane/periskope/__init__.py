@@ -1,3 +1,4 @@
+# PROOF: [L2-auto] <- mekhane/periskope/__init__.py Automatic fix for CI failure
 """
 Periskopē — HGK Deep Research Engine
 

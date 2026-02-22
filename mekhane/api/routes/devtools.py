@@ -1,3 +1,4 @@
+# PROOF: [L2-auto] <- mekhane/api/routes/devtools.py Automatic fix for CI failure
 """
 DevTools API routes — ファイル操作・ターミナル・Ochema (AI) をフロントエンド DevTools ビューに提供。
 

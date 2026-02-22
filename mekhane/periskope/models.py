@@ -1,3 +1,4 @@
+# PROOF: [L2-auto] <- mekhane/periskope/models.py Automatic fix for CI failure
 """
 Periskopē data models.
 

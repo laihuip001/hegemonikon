@@ -1,3 +1,4 @@
+# PROOF: [L2-auto] <- mekhane/periskope/searchers/tavily_searcher.py Automatic fix for CI failure
 """
 Tavily Search API client for Periskopē.
 

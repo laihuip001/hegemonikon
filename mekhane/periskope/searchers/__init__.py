@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/auto_fix/ CI Compliance
 """
 Periskopē searchers — pluggable search source adapters.
 

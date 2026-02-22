@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/auto_fix/ CI Compliance
 """
 Tape Writer — WF 実行トレースを JSONL として記録する。
 

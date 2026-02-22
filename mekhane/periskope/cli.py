@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Mekhane] <- mekhane/auto_fix/ CI Compliance
 """
 Periskopē CLI — Deep Research from the command line.
 

@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/synteleia/tests/ Auto-generated
 """
 Tests for SemanticAgent (L2)
 """

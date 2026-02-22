@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/basanos/gateway/tests/ Auto-generated
 """
 MCP Gateway — 統合テスト
 

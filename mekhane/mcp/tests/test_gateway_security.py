@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Mekhane] <- mekhane/mcp/tests/ Auto-generated
 """
 L1 動的セキュリティテスト — hgk_gateway
 

@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/periskope/tests/ Auto-generated
 """
 Tests for PageFetcher (W7: selective full-page crawling).
 """

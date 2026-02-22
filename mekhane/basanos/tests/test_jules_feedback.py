@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/basanos/tests/ Auto-generated
 """Tests for JulesFeedback — L2結果→L0精度フィードバック。"""
 
 import json

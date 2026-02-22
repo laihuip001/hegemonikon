@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/poiema/flow/tests/ Auto-generated
 """
 Poiema __init__.py 統合テスト
 

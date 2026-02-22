@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Mekhane] <- mekhane/ochema/tests/ Auto-generated
 """F0 Tool Use — 手動検証スクリプト.
 
 Usage:

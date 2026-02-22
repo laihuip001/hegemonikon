@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/tests/ Auto-generated
 """
 Guardian Integration Tests — /bou ② テスト守護者
 

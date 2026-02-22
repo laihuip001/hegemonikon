@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/periskope/tests/ Auto-generated
 """Tests for W3 QueryExpander and P3 weight distribution."""
 
 from __future__ import annotations

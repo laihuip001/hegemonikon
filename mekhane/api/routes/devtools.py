@@ -25,8 +25,8 @@ router = APIRouter(tags=["devtools"])
 
 # ─── Security: allowed base paths ──────────────────────────────
 ALLOWED_BASES = [
-    Path("/home/makaron8426/oikos"),
-    Path("/home/makaron8426/.gemini"),
+    Path.home() / "oikos",
+    Path.home() / ".gemini",
     Path("/tmp"),
 ]
 
@@ -41,7 +41,7 @@ def _is_safe_path(path: str) -> bool:
 
 @router.get("/files/list")
 async def list_directory(
-    path: str = Query(default="/home/makaron8426/oikos/hegemonikon"),
+    path: str = Query(default=str(Path.home() / "oikos/hegemonikon")),
 ) -> dict[str, Any]:
     """List directory entries with name, is_dir, size, children count."""
     if not _is_safe_path(path):
@@ -108,7 +108,7 @@ async def read_file(
 
 class TerminalRequest(BaseModel):
     command: str
-    cwd: str = "/home/makaron8426/oikos/hegemonikon"
+    cwd: str = str(Path.home() / "oikos/hegemonikon")
 
 
 # Dangerous commands that should be blocked
@@ -163,7 +163,7 @@ async def execute_command(req: TerminalRequest) -> dict[str, Any]:
 
 @router.get("/git/status")
 async def git_status(
-    repo: str = Query(default="/home/makaron8426/oikos/hegemonikon"),
+    repo: str = Query(default=str(Path.home() / "oikos/hegemonikon")),
 ) -> dict[str, Any]:
     """Get git status (changed files) for a repository."""
     if not _is_safe_path(repo):
@@ -200,7 +200,7 @@ async def git_status(
 
 @router.get("/git/diff")
 async def git_diff(
-    repo: str = Query(default="/home/makaron8426/oikos/hegemonikon"),
+    repo: str = Query(default=str(Path.home() / "oikos/hegemonikon")),
     path: str = Query(default=""),
     staged: bool = Query(default=False),
 ) -> dict[str, Any]:

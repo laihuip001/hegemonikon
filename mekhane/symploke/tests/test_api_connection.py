@@ -15,10 +15,10 @@ sys.path.insert(0, "/home/makaron8426/oikos/hegemonikon")
 
 try:
     import aiohttp
+    from mekhane.symploke.jules_client import JulesClient
 except ImportError:
     aiohttp = None
-
-from mekhane.symploke.jules_client import JulesClient
+    JulesClient = None
 
 
 # PURPOSE: Test API connection by listing sources
@@ -37,6 +37,12 @@ async def test_connection():
 
     try:
         headers = {"X-Goog-Api-Key": api_key, "Content-Type": "application/json"}
+
+        # Use shared session pattern if client is available
+        if JulesClient and aiohttp:
+            # We don't actually use JulesClient here, we test raw API connection
+            # But the test was importing it, so we guard that import above.
+            pass
 
         async with aiohttp.ClientSession() as session:
             # Test 1: Get sources (repos)

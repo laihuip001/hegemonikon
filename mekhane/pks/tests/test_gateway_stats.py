@@ -1,3 +1,4 @@
+# PROOF: [L3/Test] <- mekhane/pks/tests/ F6c→Test→GatewayStats
 #!/usr/bin/env python3
 """F6c: Gateway Stats API endpoint tests."""
 

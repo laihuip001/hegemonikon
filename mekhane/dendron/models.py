@@ -251,6 +251,7 @@ EXEMPT_PATTERNS = [
     r"\.egg-info",
     r"\.venv",              # 仮想環境を除外
     r"tests/",              # テストコードは Purpose 対象外
+    r"hermeneus/tests/",    # hermeneus テストコード
     r"test_",               # テストファイル
     r"\.codex/",            # Codex 自動生成スクリプト
     r"\.agent/scripts/",    # エージェント補助スクリプト

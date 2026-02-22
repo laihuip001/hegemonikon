@@ -1,3 +1,4 @@
+# PROOF: [L2-auto] Automatic fix for CI failure
 """
 MCP Guard — ゾンビプロセス防止の自己防衛モジュール
 

@@ -1,3 +1,4 @@
+# PROOF: [L2-auto] Automatic fix for CI failure
 """
 Tavily Search API client for Periskopē.
 

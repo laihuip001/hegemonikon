@@ -1,3 +1,4 @@
+# PROOF: [L2-auto] Automatic fix for CI failure
 import os
 import logging
 from google import genai

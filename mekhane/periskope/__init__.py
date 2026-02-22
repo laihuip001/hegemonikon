@@ -1,3 +1,4 @@
+# PROOF: [L2-auto] Automatic fix for CI failure
 """
 Periskopē — HGK Deep Research Engine
 

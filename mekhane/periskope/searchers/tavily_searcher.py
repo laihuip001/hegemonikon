@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/periskope/searchers/ Auto-generated for CI compliance
 """
 Tavily Search API client for Periskopē.
 

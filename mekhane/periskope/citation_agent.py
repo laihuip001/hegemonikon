@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/periskope/ Auto-generated for CI compliance
 """
 Citation verification agent for Periskopē.
 

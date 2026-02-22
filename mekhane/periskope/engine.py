@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/periskope/engine.py Auto-generated for CI pass
 """
 Periskopē Deep Research Engine — Orchestrator.
 

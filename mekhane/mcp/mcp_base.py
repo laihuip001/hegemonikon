@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2-auto] Automatic fix for CI failure
 """
 MCP Base Module — Hegemonikón MCP Server Common Infrastructure
 

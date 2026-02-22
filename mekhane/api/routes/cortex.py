@@ -1,3 +1,4 @@
+# PROOF: [L2-auto] Automatic fix for CI failure
 from typing import Any, AsyncGenerator
 
 import asyncio

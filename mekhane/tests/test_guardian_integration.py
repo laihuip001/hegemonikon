@@ -101,7 +101,12 @@ class TestMeaningfulTraceContextRegression:
                 intensity=2,
                 context="must persist to disk",
             )
-            save_traces(path)
+
+            # Patch TRACES_PATH used in ensure_traces_dir inside save_traces
+            # even when explicit path is passed, ensure_traces_dir() uses the global constant default path's parent
+            # which causes PermissionError on CI
+            with patch("mekhane.fep.meaningful_traces.TRACES_PATH", path):
+                save_traces(path)
 
             # Load and verify
             loaded = load_traces(path)

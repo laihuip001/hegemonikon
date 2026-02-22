@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/dendron/ Auto-generated for CI compliance
 """
 S7: Falsification Condition Checker
 

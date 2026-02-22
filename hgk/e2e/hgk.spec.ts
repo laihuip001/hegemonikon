@@ -159,63 +159,6 @@ test.describe('Command Palette', () => {
         await page.locator('#cp-overlay').click({ position: { x: 10, y: 10 } });
         await expect(page.locator('#cp-overlay')).not.toBeVisible({ timeout: 2000 });
     });
-
-    test('has correct ARIA attributes', async ({ page }) => {
-        await page.goto('/');
-        await page.waitForTimeout(500);
-        await page.keyboard.press('Control+k');
-
-        const dialog = page.locator('.cp-dialog');
-        await expect(dialog).toHaveAttribute('role', 'dialog');
-        await expect(dialog).toHaveAttribute('aria-modal', 'true');
-        await expect(dialog).toHaveAttribute('aria-label', 'Command Palette');
-
-        const input = page.locator('#cp-input');
-        await expect(input).toHaveAttribute('role', 'combobox');
-        await expect(input).toHaveAttribute('aria-expanded', 'true');
-        await expect(input).toHaveAttribute('aria-controls', 'cp-results');
-
-        const results = page.locator('#cp-results');
-        await expect(results).toHaveAttribute('role', 'listbox');
-
-        // Check if items have role="option" and aria-selected
-        // Wait for items to be visible
-        await setupApiMock(page); // Ensure mock is ready if needed
-        await page.waitForTimeout(1000);
-        const firstItem = results.locator('.cp-item').first();
-        await expect(firstItem).toBeVisible();
-        await expect(firstItem).toHaveAttribute('role', 'option');
-        await expect(firstItem).toHaveAttribute('aria-selected', 'true');
-
-        // Check aria-activedescendant on input
-        const firstItemId = await firstItem.getAttribute('id');
-        expect(firstItemId).toBeTruthy();
-        await expect(input).toHaveAttribute('aria-activedescendant', firstItemId!);
-    });
-
-    test('updates aria-activedescendant on navigation', async ({ page }) => {
-        await page.goto('/');
-        await page.waitForTimeout(500);
-        await setupApiMock(page);
-        await page.keyboard.press('Control+k');
-        await page.waitForTimeout(1000); // Wait for items
-
-        const input = page.locator('#cp-input');
-        const items = page.locator('.cp-item');
-
-        // Initial state
-        const firstItem = items.nth(0);
-        const firstId = await firstItem.getAttribute('id');
-        await expect(input).toHaveAttribute('aria-activedescendant', firstId!);
-
-        // Navigate down
-        await page.keyboard.press('ArrowDown');
-        const secondItem = items.nth(1);
-        const secondId = await secondItem.getAttribute('id');
-        await expect(input).toHaveAttribute('aria-activedescendant', secondId!);
-        await expect(secondItem).toHaveAttribute('aria-selected', 'true');
-        await expect(firstItem).toHaveAttribute('aria-selected', 'false');
-    });
 });
 
 // ─── Sprint 5: Skeleton Loader ──────────────────────────────

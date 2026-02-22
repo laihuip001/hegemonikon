@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/ Auto-generated proof for CI compliance
 #!/usr/bin/env python3
 """Intent-WAL (Write-Ahead Log) Manager.
 

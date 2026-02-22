@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/ Automatically added to satisfy CI
 """
 Playwright-based searcher for Periskopē.
 

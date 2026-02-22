@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/ Auto-generated proof for CI compliance
 from typing import Any, AsyncGenerator
 
 import asyncio

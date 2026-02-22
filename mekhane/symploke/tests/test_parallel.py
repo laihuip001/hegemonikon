@@ -1,5 +1,5 @@
-# PROOF: [L3/テスト] <- mekhane/symploke/tests/ 対象モジュールが存在→検証が必要→test_parallel が担う
 #!/usr/bin/env python3
+# PROOF: [L3/テスト] <- mekhane/symploke/tests/ 対象モジュールが存在→検証が必要→test_parallel が担う
 """
 Jules API - Parallel Execution Test
 

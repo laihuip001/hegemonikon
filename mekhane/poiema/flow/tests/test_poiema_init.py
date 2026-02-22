@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/poiema/flow/tests/test_poiema_init.py Auto-generated existence proof
 """
 Poiema __init__.py 統合テスト
 

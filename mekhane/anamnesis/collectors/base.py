@@ -1,5 +1,5 @@
-# noqa: AI-ALL
 # PROOF: [L2/インフラ] <- mekhane/anamnesis/collectors/
+# noqa: AI-ALL
 """
 PROOF: [L2/インフラ]
 

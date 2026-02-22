@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/periskope/tests/test_page_fetcher.py Auto-generated existence proof
 """
 Tests for PageFetcher (W7: selective full-page crawling).
 """

@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/basanos/gateway/tests/test_gateway.py Auto-generated existence proof
 """
 MCP Gateway — 統合テスト
 

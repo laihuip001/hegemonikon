@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/fep/tests/test_encoding.py Auto-generated existence proof
 """Tests for mekhane.fep.encoding — FEP encoding helpers."""
 
 import unittest

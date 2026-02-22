@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/fep/tests/test_credit_assignment.py Auto-generated existence proof
 """Tests for Credit Assignment — Teacher Signal for FEP Agent."""
 
 import json

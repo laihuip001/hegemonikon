@@ -1,5 +1,5 @@
-# PROOF: [L3/ユーティリティ] <- mekhane/scripts/ O4→運用スクリプトが必要→restore_sessions が担う
 #!/usr/bin/env python3
+# PROOF: [L3/ユーティリティ] <- mekhane/scripts/ O4→運用スクリプトが必要→restore_sessions が担う
 """
 restore_healthy_sessions.py
 バックアップから健全なセッションを復元する。

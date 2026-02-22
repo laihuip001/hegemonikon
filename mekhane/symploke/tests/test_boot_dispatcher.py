@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/symploke/tests/test_boot_dispatcher.py Auto-generated existence proof
 """
 Tests for Dispatcher integration in boot_integration.py
 

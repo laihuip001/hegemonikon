@@ -1,5 +1,5 @@
-# PROOF: [L3/テスト] <- mekhane/symploke/tests/ 対象モジュールが存在→検証が必要→test_api_connection が担う
 #!/usr/bin/env python3
+# PROOF: [L3/テスト] <- mekhane/symploke/tests/ 対象モジュールが存在→検証が必要→test_api_connection が担う
 """
 Quick API connection test for Jules API.
 Tests if the API key is valid and can connect to Jules.
@@ -31,7 +31,10 @@ async def test_connection():
 
     try:
         import aiohttp
+    except ImportError:
+        pytest.skip("aiohttp not installed")
 
+    try:
         headers = {"X-Goog-Api-Key": api_key, "Content-Type": "application/json"}
 
         async with aiohttp.ClientSession() as session:

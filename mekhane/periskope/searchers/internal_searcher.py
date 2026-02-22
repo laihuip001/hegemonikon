@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- searchers/ A0->Existence
 """
 Internal knowledge searcher for Periskopē.
 

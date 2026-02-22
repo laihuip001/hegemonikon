@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/
 """
 Query expander for Periskopē.
 

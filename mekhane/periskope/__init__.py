@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/periskope/__init__.py FEP->Implementation
 """
 Periskopē — HGK Deep Research Engine
 

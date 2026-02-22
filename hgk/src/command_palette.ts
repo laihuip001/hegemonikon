@@ -42,13 +42,13 @@ function trackRecentView(key: string): void {
 function createPaletteHTML(): string {
   return `
     <div class="cp-overlay" id="cp-overlay">
-      <div class="cp-dialog">
+      <div class="cp-dialog" role="dialog" aria-modal="true" aria-label="Command Palette">
         <div class="cp-input-wrapper">
           <span class="cp-icon">⌘</span>
-          <input type="text" id="cp-input" class="cp-input" placeholder="Type a workflow name or CCL expression..." autocomplete="off" />
+          <input type="text" id="cp-input" class="cp-input" placeholder="Type a workflow name or CCL expression..." autocomplete="off" role="combobox" aria-autocomplete="list" aria-expanded="true" aria-controls="cp-results" aria-activedescendant="" />
           <kbd class="cp-kbd">ESC</kbd>
         </div>
-        <div class="cp-results" id="cp-results"></div>
+        <div class="cp-results" id="cp-results" role="listbox" aria-label="Search results"></div>
         <div class="cp-footer">
           <span>↑↓ Navigate</span>
           <span>↵ Execute</span>
@@ -66,7 +66,7 @@ function renderWFItems(items: WFSummary[]): string {
     return '<div class="cp-empty">No matching workflows</div>';
   }
   return items.map((wf, i) => `
-    <div class="cp-item ${i === 0 ? 'cp-item-active' : ''}" data-idx="${i}" data-name="${esc(wf.name)}" data-ccl="${esc(wf.ccl)}">
+    <div class="cp-item" id="cp-wf-${i}" role="option" data-idx="${i}" data-name="${esc(wf.name)}" data-ccl="${esc(wf.ccl)}">
       <div class="cp-item-header">
         <span class="cp-item-name">/${esc(wf.name)}</span>
         ${wf.ccl ? `<span class="cp-item-ccl">${esc(wf.ccl)}</span>` : ''}
@@ -274,7 +274,7 @@ function renderRouteItems(filter: string): string {
   const sectionLabel = !q && recentViews.length > 0 ? '最近のビュー' : 'ビュー';
   return `<div class="cp-section-label">${sectionLabel}</div>` +
     routes.map((r, i) => `
-      <div class="cp-item cp-route-item ${i === 0 ? 'cp-item-active' : ''}" data-idx="${i}" data-route="${esc(r.key)}">
+      <div class="cp-item cp-route-item" id="cp-route-${i}" role="option" data-idx="${i}" data-route="${esc(r.key)}">
         <div class="cp-item-header">
           <span class="cp-item-icon">${r.icon}</span>
           <span class="cp-item-name">${esc(r.label)}</span>
@@ -343,7 +343,7 @@ function renderQuickActions(filter: string): string {
   if (actions.length === 0) return '';
   return `<div class="cp-section-label">Quick Actions</div>` +
     actions.map((a, i) => `
-      <div class="cp-item cp-quick-action ${i === 0 ? 'cp-item-active' : ''}" data-idx="${i}" data-action="${esc(a.label)}">
+      <div class="cp-item cp-quick-action" id="cp-qa-${i}" role="option" data-idx="${i}" data-action="${esc(a.label)}">
         <div class="cp-item-header">
           <span class="cp-item-name">${a.icon} >${esc(a.label)}</span>
         </div>
@@ -378,13 +378,51 @@ function filterWorkflows(query: string): WFSummary[] {
 
 let activeIdx = 0;
 
+function resetActiveState(resultsEl: HTMLElement): void {
+  activeIdx = 0;
+  const items = resultsEl.querySelectorAll('.cp-item');
+  items.forEach(el => {
+    el.classList.remove('cp-item-active');
+    el.setAttribute('aria-selected', 'false');
+  });
+
+  const first = items[0] as HTMLElement;
+  if (first) {
+    first.classList.add('cp-item-active');
+    first.setAttribute('aria-selected', 'true');
+    const input = document.getElementById('cp-input');
+    if (input && first.id) {
+      input.setAttribute('aria-activedescendant', first.id);
+    }
+  } else {
+    // No items
+    const input = document.getElementById('cp-input');
+    if (input) input.removeAttribute('aria-activedescendant');
+  }
+}
+
 function updateActive(resultsEl: HTMLElement, delta: number): void {
   const items = resultsEl.querySelectorAll('.cp-item');
   if (items.length === 0) return;
-  items[activeIdx]?.classList.remove('cp-item-active');
+
+  const current = items[activeIdx];
+  if (current) {
+    current.classList.remove('cp-item-active');
+    current.setAttribute('aria-selected', 'false');
+  }
+
   activeIdx = Math.max(0, Math.min(items.length - 1, activeIdx + delta));
-  items[activeIdx]?.classList.add('cp-item-active');
-  (items[activeIdx] as HTMLElement)?.scrollIntoView({ block: 'nearest' });
+
+  const next = items[activeIdx] as HTMLElement;
+  if (next) {
+    next.classList.add('cp-item-active');
+    next.setAttribute('aria-selected', 'true');
+    next.scrollIntoView({ block: 'nearest' });
+    const input = document.getElementById('cp-input');
+    if (input && next.id) {
+      input.setAttribute('aria-activedescendant', next.id);
+    }
+  }
 }
 
 async function handleInput(input: HTMLInputElement, resultsEl: HTMLElement): Promise<void> {
@@ -407,13 +445,14 @@ async function handleInput(input: HTMLInputElement, resultsEl: HTMLElement): Pro
             <button class="cp-execute-btn" id="cp-quick-exec">▶ 実行</button>
           </div>
         </div>`;
+      resetActiveState(resultsEl);
       const btn = resultsEl.querySelector('#cp-quick-exec');
       btn?.addEventListener('click', () => match.action(arg));
       return;
     }
     // Show filtered quick actions
     resultsEl.innerHTML = renderQuickActions(cmd);
-    activeIdx = 0;
+    resetActiveState(resultsEl);
     // Click handlers for quick action items
     resultsEl.querySelectorAll('.cp-quick-action').forEach(item => {
       item.addEventListener('click', () => {
@@ -436,6 +475,7 @@ async function handleInput(input: HTMLInputElement, resultsEl: HTMLElement): Pro
       } catch (e) {
         resultsEl.innerHTML = `<div class="cp-parse-error">❌ 監査エラー: ${esc((e as Error).message)}</div>`;
       }
+      resetActiveState(resultsEl);
       return;
     }
   }
@@ -445,6 +485,7 @@ async function handleInput(input: HTMLInputElement, resultsEl: HTMLElement): Pro
     const concept = val.slice(6).trim();
     if (concept) {
       resultsEl.innerHTML = renderKalonJudge(concept);
+      resetActiveState(resultsEl);
       initKalonButtons(resultsEl);
       return;
     }
@@ -460,17 +501,19 @@ async function handleInput(input: HTMLInputElement, resultsEl: HTMLElement): Pro
     } catch (e) {
       resultsEl.innerHTML = `<div class="cp-parse-error">❌ ${esc((e as Error).message)}</div>`;
     }
+    resetActiveState(resultsEl);
     return;
   }
 
   // Workflow filter
   const filtered = filterWorkflows(val);
-  activeIdx = 0;
   // Show route navigation + workflow list
   const routeSection = renderRouteItems(val);
   resultsEl.innerHTML = routeSection +
     (filtered.length > 0 ? `<div class="cp-section-label">ワークフロー</div>` : '') +
     renderWFItems(filtered);
+
+  resetActiveState(resultsEl);
 
   // Click handlers — routes
   resultsEl.querySelectorAll('.cp-route-item').forEach(item => {
@@ -513,6 +556,7 @@ async function selectWorkflow(name: string, resultsEl: HTMLElement): Promise<voi
   } catch (e) {
     resultsEl.innerHTML = `<div class="cp-parse-error">❌ ${esc((e as Error).message)}</div>`;
   }
+  resetActiveState(resultsEl);
 }
 
 // --- Open / Close ---

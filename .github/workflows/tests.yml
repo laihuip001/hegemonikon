@@ -44,7 +44,8 @@ jobs:
                   # Install core test dependencies (CPU-only)
                   # 1. Standard packages from PyPI
                   pip install pytest pytest-asyncio pytest-timeout pyyaml pydantic lancedb numpy scipy \
-                              networkx pandas tabulate requests httpx schedule
+                              networkx pandas tabulate requests httpx schedule \
+                              fastapi uvicorn python-dotenv filelock aiohttp
 
                   # 2. PyTorch (CPU) from PyTorch index
                   pip install torch --index-url https://download.pytorch.org/whl/cpu

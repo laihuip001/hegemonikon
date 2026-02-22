@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/ochema/ls_launcher.py Automatically added to satisfy CI
 #!/usr/bin/env python3
 """LS Standalone Launcher — IDE なしで Language Server を直接起動する。
 

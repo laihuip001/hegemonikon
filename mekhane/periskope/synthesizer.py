@@ -1,3 +1,4 @@
+# PROOF: [L2/Periskope] <- mekhane/periskope/synthesizer.py O3→Zet→Search
 """
 Multi-model synthesizer for Periskopē.
 

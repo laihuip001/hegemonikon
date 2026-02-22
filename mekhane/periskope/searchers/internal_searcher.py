@@ -1,3 +1,4 @@
+# PROOF: [L2/Periskope] <- mekhane/periskope/searchers/internal_searcher.py O3→Zet→Search
 """
 Internal knowledge searcher for Periskopē.
 

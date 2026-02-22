@@ -1,3 +1,4 @@
+# PROOF: [L2/Periskope] <- mekhane/periskope/engine.py O3→Zet→Search
 """
 Periskopē Deep Research Engine — Orchestrator.
 

@@ -1,3 +1,4 @@
+# PROOF: [L2/Periskope] <- mekhane/periskope/query_expander.py O3→Zet→Search
 """
 Query expander for Periskopē.
 

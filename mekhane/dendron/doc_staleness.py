@@ -1,139 +1,93 @@
-#!/usr/bin/env python3
-# PROOF: [L2/インフラ] <- mekhane/dendron/
+# PROOF: [L2/Mekhane] <- mekhane/dendron/doc_staleness.py A0→Necessity
 """
-Doc Staleness Checker — ドキュメント腐敗自動検知
+S7: Doc Staleness Checker
 
-YAML frontmatter の depends_on 宣言に基づき、
-上流ドキュメントの version > 下流の min_version であれば STALE 判定。
-updated 日付差が閾値以上なら WARNING。
+PURPOSE: ドキュメント間の依存関係と鮮度を管理し、
+古くなった情報 (Stale Documentation) を検出する。
 
-Usage:
-    python -m mekhane.dendron.doc_staleness --check
-    python -m mekhane.dendron.doc_staleness --check --root /path/to/project
+- Frontmatter `depends_on` を解析
+- 上流ドキュメントの更新日/バージョンと比較
+- 循環依存の検出
+- EPTスコアへの統合 (Doc Health %)
 """
-
-from __future__ import annotations
 
 import argparse
 import sys
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from datetime import datetime
 from enum import Enum
 from pathlib import Path
-from typing import Dict, List, Optional
+from typing import List, Optional
 
 import yaml
-from packaging.version import Version, InvalidVersion
+from packaging.version import parse as _parse_version
 
 
-# ── Data Models ──────────────────────────────────────
-
-
-# PURPOSE: 判定ステータスを列挙し、文字列リテラルの代わりに型安全な比較を可能にする
 class StalenessStatus(Enum):
-    """依存辺の検査ステータス."""
-    OK = "OK"
-    STALE = "STALE"
-    WARNING = "WARNING"
-    CIRCULAR = "CIRCULAR"
+    OK = "ok"
+    STALE = "stale"       # 上流が更新されている / バージョン不整合
+    WARNING = "warning"   # 日付が古い (閾値超過)
+    CIRCULAR = "circular" # 循環依存
 
 
-# PURPOSE: ドキュメント間の依存関係1件を表現し、STALE 判定の入力にする
 @dataclass
 class DocDependency:
-    """依存先 doc_id と期待する最低バージョン."""
     doc_id: str
-    min_version: str
+    min_version: str = "0.0.0"
 
 
-# PURPOSE: 1つのドキュメントの frontmatter 情報を構造化し、依存グラフの頂点にする
 @dataclass
 class DocInfo:
-    """ドキュメントの frontmatter メタデータ."""
     doc_id: str
     version: str
     path: Path
-    updated: Optional[str] = None
-    depends_on: List[DocDependency] = field(default_factory=list)
+    updated: str
+    depends_on: List[DocDependency]
 
 
-# PURPOSE: STALE/OK/WARNING/CIRCULAR の判定結果を個別に返し、レポート生成に渡す
 @dataclass
 class StalenessResult:
-    """1つの依存辺の検査結果."""
     doc_id: str
     upstream_id: str
     status: StalenessStatus
     detail: str
 
 
-# ── Version Compare ──────────────────────────────────
-
-
-# PURPOSE: packaging.version を使った安全なバージョン比較。pre-release にも対応する
-def _parse_version(v: str) -> Version:
-    """Parse version string via packaging.version.Version.
-
-    Invalid version strings are normalized to Version("0.0.0").
-    """
-    try:
-        return Version(v)
-    except InvalidVersion:
-        return Version("0.0.0")
-
-
-# ── Checker ──────────────────────────────────────────
-
-
-# PURPOSE: ドキュメント依存グラフを構築・検査し、腐敗を自動検知する (FEP 的環境制約)
 class DocStalenessChecker:
-    """ドキュメント腐敗 (staleness) 検知器.
+    """ドキュメントの依存関係と鮮度をチェックするクラス."""
 
-    1. scan(root) — .md ファイルの frontmatter をパース
-    2. check()   — 依存グラフから STALE/WARNING を判定
-    3. doc_health_pct() — 健全率を計算
-    """
+    STALE_DAYS_THRESHOLD = 90  # 3ヶ月
 
-    STALE_DAYS_THRESHOLD = 30
-    EXCLUDE_DIRS = frozenset({
-        "knowledge_items", ".venv", "__pycache__", ".git",
-        "node_modules", ".pytest_cache",
-    })
+    def __init__(self):
+        self._docs: dict[str, DocInfo] = {}
+        self._results: list[StalenessResult] = []
+        self._warnings: list[str] = []
 
-    def __init__(self) -> None:
-        self._docs: Dict[str, DocInfo] = {}
-        self._results: List[StalenessResult] = []
-        self._warnings: List[str] = []
-
+    # PURPOSE: doc_id 重複などの警告リストを返す
     @property
-    def warnings(self) -> List[str]:
-        """scan 時の警告 (doc_id 重複等)."""
-        return list(self._warnings)
+    def warnings(self) -> list[str]:
+        """警告リストを返す."""
+        return self._warnings
 
-    # PURPOSE: プロジェクト内の全 .md ファイルから frontmatter を収集し、依存グラフ構築の材料にする
-    def scan(self, root: Path) -> List[DocInfo]:
-        """全 .md ファイルの YAML frontmatter をパースして DocInfo 一覧を構築."""
-        self._docs.clear()
-        self._warnings.clear()
-        for md_path in sorted(root.rglob("*.md")):
-            # 除外ディレクトリ判定
-            if any(part in self.EXCLUDE_DIRS for part in md_path.parts):
-                continue
-            doc_info = self._parse_frontmatter(md_path)
-            if doc_info:
-                # doc_id 重複検出
-                if doc_info.doc_id in self._docs:
-                    existing = self._docs[doc_info.doc_id]
+    # PURPOSE: 指定ディレクトリ以下の Markdown ファイルをスキャンし、メタデータを収集する
+    def scan(self, root_dir: Path) -> None:
+        """ディレクトリを再帰的にスキャンしてドキュメント情報を収集する."""
+        if not root_dir.exists():
+            return
+
+        for path in root_dir.rglob("*.md"):
+            doc = self._parse_doc(path)
+            if doc:
+                if doc.doc_id in self._docs:
                     self._warnings.append(
-                        f"doc_id 重複: '{doc_info.doc_id}' "
-                        f"({existing.path} と {doc_info.path})"
+                        f"Duplicate doc_id '{doc.doc_id}': {path} vs {self._docs[doc.doc_id].path}"
                     )
-                self._docs[doc_info.doc_id] = doc_info
-        return list(self._docs.values())
+                else:
+                    self._docs[doc.doc_id] = doc
 
-    # PURPOSE: YAML frontmatter から doc_id/version/depends_on を抽出し DocInfo を生成する
-    def _parse_frontmatter(self, path: Path) -> Optional[DocInfo]:
-        """YAML frontmatter をパースして DocInfo を返す. frontmatter なしは None."""
+    # PURPOSE: Markdown ファイルの frontmatter を解析して DocInfo を生成する
+    def _parse_doc(self, path: Path) -> Optional[DocInfo]:
+        """Markdown ファイルの frontmatter を解析."""
         try:
             content = path.read_text(encoding="utf-8")
         except (OSError, UnicodeDecodeError):

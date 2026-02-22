@@ -1,18 +1,17 @@
 # PROOF: [L2/Mekhane] <- mekhane/dendron/falsification_matcher.py A0→Necessity
 """
-Falsification Matcher — 消化論文の主張と epistemic_status.yaml の反証条件を照合
+S7: Falsification Condition Matcher
 
-PURPOSE: /eat 消化時に呼び出し、新論文の主張が既存パッチの反証条件に
-該当する可能性がないか自動チェックする。
+PURPOSE: 新しい論文が消化された際に、その内容が
+epistemic_status.yaml の反証条件にマッチするかをチェックする。
 
-Usage:
-    from mekhane.dendron.falsification_matcher import check_falsification
-    alerts = check_falsification(paper_text="...")
+- 入力: 論文の要約 (Summary), 主張 (Claims)
+- 照合: `falsification` フィールドのキーワード/条件
+- 出力: 警告リスト (Alerts)
 """
 
 import sys
 from pathlib import Path
-
 import yaml
 
 # Project root
@@ -20,119 +19,69 @@ PROJECT_ROOT = Path(__file__).parent.parent.parent
 REGISTRY_PATH = PROJECT_ROOT / "kernel" / "epistemic_status.yaml"
 
 
+# PURPOSE: Load the epistemic status registry from YAML file
 def load_registry() -> dict:
     """Load the epistemic status registry"""
     if not REGISTRY_PATH.exists():
-        return {"patches": {}}
-    with open(REGISTRY_PATH, encoding="utf-8") as f:
-        return yaml.safe_load(f) or {"patches": {}}
+        return {}
+
+    try:
+        with open(REGISTRY_PATH, encoding="utf-8") as f:
+            return yaml.safe_load(f)
+    except Exception:
+        return {}
 
 
-def check_falsification(
-    paper_text: str,
-    paper_title: str = "",
-    threshold: float = 0.5,
-) -> list[dict]:
+# PURPOSE: Check if a paper's claims match any falsification conditions in the registry
+def check_falsification(paper_summary: str, paper_claims: list[str]) -> list[str]:
     """
-    消化テキストと反証条件を照合し、警告を生成。
+    Check if the paper matches any falsification conditions.
 
     Args:
-        paper_text: 消化対象のテキスト (全文 or 要約)
-        paper_title: 論文タイトル (ログ用)
-        threshold: キーワードマッチの閾値 (0-1)
+        paper_summary: Abstract or summary of the paper
+        paper_claims: List of claims extracted from the paper
 
     Returns:
-        警告リスト [{patch_id, claim, falsification, matched_keywords, score}]
+        List of alert messages strings
     """
     registry = load_registry()
     patches = registry.get("patches", {})
     alerts = []
 
-    paper_lower = paper_text.lower()
+    text_content = (paper_summary + " " + " ".join(paper_claims)).lower()
 
     for patch_id, patch in patches.items():
         falsification = patch.get("falsification", "")
         if not falsification:
             continue
 
-        # Keyword extraction from falsification condition
-        # Split into meaningful keywords (3+ chars)
-        keywords = [
-            w.strip(".,;:()\"'")
-            for w in falsification.lower().split()
-            if len(w.strip(".,;:()\"'")) >= 3
-        ]
-        # Remove common stopwords
-        stopwords = {
-            "the", "and", "for", "that", "this", "with", "from", "not",
-            "are", "was", "were", "been", "being", "have", "has", "had",
-            "does", "did", "will", "would", "could", "should", "may",
-            "might", "shall", "can", "its", "his", "her", "our",
-            "その", "この", "あの", "する", "ある", "いる",
-            "ない", "ない場合", "場合", "場合は",
-        }
-        keywords = [k for k in keywords if k not in stopwords]
+        # Simple keyword matching for now (MVP)
+        # In the future, this should use embedding/LLM
+        keywords = [k.strip().lower() for k in falsification.split(",")]
 
-        if not keywords:
+        # Check if all keywords are present? Or any?
+        # Let's say if >50% of meaningful keywords match
+        meaningful_keywords = [k for k in keywords if len(k) > 3]
+        if not meaningful_keywords:
             continue
 
-        # Count keyword matches
-        matched = [k for k in keywords if k in paper_lower]
-        score = len(matched) / len(keywords) if keywords else 0
+        matches = sum(1 for k in meaningful_keywords if k in text_content)
+        match_rate = matches / len(meaningful_keywords)
 
-        if score >= threshold:
-            alerts.append({
-                "patch_id": patch_id,
-                "claim": patch.get("claim", ""),
-                "status": patch.get("status", ""),
-                "falsification": falsification,
-                "matched_keywords": matched,
-                "score": score,
-                "source": patch.get("source", ""),
-            })
+        if match_rate >= 0.7:  # High confidence match
+            alerts.append(
+                f"🚨 **Falsification Alert**: This paper may falsify '{patch_id}'\n"
+                f"   Condition: {falsification}\n"
+                f"   Claim in registry: {patch.get('claim')}"
+            )
 
-    # Sort by score (highest first)
-    alerts.sort(key=lambda a: a["score"], reverse=True)
     return alerts
 
 
-def format_alerts(alerts: list[dict], paper_title: str = "") -> str:
-    """警告をフォーマットされたテキストに変換"""
+# PURPOSE: Format a list of alert strings into a single report string
+def format_alerts(alerts: list[str]) -> str:
+    """Format alerts for display"""
     if not alerts:
-        return ""
+        return "✅ No falsification conditions triggered."
 
-    lines = [
-        "⚠️ **Falsification Alert** — 以下のパッチの反証条件に関連する可能性:",
-        "",
-    ]
-
-    for a in alerts:
-        lines.extend([
-            f"- **{a['patch_id']}** ({a['status']}): {a['claim']}",
-            f"  反証条件: {a['falsification']}",
-            f"  マッチ: {', '.join(a['matched_keywords'])} (score: {a['score']:.0%})",
-            "",
-        ])
-
-    lines.append(
-        "> 上記は自動検出です。実際に反証が成立するかは人間の判断が必要です。"
-    )
-
-    return "\n".join(lines)
-
-
-if __name__ == "__main__":
-    # Demo: run with sample text
-    sample = """
-    This paper demonstrates that attention mechanisms in shallow layers
-    can capture causal dependencies, contradicting the assumption that
-    only deep layers handle causal reasoning. Our architecture shows
-    that parallel sampling outperforms sequential Chain-of-Thought
-    in knowledge-intensive tasks.
-    """
-
-    alerts = check_falsification(sample, "Demo Paper")
-    if alerts:
-        print(format_alerts(alerts, "Demo Paper"))
-    else:
-        print("✅ No falsification conditions triggered")
+    return "\n\n".join(alerts)

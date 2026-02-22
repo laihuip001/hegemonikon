@@ -1,3 +1,4 @@
+# PROOF: [L2/Periskope] <- mekhane/periskope/citation_agent.py O3→Zet→Search
 """
 Citation verification agent for Periskopē.
 

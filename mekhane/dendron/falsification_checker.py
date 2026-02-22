@@ -1,3 +1,4 @@
+# PROOF: [L2/Dendron] <- mekhane/dendron/falsification_checker.py A4→Epi→Consistency
 """
 S7: Falsification Condition Checker
 

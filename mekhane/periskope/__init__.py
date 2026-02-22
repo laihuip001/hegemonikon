@@ -1,3 +1,4 @@
+# PROOF: [L2/Periskope] <- mekhane/periskope/__init__.py O3→Zet→Search
 """
 Periskopē — HGK Deep Research Engine
 

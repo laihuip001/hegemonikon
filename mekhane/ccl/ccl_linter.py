@@ -1,3 +1,4 @@
+# PROOF: [L1/定理] <- mekhane/ccl/ S1→CCL処理
 """CCL Linter — CCL 式の静的検証。
 
 operators.md (SSOT) に基づいて CCL 式を検証し、

@@ -1,3 +1,4 @@
+# PROOF: [L2/検索] <- mekhane/periskope/ K4→検索統合
 """
 Citation verification agent for Periskopē.
 

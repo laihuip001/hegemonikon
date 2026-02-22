@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/periskope/synthesizer.py Automating existence
 """
 Multi-model synthesizer for Periskopē.
 

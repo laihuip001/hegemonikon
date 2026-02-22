@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/periskope/ A2→Krisis→Implementation
 """
 Citation verification agent for Periskopē.
 

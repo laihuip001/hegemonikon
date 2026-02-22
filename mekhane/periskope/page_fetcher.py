@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/periskope/ A2→Krisis→Implementation
 """
 Page Fetcher — 選択的全文クロール for Periskopē.
 

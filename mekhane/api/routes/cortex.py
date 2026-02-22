@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/api/routes/ A2→Krisis→Implementation
 from typing import Any, AsyncGenerator
 
 import asyncio

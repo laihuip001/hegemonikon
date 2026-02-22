@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/dendron/ A0->Existence
 """
 S7: Falsification Condition Checker
 
@@ -109,6 +110,7 @@ def summary_stats(registry: dict) -> dict:
     }
 
 
+# PURPOSE: Main entry point
 def main():
     registry = load_registry()
     

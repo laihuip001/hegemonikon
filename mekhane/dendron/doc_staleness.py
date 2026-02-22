@@ -70,7 +70,7 @@ class StalenessResult:
 # ── Version Compare ──────────────────────────────────
 
 
-# PURPOSE: packaging.version を使った安全なバージョン比較。pre-release にも対応する
+# PURPOSE: Parse version string safely using packaging.version, defaulting to 0.0.0 on error
 def _parse_version(v: str) -> Version:
     """Parse version string via packaging.version.Version.
 
@@ -100,17 +100,19 @@ class DocStalenessChecker:
         "node_modules", ".pytest_cache",
     })
 
+    # PURPOSE: Initialize the staleness checker with empty state
     def __init__(self) -> None:
         self._docs: Dict[str, DocInfo] = {}
         self._results: List[StalenessResult] = []
         self._warnings: List[str] = []
 
+    # PURPOSE: Expose internal warnings for CLI reporting
     @property
     def warnings(self) -> List[str]:
         """scan 時の警告 (doc_id 重複等)."""
         return list(self._warnings)
 
-    # PURPOSE: プロジェクト内の全 .md ファイルから frontmatter を収集し、依存グラフ構築の材料にする
+    # PURPOSE: Scan the project root for markdown files and extract their metadata
     def scan(self, root: Path) -> List[DocInfo]:
         """全 .md ファイルの YAML frontmatter をパースして DocInfo 一覧を構築."""
         self._docs.clear()
@@ -131,7 +133,7 @@ class DocStalenessChecker:
                 self._docs[doc_info.doc_id] = doc_info
         return list(self._docs.values())
 
-    # PURPOSE: YAML frontmatter から doc_id/version/depends_on を抽出し DocInfo を生成する
+    # PURPOSE: Extract doc_id, version, and dependencies from a file's YAML frontmatter
     def _parse_frontmatter(self, path: Path) -> Optional[DocInfo]:
         """YAML frontmatter をパースして DocInfo を返す. frontmatter なしは None."""
         try:
@@ -177,7 +179,7 @@ class DocStalenessChecker:
             depends_on=depends_on,
         )
 
-    # PURPOSE: 依存グラフを走査し、全辺の STALE/WARNING/CIRCULAR を判定する
+    # PURPOSE: Analyze the dependency graph to identify stale, warning, or circular dependencies
     def check(self) -> List[StalenessResult]:
         """依存グラフを検査して StalenessResult 一覧を返す."""
         self._results.clear()
@@ -255,7 +257,7 @@ class DocStalenessChecker:
 
         return self._results
 
-    # PURPOSE: 有向グラフの循環辺を検出し、CIRCULAR ステータスの判定材料にする
+    # PURPOSE: Identify circular dependencies in the graph
     @staticmethod
     def _detect_circular(edges: dict[str, set[str]]) -> set[tuple[str, str]]:
         """循環する辺ペアの集合を返す."""
@@ -267,7 +269,7 @@ class DocStalenessChecker:
                     circular.add((dst, src))
         return circular
 
-    # PURPOSE: STALE でない依存辺の割合を計算し、EPT スコア統合の入力にする
+    # PURPOSE: Calculate the percentage of healthy (non-stale) dependencies
     def doc_health_pct(self) -> float:
         """Doc Health %: STALE でない割合."""
         if not self._results:
@@ -278,7 +280,7 @@ class DocStalenessChecker:
         )
         return (ok_count / len(self._results)) * 100.0
 
-    # PURPOSE: CLI 実行時に人間が読めるレポートを標準出力に表示する
+    # PURPOSE: Generate a human-readable report of the staleness check results
     def format_report(self) -> str:
         """人間可読なレポートをフォーマット."""
         if not self._results:
@@ -311,7 +313,7 @@ class DocStalenessChecker:
 
         return "\n".join(lines)
 
-    # PURPOSE: 依存関係を Mermaid グラフ形式で出力する (F6)
+    # PURPOSE: Generate a Mermaid diagram of the document dependency graph
     def generate_mermaid(self) -> str:
         """Mermaid 形式の依存グラフを生成."""
         if not self._docs:
@@ -361,7 +363,7 @@ class DocStalenessChecker:
 # ── CLI ──────────────────────────────────────────────
 
 
-# PURPOSE: CLI エントリポイント — --check で staleness 検査を実行する
+# PURPOSE: Entry point for the CLI to run staleness checks or generate graphs
 def main() -> None:
     parser = argparse.ArgumentParser(description="Doc Staleness Checker")
     parser.add_argument(

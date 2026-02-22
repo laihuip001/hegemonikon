@@ -1,3 +1,5 @@
+# PROOF: [L2/Mekhane] <- tests/ 自動生成された存在証明
+
 # PURPOSE: MultiSemanticAgent のテスト (Layer B: Nous)
 """
 Tests for Multi-LLM Ensemble Audit Agent.

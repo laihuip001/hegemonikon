@@ -1,3 +1,5 @@
+# PROOF: [L2/Mekhane] <- tests/ 自動生成された存在証明
+
 """Ochēma unit tests: context_health, _select_model, archive_sessions.
 
 LS 非接続環境でもテスト可能。AntigravityClient のメソッドを

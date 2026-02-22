@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Mekhane] <- tests/ 自動生成された存在証明
+
 """Unseen input validation — exemplar/benchmark と重複しない入力で精度を検証.
 
 PURPOSE: multi-prototype の overfitting 検知。

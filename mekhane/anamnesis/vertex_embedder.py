@@ -1,3 +1,5 @@
+# PROOF: [L2/Mekhane] <- anamnesis/ 自動生成された存在証明
+
 import os
 import logging
 from google import genai

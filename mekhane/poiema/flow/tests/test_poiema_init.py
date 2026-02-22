@@ -1,3 +1,5 @@
+# PROOF: [L2/Mekhane] <- tests/ 自動生成された存在証明
+
 """
 Poiema __init__.py 統合テスト
 

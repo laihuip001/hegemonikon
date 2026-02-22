@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Mekhane] <- tests/ 自動生成された存在証明
+
 """
 MCP Server Integration Tests — mneme/ochema 統合後の回帰テスト
 

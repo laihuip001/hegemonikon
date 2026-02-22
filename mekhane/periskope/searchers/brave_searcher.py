@@ -1,3 +1,5 @@
+# PROOF: [L2/Mekhane] <- searchers/ 自動生成された存在証明
+
 """
 Brave Search API client for Periskopē.
 

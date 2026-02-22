@@ -1,3 +1,5 @@
+# PROOF: [L2/Mekhane] <- tests/ 自動生成された存在証明
+
 """UML Phase 2 — SEL 統合テスト"""
 
 import pytest

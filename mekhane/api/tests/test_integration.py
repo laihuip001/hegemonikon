@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/api/tests/test_integration.py Auto-generated existence proof
 """
 Tests for Timeline, Kalon, and Symploke Mnēmē API routes.
 """

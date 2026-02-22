@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/ccl/tests/test_pattern_cache.py Auto-generated existence proof
 """Tests for mekhane.ccl.pattern_cache.PatternCache."""
 
 import unittest

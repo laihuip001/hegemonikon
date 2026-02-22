@@ -1,5 +1,5 @@
-# PROOF: [L2/インフラ] <- mekhane/ergasterion/typos/ S2→プロンプト言語が必要→test_typos が担う
 #!/usr/bin/env python3
+# PROOF: [L2/インフラ] <- mekhane/ergasterion/typos/ S2→プロンプト言語が必要→test_typos が担う
 """
 typos Unit Tests
 ======================

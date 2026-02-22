@@ -1,5 +1,5 @@
-# PROOF: [L2/インフラ] <- mekhane/ergasterion/typos/ S2→プロンプト言語が必要→typos_integrate が担う
 #!/usr/bin/env python3
+# PROOF: [L2/インフラ] <- mekhane/ergasterion/typos/ S2→プロンプト言語が必要→typos_integrate が担う
 """
 typos Auto-Fire Integration
 ==================================

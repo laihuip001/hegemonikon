@@ -1,5 +1,5 @@
-# PURPOSE: Digestor 定時収集デーモン — OS 非依存の論文消化スケジューラ
 # PROOF: [L2/インフラ] <- mekhane/ergasterion/digestor/ A0→消化処理が必要→scheduler が担う
+# PURPOSE: Digestor 定時収集デーモン — OS 非依存の論文消化スケジューラ
 #!/usr/bin/env python3
 """
 Digestor Scheduler - OS 非依存の定時収集デーモン

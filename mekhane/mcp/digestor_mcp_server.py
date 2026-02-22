@@ -1,5 +1,5 @@
-# PROOF: [L2/インフラ] <- mekhane/mcp/ A0→MCP経由のアクセスが必要→digestor_mcp_server が担う
 #!/usr/bin/env python3
+# PROOF: [L2/インフラ] <- mekhane/mcp/ A0→MCP経由のアクセスが必要→digestor_mcp_server が担う
 """
 Digestor MCP Server v2.1 - Hegemonikón Knowledge Digestion Pipeline
 

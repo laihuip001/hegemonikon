@@ -1,5 +1,5 @@
-# PROOF: [L2/インフラ] <- mekhane/mcp/ A0→MCP経由のアクセスが必要→gnosis_mcp_server が担う
 #!/usr/bin/env python3
+# PROOF: [L2/インフラ] <- mekhane/mcp/ A0→MCP経由のアクセスが必要→gnosis_mcp_server が担う
 """
 ⚠️ DEPRECATED (2026-02-18): mneme_server.py に統合済み。このファイルは直接使用しない。
 Gnōsis MCP Server - Hegemonikón Knowledge Base

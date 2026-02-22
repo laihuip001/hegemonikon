@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Mekhane] <- mekhane/pks/tests/test_gateway_stats.py Auto-generated existence proof
 """F6c: Gateway Stats API endpoint tests."""
 
 import pytest

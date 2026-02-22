@@ -1,5 +1,5 @@
-# noqa: AI-ALL
 # PROOF: [L2/インフラ] <- mekhane/fep/
+# noqa: AI-ALL
 """
 PROOF: [L2/インフラ] このファイルは存在しなければならない
 

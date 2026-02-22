@@ -1,5 +1,5 @@
-# PROOF: [L3/テスト] <- mekhane/tests_root/ 対象モジュールが存在→検証が必要
 #!/usr/bin/env python3
+# PROOF: [L3/テスト] <- mekhane/tests_root/ 対象モジュールが存在→検証が必要
 """
 Basanos テストスイート
 

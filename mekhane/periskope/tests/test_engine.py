@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/periskope/tests/test_engine.py Auto-generated existence proof
 """
 Tests for Periskopē Engine (orchestrator).
 """

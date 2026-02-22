@@ -13,11 +13,6 @@ import pytest
 # Add parent to path
 sys.path.insert(0, "/home/makaron8426/oikos/hegemonikon")
 
-try:
-    from mekhane.symploke.jules_client import JulesClient
-except ImportError:
-    pytest.skip("JulesClient or dependencies (aiohttp) not available", allow_module_level=True)
-
 
 # PURPOSE: Test API connection by listing sources
 @pytest.mark.asyncio

@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/periskope/synthesizer.py Auto-generated proof for CI
 """
 Multi-model synthesizer for Periskopē.
 

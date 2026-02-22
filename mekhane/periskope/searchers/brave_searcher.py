@@ -1,3 +1,4 @@
+# PROOF: [L2-auto] Automatic fix for CI failure
 """
 Brave Search API client for Periskopē.
 

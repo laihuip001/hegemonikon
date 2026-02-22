@@ -1,0 +1,71 @@
+
+import os
+
+files_to_fix = [
+    "mekhane/tape.py",
+    "mekhane/ccl/operator_loader.py",
+    "mekhane/ccl/ccl_linter.py",
+    "mekhane/mcp/mcp_guard.py",
+    "mekhane/mcp/mcp_base.py",
+    "mekhane/ochema/ls_launcher.py",
+    "mekhane/ochema/fake_extension_server.py",
+    "mekhane/dendron/falsification_checker.py",
+    "mekhane/dendron/falsification_matcher.py",
+    "mekhane/periskope/engine.py",
+    "mekhane/periskope/synthesizer.py",
+    "mekhane/periskope/models.py",
+    "mekhane/periskope/query_expander.py",
+    "mekhane/periskope/__init__.py",
+    "mekhane/periskope/citation_agent.py",
+    "mekhane/periskope/page_fetcher.py",
+    "mekhane/periskope/cli.py",
+    "mekhane/exagoge/__main__.py",
+    "mekhane/anamnesis/vertex_embedder.py",
+    "mekhane/ochema/proto/extension_server_pb2_grpc.py",
+    "mekhane/ochema/proto/__init__.py",
+    "mekhane/ochema/proto/extension_server_pb2.py",
+    "mekhane/periskope/searchers/__init__.py",
+    "mekhane/periskope/searchers/internal_searcher.py",
+    "mekhane/periskope/searchers/tavily_searcher.py",
+    "mekhane/periskope/searchers/semantic_scholar_searcher.py",
+    "mekhane/periskope/searchers/playwright_searcher.py",
+    "mekhane/periskope/searchers/brave_searcher.py",
+    "mekhane/periskope/searchers/searxng.py",
+    "mekhane/api/routes/cortex.py",
+    "mekhane/api/routes/devtools.py",
+    "mekhane/basanos/l2/g_semantic.py",
+    "mekhane/basanos/l2/resolver.py",
+    "mekhane/basanos/l2/models.py",
+    "mekhane/basanos/l2/g_struct.py",
+    "mekhane/basanos/l2/__init__.py",
+    "mekhane/basanos/l2/deficit_factories.py",
+    "mekhane/basanos/l2/hom.py",
+    "mekhane/basanos/l2/history.py",
+    "mekhane/basanos/l2/cli.py",
+]
+
+for filepath in files_to_fix:
+    if not os.path.exists(filepath):
+        print(f"Skipping {filepath} (not found)")
+        continue
+
+    with open(filepath, "r", encoding="utf-8") as f:
+        lines = f.readlines()
+
+    if lines and lines[0].startswith("#!/usr/bin/env python3"):
+        insert_idx = 1
+    else:
+        insert_idx = 0
+
+    # Check if PROOF already exists in first few lines
+    has_proof = any(line.startswith("# PROOF:") for line in lines[:5])
+    if has_proof:
+        print(f"Skipping {filepath} (already has PROOF)")
+        continue
+
+    header = f"# PROOF: [L2/Mekhane] <- {filepath} Automated PROOF insertion\n"
+    lines.insert(insert_idx, header)
+
+    with open(filepath, "w", encoding="utf-8") as f:
+        f.writelines(lines)
+    print(f"Fixed {filepath}")

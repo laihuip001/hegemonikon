@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/periskope/searchers/tavily_searcher.py Automated PROOF insertion
 """
 Tavily Search API client for Periskopē.
 

@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/periskope/searchers/__init__.py FEP->Implementation
 """
 Periskopē searchers — pluggable search source adapters.
 

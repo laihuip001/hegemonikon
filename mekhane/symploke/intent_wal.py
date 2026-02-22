@@ -19,6 +19,7 @@ from typing import Optional
 import yaml
 
 # WAL default directory
+# PURPOSE: use relative path for CI compatibility
 WAL_DIR = Path.home() / "oikos" / "mneme" / ".hegemonikon" / "wal"
 
 # Context health levels (BC-18)

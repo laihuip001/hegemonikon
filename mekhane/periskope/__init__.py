@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- periskope/
 """
 Periskopē — HGK Deep Research Engine
 

@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- searchers/
 """
 SearXNG search client for Periskopē.
 

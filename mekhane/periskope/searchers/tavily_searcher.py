@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- searchers/
 """
 Tavily Search API client for Periskopē.
 

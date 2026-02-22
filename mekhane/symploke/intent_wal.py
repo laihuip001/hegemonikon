@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Mekhane] <- mekhane/symploke/ A0→存在証明
 """Intent-WAL (Write-Ahead Log) Manager.
 
 Manages session intent WAL files for crash recovery and context continuity.
@@ -19,6 +20,7 @@ from typing import Optional
 import yaml
 
 # WAL default directory
+# PURPOSE: use relative path for CI compatibility
 WAL_DIR = Path.home() / "oikos" / "mneme" / ".hegemonikon" / "wal"
 
 # Context health levels (BC-18)

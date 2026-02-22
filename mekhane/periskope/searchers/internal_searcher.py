@@ -1,3 +1,4 @@
+# PROOF: [L2/検索] <- mekhane/periskope/ K4→検索統合
 """
 Internal knowledge searcher for Periskopē.
 

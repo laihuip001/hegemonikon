@@ -1,3 +1,4 @@
+# PROOF: [L2/品質] <- mekhane/dendron/ A4→品質保証
 """
 S7: Falsification Condition Checker
 

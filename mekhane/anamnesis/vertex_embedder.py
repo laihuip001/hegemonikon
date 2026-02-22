@@ -1,3 +1,4 @@
+# PROOF: [L3/記憶] <- mekhane/anamnesis/ K3→記憶埋め込み
 import os
 import logging
 from google import genai

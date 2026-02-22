@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/periskope/ Auto-generated proof
 """
 SearXNG search client for Periskopē.
 

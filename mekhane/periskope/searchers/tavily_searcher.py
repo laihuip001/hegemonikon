@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/ Auto-generated PROOF header
 """
 Tavily Search API client for Periskopē.
 

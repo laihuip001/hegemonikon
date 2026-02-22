@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/ Auto-generated PROOF header
 from typing import Any, AsyncGenerator
 
 import asyncio

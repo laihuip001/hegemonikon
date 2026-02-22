@@ -1,3 +1,5 @@
+# PROOF: [L2/Mekhane] <- tests/ 自動生成された存在証明
+
 # PURPOSE: G_semantic, HomCalculator, CLI のテスト
 # REASON: 拡張モジュールが正しく動作するか検証
 """Tests for Basanos L2 extensions: G_semantic, HomCalculator, CLI."""

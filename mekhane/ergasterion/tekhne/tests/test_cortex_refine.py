@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Mekhane] <- tests/ 自動生成された存在証明
+
 """
 Tests for Sweep Engine and Deep Engine — Cortex Refine Integration
 

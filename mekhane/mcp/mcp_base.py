@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Mekhane] <- mcp/ 自動生成された存在証明
+
 """
 MCP Base Module — Hegemonikón MCP Server Common Infrastructure
 

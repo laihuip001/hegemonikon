@@ -1,3 +1,5 @@
+# PROOF: [L2/Mekhane] <- routes/ 自動生成された存在証明
+
 from typing import Any, AsyncGenerator
 
 import asyncio

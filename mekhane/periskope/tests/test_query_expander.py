@@ -1,3 +1,5 @@
+# PROOF: [L2/Mekhane] <- tests/ 自動生成された存在証明
+
 """Tests for W3 QueryExpander and P3 weight distribution."""
 
 from __future__ import annotations

@@ -1,3 +1,5 @@
+# PROOF: [L2/Mekhane] <- tests/ 自動生成された存在証明
+
 """Tests for Credit Assignment — Teacher Signal for FEP Agent."""
 
 import json

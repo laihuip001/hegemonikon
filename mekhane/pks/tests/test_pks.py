@@ -1,3 +1,5 @@
+# PROOF: [L2/Mekhane] <- tests/ 自動生成された存在証明
+
 # PURPOSE: PKS v2 全モジュールの pytest テスト
 """
 PKS v2 テストスイート

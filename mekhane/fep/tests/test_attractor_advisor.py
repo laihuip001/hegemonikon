@@ -1,3 +1,5 @@
+# PROOF: [L2/Mekhane] <- tests/ 自動生成された存在証明
+
 """Tests for attractor_advisor helper functions."""
 
 import unittest

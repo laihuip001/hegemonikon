@@ -1,3 +1,5 @@
+# PROOF: [L2/Mekhane] <- tests/ 自動生成された存在証明
+
 """Tests for wf_env_bridge — WF turbo inter-step context store."""
 
 import json

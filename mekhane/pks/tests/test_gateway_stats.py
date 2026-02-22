@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Mekhane] <- tests/ 自動生成された存在証明
+
 """F6c: Gateway Stats API endpoint tests."""
 
 import pytest

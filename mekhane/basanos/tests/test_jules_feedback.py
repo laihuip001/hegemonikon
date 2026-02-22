@@ -1,3 +1,5 @@
+# PROOF: [L2/Mekhane] <- tests/ 自動生成された存在証明
+
 """Tests for JulesFeedback — L2結果→L0精度フィードバック。"""
 
 import json

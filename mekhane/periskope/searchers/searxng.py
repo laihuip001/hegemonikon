@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/ Dendron CI check pass
 """
 SearXNG search client for Periskopē.
 

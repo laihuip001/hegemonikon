@@ -18,11 +18,16 @@ try:
 except ImportError:
     JulesClient = None
 
+try:
+    import aiohttp
+except ImportError:
+    aiohttp = None
+
 
 # PURPOSE: Test API connection by listing sources
 @pytest.mark.asyncio
 @pytest.mark.skipif(not os.environ.get("JULES_API_KEY"), reason="JULES_API_KEY not set")
-@pytest.mark.skipif(JulesClient is None, reason="aiohttp not installed")
+@pytest.mark.skipif(aiohttp is None, reason="aiohttp not installed")
 async def test_connection():
     """Test API connection by listing sources."""
     api_key = os.environ.get("JULES_API_KEY")

@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/periskope/engine.py Auto-generated proof for CI compliance
 """
 Periskopē Deep Research Engine — Orchestrator.
 

@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhanē] <- periskope/ A0→Need→This module fills it
 """
 Periskopē — HGK Deep Research Engine
 

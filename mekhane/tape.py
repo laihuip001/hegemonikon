@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhanē] <- mekhane/ A0→Need→This module fills it
 """
 Tape Writer — WF 実行トレースを JSONL として記録する。
 

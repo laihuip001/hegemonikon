@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhanē] <- searchers/ A0→Need→This module fills it
 """
 Brave Search API client for Periskopē.
 

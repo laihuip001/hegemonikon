@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhanē] <- mcp/ A0→Need→This module fills it
 """
 MCP Guard — ゾンビプロセス防止の自己防衛モジュール
 

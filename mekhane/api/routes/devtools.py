@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhanē] <- routes/ A0→Need→This module fills it
 """
 DevTools API routes — ファイル操作・ターミナル・Ochema (AI) をフロントエンド DevTools ビューに提供。
 

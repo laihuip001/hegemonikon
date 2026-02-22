@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/ Automatically added
 """
 Page Fetcher — 選択的全文クロール for Periskopē.
 

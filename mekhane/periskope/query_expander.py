@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/periskope/ A0→Implementation required→query_expander.py provides functionality
 """
 Query expander for Periskopē.
 

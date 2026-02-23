@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/tests/ A0→Implementation required→test_engine.py provides functionality
 """
 Tests for Periskopē Engine (orchestrator).
 """

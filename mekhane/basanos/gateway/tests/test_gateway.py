@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/tests/ A0→Implementation required→test_gateway.py provides functionality
 """
 MCP Gateway — 統合テスト
 

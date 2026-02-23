@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/tests/ A0→Implementation required→test_tools.py provides functionality
 """Ochema AI Tool Use — Unit Tests.
 
 Tests for tools.py: 7 tools + Claude parser + system templates + audit log.

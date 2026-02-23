@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/tests/ A0→Implementation required→test_uml_sel_bridge.py provides functionality
 """UML Phase 2 — SEL 統合テスト"""
 
 import pytest

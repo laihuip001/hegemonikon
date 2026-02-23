@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/tests/ A0→Implementation required→test_trend_analyzer.py provides functionality
 """Tests for TrendAnalyzer — 合成データで全機能をテスト。"""
 
 import json

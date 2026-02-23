@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/tests/ A0→Implementation required→test_page_fetcher.py provides functionality
 """
 Tests for PageFetcher (W7: selective full-page crawling).
 """

@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Mekhane] <- mekhane/tests/ A0→Implementation required→test_pks_v2.py provides functionality
 # PURPOSE: PKS v2 新コンポーネントのテスト
 """
 PKS v2 テストスイート

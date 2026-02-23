@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/tests/ A0→Implementation required→test_lancedb_compat.py provides functionality
 """Tests for mekhane.anamnesis.lancedb_compat."""
 
 import unittest

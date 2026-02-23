@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/tests/ A0→Implementation required→test_gateway_bridge.py provides functionality
 """
 GatewayBridge テスト — E2E + 単体テスト
 

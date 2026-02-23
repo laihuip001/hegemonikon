@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Mekhane] <- mekhane/tests/ A0→Implementation required→test_two_cell.py provides functionality
 """Tests for two_cell.py — Weak 2-category structure."""
 
 import sys

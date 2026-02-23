@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/tests/ A0→Implementation required→test_boot_dispatcher.py provides functionality
 """
 Tests for Dispatcher integration in boot_integration.py
 

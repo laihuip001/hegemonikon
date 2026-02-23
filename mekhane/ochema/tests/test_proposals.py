@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/tests/ A0→Implementation required→test_proposals.py provides functionality
 """Ochēma unit tests: context_health, _select_model, archive_sessions.
 
 LS 非接続環境でもテスト可能。AntigravityClient のメソッドを

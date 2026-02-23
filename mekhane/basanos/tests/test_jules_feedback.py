@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/tests/ A0→Implementation required→test_jules_feedback.py provides functionality
 """Tests for JulesFeedback — L2結果→L0精度フィードバック。"""
 
 import json

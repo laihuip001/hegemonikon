@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Mekhane] <- mekhane/tests/ A0→Implementation required→test_intent_wal.py provides functionality
 """Tests for Intent-WAL Manager."""
 
 import sys

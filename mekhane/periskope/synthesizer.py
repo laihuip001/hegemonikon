@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/periskope/ A0→Implementation required→synthesizer.py provides functionality
 """
 Multi-model synthesizer for Periskopē.
 

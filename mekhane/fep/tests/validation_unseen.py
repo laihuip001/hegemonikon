@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Mekhane] <- mekhane/tests/ A0→Implementation required→validation_unseen.py provides functionality
 """Unseen input validation — exemplar/benchmark と重複しない入力で精度を検証.
 
 PURPOSE: multi-prototype の overfitting 検知。

@@ -17,9 +17,12 @@ Usage:
 """
 
 import asyncio
-import aiohttp
 import functools
 import logging
+try:
+    import aiohttp
+except ImportError:
+    aiohttp = None
 import os
 import time
 import uuid
@@ -255,7 +258,7 @@ class JulesClient:
     def __init__(
         self,
         api_key: Optional[str] = None,
-        session: Optional[aiohttp.ClientSession] = None,
+        session: Optional["aiohttp.ClientSession"] = None,
         max_concurrent: Optional[int] = None,
         base_url: Optional[str] = None,
     ):
@@ -268,6 +271,11 @@ class JulesClient:
             max_concurrent: Global concurrency limit. Defaults to MAX_CONCURRENT.
             base_url: Override API base URL. Also reads JULES_BASE_URL env var.
         """
+        if aiohttp is None:
+            raise ImportError(
+                "aiohttp is required for JulesClient. Install it with `pip install aiohttp`."
+            )
+
         self.api_key = api_key or os.environ.get("JULES_API_KEY")
         if not self.api_key:
             raise ValueError("API key required. Set JULES_API_KEY or pass api_key.")

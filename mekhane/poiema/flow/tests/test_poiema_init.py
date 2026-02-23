@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/poiema/flow/tests/ Automatically added to satisfy CI
 """
 Poiema __init__.py 統合テスト
 

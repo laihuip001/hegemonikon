@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/pks/tests/ Automatically added to satisfy CI
 """
 GatewayBridge テスト — E2E + 単体テスト
 

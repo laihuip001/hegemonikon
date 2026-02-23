@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/basanos/tests/ Automatically added to satisfy CI
 """Tests for TrendAnalyzer — 合成データで全機能をテスト。"""
 
 import json

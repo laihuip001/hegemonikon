@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/periskope/cli.py Automatically added to satisfy CI
 #!/usr/bin/env python3
 """
 Periskopē CLI — Deep Research from the command line.

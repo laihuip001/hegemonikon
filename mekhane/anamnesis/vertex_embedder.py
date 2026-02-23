@@ -1,3 +1,4 @@
+# PROOF: [L2/Anamnesis] <- mekhane/anamnesis/ A0->Embed->Vertex
 import os
 import logging
 from google import genai

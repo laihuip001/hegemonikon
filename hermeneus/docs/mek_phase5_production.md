@@ -124,3 +124,11 @@ hermeneus audit --period 7 --format json
 ---
 
 *Generated: 2026-02-01 | Origin: /mek+ Hermēneus Phase 5*
+
+## 検証済みステータス (2025-05-30)
+
+### [WO-J02] Self-Modification PoC
+- **Status**: ✅ Verified
+- **Scope**: `mekhane/api/routes/agent.py` + `serve.py` target
+- **Flow**: Agent (`/api/ask/agent`) -> Diff Proposal (`propose_edit`) -> Approval (`/api/ask/agent/approve`) -> Application -> Restart
+- **Test**: `tests/e2e/test_self_modification.py` passed.

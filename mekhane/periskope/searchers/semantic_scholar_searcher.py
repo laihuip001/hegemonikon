@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/ Axiom->Implementation
 """
 Semantic Scholar API client for Periskopē.
 

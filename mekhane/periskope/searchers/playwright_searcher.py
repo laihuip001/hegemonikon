@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/ Axiom->Implementation
 """
 Playwright-based searcher for Periskopē.
 

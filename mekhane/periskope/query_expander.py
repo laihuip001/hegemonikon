@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/ Axiom->Implementation
 """
 Query expander for Periskopē.
 

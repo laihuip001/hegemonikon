@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/ Axiom->Implementation
 """
 Internal knowledge searcher for Periskopē.
 

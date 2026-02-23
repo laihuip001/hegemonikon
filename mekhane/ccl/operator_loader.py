@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/ Axiom->Implementation
 """operators.md の SSOT パーサー。
 
 operators.md の Markdown テーブルから演算子定義を抽出し、

@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/periskope/citation_agent.py Automatically added to satisfy CI
 """
 Citation verification agent for Periskopē.
 

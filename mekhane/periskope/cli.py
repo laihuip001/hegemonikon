@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Mekhane] <- periskope Automatically added to satisfy CI
 """
 Periskopē CLI — Deep Research from the command line.
 

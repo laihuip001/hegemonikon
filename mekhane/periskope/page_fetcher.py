@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- periskope Automatically added to satisfy CI
 """
 Page Fetcher — 選択的全文クロール for Periskopē.
 

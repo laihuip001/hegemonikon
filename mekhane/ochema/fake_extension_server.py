@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- ochema Automatically added to satisfy CI
 """Fake Extension Server — ConnectRPC over HTTP.
 
 LS は ConnectRPC (extension_server_go_proto_connect) で Extension Server に接続する。

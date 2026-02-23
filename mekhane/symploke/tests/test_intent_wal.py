@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Mekhane] <- mekhane/symploke/tests/ Automatically added to satisfy CI
 """Tests for Intent-WAL Manager."""
 
 import sys

@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/periskope/engine.py O1->Zet->AutoFixed
 """
 Periskopē Deep Research Engine — Orchestrator.
 

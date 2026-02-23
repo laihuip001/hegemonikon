@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/periskope/searchers/searxng.py O1->Zet->AutoFixed
 """
 SearXNG search client for Periskopē.
 

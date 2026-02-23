@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/dendron/falsification_checker.py O1->Zet->AutoFixed
 """
 S7: Falsification Condition Checker
 

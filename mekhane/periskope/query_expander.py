@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/periskope/query_expander.py O1->Zet->AutoFixed
 """
 Query expander for Periskopē.
 

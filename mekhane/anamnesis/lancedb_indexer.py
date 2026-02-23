@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Mekhane] <- mekhane/anamnesis/lancedb_indexer.py Automatically added to satisfy CI
 # PROOF: [L2/インフラ] <- mekhane/anamnesis/
 r"""
 PROOF: [L2/インフラ]

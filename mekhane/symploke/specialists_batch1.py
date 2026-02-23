@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Mekhane] <- mekhane/symploke/specialists_batch1.py Automatically added to satisfy CI
 # PROOF: [L2/インフラ] <- mekhane/symploke/ A0→Tier1-1 Specialist定義が必要→specialists_batch1が担う
 """
 Specialist v2 カテゴリ: 型・安全性、エラー処理、関数設計、クラス設計

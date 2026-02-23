@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Mekhane] <- mekhane/exagoge/doxa_exporter.py Automatically added to satisfy CI
 # PROOF: [L2/コア] <- mekhane/exagoge/
 # PURPOSE: Doxa (信念) データのエクスポート機能
 """

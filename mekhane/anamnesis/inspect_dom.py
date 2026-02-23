@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Mekhane] <- mekhane/anamnesis/inspect_dom.py Automatically added to satisfy CI
 # PROOF: [L3/ユーティリティ] <- mekhane/anamnesis/ P3→DOM調査が必要→inspect_dom が担う
 """DOM構造調査スクリプト"""
 

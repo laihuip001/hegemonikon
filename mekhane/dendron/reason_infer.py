@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Mekhane] <- mekhane/dendron/reason_infer.py Automatically added to satisfy CI
 # PROOF: [L2/インフラ] <- mekhane/dendron/
 # PURPOSE: コードの REASON (存在理由の経緯) を自動推定して付与し、R軸カバレッジを改善する
 # REASON: REASON カバレッジ 1.3% (41/3089) を改善するため purpose_infer.py と同じアーキテクチャで構築

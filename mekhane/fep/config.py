@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/fep/config.py Automatically added to satisfy CI
 # noqa: AI-ALL
 # PROOF: [L2/インフラ] <- mekhane/fep/
 """

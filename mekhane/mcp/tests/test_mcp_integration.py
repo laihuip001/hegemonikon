@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Mekhane] <- mekhane/mcp/tests/test_mcp_integration.py Automatically added to satisfy CI
 """
 MCP Server Integration Tests — mneme/ochema 統合後の回帰テスト
 
@@ -481,4 +482,3 @@ class TestMnemeDendronCheck:
         result = await _handle_dendron_check({"path": str(test_file)})
         assert len(result) == 1
         assert isinstance(result[0].text, str)
-

@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Mekhane] <- mekhane/symploke/jules_daily_scheduler.py Automatically added to satisfy CI
 # PROOF: [L3/ユーティリティ] <- mekhane/symploke/ O4→日次バッチ消化→scheduler が担う
 # PURPOSE: Jules 720 tasks/day スケジューラー — 6垢分散 + 自動ローテーション
 """

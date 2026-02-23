@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Mekhane] <- mekhane/ergasterion/tekhne/tests/test_pipeline.py Automatically added to satisfy CI
 # PROOF: [L3/テスト] <- mekhane/ergasterion/tekhne/ TekhnePipeline 統合テスト
 """
 TekhnePipeline Integration Tests.

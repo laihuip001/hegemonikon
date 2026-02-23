@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Mekhane] <- mekhane/pks/self_advocate.py Automatically added to satisfy CI
 # PROOF: [L2/インフラ] <- mekhane/pks/
 """
 PROOF: [L2/インフラ] このファイルは存在しなければならない

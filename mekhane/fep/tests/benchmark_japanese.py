@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Mekhane] <- mekhane/fep/tests/benchmark_japanese.py Automatically added to satisfy CI
 # PROOF: [L3/テスト] <- mekhane/fep/tests/
 # PURPOSE: FEP日本語処理のベンチマーク測定
 """

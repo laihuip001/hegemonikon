@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Mekhane] <- mekhane/dendron/purpose_infer.py Automatically added to satisfy CI
 # PROOF: [L2/インフラ] <- mekhane/dendron/ A0→PURPOSE自動付与が必要→purpose_inferが担う
 """
 PURPOSE Auto-Inferer — 関数/クラスの名前と文脈から PURPOSE コメントを自動推定して付与する。

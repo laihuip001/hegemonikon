@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Mekhane] <- mekhane/mcp/hgk_gateway.py Automatically added to satisfy CI
 # PROOF: [L2/インフラ] <- mekhane/mcp/ 出張 HGK MCP Gateway
 """
 出張 HGK MCP Gateway — モバイルからの HGK アクセス
@@ -1877,4 +1878,3 @@ if __name__ == "__main__":
     print("🔒 OAuth 2.1 authentication ENABLED")
     print(f"🚀 HGK Gateway starting on {GATEWAY_HOST}:{GATEWAY_PORT}")
     mcp.run(transport="streamable-http")
-

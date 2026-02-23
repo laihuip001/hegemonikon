@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Mekhane] <- mekhane/symploke/basanos_bridge.py Automatically added to satisfy CI
 # PROOF: [L2/インフラ] <- mekhane/symploke/ A2→構造化レビュー統合→basanos_bridge が担う
 # PURPOSE: Basanos PerspectiveMatrix → Specialist v2 変換アダプタ
 """

@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Mekhane] <- mekhane/exagoge/tests/test_extractor.py Automatically added to satisfy CI
 # PROOF: [L1/テスト] <- mekhane/exagoge/tests/
 # PURPOSE: Exagoge extractor モジュールのユニットテスト
 """

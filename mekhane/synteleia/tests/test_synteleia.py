@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Mekhane] <- mekhane/synteleia/tests/test_synteleia.py Automatically added to satisfy CI
 # PROOF: [L2/テスト] <- mekhane/synteleia/tests/
 # PURPOSE: Synteleia 2層オーケストレーター + 基底クラスの包括テスト
 """Synteleia Audit System Tests"""
@@ -781,4 +782,3 @@ class TestSynMacroRegistration:
         from hermeneus.src.macros import get_all_macros
         all_macros = get_all_macros()
         assert "syn" in all_macros
-

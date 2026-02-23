@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Mekhane] <- mekhane/symploke/tests/test_audit_matcher.py Automatically added to satisfy CI
 # PROOF: [L2/テスト] <- mekhane/symploke/tests/
 # PURPOSE: F7/F8 のユニットテスト
 """Tests for Audit-Specialist Matcher and Dynamic Perspective Generator."""

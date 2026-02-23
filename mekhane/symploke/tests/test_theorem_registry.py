@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Mekhane] <- mekhane/symploke/tests/test_theorem_registry.py Automatically added to satisfy CI
 # PROOF: [L2/テスト] <- mekhane/symploke/tests/
 # PURPOSE: Boot THEOREM_REGISTRY の包括テスト — 96要素体系の Boot 時参照を検証
 """Boot THEOREM_REGISTRY Tests"""

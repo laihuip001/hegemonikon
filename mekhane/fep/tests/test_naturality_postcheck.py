@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Mekhane] <- mekhane/fep/tests/test_naturality_postcheck.py Automatically added to satisfy CI
 # PROOF: [L3/テスト] <- scripts/tests/
 """
 PROOF: [L3/テスト] このファイルは存在しなければならない

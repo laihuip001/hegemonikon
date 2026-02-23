@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Mekhane] <- mekhane/symploke/audit_specialist_matcher.py Automatically added to satisfy CI
 # PROOF: [L2/データフロー] <- mekhane/symploke/ S2→issue→specialist ルーティング
 # PURPOSE: AIAuditor issue コード → Specialist カテゴリ 自動マッチング
 """

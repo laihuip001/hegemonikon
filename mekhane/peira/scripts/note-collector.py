@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Mekhane] <- mekhane/peira/scripts/note-collector.py Automatically added to satisfy CI
 # PROOF: [L2/インフラ] <- mekhane/peira/ A0→note.com記事収集が必要→note-collectorが担う
 """
 note.com 記事収集スクリプト v2

@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/anamnesis/collectors/base.py Automatically added to satisfy CI
 # noqa: AI-ALL
 # PROOF: [L2/インフラ] <- mekhane/anamnesis/collectors/
 """

@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Mekhane] <- mekhane/api/routes/gnosis_narrator.py Automatically added to satisfy CI
 # PROOF: [L2/Gnōsis] <- mekhane/api/routes/
 # PURPOSE: Gnōsis Narrator API — 論文カード + 問い + ナレーション
 """

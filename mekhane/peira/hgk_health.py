@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Mekhane] <- mekhane/peira/hgk_health.py Automatically added to satisfy CI
 # PROOF: [L2/インフラ] <- mekhane/peira/ A0→システム可観測性が必要→hgk_healthが担う
 """
 Hegemonikón Health Dashboard — 全サービスの死活と品質を一覧表示

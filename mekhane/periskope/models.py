@@ -1,3 +1,4 @@
+# PROOF: [L2/Periskope] <- mekhane/periskope/models.py A0->Need->Implementation
 """
 Periskopē data models.
 

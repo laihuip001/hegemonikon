@@ -1,3 +1,4 @@
+# PROOF: [L2/API] <- api/routes/ S2->API endpoints
 from typing import Any, AsyncGenerator
 
 import asyncio

@@ -1,3 +1,4 @@
+# PROOF: [L2/Search] <- periskope/searchers/ K2->Search strategy implementation
 """
 Periskopē searchers — pluggable search source adapters.
 

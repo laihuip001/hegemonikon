@@ -1,3 +1,4 @@
+# PROOF: [L2/Search] <- periskope/ K2->Search integration
 """
 Page Fetcher — 選択的全文クロール for Periskopē.
 

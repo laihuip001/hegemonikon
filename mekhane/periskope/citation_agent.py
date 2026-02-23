@@ -1,3 +1,4 @@
+# PROOF: [L2/Search] <- periskope/ K2->Search integration
 """
 Citation verification agent for Periskopē.
 

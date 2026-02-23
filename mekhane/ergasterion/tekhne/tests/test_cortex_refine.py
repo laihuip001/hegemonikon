@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Mekhane] <- mekhane/tests/ A0→Implementation required→test_cortex_refine.py provides functionality
 """
 Tests for Sweep Engine and Deep Engine — Cortex Refine Integration
 

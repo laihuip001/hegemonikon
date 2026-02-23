@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/tests/ A0→Implementation required→test_poiema_init.py provides functionality
 """
 Poiema __init__.py 統合テスト
 

@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/tests/ A0→Implementation required→test_operator_loader.py provides functionality
 """G6: dispatch E2E テスト + G9: Linter テスト + operator_loader テスト。"""
 
 import pytest

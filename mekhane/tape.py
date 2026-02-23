@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/mekhane/ A0→Implementation required→tape.py provides functionality
 """
 Tape Writer — WF 実行トレースを JSONL として記録する。
 

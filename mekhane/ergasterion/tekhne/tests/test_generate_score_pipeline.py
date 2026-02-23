@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Mekhane] <- mekhane/tests/ A0→Implementation required→test_generate_score_pipeline.py provides functionality
 """
 Generate → Score Pipeline CI Tests
 

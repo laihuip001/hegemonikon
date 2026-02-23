@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/tests/ A0→Implementation required→test_query_expander.py provides functionality
 """Tests for W3 QueryExpander and P3 weight distribution."""
 
 from __future__ import annotations

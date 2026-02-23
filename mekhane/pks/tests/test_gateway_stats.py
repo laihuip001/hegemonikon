@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Mekhane] <- mekhane/tests/ A0→Implementation required→test_gateway_stats.py provides functionality
 """F6c: Gateway Stats API endpoint tests."""
 
 import pytest

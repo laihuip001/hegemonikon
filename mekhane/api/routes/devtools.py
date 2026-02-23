@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/routes/ A0→Implementation required→devtools.py provides functionality
 """
 DevTools API routes — ファイル操作・ターミナル・Ochema (AI) をフロントエンド DevTools ビューに提供。
 

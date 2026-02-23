@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Mekhane] <- mekhane/tests/ A0→Implementation required→test_pks_e2e.py provides functionality
 # PURPOSE: PKS v2 E2E シナリオテスト
 """
 PKS v2 End-to-End シナリオテスト

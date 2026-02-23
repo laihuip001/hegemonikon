@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/tests/ A0→Implementation required→test_pks.py provides functionality
 # PURPOSE: PKS v2 全モジュールの pytest テスト
 """
 PKS v2 テストスイート

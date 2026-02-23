@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/anamnesis/ A0→Implementation required→vertex_embedder.py provides functionality
 import os
 import logging
 from google import genai

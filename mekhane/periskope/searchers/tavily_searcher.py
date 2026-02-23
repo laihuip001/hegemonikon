@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/searchers/ A0→Implementation required→tavily_searcher.py provides functionality
 """
 Tavily Search API client for Periskopē.
 

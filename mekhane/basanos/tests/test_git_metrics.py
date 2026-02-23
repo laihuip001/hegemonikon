@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/tests/ A0→Implementation required→test_git_metrics.py provides functionality
 """Tests for GitMetrics — git 履歴からのリスク予兆検出。"""
 
 import subprocess

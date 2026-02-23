@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/tests/ A0→Implementation required→test_attractor_advisor.py provides functionality
 """Tests for attractor_advisor helper functions."""
 
 import unittest

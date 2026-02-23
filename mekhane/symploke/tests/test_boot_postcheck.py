@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Mekhane] <- mekhane/tests/ A0→Implementation required→test_boot_postcheck.py provides functionality
 """Tests for boot_integration template generation and postcheck."""
 
 import sys

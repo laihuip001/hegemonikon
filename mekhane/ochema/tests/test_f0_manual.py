@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Mekhane] <- mekhane/tests/ A0→Implementation required→test_f0_manual.py provides functionality
 """F0 Tool Use — 手動検証スクリプト.
 
 Usage:

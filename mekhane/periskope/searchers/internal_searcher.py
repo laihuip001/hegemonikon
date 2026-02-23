@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/searchers/ A0→Implementation required→internal_searcher.py provides functionality
 """
 Internal knowledge searcher for Periskopē.
 

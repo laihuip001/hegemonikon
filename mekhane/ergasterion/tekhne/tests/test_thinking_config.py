@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/tests/ A0→Implementation required→test_thinking_config.py provides functionality
 """Tests for thinking config resolution (HGK depth -> model params)."""
 
 import pytest

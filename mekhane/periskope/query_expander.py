@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- periskope/query_expander.py Automatically added to satisfy CI
 """
 Query expander for Periskopē.
 

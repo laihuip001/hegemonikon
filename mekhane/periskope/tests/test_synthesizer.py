@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- tests/test_synthesizer.py Automatically added to satisfy CI
 """
 Tests for multi-model synthesizer.
 """

@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- tests/test_trend_analyzer.py Automatically added to satisfy CI
 """Tests for TrendAnalyzer — 合成データで全機能をテスト。"""
 
 import json

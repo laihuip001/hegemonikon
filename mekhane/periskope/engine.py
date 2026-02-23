@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- periskope/engine.py Automatically added to satisfy CI
 """
 Periskopē Deep Research Engine — Orchestrator.
 

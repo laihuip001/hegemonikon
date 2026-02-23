@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- tests/test_boot_dispatcher.py Automatically added to satisfy CI
 """
 Tests for Dispatcher integration in boot_integration.py
 

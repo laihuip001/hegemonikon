@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- tests/test_thinking_config.py Automatically added to satisfy CI
 """Tests for thinking config resolution (HGK depth -> model params)."""
 
 import pytest

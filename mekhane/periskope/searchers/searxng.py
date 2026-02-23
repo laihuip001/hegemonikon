@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- searchers/searxng.py Automatically added to satisfy CI
 """
 SearXNG search client for Periskopē.
 

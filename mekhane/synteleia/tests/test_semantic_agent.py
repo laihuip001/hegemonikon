@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- tests/test_semantic_agent.py Automatically added to satisfy CI
 """
 Tests for SemanticAgent (L2)
 """

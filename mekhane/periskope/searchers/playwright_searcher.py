@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- searchers/playwright_searcher.py Automatically added to satisfy CI
 """
 Playwright-based searcher for Periskopē.
 

@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- periskope/page_fetcher.py Automatically added to satisfy CI
 """
 Page Fetcher — 選択的全文クロール for Periskopē.
 

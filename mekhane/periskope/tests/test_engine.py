@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- tests/test_engine.py Automatically added to satisfy CI
 """
 Tests for Periskopē Engine (orchestrator).
 """

@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/periskope/searchers/playwright_searcher.py O1->Zet->AutoFixed
 """
 Playwright-based searcher for Periskopē.
 

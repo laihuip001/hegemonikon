@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/periskope/searchers/brave_searcher.py O1->Zet->AutoFixed
 """
 Brave Search API client for Periskopē.
 

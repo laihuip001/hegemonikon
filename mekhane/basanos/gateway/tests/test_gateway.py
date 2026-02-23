@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- tests/test_gateway.py Automatically added to satisfy CI
 """
 MCP Gateway — 統合テスト
 

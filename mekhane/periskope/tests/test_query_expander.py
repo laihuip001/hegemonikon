@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- tests/test_query_expander.py Automatically added to satisfy CI
 """Tests for W3 QueryExpander and P3 weight distribution."""
 
 from __future__ import annotations

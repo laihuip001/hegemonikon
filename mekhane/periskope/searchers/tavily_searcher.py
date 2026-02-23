@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- searchers/tavily_searcher.py Automatically added to satisfy CI
 """
 Tavily Search API client for Periskopē.
 

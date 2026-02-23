@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- searchers/semantic_scholar_searcher.py Automatically added to satisfy CI
 """
 Semantic Scholar API client for Periskopē.
 

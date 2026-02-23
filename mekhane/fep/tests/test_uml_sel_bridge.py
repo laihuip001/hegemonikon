@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- tests/test_uml_sel_bridge.py Automatically added to satisfy CI
 """UML Phase 2 — SEL 統合テスト"""
 
 import pytest

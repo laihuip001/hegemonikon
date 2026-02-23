@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- ccl/operator_loader.py Automatically added to satisfy CI
 """operators.md の SSOT パーサー。
 
 operators.md の Markdown テーブルから演算子定義を抽出し、

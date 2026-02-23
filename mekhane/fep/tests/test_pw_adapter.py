@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- tests/test_pw_adapter.py Automatically added to satisfy CI
 """Tests for pw_adapter.py — L1↔L2 PW bridge."""
 
 import pytest

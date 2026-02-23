@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- tests/test_git_metrics.py Automatically added to satisfy CI
 """Tests for GitMetrics — git 履歴からのリスク予兆検出。"""
 
 import subprocess

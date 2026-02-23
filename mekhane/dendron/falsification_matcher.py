@@ -1,3 +1,5 @@
+# PROOF: [L2/Mekhane] <- mekhane/ A0->Implementation
+# PURPOSE: Implementation module
 """
 Falsification Matcher — 消化論文の主張と epistemic_status.yaml の反証条件を照合
 

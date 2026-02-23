@@ -101,7 +101,10 @@ class TestMeaningfulTraceContextRegression:
                 intensity=2,
                 context="must persist to disk",
             )
-            save_traces(path)
+
+            # Mock ensure_traces_dir to prevent it from trying to create the production directory
+            with patch("mekhane.fep.meaningful_traces.ensure_traces_dir") as mock_ensure:
+                save_traces(path)
 
             # Load and verify
             loaded = load_traces(path)

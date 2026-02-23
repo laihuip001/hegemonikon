@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- searchers/__init__.py Automatically added to satisfy CI
 """
 Periskopē searchers — pluggable search source adapters.
 

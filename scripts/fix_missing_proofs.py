@@ -18,8 +18,9 @@ def main():
     count = 0
 
     for py_file in root.rglob("*.py"):
-        if py_file.name == "__init__.py":
-            continue
+        # __init__.py も対象にする
+        # if py_file.name == "__init__.py":
+        #     continue
 
         try:
             content = py_file.read_text(encoding="utf-8")

@@ -1,0 +1,13 @@
+# README警備員 レビュー
+
+## 対象ファイル
+`mekhane/symploke/boot_integration.py`
+
+## 判定
+発言（要改善）
+
+## 発見事項
+- `mekhane/symploke/` ディレクトリに `README.md` が存在しません (High)
+
+## 重大度
+High

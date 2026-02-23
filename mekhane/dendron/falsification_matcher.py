@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/dendron/ A0->Exist->Falsification_matcher
 """
 Falsification Matcher — 消化論文の主張と epistemic_status.yaml の反証条件を照合
 

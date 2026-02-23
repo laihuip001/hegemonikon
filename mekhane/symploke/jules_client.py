@@ -17,10 +17,13 @@ Usage:
 """
 
 import asyncio
-import aiohttp
 import functools
 import logging
 import os
+try:
+    import aiohttp
+except ImportError:
+    aiohttp = None  # Handle missing dependency gracefully
 import time
 import uuid
 import random  # AI-022: Thundering Herd 対策用

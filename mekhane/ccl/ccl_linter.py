@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- ccl Automatically added to satisfy CI
 """CCL Linter — CCL 式の静的検証。
 
 operators.md (SSOT) に基づいて CCL 式を検証し、

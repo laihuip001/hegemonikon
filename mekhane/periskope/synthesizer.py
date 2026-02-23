@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- periskope Automatically added to satisfy CI
 """
 Multi-model synthesizer for Periskopē.
 

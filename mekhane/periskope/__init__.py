@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/periskope/__init__.py A0->Found->Fix
 """
 Periskopē — HGK Deep Research Engine
 

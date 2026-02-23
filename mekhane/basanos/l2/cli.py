@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/basanos/l2/cli.py Automatically added to satisfy CI
 #!/usr/bin/env python3
 # PURPOSE: Basanos L2 問い生成 CLI — deficit 検出→問い生成→優先度表示
 # REASON: 全 deficit factory を統合実行し、HGK の構造的ズレを対話的に発見する

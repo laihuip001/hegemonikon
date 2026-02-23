@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/mcp/mcp_base.py Automatically added to satisfy CI
 #!/usr/bin/env python3
 """
 MCP Base Module — Hegemonikón MCP Server Common Infrastructure

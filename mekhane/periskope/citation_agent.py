@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/periskope/citation_agent.py Axiom->Reason->Module
 """
 Citation verification agent for Periskopē.
 

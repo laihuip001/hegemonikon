@@ -1,3 +1,4 @@
+# PROOF: [L2/Periskope] <- mekhane/periskope/ O1->Search Need
 """
 Multi-model synthesizer for Periskopē.
 

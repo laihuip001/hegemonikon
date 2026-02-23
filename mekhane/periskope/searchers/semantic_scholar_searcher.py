@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/periskope/searchers/semantic_scholar_searcher.py O1->Zet->SemanticScholarSearcher
 """
 Semantic Scholar API client for Periskopē.
 

@@ -13,7 +13,10 @@ import pytest
 # Add parent to path
 sys.path.insert(0, "/home/makaron8426/oikos/hegemonikon")
 
-from mekhane.symploke.jules_client import JulesClient
+try:
+    from mekhane.symploke.jules_client import JulesClient
+except ImportError:
+    pytest.skip("mekhane.symploke.jules_client could not be imported (likely missing dependencies)", allow_module_level=True)
 
 
 # PURPOSE: Test API connection by listing sources

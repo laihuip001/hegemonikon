@@ -3,6 +3,9 @@
 
 import pytest
 from unittest.mock import patch, MagicMock
+
+# Optional dependency: skip if fastapi is not installed
+fastapi = pytest.importorskip("fastapi")
 from fastapi.testclient import TestClient
 
 

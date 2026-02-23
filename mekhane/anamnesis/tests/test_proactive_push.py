@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/anamnesis/tests/ Automatically added to satisfy CI
 """Proactive Push + Link Graph のテスト."""
 
 import json

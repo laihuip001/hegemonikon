@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/symploke/tests/ Automatically added to satisfy CI
 """
 Tests for Dispatcher integration in boot_integration.py
 

@@ -1,4 +1,5 @@
 # PROOF: [L2/LLM] <- mekhane/synteleia/dokimasia/ セマンティック監査エージェント PoC
+# PURPOSE: Semantic Audit Agent (L2)
 """
 Semantic Audit Agent (L2)
 

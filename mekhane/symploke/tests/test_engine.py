@@ -1,4 +1,5 @@
 # PROOF: [L3/テスト] <- mekhane/symploke/tests/ 対象モジュールが存在→検証が必要→test_engine が担う
+# PURPOSE: Symplokē Tests - Search Engine
 """
 Symplokē Tests - Search Engine
 

@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # PROOF: [L2/ドメイン] <- mekhane/symploke/ O4→perspective繁殖→自律進化
+# PURPOSE: F25: Perspective Breeder — 高有用率 Perspective のバリエーションを生成する。
 """F25: Perspective Breeder — 高有用率 Perspective のバリエーションを生成する。
 
 高スコア Perspective の特性を分析し、未カバー領域に対する
@@ -168,6 +169,7 @@ def _breed_combination(parents: list[dict], existing_ids: set[str]) -> list[dict
     return children
 
 
+# PURPOSE: 高品質 Perspective から子孫を生成する。
 def breed_perspectives(
     store,
     max_children: int = 10,

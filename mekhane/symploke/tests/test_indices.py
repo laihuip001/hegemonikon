@@ -1,4 +1,5 @@
 # PROOF: [L3/テスト] <- mekhane/symploke/tests/ 対象モジュールが存在→検証が必要→test_indices が担う
+# PURPOSE: Symplokē Tests - Index Layer
 """
 Symplokē Tests - Index Layer
 

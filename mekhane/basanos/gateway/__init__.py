@@ -1,4 +1,5 @@
 # PROOF: [L2/インフラ] <- mekhane/basanos/gateway/ A0→MCP Gateway統合が必要→gatewayパッケージが担う
+# PURPOSE: basanos.gateway — MCP Gateway
 """
 basanos.gateway — MCP Gateway
 

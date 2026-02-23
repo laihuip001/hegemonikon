@@ -1,4 +1,5 @@
 # PROOF: [L2/インフラ] <- mekhane/ A0→mekhane実装層が必要→__init__ が担う
+# PURPOSE: Hegemonikón Mechanism Layer (Mēkhanē)
 """Hegemonikón Mechanism Layer (Mēkhanē)"""
 
 # Sub-layers

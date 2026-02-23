@@ -1,4 +1,5 @@
 # PROOF: [L1/定理] <- mekhane/synteleia/dokimasia/ K1 Eukairia 時宜判断エージェント
+# PURPOSE: Kairos Agent - Timing Evaluation
 """
 Kairos Agent - Timing Evaluation
 

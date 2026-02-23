@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/basanos/l2/tests/test_extensions.py O1->Zet->Impl
 # PURPOSE: G_semantic, HomCalculator, CLI のテスト
 # REASON: 拡張モジュールが正しく動作するか検証
 """Tests for Basanos L2 extensions: G_semantic, HomCalculator, CLI."""
@@ -20,12 +21,15 @@ from mekhane.basanos.l2.models import ExternalForm
 # ---------------------------------------------------------------------------
 
 
+# PURPOSE: Test G_semantic translation
 class TestGSemantic:
     """Test G_semantic translation."""
 
+    # PURPOSE: static_translations_exist をテストする
     def test_static_translations_exist(self) -> None:
         assert len(STATIC_TRANSLATIONS) >= 20
 
+    # PURPOSE: translate_noesis をテストする
     def test_translate_noesis(self) -> None:
         gs = GSemantic(use_llm=False)
         ef = ExternalForm(
@@ -38,6 +42,7 @@ class TestGSemantic:
         assert any("reasoning" in kw.lower() or "cognition" in kw.lower() for kw in result.keywords)
         assert "Noēsis" in result.keywords  # Original preserved
 
+    # PURPOSE: translate_fep_terms をテストする
     def test_translate_fep_terms(self) -> None:
         gs = GSemantic(use_llm=False)
         ef = ExternalForm(
@@ -47,6 +52,7 @@ class TestGSemantic:
         result = gs.translate(ef)
         assert any("Free Energy" in kw for kw in result.keywords)
 
+    # PURPOSE: unknown_term_passthrough をテストする
     def test_unknown_term_passthrough(self) -> None:
         gs = GSemantic(use_llm=False)
         ef = ExternalForm(
@@ -56,6 +62,7 @@ class TestGSemantic:
         result = gs.translate(ef)
         assert "completely_unknown_xyz" in result.keywords
 
+    # PURPOSE: claims_translated をテストする
     def test_claims_translated(self) -> None:
         gs = GSemantic(use_llm=False)
         ef = ExternalForm(
@@ -73,32 +80,39 @@ class TestGSemantic:
 # ---------------------------------------------------------------------------
 
 
+# PURPOSE: Test HomScore dataclass
 class TestHomScore:
     """Test HomScore dataclass."""
 
+    # PURPOSE: keyword_only をテストする
     def test_keyword_only(self) -> None:
         s = HomScore(source="a", target="b", keyword_score=0.5)
         assert s.combined_score == 0.5  # Only keyword, full weight
         assert s.is_related
 
+    # PURPOSE: with_embedding をテストする
     def test_with_embedding(self) -> None:
         s = HomScore(source="a", target="b", keyword_score=0.3, embedding_score=0.8)
         # Weighted: (0.3*0.3 + 0.8*0.5) / (0.3+0.5) = 0.09+0.4 / 0.8 = 0.6125
         assert 0.5 < s.combined_score < 0.7
         assert s.is_related
 
+    # PURPOSE: not_related をテストする
     def test_not_related(self) -> None:
         s = HomScore(source="a", target="b", keyword_score=0.0)
         assert not s.is_related
 
+    # PURPOSE: full_scores をテストする
     def test_full_scores(self) -> None:
         s = HomScore(source="a", target="b", keyword_score=1.0, embedding_score=1.0, llm_score=1.0)
         assert abs(s.combined_score - 1.0) < 0.01
 
 
+# PURPOSE: Test HomCalculator
 class TestHomCalculator:
     """Test HomCalculator."""
 
+    # PURPOSE: jaccard_identical をテストする
     def test_jaccard_identical(self) -> None:
         hc = HomCalculator("/tmp", use_mneme=False, use_llm=False)
         score = hc.compute(
@@ -107,11 +121,13 @@ class TestHomCalculator:
         )
         assert score.keyword_score == 1.0
 
+    # PURPOSE: jaccard_disjoint をテストする
     def test_jaccard_disjoint(self) -> None:
         hc = HomCalculator("/tmp", use_mneme=False, use_llm=False)
         score = hc.compute(["alpha", "beta"], ["gamma", "delta"])
         assert score.keyword_score == 0.0
 
+    # PURPOSE: jaccard_partial をテストする
     def test_jaccard_partial(self) -> None:
         hc = HomCalculator("/tmp", use_mneme=False, use_llm=False)
         score = hc.compute(
@@ -120,12 +136,14 @@ class TestHomCalculator:
         )
         assert 0.0 < score.keyword_score < 1.0
 
+    # PURPOSE: substring_matching をテストする
     def test_substring_matching(self) -> None:
         hc = HomCalculator("/tmp", use_mneme=False, use_llm=False)
         score = hc.compute(["inference"], ["active inference"])
         # "inference" is a substring of "active inference"
         assert score.keyword_score > 0.0
 
+    # PURPOSE: batch_compute をテストする
     def test_batch_compute(self) -> None:
         hc = HomCalculator("/tmp", use_mneme=False, use_llm=False)
         scores = hc.batch_compute(
@@ -141,11 +159,13 @@ class TestHomCalculator:
 # ---------------------------------------------------------------------------
 
 
+# PURPOSE: Test CLI entry point
 class TestCLI:
     """Test CLI entry point."""
 
     PROJECT_ROOT = Path("/home/makaron8426/oikos/hegemonikon")
 
+    # PURPOSE: scan_epsilon をテストする
     @pytest.mark.skipif(
         not Path("/home/makaron8426/oikos/hegemonikon/kernel").is_dir(),
         reason="Real kernel/ not available",
@@ -157,6 +177,7 @@ class TestCLI:
         for d in deficits:
             assert d.type.value.startswith("ε")
 
+    # PURPOSE: scan_delta をテストする
     @pytest.mark.skipif(
         not Path("/home/makaron8426/oikos/hegemonikon/kernel").is_dir(),
         reason="Real kernel/ not available",
@@ -166,10 +187,12 @@ class TestCLI:
         # May or may not find deltas depending on recent git changes
         assert isinstance(deficits, list)
 
+    # PURPOSE: cli_no_args_returns_1 をテストする
     def test_cli_no_args_returns_1(self) -> None:
         ret = cli_main([])
         assert ret == 1
 
+    # PURPOSE: cli_help をテストする
     def test_cli_help(self) -> None:
         with pytest.raises(SystemExit) as exc_info:
             cli_main(["--help"])

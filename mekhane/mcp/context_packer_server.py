@@ -1,4 +1,5 @@
 # PROOF: [L2/インフラ] <- mekhane/mcp/ A0→デバッグコンテキスト集約が必要→context_packer_serverが担う
+# PURPOSE: Context Packer MCP Server — HGK デバッグコンテキスト集約
 """
 Context Packer MCP Server — HGK デバッグコンテキスト集約
 

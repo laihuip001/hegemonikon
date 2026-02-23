@@ -1,4 +1,5 @@
 # PROOF: [L2/インフラ] <- mekhane/ergasterion/digestor/ A0→消化処理が必要→selector が担う
+# PURPOSE: Digestor Selector - 消化候補選定ロジック
 """
 Digestor Selector - 消化候補選定ロジック
 

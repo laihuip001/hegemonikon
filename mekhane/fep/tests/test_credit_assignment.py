@@ -1,3 +1,5 @@
+# PROOF: [L2/Mekhane] <- mekhane/fep/tests/test_credit_assignment.py O1->Zet->Impl
+# PURPOSE: Tests for Credit Assignment — Teacher Signal for FEP Agent.
 """Tests for Credit Assignment — Teacher Signal for FEP Agent."""
 
 import json

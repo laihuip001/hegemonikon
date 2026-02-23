@@ -1,4 +1,5 @@
 # PROOF: [L2/インフラ] <- mekhane/dendron/
+# PURPOSE: Dendron package entry point.
 """
 Dendron package entry point.
 

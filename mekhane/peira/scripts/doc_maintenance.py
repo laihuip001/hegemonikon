@@ -1,4 +1,5 @@
 # PROOF: [L3/ユーティリティ] <- mekhane/peira/scripts/ O4→実験スクリプトが必要
+# PURPOSE: Module: doc_maintenance.py
 """
 Module: doc_maintenance.py
 Description: Automated maintenance for AI-optimized documentation (AGENTS.md, etc.)

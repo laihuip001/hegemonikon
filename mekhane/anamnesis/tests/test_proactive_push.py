@@ -1,3 +1,5 @@
+# PROOF: [L2/Mekhane] <- mekhane/anamnesis/tests/test_proactive_push.py O1->Zet->Impl
+# PURPOSE: Proactive Push + Link Graph のテスト.
 """Proactive Push + Link Graph のテスト."""
 
 import json

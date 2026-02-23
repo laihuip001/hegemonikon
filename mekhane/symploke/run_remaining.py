@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # PROOF: [L3/ユーティリティ] <- mekhane/symploke/ O4→実行スクリプトが必要→run_remaining が担う
+# PURPOSE: 残りの専門家26人を実行
 """残りの専門家26人を実行"""
 
 import asyncio

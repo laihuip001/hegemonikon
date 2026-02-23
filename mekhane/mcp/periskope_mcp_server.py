@@ -1,4 +1,5 @@
 # PROOF: [L2/インフラ] <- mekhane/mcp/ Periskopē Deep Research を MCP ツールとして公開
+# PURPOSE: Periskopē MCP Server v1.0 — Deep Research Engine via MCP
 #!/usr/bin/env python3
 """
 Periskopē MCP Server v1.0 — Deep Research Engine via MCP
@@ -41,6 +42,7 @@ except Exception as e:
     log("Will run with stub mode")
 
 
+# PURPOSE: List available tools
 @server.list_tools()
 async def list_tools():
     """List available tools."""
@@ -148,6 +150,7 @@ async def list_tools():
     ]
 
 
+# PURPOSE: Handle tool calls
 @server.call_tool()
 async def call_tool(name: str, arguments: dict):
     """Handle tool calls."""
@@ -169,6 +172,7 @@ async def call_tool(name: str, arguments: dict):
         return [TextContent(type="text", text=f"Error: {str(e)}")]
 
 
+# PURPOSE: Full deep research pipeline
 async def handle_research(arguments: dict):
     """Full deep research pipeline."""
     if PeriskopeEngine is None:
@@ -209,6 +213,7 @@ async def handle_research(arguments: dict):
     return [TextContent(type="text", text=md)]
 
 
+# PURPOSE: Search only (no synthesis/verification)
 async def handle_search(arguments: dict):
     """Search only (no synthesis/verification)."""
     if PeriskopeEngine is None:
@@ -283,6 +288,7 @@ async def handle_search(arguments: dict):
     return [TextContent(type="text", text="\n".join(lines))]
 
 
+# PURPOSE: Recommend optimal sources for a query
 async def handle_sources(arguments: dict):
     """Recommend optimal sources for a query."""
     if PeriskopeEngine is None:

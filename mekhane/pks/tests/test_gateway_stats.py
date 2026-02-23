@@ -1,11 +1,17 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Mekhane] <- mekhane/pks/tests/test_gateway_stats.py O1->Zet->Impl
 """F6c: Gateway Stats API endpoint tests."""
 
 import pytest
 from unittest.mock import patch, MagicMock
-from fastapi.testclient import TestClient
+
+try:
+    from fastapi.testclient import TestClient
+except ImportError:
+    pytest.skip("fastapi not installed", allow_module_level=True)
 
 
+# PURPOSE: TestClient for the API without starting PKSEngine
 @pytest.fixture
 def client():
     """TestClient for the API without starting PKSEngine."""
@@ -13,9 +19,11 @@ def client():
     return TestClient(app)
 
 
+# PURPOSE: GET /api/pks/gateway-stats のテスト。
 class TestGatewayStatsEndpoint:
     """GET /api/pks/gateway-stats のテスト。"""
 
+    # PURPOSE: エンドポイントが 200 を返す。
     def test_gateway_stats_returns_200(self, client):
         """エンドポイントが 200 を返す。"""
         resp = client.get("/api/pks/gateway-stats")
@@ -26,6 +34,7 @@ class TestGatewayStatsEndpoint:
         assert "sources" in data
         assert "total_files" in data
 
+    # PURPOSE: directory パスがレスポンスに含まれない (F6a)。
     def test_gateway_stats_no_directory_leak(self, client):
         """directory パスがレスポンスに含まれない (F6a)。"""
         resp = client.get("/api/pks/gateway-stats")
@@ -38,12 +47,14 @@ class TestGatewayStatsEndpoint:
                 f"source '{source_name}' leaks 'exists' field"
             )
 
+    # PURPOSE: total_nuggets フィールドが削除されている (F6b)。
     def test_gateway_stats_no_total_nuggets(self, client):
         """total_nuggets フィールドが削除されている (F6b)。"""
         resp = client.get("/api/pks/gateway-stats")
         data = resp.json()
         assert "total_nuggets" not in data
 
+    # PURPOSE: 各ソースに count フィールドがある。
     def test_gateway_stats_sources_have_count(self, client):
         """各ソースに count フィールドがある。"""
         resp = client.get("/api/pks/gateway-stats")
@@ -54,6 +65,7 @@ class TestGatewayStatsEndpoint:
             )
             assert isinstance(source_data["count"], int)
 
+    # PURPOSE: total_files が各ソースの count の合計と一致する。
     def test_gateway_stats_total_files_matches_sum(self, client):
         """total_files が各ソースの count の合計と一致する。"""
         resp = client.get("/api/pks/gateway-stats")
@@ -64,6 +76,7 @@ class TestGatewayStatsEndpoint:
         )
         assert data["total_files"] == expected_total
 
+    # PURPOSE: PKSEngine 未初期化時に空レスポンスを返す。
     @patch("mekhane.api.routes.pks._get_engine")
     def test_gateway_stats_engine_unavailable(self, mock_engine, client):
         """PKSEngine 未初期化時に空レスポンスを返す。"""
@@ -75,6 +88,7 @@ class TestGatewayStatsEndpoint:
         assert data["sources"] == {}
         assert data["total_files"] == 0
 
+    # PURPOSE: PKSEngine が例外を投げた場合もグレースフルに処理。
     @patch("mekhane.api.routes.pks._get_engine")
     def test_gateway_stats_engine_exception(self, mock_engine, client):
         """PKSEngine が例外を投げた場合もグレースフルに処理。"""

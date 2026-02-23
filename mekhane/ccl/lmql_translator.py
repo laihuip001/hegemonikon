@@ -1,4 +1,5 @@
 # PROOF: [L2/インフラ] <- mekhane/ccl/ CCL → LMQL 翻訳層 PoC
+# PURPOSE: CCL to LMQL Translator - Proof of Concept
 """
 CCL to LMQL Translator - Proof of Concept
 

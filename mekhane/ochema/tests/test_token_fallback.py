@@ -21,6 +21,7 @@ from unittest.mock import patch, MagicMock
 import pytest
 
 
+# PURPOSE: Create a CortexClient with no cached token
 @pytest.fixture
 def fresh_client():
     """Create a CortexClient with no cached token."""
@@ -30,6 +31,7 @@ def fresh_client():
     return client
 
 
+# PURPOSE: Verify _get_token() tries sources in the correct order
 class TestTokenFallbackOrder:
     """Verify _get_token() tries sources in the correct order.
 
@@ -41,14 +43,17 @@ class TestTokenFallbackOrder:
         5. gemini-cli OAuth (last resort)
     """
 
+    # PURPOSE: LS OAuth should be attempted before TokenVault
     def test_ls_oauth_tried_before_vault(self, fresh_client):
         """LS OAuth should be attempted before TokenVault."""
         call_order = []
 
+        # PURPOSE: mock_ls_token の処理
         def mock_ls_token(self_):
             call_order.append("ls_oauth")
             return "ya29.ls_token_value"
 
+        # PURPOSE: mock_vault_get の処理
         def mock_vault_get(account):
             call_order.append("vault")
             raise Exception("vault not configured")
@@ -61,14 +66,17 @@ class TestTokenFallbackOrder:
         assert token == "ya29.ls_token_value"
         assert call_order == ["ls_oauth"], f"Expected LS first, got: {call_order}"
 
+    # PURPOSE: TokenVault should be tried when LS OAuth returns None
     def test_vault_tried_after_ls_fails(self, fresh_client):
         """TokenVault should be tried when LS OAuth returns None."""
         call_order = []
 
+        # PURPOSE: mock_ls_token の処理
         def mock_ls_token(self_):
             call_order.append("ls_oauth")
             return None
 
+        # PURPOSE: mock_vault_get の処理
         def mock_vault_get(account):
             call_order.append("vault")
             return "vault_token_value"
@@ -81,18 +89,22 @@ class TestTokenFallbackOrder:
         assert token == "vault_token_value"
         assert call_order == ["ls_oauth", "vault"]
 
+    # PURPOSE: gemini-cli OAuth should only be tried after LS and vault fail
     def test_gemini_cli_is_last_resort(self, fresh_client):
         """gemini-cli OAuth should only be tried after LS and vault fail."""
         call_order = []
 
+        # PURPOSE: mock_ls_token の処理
         def mock_ls_token(self_):
             call_order.append("ls_oauth")
             return None
 
+        # PURPOSE: mock_vault_get の処理
         def mock_vault_get(account):
             call_order.append("vault")
             raise Exception("vault fail")
 
+        # PURPOSE: mock_refresh の処理
         def mock_refresh(self_):
             call_order.append("gemini_cli")
             return "gemini_cli_token"
@@ -110,6 +122,7 @@ class TestTokenFallbackOrder:
         assert token == "gemini_cli_token"
         assert call_order == ["ls_oauth", "vault", "gemini_cli"]
 
+    # PURPOSE: File cache hit should skip LS, vault, and gemini-cli
     def test_cache_hit_skips_all(self, fresh_client):
         """File cache hit should skip LS, vault, and gemini-cli."""
         fresh_client._token = "cached_token"
@@ -123,11 +136,13 @@ class TestTokenFallbackOrder:
 
         assert token == "cached_token"
 
+    # PURPOSE: LS OAuth token should be written to file cache for performance
     def test_ls_token_cached_to_file(self, fresh_client):
         """LS OAuth token should be written to file cache for performance."""
         mock_cache = MagicMock()
         mock_cache.exists.return_value = False
 
+        # PURPOSE: mock_ls_token の処理
         def mock_ls_token(self_):
             return "ya29.fresh_ls_token"
 
@@ -140,13 +155,16 @@ class TestTokenFallbackOrder:
         mock_cache.write_text.assert_called_once_with("ya29.fresh_ls_token")
         mock_cache.chmod.assert_called_once_with(0o600)
 
+    # PURPOSE: CortexAuthError should mention LS first in error message
     def test_all_fail_raises_auth_error(self, fresh_client):
         """CortexAuthError should mention LS first in error message."""
         from mekhane.ochema.cortex_client import CortexAuthError
 
+        # PURPOSE: mock_ls_token の処理
         def mock_ls_token(self_):
             return None
 
+        # PURPOSE: mock_vault_get の処理
         def mock_vault_get(account):
             raise Exception("vault fail")
 

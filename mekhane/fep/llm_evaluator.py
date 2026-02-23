@@ -1,4 +1,5 @@
 # PROOF: [L2/インフラ] <- mekhane/fep/
+# PURPOSE: PROOF: このファイルは存在しなければならない
 """
 PROOF: このファイルは存在しなければならない
 

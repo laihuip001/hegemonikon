@@ -1,3 +1,5 @@
+# PROOF: [L2/Mekhane] <- mekhane/periskope/searchers/searxng.py O1->Zet->Impl
+# PURPOSE: SearXNG search client for Periskopē.
 """
 SearXNG search client for Periskopē.
 
@@ -39,6 +41,7 @@ DOMAIN_BLACKLIST: set[str] = {
 }
 
 
+# PURPOSE: Client for SearXNG meta-search engine
 class SearXNGSearcher:
     """Client for SearXNG meta-search engine.
 
@@ -66,11 +69,13 @@ class SearXNGSearcher:
             self._client = httpx.AsyncClient(timeout=self.timeout)
         return self._client
 
+    # PURPOSE: close を閉じる
     async def close(self) -> None:
         if self._client and not self._client.is_closed:
             await self._client.aclose()
             self._client = None
 
+    # PURPOSE: Execute a search against SearXNG
     async def search(
         self,
         query: str,
@@ -170,6 +175,7 @@ class SearXNGSearcher:
 
         return results
 
+    # PURPOSE: Search academic sources (Google Scholar, Semantic Scholar, arXiv)
     async def search_academic(
         self,
         query: str,
@@ -183,6 +189,7 @@ class SearXNGSearcher:
             engines=["google scholar", "semantic scholar", "arxiv"],
         )
 
+    # PURPOSE: Search news sources
     async def search_news(
         self,
         query: str,
@@ -197,6 +204,7 @@ class SearXNGSearcher:
             time_range=time_range,
         )
 
+    # PURPOSE: Check if SearXNG is reachable
     async def health_check(self) -> bool:
         """Check if SearXNG is reachable."""
         try:
@@ -206,6 +214,7 @@ class SearXNGSearcher:
         except Exception:
             return False
 
+    # PURPOSE: W1: Search across 4 categories in parallel
     async def search_multi_category(
         self,
         query: str,

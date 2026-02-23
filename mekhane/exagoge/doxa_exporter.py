@@ -18,6 +18,7 @@ import yaml
 from .extractor import BaseExporter
 
 
+# PURPOSE: Doxa (信念) データのエクスポーター。
 class DoxaExporter(BaseExporter):
     """Doxa (信念) データのエクスポーター。
 

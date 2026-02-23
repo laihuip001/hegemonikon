@@ -1,5 +1,6 @@
 """
 # PROOF: [L2/インフラ] <- mekhane/symploke/adapters/ A0→ベクトルDBアダプタが必要→hnswlib_adapter が担う
+# PURPOSE: # PROOF: [L2/インフラ] <- mekhane/symploke/adapters/ A0→ベクトルDBアダプタが必要→hnswlib_adapter が担う
 HNSWlib Adapter - High-speed approximate nearest neighbor search
 
 パプ君調査結果より:

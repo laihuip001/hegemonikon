@@ -1,5 +1,6 @@
 # noqa: AI-ALL
 # PROOF: [L2/インフラ] <- mekhane/anamnesis/collectors/
+# PURPOSE: PROOF: [L2/インフラ]
 """
 PROOF: [L2/インフラ]
 

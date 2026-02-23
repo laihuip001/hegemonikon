@@ -1,4 +1,5 @@
 # PROOF: [L1/定理] <- mekhane/synteleia/dokimasia/ P1 Khōra 境界画定エージェント
+# PURPOSE: Perigraphē Agent - Boundary Evaluation
 """
 Perigraphē Agent - Boundary Evaluation
 

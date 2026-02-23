@@ -1,4 +1,5 @@
 # PROOF: [L2/インフラ] <- mekhane/poiema/flow/ O4→創造機能が必要
+# PURPOSE: Energeia Core — O4 Energeia Instantiation
 """
 Energeia Core — O4 Energeia Instantiation
 

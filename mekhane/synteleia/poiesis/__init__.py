@@ -1,4 +1,5 @@
 # PROOF: [L2/インフラ] <- mekhane/synteleia/poiesis/ Poiēsis 生成層パッケージ
+# PURPOSE: Poiēsis (ποίησις) — 生成層
 """
 Poiēsis (ποίησις) — 生成層
 

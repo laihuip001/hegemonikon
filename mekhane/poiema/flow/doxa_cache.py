@@ -1,4 +1,5 @@
 # PROOF: [L2/インフラ] <- mekhane/poiema/flow/ O4→創造機能が必要
+# PURPOSE: Doxa Cache — H4 Doxa Instantiation
 """
 Doxa Cache — H4 Doxa Instantiation
 

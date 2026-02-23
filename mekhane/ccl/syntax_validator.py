@@ -1,4 +1,5 @@
 # PROOF: [L1/定理] <- mekhane/ccl/ CCL→CCLパーサーが必要→syntax_validator が担う
+# PURPOSE: CCL Syntax Validator v2.0
 """
 CCL Syntax Validator v2.0
 

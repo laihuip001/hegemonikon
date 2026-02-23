@@ -1,4 +1,5 @@
 # PROOF: [L2/インフラ] <- mekhane/dendron/
+# PURPOSE: Skill & Workflow Frontmatter Checker — Safety Contract 検証
 """
 Skill & Workflow Frontmatter Checker — Safety Contract 検証
 

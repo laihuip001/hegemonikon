@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # PROOF: [L3/テスト] <- mekhane/ergasterion/tekhne/ TekhnePipeline 統合テスト
+# PURPOSE: TekhnePipeline Integration Tests.
 """
 TekhnePipeline Integration Tests.
 
@@ -32,6 +33,7 @@ from mekhane.ergasterion.tekhne.sweep_engine import SweepReport, SweepIssue
 # === Fixtures ===
 
 
+# PURPOSE: Create a directory with mixed files for target collection testing
 @pytest.fixture
 def sample_dir(tmp_path):
     """Create a directory with mixed files for target collection testing."""
@@ -57,6 +59,7 @@ def sample_dir(tmp_path):
     return tmp_path
 
 
+# PURPOSE: Create a sample prompt file
 @pytest.fixture
 def sample_prompt_file(tmp_path):
     """Create a sample prompt file."""
@@ -65,6 +68,7 @@ def sample_prompt_file(tmp_path):
     return f
 
 
+# PURPOSE: Create a mock SweepReport with realistic data
 @pytest.fixture
 def mock_sweep_report():
     """Create a mock SweepReport with realistic data."""
@@ -106,9 +110,11 @@ def mock_sweep_report():
 # === Target Collection Tests ===
 
 
+# PURPOSE: Test _collect_targets method
 class TestTargetCollection:
     """Test _collect_targets method."""
 
+    # PURPOSE: Single file target returns list with one element
     def test_single_file(self, sample_prompt_file):
         """Single file target returns list with one element."""
         pipeline = TekhnePipeline()
@@ -116,6 +122,7 @@ class TestTargetCollection:
         assert len(targets) == 1
         assert targets[0].endswith("test_prompt.md")
 
+    # PURPOSE: Directory scan finds supported files, excludes hidden/pycache
     def test_directory_scan(self, sample_dir):
         """Directory scan finds supported files, excludes hidden/pycache."""
         pipeline = TekhnePipeline()
@@ -134,12 +141,14 @@ class TestTargetCollection:
         assert "cache.py" not in filenames  # __pycache__
         assert "photo.jpg" not in filenames  # unsupported extension
 
+    # PURPOSE: Non-existent path raises FileNotFoundError
     def test_nonexistent_target_raises(self):
         """Non-existent path raises FileNotFoundError."""
         pipeline = TekhnePipeline()
         with pytest.raises(FileNotFoundError, match="Target not found"):
             pipeline._collect_targets("/nonexistent/path")
 
+    # PURPOSE: SUPPORTED_EXTENSIONS contains expected types
     def test_supported_extensions(self):
         """SUPPORTED_EXTENSIONS contains expected types."""
         assert ".py" in SUPPORTED_EXTENSIONS
@@ -149,6 +158,7 @@ class TestTargetCollection:
         assert ".jpg" not in SUPPORTED_EXTENSIONS
         assert ".png" not in SUPPORTED_EXTENSIONS
 
+    # PURPOSE: Targets include files from subdirectories
     def test_subdirectory_traversal(self, sample_dir):
         """Targets include files from subdirectories."""
         pipeline = TekhnePipeline()
@@ -157,6 +167,7 @@ class TestTargetCollection:
         has_subdir = any("lib" in t for t in targets)
         assert has_subdir, f"No subdirectory files found: {targets}"
 
+    # PURPOSE: Collected targets use resolved (absolute) paths
     def test_resolved_paths(self, sample_dir):
         """Collected targets use resolved (absolute) paths."""
         pipeline = TekhnePipeline()
@@ -168,6 +179,7 @@ class TestTargetCollection:
 # === AggregatedReport Tests ===
 
 
+# PURPOSE: Test report generation
 class TestAggregatedReport:
     """Test report generation."""
 
@@ -210,6 +222,7 @@ class TestAggregatedReport:
             timestamp="2026-02-14 19:30:00",
         )
 
+    # PURPOSE: Markdown report contains expected sections
     def test_markdown_report_structure(self):
         """Markdown report contains expected sections."""
         report = self._make_report()
@@ -223,6 +236,7 @@ class TestAggregatedReport:
         assert "## Per-File Breakdown" in md
         assert "Tekhne Pipeline v1.0" in md
 
+    # PURPOSE: Top N limits the number of issues shown
     def test_markdown_top_n_limit(self):
         """Top N limits the number of issues shown."""
         report = self._make_report()
@@ -230,6 +244,7 @@ class TestAggregatedReport:
         # Should show "Top 1 Issues" not "Top 2 Issues"
         assert "Top 1 Issues" in md
 
+    # PURPOSE: JSON report is valid JSON
     def test_json_report_parseable(self):
         """JSON report is valid JSON."""
         report = self._make_report()
@@ -239,6 +254,7 @@ class TestAggregatedReport:
         assert data["summary"]["critical"] == 1
         assert "a.py" in data["files"]
 
+    # PURPOSE: report_markdown does NOT mutate original file_reports
     def test_dict_mutation_safety(self):
         """report_markdown does NOT mutate original file_reports."""
         original_issues = [
@@ -257,6 +273,7 @@ class TestAggregatedReport:
         for issue in report.file_reports["a.py"]["issues"]:
             assert "_file" not in issue, f"Mutation detected: {issue}"
 
+    # PURPOSE: Single file report does NOT show per-file breakdown
     def test_single_file_no_breakdown(self):
         """Single file report does NOT show per-file breakdown."""
         report = AggregatedReport(
@@ -267,6 +284,7 @@ class TestAggregatedReport:
         md = report.report_markdown()
         assert "Per-File Breakdown" not in md
 
+    # PURPOSE: Empty report generates without errors
     def test_empty_report(self):
         """Empty report generates without errors."""
         report = AggregatedReport(timestamp="2026-02-14")
@@ -280,9 +298,11 @@ class TestAggregatedReport:
 # === Pipeline Config Tests ===
 
 
+# PURPOSE: Test PipelineConfig defaults and overrides
 class TestPipelineConfig:
     """Test PipelineConfig defaults and overrides."""
 
+    # PURPOSE: defaults をテストする
     def test_defaults(self):
         cfg = PipelineConfig()
         assert cfg.model == "gemini-2.0-flash"
@@ -294,6 +314,7 @@ class TestPipelineConfig:
         assert cfg.domains is None
         assert cfg.axes is None
 
+    # PURPOSE: custom_config をテストする
     def test_custom_config(self):
         cfg = PipelineConfig(
             domains=["Security"],
@@ -310,9 +331,11 @@ class TestPipelineConfig:
 # === Pipeline Run Tests (Mocked) ===
 
 
+# PURPOSE: Test pipeline run with mocked SweepEngine
 class TestPipelineRun:
     """Test pipeline run with mocked SweepEngine."""
 
+    # PURPOSE: Pipeline run processes a single file and aggregates results
     def test_run_single_file(self, sample_prompt_file, mock_sweep_report):
         """Pipeline run processes a single file and aggregates results."""
         pipeline = TekhnePipeline()
@@ -336,6 +359,7 @@ class TestPipelineRun:
         assert report.elapsed_seconds > 0
         mock_engine.sweep.assert_called_once()
 
+    # PURPOSE: Pipeline run processes all supported files in a directory
     def test_run_directory(self, sample_dir, mock_sweep_report):
         """Pipeline run processes all supported files in a directory."""
         pipeline = TekhnePipeline()
@@ -352,6 +376,7 @@ class TestPipelineRun:
         assert len(report.files) == 6
         assert mock_engine.sweep.call_count == 6
 
+    # PURPOSE: Pipeline handles sweep failures gracefully
     def test_run_with_sweep_error(self, sample_prompt_file):
         """Pipeline handles sweep failures gracefully."""
         pipeline = TekhnePipeline()
@@ -367,10 +392,12 @@ class TestPipelineRun:
         assert len(report.files) == 1
         assert "error" in report.file_reports[str(sample_prompt_file.resolve())]
 
+    # PURPOSE: Pipeline collects cache statistics when cache is enabled
     def test_run_with_cache_stats(self, sample_prompt_file, mock_sweep_report):
         """Pipeline collects cache statistics when cache is enabled."""
         pipeline = TekhnePipeline()
 
+        # PURPOSE: Mock cache stats の実装
         @dataclass
         class MockCacheStats:
             hits: int = 5
@@ -390,6 +417,7 @@ class TestPipelineRun:
         assert report.cache_hits == 5
         assert report.cache_misses == 3
 
+    # PURPOSE: Pipeline passes domain filter to sweep engine
     def test_run_with_domain_filter(self, sample_prompt_file, mock_sweep_report):
         """Pipeline passes domain filter to sweep engine."""
         pipeline = TekhnePipeline(config=PipelineConfig(domains=["Security"]))
@@ -409,9 +437,11 @@ class TestPipelineRun:
 # === Report Save Tests ===
 
 
+# PURPOSE: Test report saving
 class TestReportSave:
     """Test report saving."""
 
+    # PURPOSE: Save Markdown report to specified path
     def test_save_markdown(self, tmp_path):
         """Save Markdown report to specified path."""
         pipeline = TekhnePipeline()
@@ -424,6 +454,7 @@ class TestReportSave:
         content = result.read_text()
         assert "Tekhne Sweep Report" in content
 
+    # PURPOSE: Save JSON report to specified path
     def test_save_json(self, tmp_path):
         """Save JSON report to specified path."""
         pipeline = TekhnePipeline(config=PipelineConfig(report_format="json"))
@@ -436,6 +467,7 @@ class TestReportSave:
         data = json.loads(result.read_text())
         assert "summary" in data
 
+    # PURPOSE: Auto-generate path when output_path not specified
     def test_save_auto_path(self, tmp_path):
         """Auto-generate path when output_path not specified."""
         pipeline = TekhnePipeline(config=PipelineConfig(output_dir=tmp_path))

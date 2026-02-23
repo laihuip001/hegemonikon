@@ -1,4 +1,5 @@
 # PROOF: [L3/ユーティリティ] <- mekhane/peira/scripts/ O4→実験スクリプトが必要
+# PURPOSE: AIDB Knowledge Base - LanceDB + ONNX Runtime Edition
 #!/usr/bin/env python3
 """
 AIDB Knowledge Base - LanceDB + ONNX Runtime Edition

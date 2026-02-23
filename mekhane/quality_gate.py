@@ -1,4 +1,5 @@
 # PROOF: [L2/インフラ] <- mekhane/ A0→品質管理が必要→quality_gate が担う
+# PURPOSE: Quality Gate Module - Hegemonikón品質体系
 """
 Quality Gate Module - Hegemonikón品質体系
 

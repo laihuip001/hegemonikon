@@ -1,3 +1,5 @@
+# PROOF: [L2/Mekhane] <- mekhane/periskope/synthesizer.py O1->Zet->Impl
+# PURPOSE: Multi-model synthesizer for Periskopē.
 """
 Multi-model synthesizer for Periskopē.
 
@@ -70,11 +72,13 @@ _DEPTH_MODELS: dict[int, list[SynthModel]] = {
 }
 
 
+# PURPOSE: Return synthesis models for the given depth level (1-3)
 def models_for_depth(depth: int) -> list[SynthModel]:
     """Return synthesis models for the given depth level (1-3)."""
     return _DEPTH_MODELS.get(depth, _DEPTH_MODELS[2])
 
 
+# PURPOSE: Synthesize search results using multiple LLMs
 class MultiModelSynthesizer:
     """Synthesize search results using multiple LLMs.
 
@@ -108,6 +112,7 @@ class MultiModelSynthesizer:
             )
         return self._cortex
 
+    # PURPOSE: Synthesize search results using configured models
     async def synthesize(
         self,
         query: str,
@@ -211,6 +216,7 @@ class MultiModelSynthesizer:
             else 0,
         )
 
+    # PURPOSE: Detect divergence between multiple model outputs
     def detect_divergence(
         self,
         results: list[SynthesisResult],

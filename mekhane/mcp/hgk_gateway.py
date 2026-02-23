@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # PROOF: [L2/インフラ] <- mekhane/mcp/ 出張 HGK MCP Gateway
+# PURPOSE: 出張 HGK MCP Gateway — モバイルからの HGK アクセス
 """
 出張 HGK MCP Gateway — モバイルからの HGK アクセス
 
@@ -230,6 +231,7 @@ def _traced(fn):
     """
     import functools
 
+    # PURPOSE: wrapper の処理
     @functools.wraps(fn)
     def wrapper(*args: Any, **kwargs: Any) -> Any:
         _start = time.time()

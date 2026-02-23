@@ -1,4 +1,5 @@
 # PROOF: [L2/インフラ] <- mekhane/ccl/
+# PURPOSE: CCL Spec Injector - 仕様強制注入モジュール
 # Phase 0: CCL 実行前の仕様強制注入
 
 """

@@ -1,4 +1,5 @@
 # PROOF: [L1/定理] <- mekhane/basanos/ VISION.md 第3段階: 予兆を察知する免疫
+# PURPOSE: GitMetrics — git 履歴からリスク予兆を検出する。
 """
 GitMetrics — git 履歴からリスク予兆を検出する。
 
@@ -21,6 +22,7 @@ from typing import Dict, List, Optional, Tuple
 logger = logging.getLogger(__name__)
 
 
+# PURPOSE: ファイルの変動(churn)情報。
 @dataclass
 class FileChurn:
     """ファイルの変動(churn)情報。"""
@@ -33,6 +35,7 @@ class FileChurn:
     last_modified: str = ""
     days_active: int = 0      # days with at least 1 commit
 
+    # PURPOSE: 変動率: (added + deleted) / commits。高い = 不安定。
     @property
     def churn_rate(self) -> float:
         """変動率: (added + deleted) / commits。高い = 不安定。"""
@@ -40,6 +43,7 @@ class FileChurn:
             return 0.0
         return (self.lines_added + self.lines_deleted) / self.commits
 
+    # PURPOSE: リスクスコア: churn_rate × authors × recency。
     @property
     def risk_score(self) -> float:
         """リスクスコア: churn_rate × authors × recency。
@@ -50,6 +54,7 @@ class FileChurn:
         return self.churn_rate * author_factor
 
 
+# PURPOSE: 日別のコミット統計。
 @dataclass
 class CommitStats:
     """日別のコミット統計。"""
@@ -61,6 +66,7 @@ class CommitStats:
     deletions: int = 0
 
 
+# PURPOSE: git 履歴からリスク予兆を検出する。
 class GitMetrics:
     """git 履歴からリスク予兆を検出する。
 
@@ -94,6 +100,7 @@ class GitMetrics:
             logger.warning(f"git command failed: {e}")
             return ""
 
+    # PURPOSE: ファイル別の churn (変動) を算出。
     def file_churn(self) -> Dict[str, FileChurn]:
         """ファイル別の churn (変動) を算出。"""
         if self._churn_cache is not None:
@@ -167,12 +174,14 @@ class GitMetrics:
         self._churn_cache = churns
         return churns
 
+    # PURPOSE: リスクスコア上位のファイルを返す。
     def risky_files(self, top_n: int = 10) -> List[FileChurn]:
         """リスクスコア上位のファイルを返す。"""
         churns = self.file_churn()
         ranked = sorted(churns.values(), key=lambda fc: fc.risk_score, reverse=True)
         return ranked[:top_n]
 
+    # PURPOSE: 日別コミット統計。
     def daily_stats(self) -> List[CommitStats]:
         """日別コミット統計。"""
         since = (datetime.now() - timedelta(days=self.days)).strftime("%Y-%m-%d")
@@ -193,6 +202,7 @@ class GitMetrics:
 
         return stats
 
+    # PURPOSE: TrendAnalyzer の hot files と git churn の交差点を検出。
     def hotspot_overlaps(self, trend_hot_files: List[str]) -> List[str]:
         """TrendAnalyzer の hot files と git churn の交差点を検出。
 
@@ -215,6 +225,7 @@ class GitMetrics:
 
         return overlaps
 
+    # PURPOSE: 直近のコミット速度 (commits/day)。
     def commit_velocity(self) -> float:
         """直近のコミット速度 (commits/day)。"""
         stats = self.daily_stats()
@@ -223,6 +234,7 @@ class GitMetrics:
         total = sum(s.count for s in stats)
         return total / max(len(stats), 1)
 
+    # PURPOSE: 分析結果の要約テキスト。
     def summary(self) -> str:
         """分析結果の要約テキスト。"""
         churns = self.file_churn()

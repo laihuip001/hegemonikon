@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Mekhane] <- mekhane/fep/tests/validation_unseen.py O1->Zet->Impl
+# PURPOSE: Unseen input validation — exemplar/benchmark と重複しない入力で精度を検証.
 """Unseen input validation — exemplar/benchmark と重複しない入力で精度を検証.
 
 PURPOSE: multi-prototype の overfitting 検知。

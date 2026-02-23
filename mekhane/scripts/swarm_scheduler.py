@@ -1,4 +1,5 @@
 # PROOF: [L3/ユーティリティ] <- mekhane/scripts/ O4→運用スクリプトが必要→swarm_scheduler が担う
+# PURPOSE: Swarm Scheduler - Daily 4AM Execution
 #!/usr/bin/env python3
 """
 Swarm Scheduler - Daily 4AM Execution

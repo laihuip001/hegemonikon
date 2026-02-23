@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # PROOF: [L2/アプリケーション] <- mekhane/symploke/ A0→レビュー戦略が必要→basanos_reviewer が担う
+# PURPOSE: Basanos Reviewer - Hegemonikón Specialist Review Orchestrator
 """
 Basanos Reviewer - Hegemonikón Specialist Review Orchestrator
 

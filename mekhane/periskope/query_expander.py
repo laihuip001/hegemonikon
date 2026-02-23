@@ -1,3 +1,5 @@
+# PROOF: [L2/Mekhane] <- mekhane/periskope/query_expander.py O1->Zet->Impl
+# PURPOSE: Query expander for Periskopē.
 """
 Query expander for Periskopē.
 
@@ -35,6 +37,7 @@ def _is_japanese(text: str) -> bool:
     return False
 
 
+# PURPOSE: Expand search queries via translation and synonym generation
 class QueryExpander:
     """Expand search queries via translation and synonym generation.
 
@@ -51,6 +54,7 @@ class QueryExpander:
         self.model = model
         self.timeout = timeout
 
+    # PURPOSE: Expand query via bilingual translation
     async def expand(self, query: str) -> list[str]:
         """Expand query via bilingual translation.
 

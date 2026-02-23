@@ -1,4 +1,5 @@
 # PROOF: [L2/インフラ] <- mekhane/basanos/gateway/ A0→セキュリティポリシー強制が必要→PolicyEnforcerが担う
+# PURPOSE: Policy Enforcer — MCP Gateway のセキュリティポリシー強制
 """
 Policy Enforcer — MCP Gateway のセキュリティポリシー強制
 

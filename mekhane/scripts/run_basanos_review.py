@@ -1,4 +1,5 @@
 # PROOF: [L3/ユーティリティ] <- mekhane/scripts/ O4→運用スクリプトが必要→run_basanos_review が担う
+# PURPOSE: Basanos v2.1 API Review Runner
 #!/usr/bin/env python3
 """
 Basanos v2.1 API Review Runner

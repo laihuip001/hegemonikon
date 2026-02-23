@@ -1,4 +1,5 @@
 # PROOF: [L2/インフラ] <- mekhane/ccl/
+# PURPOSE: Zero-Trust CCL Executor
 # CCL Zero-Trust Executor - 統合エントリポイント
 
 """

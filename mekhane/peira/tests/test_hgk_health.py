@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # PROOF: [L2/テスト] <- mekhane/peira/ A0→テストが必要→test_hgk_healthが担う
+# PURPOSE: Tests for hgk_health.py — Hegemonikón Health Dashboard
 """
 Tests for hgk_health.py — Hegemonikón Health Dashboard
 """
@@ -234,6 +235,7 @@ class TestCheckTheoremActivity(unittest.TestCase):
             self.assertIn("alive", result.detail)
             self.assertIsNotNone(result.metric)
 
+    # PURPOSE: 全24定理が alive の場合
     @patch("mekhane.peira.theorem_activity.scan_handoffs")
     def test_all_alive(self, mock_scan):
         """全24定理が alive の場合"""
@@ -260,6 +262,7 @@ class TestCheckTheoremActivity(unittest.TestCase):
         self.assertIn("24/24 alive", result.detail)
         self.assertAlmostEqual(result.metric, 1.0)
 
+    # PURPOSE: 一部 dormant (0回) がある場合
     @patch("mekhane.peira.theorem_activity.scan_handoffs")
     def test_some_dormant(self, mock_scan):
         """一部 dormant (0回) がある場合"""
@@ -281,6 +284,7 @@ class TestCheckTheoremActivity(unittest.TestCase):
         self.assertEqual(result.status, "warn")
         self.assertIn("16/24 alive", result.detail)
 
+    # PURPOSE: 一部がハブ経由のみで alive の場合 — DX-008 R4
     @patch("mekhane.peira.theorem_activity.scan_handoffs")
     def test_hub_only_alive(self, mock_scan):
         """一部がハブ経由のみで alive の場合 — DX-008 R4"""

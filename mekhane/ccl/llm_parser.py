@@ -1,4 +1,5 @@
 # PROOF: [L1/定理] <- mekhane/ccl/ CCL→CCLパーサーが必要→llm_parser が担う
+# PURPOSE: LLM Parser for CCL v2.0
 """
 LLM Parser for CCL v2.0
 

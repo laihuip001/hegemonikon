@@ -30,6 +30,7 @@ os.environ["HGK_GATEWAY_TOKEN"] = "test_token_for_functional_testing"
 # Fixtures
 # =============================================================================
 
+# PURPOSE: 各テスト用の一時ディレクトリを設定。実ファイルシステムを汚さない。
 @pytest.fixture(autouse=True)
 def setup_test_dirs(tmp_path, monkeypatch):
     """各テスト用の一時ディレクトリを設定。実ファイルシステムを汚さない。"""

@@ -1,4 +1,5 @@
 # PROOF: [L3/ユーティリティ] <- mekhane/peira/scripts/ O4→実験スクリプトが必要
+# PURPOSE: cleanup-datefix.py
 #!/usr/bin/env python3
 """
 cleanup-datefix.py

@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # PROOF: [L2/インフラ] <- mekhane/api/routes/ Digestor 候補閲覧 API
+# PURPOSE: Digestor API — digest_report の閲覧エンドポイント
 """
 Digestor API — digest_report の閲覧エンドポイント
 

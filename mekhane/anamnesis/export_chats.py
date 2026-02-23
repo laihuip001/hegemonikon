@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # PROOF: [L2/インフラ] <- mekhane/anamnesis/
+# PURPOSE: PROOF: [L3/ユーティリティ]
 """
 PROOF: [L3/ユーティリティ]
 

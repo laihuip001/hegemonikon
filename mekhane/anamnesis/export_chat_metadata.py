@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # PROOF: [L2/インフラ] <- mekhane/anamnesis/ A0→セッション記録の永続化→メタデータ抽出が担う
+# PURPOSE: Antigravity IDE チャット履歴メタデータ エクスポーター
 """
 Antigravity IDE チャット履歴メタデータ エクスポーター
 

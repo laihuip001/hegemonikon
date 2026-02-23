@@ -1,4 +1,5 @@
 # PROOF: [L1/定理] <- mekhane/ CCL→実行基盤が必要
+# PURPOSE: Workflow Runner with Derivative Selection
 """
 Workflow Runner with Derivative Selection
 

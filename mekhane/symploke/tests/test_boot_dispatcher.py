@@ -1,3 +1,5 @@
+# PROOF: [L2/Mekhane] <- mekhane/symploke/tests/test_boot_dispatcher.py O1->Zet->Impl
+# PURPOSE: Tests for Dispatcher integration in boot_integration.py
 """
 Tests for Dispatcher integration in boot_integration.py
 

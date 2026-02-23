@@ -1,4 +1,5 @@
 # PROOF: [L3/テスト] <- mekhane/fep/tests/ 対象モジュールが存在→検証が必要
+# PURPOSE: Tests for Phase D modules: Zētēsis, Schema, Doxa, Sophia, Krisis
 """
 Tests for Phase D modules: Zētēsis, Schema, Doxa, Sophia, Krisis
 """

@@ -1,4 +1,5 @@
 # PROOF: [L1/定理] <- mekhane/basanos/ VISION.md G7/G8 の具体化
+# PURPOSE: TrendAnalyzer — daily_reviews/ データからパターンを学習する「記憶する免疫」。
 """
 TrendAnalyzer — daily_reviews/ データからパターンを学習する「記憶する免疫」。
 
@@ -24,6 +25,7 @@ logger = logging.getLogger(__name__)
 DAILY_REVIEWS_DIR = Path.home() / "oikos/mneme/.hegemonikon/daily_reviews"
 
 
+# PURPOSE: ファイル別のissue履歴プロファイル。
 @dataclass
 class FileProfile:
     """ファイル別のissue履歴プロファイル。"""
@@ -36,6 +38,7 @@ class FileProfile:
     streak: int = 0  # consecutive days with issues
     days_active: int = 0  # total days with issues
 
+    # PURPOSE: ヒートスコア: issues/day × streak × recency_decay。
     @property
     def heat(self) -> float:
         """ヒートスコア: issues/day × streak × recency_decay。
@@ -64,6 +67,7 @@ class FileProfile:
             return 0.5
 
 
+# PURPOSE: daily_reviews/ データからトレンドを分析する。
 class TrendAnalyzer:
     """daily_reviews/ データからトレンドを分析する。
 
@@ -84,6 +88,7 @@ class TrendAnalyzer:
         self._reports: Optional[List[dict]] = None
         self._dates: Optional[List[str]] = None
 
+    # PURPOSE: daily_reviews/ から過去N日分のレポートを読み込む。
     def load_reports(self) -> List[dict]:
         """daily_reviews/ から過去N日分のレポートを読み込む。"""
         if self._reports is not None:
@@ -123,6 +128,7 @@ class TrendAnalyzer:
         logger.info(f"Loaded {len(reports)} reports from {len(self._dates)} days")
         return reports
 
+    # PURPOSE: レポートが存在する日付のリスト。
     @property
     def dates(self) -> List[str]:
         """レポートが存在する日付のリスト。"""
@@ -130,6 +136,7 @@ class TrendAnalyzer:
             self.load_reports()
         return self._dates or []
 
+    # PURPOSE: ファイル別のプロファイルを集計。
     def file_profiles(self) -> Dict[str, FileProfile]:
         """ファイル別のプロファイルを集計。"""
         reports = self.load_reports()
@@ -186,12 +193,14 @@ class TrendAnalyzer:
 
         return streak
 
+    # PURPOSE: ヒートスコア上位のファイルを返す。
     def hot_files(self, top_n: int = 10) -> List[FileProfile]:
         """ヒートスコア上位のファイルを返す。"""
         profiles = self.file_profiles()
         ranked = sorted(profiles.values(), key=lambda p: p.heat, reverse=True)
         return ranked[:top_n]
 
+    # PURPOSE: カテゴリ別の日次issue数推移。
     def category_trends(self) -> Dict[str, List[int]]:
         """カテゴリ別の日次issue数推移。
 
@@ -220,6 +229,7 @@ class TrendAnalyzer:
 
         return result
 
+    # PURPOSE: カテゴリ別のissue増減速度 (issues/day)。
     def category_velocity(self) -> Dict[str, float]:
         """カテゴリ別のissue増減速度 (issues/day)。
 
@@ -249,6 +259,7 @@ class TrendAnalyzer:
 
         return velocities
 
+    # PURPOSE: G8: カテゴリ別の推奨閾値を算出。
     def suggest_thresholds(self) -> Dict[str, float]:
         """G8: カテゴリ別の推奨閾値を算出。
 
@@ -267,6 +278,7 @@ class TrendAnalyzer:
 
         return thresholds
 
+    # PURPOSE: G7: 分析結果を RotationState に反映。
     def apply_to_rotation(self, state: "RotationState") -> Dict[str, Any]:
         """G7: 分析結果を RotationState に反映。
 
@@ -316,6 +328,7 @@ class TrendAnalyzer:
         )
         return changes
 
+    # PURPOSE: 分析結果の要約テキスト。
     def summary(self) -> str:
         """分析結果の要約テキスト。"""
         reports = self.load_reports()

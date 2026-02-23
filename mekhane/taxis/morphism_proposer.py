@@ -1,4 +1,5 @@
 # PROOF: [L2/インフラ] <- mekhane/taxis/ A0→X-series射提案が必要→morphism_proposerが担う
+# PURPOSE: morphism_proposer.py — X-series 射提案エンジン
 """
 morphism_proposer.py — X-series 射提案エンジン
 

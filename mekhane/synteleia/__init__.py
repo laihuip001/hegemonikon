@@ -1,4 +1,5 @@
 # PROOF: [L2/インフラ] <- mekhane/synteleia/ Synteleia メタ認知・社会的認知 実装層
+# PURPOSE: Synteleia (συντέλεια) — メタ認知・社会的認知の実装層
 """
 Synteleia (συντέλεια) — メタ認知・社会的認知の実装層
 

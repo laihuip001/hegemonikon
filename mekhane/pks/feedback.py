@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # PROOF: [L2/インフラ] <- mekhane/pks/ A0→プッシュ反応の学習が次回精度を上げる→feedback が担う
+# PURPOSE: PKS Feedback Loop — プッシュ知識への反応を収集・学習
 """
 PKS Feedback Loop — プッシュ知識への反応を収集・学習
 

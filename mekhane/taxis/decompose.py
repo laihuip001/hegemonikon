@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # PROOF: [L2/インフラ] <- mekhane/taxis/ A0→G関手(第一原理分解)が必要→decomposeが担う
+# PURPOSE: PROOF: [L2/インフラ] このファイルは存在しなければならない
 """
 PROOF: [L2/インフラ] このファイルは存在しなければならない
 

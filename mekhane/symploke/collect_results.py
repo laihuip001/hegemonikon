@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # PROOF: [L3/ユーティリティ] <- mekhane/symploke/ O4→結果収集が必要→collect_results が担う
+# PURPOSE: Jules Specialist レビュー結果収集パイプライン v1.0
 """
 Jules Specialist レビュー結果収集パイプライン v1.0
 

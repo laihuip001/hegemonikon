@@ -1,3 +1,5 @@
+# PROOF: [L2/Mekhane] <- mekhane/mcp/mcp_guard.py O1->Zet->Impl
+# PURPOSE: MCP Guard — ゾンビプロセス防止の自己防衛モジュール
 """
 MCP Guard — ゾンビプロセス防止の自己防衛モジュール
 
@@ -30,6 +32,7 @@ PID_DIR = Path.home() / ".cache" / "hgk" / "mcp"
 _KILL_WAIT = 2.0
 
 
+# PURPOSE: MCP サーバー起動ガード。
 def guard(server_name: str) -> None:
     """MCP サーバー起動ガード。
 
@@ -179,6 +182,7 @@ def _register_cleanup(server_name: str) -> None:
     atexit.register(_cleanup)
 
 
+# PURPOSE: 全 MCP サーバーの PID 状況を返す。診断用。
 def status() -> dict:
     """全 MCP サーバーの PID 状況を返す。診断用。"""
     result = {}

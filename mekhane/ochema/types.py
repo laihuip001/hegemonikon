@@ -12,6 +12,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 
 
+# PURPOSE: LLM からの応答を保持する。
 @dataclass
 class LLMResponse:
     """LLM からの応答を保持する。"""

@@ -1,4 +1,5 @@
 # PROOF: [L3/ユーティリティ] <- mekhane/peira/scripts/ O4→実験スクリプトが必要
+# PURPOSE: Chat History Knowledge Base - LanceDB Edition
 #!/usr/bin/env python3
 """
 Chat History Knowledge Base - LanceDB Edition

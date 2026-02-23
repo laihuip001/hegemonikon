@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # PROOF: [L2/インフラ] <- mekhane/dendron/
+# PURPOSE: Doc Staleness Checker — ドキュメント腐敗自動検知
 """
 Doc Staleness Checker — ドキュメント腐敗自動検知
 
@@ -105,6 +106,7 @@ class DocStalenessChecker:
         self._results: List[StalenessResult] = []
         self._warnings: List[str] = []
 
+    # PURPOSE: scan 時の警告 (doc_id 重複等)
     @property
     def warnings(self) -> List[str]:
         """scan 時の警告 (doc_id 重複等)."""

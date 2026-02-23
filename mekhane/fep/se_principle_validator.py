@@ -1,4 +1,5 @@
 # PROOF: [L2/インフラ] <- mekhane/fep/
+# PURPOSE: PROOF: [L2/インフラ]
 """
 PROOF: [L2/インフラ]
 

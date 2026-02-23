@@ -1,4 +1,5 @@
 # PROOF: [L2/インフラ] <- mekhane/basanos/ A2→評議会システム統合パッケージ
+# PURPOSE: Basanos — 統合評議会パッケージ
 # Basanos — Hegemonikón 多視点レビュー & 静的解析システム
 """
 Basanos — 統合評議会パッケージ

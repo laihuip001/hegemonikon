@@ -1,3 +1,5 @@
+# PROOF: [L2/Mekhane] <- mekhane/fep/tests/test_pw_adapter.py O1->Zet->Impl
+# PURPOSE: Tests for pw_adapter.py — L1↔L2 PW bridge.
 """Tests for pw_adapter.py — L1↔L2 PW bridge."""
 
 import pytest

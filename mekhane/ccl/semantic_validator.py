@@ -1,4 +1,5 @@
 # PROOF: [L1/定理] <- mekhane/ccl/ CCL→CCLパーサーが必要→semantic_validator が担う
+# PURPOSE: CCL Semantic Validator v1.0
 """
 CCL Semantic Validator v1.0
 

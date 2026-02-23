@@ -1,4 +1,5 @@
 # PROOF: [L2/インフラ] <- mekhane/ergasterion/basanos/tests/ A2→評議会システムが必要→test_prompt_generator が担う
+# PURPOSE: Tests for Jules Basanos v2 Prompt Generator.
 #!/usr/bin/env python3
 """
 Tests for Jules Basanos v2 Prompt Generator.

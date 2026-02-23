@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # PROOF: [L2/インフラ] <- mekhane/anamnesis/
+# PURPOSE: Implementation of module
 #
 # P3 → セッション終了時に Walkthrough を保存する必要がある
 #    → Antigravity brain から walkthrough.md を mneme にコピー

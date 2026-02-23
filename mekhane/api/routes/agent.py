@@ -189,8 +189,7 @@ async def approve_proposal(req: ApproveRequest):
 
     # Security check (simple)
     if "serve.py" not in str(path): # Limit scope for PoC
-        # raise HTTPException(403, "Access denied: Can only modify serve.py in PoC")
-        pass
+        raise HTTPException(403, "Access denied: Can only modify serve.py in PoC")
 
     try:
         path.write_text(prop["content"], encoding="utf-8")

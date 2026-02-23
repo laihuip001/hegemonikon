@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/periskope/searchers/tavily_searcher.py O1->Zet->Purpose
 """
 Tavily Search API client for Periskopē.
 

@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/periskope/models.py O1->Zet->Purpose
 """
 Periskopē data models.
 

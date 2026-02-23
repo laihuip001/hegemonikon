@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # PROOF: [L2/インフラ] <- mekhane/symploke/ A0→知識管理が必要→search_helper が担う
+# PURPOSE: Symploke Search Helper - 統合検索の簡易インターフェース
 """
 Symploke Search Helper - 統合検索の簡易インターフェース
 

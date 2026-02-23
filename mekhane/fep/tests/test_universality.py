@@ -1,3 +1,5 @@
+# PROOF: [L2/Mekhane] <- mekhane/fep/tests/test_universality.py O1->Zet->Impl
+# PURPOSE: Tests for mekhane.fep.universality — Kalon (圏論的普遍性検証).
 """Tests for mekhane.fep.universality — Kalon (圏論的普遍性検証)."""
 
 import json

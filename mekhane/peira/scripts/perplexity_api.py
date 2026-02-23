@@ -1,4 +1,5 @@
 # PROOF: [L3/ユーティリティ] <- mekhane/peira/scripts/ O4→実験スクリプトが必要
+# PURPOSE: Perplexity API Client (パプ君)
 #!/usr/bin/env python3
 """
 Perplexity API Client (パプ君)

@@ -1,4 +1,5 @@
 # PROOF: [L1/定理] <- mekhane/ CCL→実行基盤が必要
+# PURPOSE: CCL Tracer (v1.0)
 #!/usr/bin/env python3
 """
 CCL Tracer (v1.0)

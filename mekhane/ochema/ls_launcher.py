@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Mekhane] <- mekhane/ochema/ls_launcher.py O1->Zet->Impl
+# PURPOSE: LS Standalone Launcher — IDE なしで Language Server を直接起動する。
 """LS Standalone Launcher — IDE なしで Language Server を直接起動する。
 
 ManagementMetadata protobuf を stdin に送り込んで LS を起動。
@@ -33,6 +35,7 @@ LS_BINARY = (
 CLOUD_CODE_ENDPOINT = "https://daily-cloudcode-pa.googleapis.com"
 
 
+# PURPOSE: Encode a protobuf string field (wire type 2)
 def encode_protobuf_string(field_number: int, value: str) -> bytes:
     """Encode a protobuf string field (wire type 2)."""
     if not value:
@@ -42,6 +45,7 @@ def encode_protobuf_string(field_number: int, value: str) -> bytes:
     return _encode_varint(tag) + _encode_varint(len(data)) + data
 
 
+# PURPOSE: Encode a protobuf bool field (wire type 0)
 def encode_protobuf_bool(field_number: int, value: bool) -> bytes:
     """Encode a protobuf bool field (wire type 0)."""
     if not value:
@@ -60,6 +64,7 @@ def _encode_varint(value: int) -> bytes:
     return bytes(result)
 
 
+# PURPOSE: Build ManagementMetadata protobuf binary
 def build_management_metadata(
     auth_token: str,
     auth_uid: str = "",
@@ -75,6 +80,7 @@ def build_management_metadata(
     return msg
 
 
+# PURPOSE: 現在起動中の LS プロセスのメモリから OAuth token を取得する。
 def get_current_oauth_token() -> str | None:
     """現在起動中の LS プロセスのメモリから OAuth token を取得する。
     
@@ -134,6 +140,7 @@ def get_current_oauth_token() -> str | None:
     return None
 
 
+# PURPOSE: LS を直接起動する。
 def launch_ls(
     port: int,
     auth_token: str,
@@ -198,6 +205,7 @@ def launch_ls(
     return proc
 
 
+# PURPOSE: main の処理
 def main():
     parser = argparse.ArgumentParser(description="LS Standalone Launcher")
     parser.add_argument("--port", type=int, default=29501, help="Server port")

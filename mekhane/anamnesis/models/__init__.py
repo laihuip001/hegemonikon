@@ -1,4 +1,5 @@
 # PROOF: [L2/インフラ] <- mekhane/anamnesis/models/ P3→知識の正規化が必要→models が担う
+# PURPOSE: Implementation of module
 # Gnōsis Models
 from mekhane.anamnesis.models.paper import Paper, merge_papers
 

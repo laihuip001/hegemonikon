@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # PROOF: [L3/ユーティリティ] <- mekhane/symploke/ O4→実行スクリプトが必要→phase0_specialists が担う
+# PURPOSE: Jules 専門家定義: Phase 0 従来的品質層 (Layer 1-6: 255人)
 """
 Jules 専門家定義: Phase 0 従来的品質層 (Layer 1-6: 255人)
 

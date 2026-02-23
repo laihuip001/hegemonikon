@@ -1,4 +1,5 @@
 # PROOF: [L3/ユーティリティ] <- mekhane/scripts/ O4→運用スクリプトが必要→compile_docs が担う
+# PURPOSE: Implementation of module
 import os
 from pathlib import Path
 

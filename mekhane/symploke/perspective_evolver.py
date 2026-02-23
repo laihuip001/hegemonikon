@@ -1,4 +1,5 @@
 # PROOF: [L2/ドメイン] <- mekhane/symploke/ O4→perspective進化→自律生成
+# PURPOSE: F15: Perspective Evolver — 高スコア domain から新しい Perspective を自動提案する。
 """F15: Perspective Evolver — 高スコア domain から新しい Perspective を自動提案する。
 
 FeedbackStore の domain 集計を元に、高有用率 domain の未カバー axis に
@@ -47,6 +48,7 @@ def _get_domain_stats(store: FeedbackStore) -> dict[str, dict]:
     return domain_stats
 
 
+# PURPOSE: 高有用率 domain の未カバー axis から新 Perspective を提案する。
 def propose_new_perspectives(
     store: FeedbackStore,
     max_proposals: int = 5,
@@ -94,6 +96,7 @@ def propose_new_perspectives(
     return proposals[:max_proposals]
 
 
+# PURPOSE: 進化レポートを生成する。
 def evolve(
     store: FeedbackStore,
     matrix_path: Optional[Path] = None,

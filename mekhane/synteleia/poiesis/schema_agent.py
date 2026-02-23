@@ -1,4 +1,5 @@
 # PROOF: [L1/定理] <- mekhane/synteleia/poiesis/ S2 Mekhanē 構造設計エージェント
+# PURPOSE: Schema Agent - Structure Evaluation
 """
 Schema Agent - Structure Evaluation
 

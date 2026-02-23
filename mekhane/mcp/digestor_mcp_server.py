@@ -1,4 +1,5 @@
 # PROOF: [L2/インフラ] <- mekhane/mcp/ A0→MCP経由のアクセスが必要→digestor_mcp_server が担う
+# PURPOSE: Digestor MCP Server v2.1 - Hegemonikón Knowledge Digestion Pipeline
 #!/usr/bin/env python3
 """
 Digestor MCP Server v2.1 - Hegemonikón Knowledge Digestion Pipeline
@@ -345,6 +346,7 @@ async def handle_mark_processed(arguments: dict):
 
 # === Semantic Scholar handlers ===
 
+# PURPOSE: Handle Semantic Scholar API tools
 async def handle_semantic_scholar(name: str, arguments: dict):
     """Handle Semantic Scholar API tools."""
     try:

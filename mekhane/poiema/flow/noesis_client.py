@@ -1,4 +1,5 @@
 # PROOF: [L2/インフラ] <- mekhane/poiema/flow/ O4→創造機能が必要
+# PURPOSE: Noēsis Client — O1 Noēsis Instantiation (API Layer)
 """
 Noēsis Client — O1 Noēsis Instantiation (API Layer)
 

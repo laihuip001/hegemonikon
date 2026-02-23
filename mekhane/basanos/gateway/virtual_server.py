@@ -1,4 +1,5 @@
 # PROOF: [L2/インフラ] <- mekhane/basanos/gateway/ A0→MCP統合が必要→VirtualServerが担う
+# PURPOSE: Virtual MCP Server — 複数の下流 MCP サーバーを束ねて単一サーバーとして公開
 """
 Virtual MCP Server — 複数の下流 MCP サーバーを束ねて単一サーバーとして公開
 

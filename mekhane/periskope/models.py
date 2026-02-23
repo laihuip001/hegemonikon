@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/periskope/models.py O1->Zet->Impl
 """
 Periskopē data models.
 
@@ -11,6 +12,7 @@ from enum import Enum
 from typing import Any
 
 
+# PURPOSE: Search source identifiers
 class SearchSource(str, Enum):
     """Search source identifiers."""
     SEARXNG = "searxng"
@@ -23,6 +25,7 @@ class SearchSource(str, Enum):
     PLAYWRIGHT = "playwright"
 
 
+# PURPOSE: BC-6 TAINT classification for citations
 class TaintLevel(str, Enum):
     """BC-6 TAINT classification for citations."""
     SOURCE = "SOURCE"       # Directly verified (similarity > 0.8)
@@ -31,6 +34,7 @@ class TaintLevel(str, Enum):
     UNCHECKED = "UNCHECKED"   # Not yet verified
 
 
+# PURPOSE: Available synthesis models
 class SynthModel(str, Enum):
     """Available synthesis models."""
     GEMINI_FLASH = "gemini-3-flash-preview"
@@ -42,6 +46,7 @@ class SynthModel(str, Enum):
     CLAUDE_CORTEX = "claude-cortex"
 
 
+# PURPOSE: A single search result from any source
 @dataclass
 class SearchResult:
     """A single search result from any source."""
@@ -54,12 +59,14 @@ class SearchResult:
     timestamp: str | None = None
     metadata: dict[str, Any] = field(default_factory=dict)
 
+    # PURPOSE: Whether this result comes from HGK internal knowledge
     @property
     def is_internal(self) -> bool:
         """Whether this result comes from HGK internal knowledge."""
         return self.source in (SearchSource.GNOSIS, SearchSource.SOPHIA, SearchSource.KAIROS)
 
 
+# PURPOSE: A citation linking a claim to its source
 @dataclass
 class Citation:
     """A citation linking a claim to its source."""
@@ -71,11 +78,13 @@ class Citation:
     verified_at: str | None = None
     verification_note: str = ""
 
+    # PURPOSE: is_trustworthy の処理
     @property
     def is_trustworthy(self) -> bool:
         return self.taint_level == TaintLevel.SOURCE
 
 
+# PURPOSE: Result from a single model's synthesis
 @dataclass
 class SynthesisResult:
     """Result from a single model's synthesis."""
@@ -87,6 +96,7 @@ class SynthesisResult:
     token_count: int = 0
 
 
+# PURPOSE: Report on divergence between multiple model outputs
 @dataclass
 class DivergenceReport:
     """Report on divergence between multiple model outputs."""
@@ -96,6 +106,7 @@ class DivergenceReport:
     consensus_claims: list[str] = field(default_factory=list)
 
 
+# PURPOSE: Configuration for a Periskopē research session
 @dataclass
 class PeriskopeConfig:
     """Configuration for a Periskopē research session."""
@@ -124,6 +135,7 @@ class PeriskopeConfig:
     auto_digest: bool = False  # Auto-run /eat- after completion
 
 
+# PURPOSE: Final output of a Periskopē research session
 @dataclass
 class PeriskopeReport:
     """Final output of a Periskopē research session."""
@@ -140,6 +152,7 @@ class PeriskopeReport:
     execution_time_seconds: float = 0.0
     report_markdown: str = ""
 
+    # PURPOSE: Overall citation health assessment
     @property
     def citation_health(self) -> str:
         """Overall citation health assessment."""

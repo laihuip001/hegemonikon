@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/periskope/tests/test_page_fetcher.py O1->Zet->Impl
 """
 Tests for PageFetcher (W7: selective full-page crawling).
 """
@@ -17,6 +18,7 @@ from mekhane.periskope.page_fetcher import (
 
 # ── Text Extraction Tests ──
 
+# PURPOSE: trafilatura should extract clean text from HTML
 def test_extract_text_with_trafilatura():
     """trafilatura should extract clean text from HTML."""
     html = """
@@ -43,6 +45,7 @@ def test_extract_text_with_trafilatura():
     assert len(text) > 50
 
 
+# PURPOSE: Should fall back to basic HTML stripping if trafilatura unavailable
 def test_extract_text_fallback_without_trafilatura():
     """Should fall back to basic HTML stripping if trafilatura unavailable."""
     html = """
@@ -72,6 +75,7 @@ def test_extract_text_fallback_without_trafilatura():
 
 # ── Blocked Domains ──
 
+# PURPOSE: URLs from blocked domains should be skipped
 @pytest.mark.asyncio
 async def test_blocked_domains_skipped():
     """URLs from blocked domains should be skipped."""
@@ -84,6 +88,7 @@ async def test_blocked_domains_skipped():
 
 # ── fetch_many ──
 
+# PURPOSE: Empty URL list should return empty dict
 @pytest.mark.asyncio
 async def test_fetch_many_empty():
     """Empty URL list should return empty dict."""
@@ -92,6 +97,7 @@ async def test_fetch_many_empty():
     assert result == {}
 
 
+# PURPOSE: fetch_many should process multiple URLs concurrently
 @pytest.mark.asyncio
 async def test_fetch_many_with_mock():
     """fetch_many should process multiple URLs concurrently."""
@@ -100,6 +106,7 @@ async def test_fetch_many_with_mock():
     # Mock fetch_one to return predictable results
     call_count = 0
 
+    # PURPOSE: mock_fetch の処理
     async def mock_fetch(url):
         nonlocal call_count
         call_count += 1
@@ -121,6 +128,7 @@ async def test_fetch_many_with_mock():
     assert "https://bad.example.com/page2" not in result
 
 
+# PURPOSE: Concurrency should be limited by semaphore
 @pytest.mark.asyncio
 async def test_fetch_many_concurrency_limit():
     """Concurrency should be limited by semaphore."""
@@ -128,6 +136,7 @@ async def test_fetch_many_concurrency_limit():
     max_concurrent = 0
     current_concurrent = 0
 
+    # PURPOSE: mock_fetch の処理
     async def mock_fetch(url):
         nonlocal max_concurrent, current_concurrent
         current_concurrent += 1
@@ -145,6 +154,7 @@ async def test_fetch_many_concurrency_limit():
 
 # ── INTERNAL_SOURCES ──
 
+# PURPOSE: INTERNAL_SOURCES should contain expected sources
 def test_internal_sources_constant():
     """INTERNAL_SOURCES should contain expected sources."""
     assert "gnosis" in INTERNAL_SOURCES
@@ -155,6 +165,7 @@ def test_internal_sources_constant():
 
 # ── PageFetcher init ──
 
+# PURPOSE: PageFetcher should initialize with sensible defaults
 def test_fetcher_defaults():
     """PageFetcher should initialize with sensible defaults."""
     fetcher = PageFetcher()
@@ -164,6 +175,7 @@ def test_fetcher_defaults():
     assert fetcher.playwright_fallback is True
 
 
+# PURPOSE: PageFetcher should accept custom configuration
 def test_fetcher_custom_config():
     """PageFetcher should accept custom configuration."""
     fetcher = PageFetcher(
@@ -180,12 +192,14 @@ def test_fetcher_custom_config():
 
 # ── Cache ──
 
+# PURPOSE: Second fetch of same URL should use cache, not re-fetch
 @pytest.mark.asyncio
 async def test_cache_prevents_refetch():
     """Second fetch of same URL should use cache, not re-fetch."""
     fetcher = PageFetcher()
     fetch_count = 0
 
+    # PURPOSE: mock_fetch の処理
     async def mock_fetch(url):
         nonlocal fetch_count
         fetch_count += 1
@@ -201,12 +215,14 @@ async def test_cache_prevents_refetch():
 
 # ── Content length filtering ──
 
+# PURPOSE: Content shorter than min_content_length should be rejected
 @pytest.mark.asyncio
 async def test_fetch_one_rejects_short_content():
     """Content shorter than min_content_length should be rejected."""
     fetcher = PageFetcher(min_content_length=500)
 
     # Mock httpx to return short content
+    # PURPOSE: mock_fetch_httpx の処理
     async def mock_fetch_httpx(url):
         return "Too short"
 
@@ -217,12 +233,14 @@ async def test_fetch_one_rejects_short_content():
     assert result is None
 
 
+# PURPOSE: Content longer than max_content_length should be truncated
 @pytest.mark.asyncio
 async def test_fetch_one_truncates_long_content():
     """Content longer than max_content_length should be truncated."""
     fetcher = PageFetcher(max_content_length=100, min_content_length=10)
     long_content = "x" * 500
 
+    # PURPOSE: mock_fetch_httpx の処理
     async def mock_fetch_httpx(url):
         return long_content
 

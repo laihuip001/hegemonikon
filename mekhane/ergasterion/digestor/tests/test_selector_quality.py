@@ -1,4 +1,5 @@
 # PROOF: [L2/テスト] <- mekhane/ergasterion/digestor/ selector品質改善の検証
+# PURPOSE: Digestor Selector 品質テスト
 """
 Digestor Selector 品質テスト
 

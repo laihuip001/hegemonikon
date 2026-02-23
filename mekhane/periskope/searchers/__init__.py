@@ -1,3 +1,5 @@
+# PROOF: [L2/Mekhane] <- mekhane/periskope/searchers/__init__.py O1->Zet->Impl
+# PURPOSE: Periskopē searchers — pluggable search source adapters.
 """
 Periskopē searchers — pluggable search source adapters.
 

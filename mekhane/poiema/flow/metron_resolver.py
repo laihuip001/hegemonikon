@@ -1,4 +1,5 @@
 # PROOF: [L2/インフラ] <- mekhane/poiema/flow/ O4→創造機能が必要
+# PURPOSE: Metron Resolver — S1 Metron Instantiation
 """
 Metron Resolver — S1 Metron Instantiation
 

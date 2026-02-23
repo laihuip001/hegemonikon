@@ -1,4 +1,5 @@
 # PROOF: [L1/定理] <- mekhane/ccl/ CCL→CCLパーサーが必要→tracer が担う
+# PURPOSE: CCL Tracer v2.0
 #!/usr/bin/env python3
 """
 CCL Tracer v2.0

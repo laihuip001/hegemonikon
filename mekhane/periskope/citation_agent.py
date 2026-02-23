@@ -1,3 +1,5 @@
+# PROOF: [L2/Mekhane] <- mekhane/periskope/citation_agent.py O1->Zet->Impl
+# PURPOSE: Citation verification agent for Periskopē.
 """
 Citation verification agent for Periskopē.
 
@@ -20,6 +22,7 @@ from mekhane.periskope.models import Citation, TaintLevel
 logger = logging.getLogger(__name__)
 
 
+# PURPOSE: Verify citations by matching claims against source content
 class CitationAgent:
     """Verify citations by matching claims against source content.
 
@@ -57,6 +60,7 @@ class CitationAgent:
         # F8: embedding cache (SHA256[:16] → vector)
         self._embed_cache: dict[str, list[float]] = {}
 
+    # PURPOSE: Verify a list of citations
     async def verify_citations(
         self,
         citations: list[Citation],
@@ -347,6 +351,7 @@ class CitationAgent:
             logger.debug("Failed to fetch %s: %s", url, e)
             return ""
 
+    # PURPOSE: Extract verifiable claims from synthesis text
     def extract_claims_from_synthesis(
         self,
         synthesis_text: str,

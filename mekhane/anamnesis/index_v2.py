@@ -1,4 +1,5 @@
 # PROOF: [L2/インフラ] <- mekhane/anamnesis/
+# PURPOSE: PROOF: [L2/インフラ]
 """
 PROOF: [L2/インフラ]
 

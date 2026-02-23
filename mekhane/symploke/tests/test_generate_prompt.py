@@ -1,4 +1,5 @@
 # PROOF: [L3/テスト] <- mekhane/symploke/tests/ 対象モジュールが存在→検証が必要→test_generate_prompt が担う
+# PURPOSE: Tests for generate_prompt with dynamic project context loading.
 #!/usr/bin/env python3
 """
 Tests for generate_prompt with dynamic project context loading.

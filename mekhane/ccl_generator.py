@@ -1,4 +1,5 @@
 # PROOF: [L1/定理] <- mekhane/ CCL→実行基盤が必要
+# PURPOSE: CCL Generator (v1.0)
 """
 CCL Generator (v1.0)
 

@@ -1,4 +1,5 @@
 # PROOF: [L2/インフラ] <- mekhane/ergasterion/digestor/ A0→消化処理が必要→pipeline が担う
+# PURPOSE: Digestor Pipeline - Gnosis → /eat 連携パイプライン
 """
 Digestor Pipeline - Gnosis → /eat 連携パイプライン
 

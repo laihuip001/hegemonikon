@@ -1,4 +1,5 @@
 # PROOF: [L1/定理] <- mekhane/fep/
+# PURPOSE: PROOF: [L1/定理] このファイルは存在しなければならない
 """
 PROOF: [L1/定理] このファイルは存在しなければならない
 

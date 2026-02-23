@@ -1,4 +1,5 @@
 # PROOF: [L3/ユーティリティ] <- mekhane/peira/scripts/ O4→実験スクリプトが必要
+# PURPOSE: phase3-fast-collect.py
 #!/usr/bin/env python3
 """
 phase3-fast-collect.py

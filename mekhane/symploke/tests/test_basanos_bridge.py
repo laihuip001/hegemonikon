@@ -37,12 +37,14 @@ from specialist_v2 import Specialist, Archetype, VerdictFormat
 
 # === Fixtures ===
 
+# PURPOSE: Standard BasanosBridge instance
 @pytest.fixture
 def bridge():
     """Standard BasanosBridge instance."""
     return BasanosBridge()
 
 
+# PURPOSE: Temporary rotation state file
 @pytest.fixture
 def temp_rotation_file(tmp_path):
     """Temporary rotation state file."""
@@ -52,9 +54,11 @@ def temp_rotation_file(tmp_path):
 
 # === Test: perspective_to_specialist ===
 
+# PURPOSE: Perspective → Specialist 変換のテスト。
 class TestPerspectiveToSpecialist:
     """Perspective → Specialist 変換のテスト。"""
 
+    # PURPOSE: 変換結果が Specialist インスタンスであること。
     def test_conversion_returns_specialist(self, bridge):
         """変換結果が Specialist インスタンスであること。"""
         specs = bridge.get_perspectives_as_specialists(
@@ -64,6 +68,7 @@ class TestPerspectiveToSpecialist:
         assert len(specs) == 1
         assert isinstance(specs[0], Specialist)
 
+    # PURPOSE: ID に BP- 接頭辞が付くこと。
     def test_id_prefix(self, bridge):
         """ID に BP- 接頭辞が付くこと。"""
         specs = bridge.get_perspectives_as_specialists(
@@ -72,6 +77,7 @@ class TestPerspectiveToSpecialist:
         )
         assert specs[0].id.startswith("BP-")
 
+    # PURPOSE: category がドメイン ID の小文字であること。
     def test_category_is_lowercase_domain(self, bridge):
         """category がドメイン ID の小文字であること。"""
         domain = bridge.all_domains[0]
@@ -81,6 +87,7 @@ class TestPerspectiveToSpecialist:
         )
         assert specs[0].category == domain.lower()
 
+    # PURPOSE: O-series (O1-O4) → PRECISION。
     def test_archetype_mapping_o_series(self, bridge):
         """O-series (O1-O4) → PRECISION。"""
         o_axes = [a for a in bridge.all_axes if a.startswith("O")]
@@ -91,6 +98,7 @@ class TestPerspectiveToSpecialist:
             )
             assert specs[0].archetype == Archetype.PRECISION
 
+    # PURPOSE: S-series (S1-S4) → AUTONOMY。
     def test_archetype_mapping_s_series(self, bridge):
         """S-series (S1-S4) → AUTONOMY。"""
         s_axes = [a for a in bridge.all_axes if a.startswith("S")]
@@ -101,6 +109,7 @@ class TestPerspectiveToSpecialist:
             )
             assert specs[0].archetype == Archetype.AUTONOMY
 
+    # PURPOSE: H-series (H1-H4) → CREATIVE。
     def test_archetype_mapping_h_series(self, bridge):
         """H-series (H1-H4) → CREATIVE。"""
         h_axes = [a for a in bridge.all_axes if a.startswith("H")]
@@ -111,6 +120,7 @@ class TestPerspectiveToSpecialist:
             )
             assert specs[0].archetype == Archetype.CREATIVE
 
+    # PURPOSE: verdict が常に REVIEW であること。
     def test_verdict_is_review(self, bridge):
         """verdict が常に REVIEW であること。"""
         specs = bridge.get_perspectives_as_specialists(
@@ -120,6 +130,7 @@ class TestPerspectiveToSpecialist:
         for s in specs:
             assert s.verdict == VerdictFormat.REVIEW
 
+    # PURPOSE: name が 'Domain × Axis' 形式であること。
     def test_name_format(self, bridge):
         """name が 'Domain × Axis' 形式であること。"""
         specs = bridge.get_perspectives_as_specialists(
@@ -131,26 +142,32 @@ class TestPerspectiveToSpecialist:
 
 # === Test: BasanosBridge ===
 
+# PURPOSE: BasanosBridge クラスのテスト。
 class TestBasanosBridge:
     """BasanosBridge クラスのテスト。"""
 
+    # PURPOSE: 480 perspectives (20 × 24) が存在すること。
     def test_total_perspectives(self, bridge):
         """480 perspectives (20 × 24) が存在すること。"""
         assert bridge.total_perspectives == 480
 
+    # PURPOSE: 20 ドメインが存在すること。
     def test_domains_count(self, bridge):
         """20 ドメインが存在すること。"""
         assert len(bridge.all_domains) == 20
 
+    # PURPOSE: 24 軸が存在すること。
     def test_axes_count(self, bridge):
         """24 軸が存在すること。"""
         assert len(bridge.all_axes) == 24
 
+    # PURPOSE: 全パースペクティブを取得できること。
     def test_get_all_perspectives(self, bridge):
         """全パースペクティブを取得できること。"""
         all_specs = bridge.get_perspectives_as_specialists()
         assert len(all_specs) == 480
 
+    # PURPOSE: 1 ドメイン指定 → 24 specialists。
     def test_single_domain(self, bridge):
         """1 ドメイン指定 → 24 specialists。"""
         specs = bridge.get_perspectives_as_specialists(
@@ -158,6 +175,7 @@ class TestBasanosBridge:
         )
         assert len(specs) == 24
 
+    # PURPOSE: 5 ドメイン指定 → 120 specialists。
     def test_multiple_domains(self, bridge):
         """5 ドメイン指定 → 120 specialists。"""
         specs = bridge.get_perspectives_as_specialists(
@@ -165,6 +183,7 @@ class TestBasanosBridge:
         )
         assert len(specs) == 120
 
+    # PURPOSE: 1 軸指定 → 20 specialists。
     def test_single_axis(self, bridge):
         """1 軸指定 → 20 specialists。"""
         specs = bridge.get_perspectives_as_specialists(
@@ -172,6 +191,7 @@ class TestBasanosBridge:
         )
         assert len(specs) == 20
 
+    # PURPOSE: 無効ドメインでは空リスト。
     def test_empty_result_for_invalid_domain(self, bridge):
         """無効ドメインでは空リスト。"""
         specs = bridge.get_perspectives_as_specialists(
@@ -182,19 +202,23 @@ class TestBasanosBridge:
 
 # === Test: Domain Sampling ===
 
+# PURPOSE: ドメインサンプリングとローテーションのテスト。
 class TestDomainSampling:
     """ドメインサンプリングとローテーションのテスト。"""
 
+    # PURPOSE: 指定数のドメインが返ること。
     def test_sample_count(self, bridge):
         """指定数のドメインが返ること。"""
         sampled = bridge.sample_domains(5, seed=42)
         assert len(sampled) == 5
 
+    # PURPOSE: サンプリング結果に重複がないこと。
     def test_sample_unique(self, bridge):
         """サンプリング結果に重複がないこと。"""
         sampled = bridge.sample_domains(10, seed=42)
         assert len(sampled) == len(set(sampled))
 
+    # PURPOSE: 同じ seed で同じ結果になること。
     def test_sample_deterministic_with_seed(self, bridge):
         """同じ seed で同じ結果になること。"""
         s1 = bridge.sample_domains(5, seed=123)
@@ -202,11 +226,13 @@ class TestDomainSampling:
         # Note: rotation state changes between calls, so results may differ
         # This test verifies the seed works within a single call
 
+    # PURPOSE: ドメイン数以上をリクエストした場合、全ドメインが返ること。
     def test_sample_more_than_available(self, bridge):
         """ドメイン数以上をリクエストした場合、全ドメインが返ること。"""
         sampled = bridge.sample_domains(100, seed=42)
         assert len(sampled) == len(bridge.all_domains)
 
+    # PURPOSE: 前回使ったドメインより未使用ドメインが優先されること。
     def test_rotation_prefers_fresh_domains(self, bridge):
         """前回使ったドメインより未使用ドメインが優先されること。"""
         with patch.object(bridge, '_load_rotation', return_value={
@@ -223,9 +249,11 @@ class TestDomainSampling:
 
 # === Test: Prompt Generation ===
 
+# PURPOSE: プロンプト生成のテスト。
 class TestPromptGeneration:
     """プロンプト生成のテスト。"""
 
+    # PURPOSE: 生成プロンプトにターゲットファイルが含まれること。
     def test_generate_prompt_contains_target(self, bridge):
         """生成プロンプトにターゲットファイルが含まれること。"""
         prompt = bridge.generate_perspective_prompt(
@@ -235,6 +263,7 @@ class TestPromptGeneration:
         )
         assert "test/file.py" in prompt
 
+    # PURPOSE: 生成プロンプトが空でないこと。
     def test_generate_prompt_non_empty(self, bridge):
         """生成プロンプトが空でないこと。"""
         prompt = bridge.generate_perspective_prompt(

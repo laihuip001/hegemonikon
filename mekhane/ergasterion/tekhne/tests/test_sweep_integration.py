@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # PROOF: [L3/テスト] <- mekhane/ergasterion/tekhne/ SweepEngine + ResponseCache 統合テスト
+# PURPOSE: SweepEngine + ResponseCache Integration Tests.
 """
 SweepEngine + ResponseCache Integration Tests.
 
@@ -36,18 +37,21 @@ from mekhane.ergasterion.tekhne.sweep_engine import (
 # === Fixtures ===
 
 
+# PURPOSE: Temporary cache directory for tests
 @pytest.fixture
 def tmp_cache_dir(tmp_path):
     """Temporary cache directory for tests."""
     return tmp_path / "test_cache"
 
 
+# PURPOSE: Fresh ResponseCache with short TTL for testing
 @pytest.fixture
 def cache(tmp_cache_dir):
     """Fresh ResponseCache with short TTL for testing."""
     return ResponseCache(cache_dir=tmp_cache_dir, ttl=60)
 
 
+# PURPOSE: Standard mock response from Cortex API
 @pytest.fixture
 def mock_cortex_response():
     """Standard mock response from Cortex API."""
@@ -62,6 +66,7 @@ def mock_cortex_response():
     })
 
 
+# PURPOSE: Create a sample prompt file for sweep testing
 @pytest.fixture
 def sample_prompt_file(tmp_path):
     """Create a sample prompt file for sweep testing."""
@@ -77,9 +82,11 @@ def sample_prompt_file(tmp_path):
 # === ResponseCache Unit Tests (Extended) ===
 
 
+# PURPOSE: Basic cache operations
 class TestCacheBasicOps:
     """Basic cache operations."""
 
+    # PURPOSE: Store and retrieve a response
     def test_put_and_get(self, cache):
         """Store and retrieve a response."""
         key = cache.put(
@@ -94,11 +101,13 @@ class TestCacheBasicOps:
         assert hit["text"] == "Test response"
         assert hit["model"] == "gemini-2.0-flash"
 
+    # PURPOSE: Non-existent key returns None
     def test_cache_miss(self, cache):
         """Non-existent key returns None."""
         result = cache.get(prompt="nonexistent", model="gemini-2.0-flash")
         assert result is None
 
+    # PURPOSE: Expired entries return None
     def test_ttl_expiry(self, tmp_cache_dir):
         """Expired entries return None."""
         cache = ResponseCache(cache_dir=tmp_cache_dir, ttl=1)  # 1 second TTL
@@ -115,6 +124,7 @@ class TestCacheBasicOps:
         time.sleep(1.1)
         assert cache.get(prompt="expirable", model="gemini-2.0-flash") is None
 
+    # PURPOSE: Same prompt with different models creates separate cache entries
     def test_different_models_different_keys(self, cache):
         """Same prompt with different models creates separate cache entries."""
         cache.put(prompt="same", model="model-a", response_text="response-a")
@@ -126,6 +136,7 @@ class TestCacheBasicOps:
         assert hit_a["text"] == "response-a"
         assert hit_b["text"] == "response-b"
 
+    # PURPOSE: System instruction changes the cache key
     def test_system_instruction_affects_key(self, cache):
         """System instruction changes the cache key."""
         cache.put(
@@ -143,9 +154,11 @@ class TestCacheBasicOps:
         )["text"] == "with-sys"
 
 
+# PURPOSE: Cache statistics tracking
 class TestCacheStats:
     """Cache statistics tracking."""
 
+    # PURPOSE: Stats accurately count hits and misses
     def test_hit_miss_counting(self, cache):
         """Stats accurately count hits and misses."""
         cache.put(prompt="exists", model="m", response_text="yes")
@@ -160,6 +173,7 @@ class TestCacheStats:
         assert stats.misses == 2
         assert stats.hit_rate == 0.5
 
+    # PURPOSE: Stats report correct number of entries
     def test_stats_total_entries(self, cache):
         """Stats report correct number of entries."""
         for i in range(5):
@@ -168,6 +182,7 @@ class TestCacheStats:
         stats = cache.stats()
         assert stats.total_entries == 5
 
+    # PURPOSE: Empty cache returns zero stats
     def test_empty_cache_stats(self, cache):
         """Empty cache returns zero stats."""
         stats = cache.stats()
@@ -176,9 +191,11 @@ class TestCacheStats:
         assert stats.hit_rate == 0.0
 
 
+# PURPOSE: Cache eviction behavior
 class TestCacheEviction:
     """Cache eviction behavior."""
 
+    # PURPOSE: Clear removes all entries
     def test_clear(self, cache):
         """Clear removes all entries."""
         for i in range(10):
@@ -188,6 +205,7 @@ class TestCacheEviction:
         assert removed == 10
         assert cache.stats().total_entries == 0
 
+    # PURPOSE: Invalidate removes only the targeted entry
     def test_invalidate_specific(self, cache):
         """Invalidate removes only the targeted entry."""
         cache.put(prompt="keep", model="m", response_text="keep-me")
@@ -198,6 +216,7 @@ class TestCacheEviction:
         assert cache.get(prompt="remove", model="m") is None
         assert cache.get(prompt="keep", model="m") is not None
 
+    # PURPOSE: Invalidate on non-existent key returns False
     def test_invalidate_nonexistent(self, cache):
         """Invalidate on non-existent key returns False."""
         assert cache.invalidate(prompt="nope", model="m") is False
@@ -206,19 +225,23 @@ class TestCacheEviction:
 # === SweepEngine + Cache Integration ===
 
 
+# PURPOSE: Integration tests for SweepEngine with ResponseCache
 class TestSweepCacheIntegration:
     """Integration tests for SweepEngine with ResponseCache."""
 
+    # PURPOSE: SweepEngine initializes with cache enabled by default
     def test_engine_creates_with_cache(self):
         """SweepEngine initializes with cache enabled by default."""
         engine = SweepEngine(use_cache=True)
         assert engine.use_cache is True
 
+    # PURPOSE: SweepEngine can be created with cache disabled
     def test_engine_without_cache(self):
         """SweepEngine can be created with cache disabled."""
         engine = SweepEngine(use_cache=False)
         assert engine.use_cache is False
 
+    # PURPOSE: Cache is populated during sweep and used on re-sweep
     def test_cache_integration_during_sweep(
         self, tmp_cache_dir, sample_prompt_file, mock_cortex_response
     ):
@@ -270,6 +293,7 @@ class TestSweepCacheIntegration:
             f"hits: {stats.hits})"
         )
 
+    # PURPOSE: Parsed results from cached response match parsed API response
     def test_parse_cached_response(self, mock_cortex_response):
         """Parsed results from cached response match parsed API response."""
         issues1 = _parse_sweep_response(
@@ -287,9 +311,11 @@ class TestSweepCacheIntegration:
 # === Regression Tests ===
 
 
+# PURPOSE: Regression tests for known issues
 class TestRegressions:
     """Regression tests for known issues."""
 
+    # PURPOSE: Cache correctly stores and retrieves empty responses
     def test_cache_handles_empty_response(self, cache):
         """Cache correctly stores and retrieves empty responses."""
         cache.put(prompt="empty", model="m", response_text="")
@@ -297,6 +323,7 @@ class TestRegressions:
         assert hit is not None
         assert hit["text"] == ""
 
+    # PURPOSE: Cache handles Japanese/Unicode content correctly
     def test_cache_handles_unicode(self, cache):
         """Cache handles Japanese/Unicode content correctly."""
         text = "これはテスト応答です。セキュリティ問題なし。"
@@ -304,6 +331,7 @@ class TestRegressions:
         hit = cache.get(prompt="日本語テスト", model="m")
         assert hit["text"] == text
 
+    # PURPOSE: Cache handles large responses without corruption
     def test_cache_handles_large_response(self, cache):
         """Cache handles large responses without corruption."""
         large_text = "x" * 100_000  # 100KB
@@ -312,6 +340,7 @@ class TestRegressions:
         assert hit["text"] == large_text
         assert len(hit["text"]) == 100_000
 
+    # PURPOSE: Metadata is preserved through put/get cycle
     def test_concurrent_cache_metadata(self, cache):
         """Metadata is preserved through put/get cycle."""
         meta = {"perspective": "Security-O1", "domain": "Security", "axis": "O1"}

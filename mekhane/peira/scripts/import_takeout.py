@@ -1,4 +1,5 @@
 # PROOF: [L3/ユーティリティ] <- mekhane/peira/scripts/ O4→実験スクリプトが必要
+# PURPOSE: Takeout Importer for Hegemonikón (Robustness Enhanced)
 #!/usr/bin/env python3
 """
 Takeout Importer for Hegemonikón (Robustness Enhanced)

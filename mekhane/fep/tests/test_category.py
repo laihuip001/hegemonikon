@@ -1,4 +1,5 @@
 # PROOF: [L2/テスト] <- mekhane/fep/tests/
+# PURPOSE: PROOF: [L2/テスト] このファイルは存在しなければならない
 """
 PROOF: [L2/テスト] このファイルは存在しなければならない
 

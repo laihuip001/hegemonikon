@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # PROOF: [L2/インフラ] <- mekhane/peira/ A0→システム可観測性が必要→hgk_healthが担う
+# PURPOSE: Hegemonikón Health Dashboard — 全サービスの死活と品質を一覧表示
 """
 Hegemonikón Health Dashboard — 全サービスの死活と品質を一覧表示
 

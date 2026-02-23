@@ -1,4 +1,5 @@
 # PROOF: [L2/インフラ] <- mekhane/ergasterion/typos/ S2→プロンプト言語が必要→typos が担う
+# PURPOSE: typos Parser
 #!/usr/bin/env python3
 """
 typos Parser

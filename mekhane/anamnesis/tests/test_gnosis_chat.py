@@ -1,4 +1,5 @@
 # PROOF: [L3/テスト] <- mekhane/anamnesis/tests/ 対象モジュール gnosis_chat が存在→その検証が必要
+# PURPOSE: Gnōsis Chat Test Suite — ConversationHistory, KnowledgeIndexer, Reranker, GnosisChat
 """
 Gnōsis Chat Test Suite — ConversationHistory, KnowledgeIndexer, Reranker, GnosisChat
 

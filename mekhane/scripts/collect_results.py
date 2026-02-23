@@ -1,4 +1,5 @@
 # PROOF: [L3/ユーティリティ] <- mekhane/scripts/ O4→運用スクリプトが必要→collect_results が担う
+# PURPOSE: Basanos v2.1 Result Collector
 #!/usr/bin/env python3
 """
 Basanos v2.1 Result Collector

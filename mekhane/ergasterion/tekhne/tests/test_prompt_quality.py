@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Mekhane] <- mekhane/ergasterion/tekhne/tests/test_prompt_quality.py O1->Zet->Impl
+# PURPOSE: Prompt Quality Testing Suite
 """
 Prompt Quality Testing Suite
 

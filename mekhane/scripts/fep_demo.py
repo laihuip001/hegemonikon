@@ -1,4 +1,5 @@
 # PROOF: [L3/ユーティリティ] <- mekhane/scripts/ O4→運用スクリプトが必要→fep_demo が担う
+# PURPOSE: FEP Demo: Hegemonikón Active Inference Agent
 #!/usr/bin/env python3
 """
 FEP Demo: Hegemonikón Active Inference Agent

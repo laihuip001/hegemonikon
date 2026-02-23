@@ -1,4 +1,5 @@
 # PROOF: [L1/定理] <- mekhane/ccl/ CCL→CCLパーサーが必要→semantic_matcher が担う
+# PURPOSE: Semantic Macro Matcher
 """
 Semantic Macro Matcher
 

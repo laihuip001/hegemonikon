@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # PROOF: [L2/インフラ] <- mekhane/anamnesis/ A0→Library検索CLIが必要→search_library_cliが担う
+# PURPOSE: Library Search CLI — /lib ワークフローのバックエンド
 """
 Library Search CLI — /lib ワークフローのバックエンド
 

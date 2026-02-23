@@ -1,4 +1,5 @@
 # PROOF: [L2/インフラ] <- mekhane/dendron/
+# PURPOSE: Dendron — 存在証明検証ツール
 """
 Dendron — 存在証明検証ツール
 

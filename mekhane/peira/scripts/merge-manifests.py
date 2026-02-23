@@ -1,4 +1,5 @@
 # PROOF: [L3/ユーティリティ] <- mekhane/peira/scripts/ O4→実験スクリプトが必要
+# PURPOSE: merge-manifests.py
 #!/usr/bin/env python3
 """
 merge-manifests.py

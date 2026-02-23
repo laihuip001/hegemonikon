@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/basanos/l2/hom.py O1->Zet->Impl
 # PURPOSE: Hom 計算 — 3段階の関連性尺度で随伴条件の「破れ」を測定する
 # REASON: F⊣G 随伴の Hom(F(ext), hgk) ≅ Hom(ext, G(hgk)) の妥当性を定量化する
 """Hom computation for Basanos L2.
@@ -17,6 +18,7 @@ from pathlib import Path
 from typing import Optional
 
 
+# PURPOSE: Result of Hom computation between two concepts
 @dataclass
 class HomScore:
     """Result of Hom computation between two concepts."""
@@ -27,6 +29,7 @@ class HomScore:
     embedding_score: Optional[float] = None  # Pass 2: cosine similarity [0, 1]
     llm_score: Optional[float] = None  # Pass 3: LLM judgment [0, 1]
 
+    # PURPOSE: Weighted combination of available scores
     @property
     def combined_score(self) -> float:
         """Weighted combination of available scores."""
@@ -39,12 +42,14 @@ class HomScore:
         total_weight = sum(w for _, w in scores)
         return sum(s * w for s, w in scores) / total_weight if total_weight > 0 else 0.0
 
+    # PURPOSE: Whether the concepts are considered related (threshold: 0.3)
     @property
     def is_related(self) -> bool:
         """Whether the concepts are considered related (threshold: 0.3)."""
         return self.combined_score >= 0.3
 
 
+# PURPOSE: Calculate Hom (relatedness) between external and HGK concepts
 class HomCalculator:
     """Calculate Hom (relatedness) between external and HGK concepts.
 
@@ -64,6 +69,7 @@ class HomCalculator:
         self.use_mneme = use_mneme
         self.use_llm = use_llm
 
+    # PURPOSE: Compute Hom score between two keyword sets
     def compute(
         self,
         source_keywords: list[str],
@@ -104,6 +110,7 @@ class HomCalculator:
 
         return score
 
+    # PURPOSE: Compute Hom scores against multiple targets
     def batch_compute(
         self,
         source_keywords: list[str],

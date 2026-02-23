@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/pks/tests/test_pks.py O1->Zet->Impl
 # PURPOSE: PKS v2 全モジュールの pytest テスト
 """
 PKS v2 テストスイート

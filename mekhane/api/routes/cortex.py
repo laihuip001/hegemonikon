@@ -1,3 +1,5 @@
+# PROOF: [L2/Mekhane] <- mekhane/api/routes/cortex.py O1->Zet->Impl
+# PURPOSE: Implementation of module
 from typing import Any, AsyncGenerator
 
 import asyncio
@@ -22,12 +24,14 @@ def _get_client() -> CortexClient:
     return _client
 
 
+# PURPOSE: Health check for Cortex Proxy
 @router.get("/health")
 async def health():
     """Health check for Cortex Proxy."""
     return {"status": "ok", "service": "hgk-desktop-api-cortex"}
 
 
+# PURPOSE: Simple ask endpoint — non-streaming
 @router.post("/ask")
 async def ask(request: Request):
     """Simple ask endpoint — non-streaming."""
@@ -49,6 +53,7 @@ async def ask(request: Request):
         return JSONResponse({"error": str(e)}, status_code=500)
 
 
+# PURPOSE: SSE streaming endpoint — full parameter control
 @router.post("/ask/stream")
 async def ask_stream(request: Request):
     """SSE streaming endpoint — full parameter control."""
@@ -63,6 +68,7 @@ async def ask_stream(request: Request):
     if not message:
         return JSONResponse({"error": "message is required"}, status_code=400)
 
+    # PURPOSE: event_generator の処理
     async def event_generator() -> AsyncGenerator[str, Any]:
         try:
             client = _get_client()

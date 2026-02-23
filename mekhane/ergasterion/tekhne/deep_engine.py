@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # PROOF: [L2/インフラ] <- mekhane/ergasterion/tekhne/ A0→プロンプト品質の深掘り分析が必要→deep_engineが担う
+# PURPOSE: Deep Engine — Pro × 20次元プロンプト品質深掘り分析
 """
 Deep Engine — Pro × 20次元プロンプト品質深掘り分析
 
@@ -46,6 +47,7 @@ if str(_PROJECT_ROOT) not in sys.path:
 # === Data Structures ===
 
 
+# PURPOSE: A concrete fix for an issue
 @dataclass
 class DeepFix:
     """A concrete fix for an issue."""
@@ -56,6 +58,7 @@ class DeepFix:
     confidence: float = 0.0  # 0.0-1.0
 
 
+# PURPOSE: Deep analysis of a single issue
 @dataclass
 class DeepAnalysis:
     """Deep analysis of a single issue."""
@@ -68,11 +71,13 @@ class DeepAnalysis:
     related_issues: list[str] = field(default_factory=list)
     priority_score: float = 0.0  # 0.0-1.0 (computed from severity + fixability)
 
+    # PURPOSE: has_actionable_fix の処理
     @property
     def has_actionable_fix(self) -> bool:
         return len(self.fixes) > 0 and any(f.replacement for f in self.fixes)
 
 
+# PURPOSE: Result of deep analysis on top issues
 @dataclass
 class DeepReport:
     """Result of deep analysis on top issues."""
@@ -83,16 +88,19 @@ class DeepReport:
     total_issues: int = 0
     elapsed_seconds: float = 0.0
 
+    # PURPOSE: Return analyses sorted by priority (highest first)
     def prioritized(self) -> list[DeepAnalysis]:
         """Return analyses sorted by priority (highest first)."""
         return sorted(
             self.analyses, key=lambda a: a.priority_score, reverse=True
         )
 
+    # PURPOSE: Return only analyses with concrete fixes
     def actionable(self) -> list[DeepAnalysis]:
         """Return only analyses with concrete fixes."""
         return [a for a in self.prioritized() if a.has_actionable_fix]
 
+    # PURPOSE: Human-readable summary
     def summary(self) -> str:
         """Human-readable summary."""
         lines = [
@@ -128,6 +136,7 @@ class DeepReport:
         lines.append(f"{'=' * 60}")
         return "\n".join(lines)
 
+    # PURPOSE: Serialize to dict
     def to_dict(self) -> dict:
         """Serialize to dict."""
         return {
@@ -223,6 +232,7 @@ def _parse_deep_response(response_text: str, issue_id: str) -> Optional[DeepAnal
 # === Deep Engine ===
 
 
+# PURPOSE: Pro × 20 Core deep analysis engine
 class DeepEngine:
     """Pro × 20 Core deep analysis engine.
 
@@ -255,6 +265,7 @@ class DeepEngine:
             self._client = CortexClient(model=self.model, temperature=0.2, max_tokens=2048)
         return self._client
 
+    # PURPOSE: Run deep analysis on a list of issues
     def analyze(
         self,
         issues: list,  # list[SweepIssue]
@@ -349,6 +360,7 @@ class DeepEngine:
 # === CLI ===
 
 
+# PURPOSE: main の処理
 def main():
     import argparse
 

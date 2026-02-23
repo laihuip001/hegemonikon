@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # PROOF: [L3/弱2-圏] <- mekhane/fep/ A0→派生は2-cellとして存在する→two_cellが担う
+# PURPOSE: Two-Cell — Weak 2-Category Structure for Derivatives
 """
 Two-Cell — Weak 2-Category Structure for Derivatives
 

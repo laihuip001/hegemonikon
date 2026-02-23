@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # PROOF: [L3/ユーティリティ] <- mekhane/scripts/ 後方互換ラッパー（非推奨）
+# PURPOSE: DEPRECATED: Use `python -m dendron.cli check mekhane/` instead.
 # lineage: 旧 check_proof.py → dendron/checker.py へ昇華 (2026-02-01)
 """
 DEPRECATED: Use `python -m dendron.cli check mekhane/` instead.

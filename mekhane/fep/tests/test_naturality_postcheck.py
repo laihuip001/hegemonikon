@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # PROOF: [L3/テスト] <- scripts/tests/
+# PURPOSE: PROOF: [L3/テスト] このファイルは存在しなければならない
 """
 PROOF: [L3/テスト] このファイルは存在しなければならない
 

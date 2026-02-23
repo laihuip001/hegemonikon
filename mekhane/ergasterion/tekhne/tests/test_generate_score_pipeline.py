@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Mekhane] <- mekhane/ergasterion/tekhne/tests/test_generate_score_pipeline.py O1->Zet->Impl
+# PURPOSE: Generate → Score Pipeline CI Tests
 """
 Generate → Score Pipeline CI Tests
 
@@ -61,6 +63,7 @@ class TestDomainDetection:
     """detect_domain should correctly identify all 4 domains."""
 
     # PURPOSE: Verify detect domain behaves correctly
+    # PURPOSE: Verify detect domain behavior
     @pytest.mark.parametrize("text,expected", [
         ("SQLインジェクションのコードレビューをする", "technical"),
         ("Pythonのバグをデバッグする", "technical"),

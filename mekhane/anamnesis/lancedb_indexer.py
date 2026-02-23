@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # PROOF: [L2/インフラ] <- mekhane/anamnesis/
+# PURPOSE: import re
 r"""
 PROOF: [L2/インフラ]
 

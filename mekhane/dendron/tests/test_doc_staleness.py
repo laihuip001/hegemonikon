@@ -1,4 +1,5 @@
 # PROOF: [L3/テスト] <- mekhane/dendron/
+# PURPOSE: Doc Staleness Checker テスト
 """
 Doc Staleness Checker テスト
 

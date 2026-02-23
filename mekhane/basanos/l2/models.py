@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/basanos/l2/models.py O1->Zet->Impl
 # PURPOSE: L2 問い生成のコアデータモデル — deficit と question の型定義
 # REASON: F⊣G 随伴構造の概念を Python の型として具象化するため
 """Core data models for Basanos L2 structural deficit detection."""
@@ -9,6 +10,7 @@ from enum import Enum
 from typing import Optional
 
 
+# PURPOSE: Type of structural deficit detected
 class DeficitType(Enum):
     """Type of structural deficit detected."""
 
@@ -18,6 +20,7 @@ class DeficitType(Enum):
     DELTA = "Δε/Δt"  # Change-introduced discrepancy
 
 
+# PURPOSE: G(hgk): HGK concept projected into external-comparable form
 @dataclass(frozen=True)
 class ExternalForm:
     """G(hgk): HGK concept projected into external-comparable form.
@@ -35,6 +38,7 @@ class ExternalForm:
     theorem_ids: list[str] = field(default_factory=list)  # e.g. ["O1", "O2"]
 
 
+# PURPOSE: Internal HGK concept extracted from kernel/
 @dataclass(frozen=True)
 class HGKConcept:
     """Internal HGK concept extracted from kernel/."""
@@ -50,6 +54,7 @@ class HGKConcept:
     has_implementation: bool = False  # mekhane/ counterpart exists
 
 
+# PURPOSE: Structural discrepancy detected by Basanos L2
 @dataclass
 class Deficit:
     """Structural discrepancy detected by Basanos L2.
@@ -65,6 +70,7 @@ class Deficit:
     evidence: list[str] = field(default_factory=list)  # supporting facts
     suggested_action: Optional[str] = None
 
+    # PURPOSE: Convert deficit to a natural question
     def to_question(self) -> Question:
         """Convert deficit to a natural question."""
         templates = {
@@ -83,6 +89,7 @@ class Deficit:
         )
 
 
+# PURPOSE: Question generated from a structural deficit
 @dataclass
 class Question:
     """Question generated from a structural deficit."""

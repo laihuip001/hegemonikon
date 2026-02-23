@@ -1,4 +1,5 @@
 # PROOF: [L3/テスト] <- mekhane/tests_root/ 対象モジュールが存在→検証が必要
+# PURPOSE: Tests for FEP config module.
 """
 Tests for FEP config module.
 """

@@ -1,4 +1,5 @@
 # PROOF: [L2/インフラ] <- mekhane/ergasterion/basanos/ 後方互換 re-export ラッパー
+# PURPOSE: Backward compatibility shim — DEPRECATED.
 """
 Backward compatibility shim — DEPRECATED.
 

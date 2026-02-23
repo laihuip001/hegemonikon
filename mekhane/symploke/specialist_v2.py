@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # PROOF: [L2/インフラ] <- mekhane/symploke/ A0→専門家定義v2→specialist_v2 が担う
+# PURPOSE: Specialist v2: 純化された知性の定義
 """
 Specialist v2: 純化された知性の定義
 

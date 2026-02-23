@@ -1,4 +1,5 @@
 # PROOF: [L2/インフラ] <- mekhane/poiema/ O4→創造機能が必要
+# PURPOSE: Poiema — 構造化出力の生成エンジン
 # Hegemonikón poiēma (ποίημα) Layer
 # Products built using Hegemonikón design principles
 """

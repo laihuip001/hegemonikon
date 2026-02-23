@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # PROOF: [L2/インフラ] <- mekhane/ergasterion/tekhne/ A0→プロンプト品質定量化が必要→prompt_quality_scorerが担う
+# PURPOSE: Prompt Quality Scorer — システムプロンプトの品質を定量的にスコアリング
 """
 Prompt Quality Scorer — システムプロンプトの品質を定量的にスコアリング
 
@@ -583,6 +584,7 @@ def score_prompt(filepath: str) -> QualityReport:
     return _score_content(content, filepath=filepath)
 
 
+# PURPOSE: Score prompt content directly (without reading from file)
 def score_prompt_text(content: str, name: str = "<inline>") -> QualityReport:
     """Score prompt content directly (without reading from file).
 

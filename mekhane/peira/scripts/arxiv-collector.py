@@ -1,4 +1,5 @@
 # PROOF: [L3/ユーティリティ] <- mekhane/peira/scripts/ O4→実験スクリプトが必要
+# PURPOSE: arXiv論文コレクター - AIDB記事からarXivリンクを抽出し、論文DBを構築
 #!/usr/bin/env python3
 """
 arXiv論文コレクター - AIDB記事からarXivリンクを抽出し、論文DBを構築

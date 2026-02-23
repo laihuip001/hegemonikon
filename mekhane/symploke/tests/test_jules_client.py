@@ -1,4 +1,5 @@
 # PROOF: [L3/テスト] <- mekhane/symploke/tests/ 対象モジュールが存在→検証が必要→test_jules_client が担う
+# PURPOSE: Tests for Jules Client
 #!/usr/bin/env python3
 """
 Tests for Jules Client

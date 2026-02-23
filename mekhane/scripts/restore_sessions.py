@@ -1,4 +1,5 @@
 # PROOF: [L3/ユーティリティ] <- mekhane/scripts/ O4→運用スクリプトが必要→restore_sessions が担う
+# PURPOSE: restore_healthy_sessions.py
 #!/usr/bin/env python3
 """
 restore_healthy_sessions.py

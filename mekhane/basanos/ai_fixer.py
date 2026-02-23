@@ -1,4 +1,5 @@
 # PROOF: [L2/インフラ] <- mekhane/basanos/ AI Auditor 検出問題の自動修正
+# PURPOSE: AI Basanos Issue Fixer (AI-001 〜 AI-022)
 """
 AI Basanos Issue Fixer (AI-001 〜 AI-022)
 

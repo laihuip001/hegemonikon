@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Mekhane] <- mekhane/mcp/tests/test_gateway_security.py O1->Zet->Impl
+# PURPOSE: L1 動的セキュリティテスト — hgk_gateway
 """
 L1 動的セキュリティテスト — hgk_gateway
 

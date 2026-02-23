@@ -1,4 +1,5 @@
 # PROOF: [L3/ユーティリティ] <- mekhane/scripts/ O4→運用スクリプトが必要→fep_experiment が担う
+# PURPOSE: FEP Interactive Experiment: Explore pymdp behavior in real-time.
 #!/usr/bin/env python3
 """
 FEP Interactive Experiment: Explore pymdp behavior in real-time.

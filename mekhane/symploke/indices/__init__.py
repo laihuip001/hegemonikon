@@ -1,4 +1,5 @@
 # PROOF: [L2/インフラ] <- mekhane/symploke/indices/ A0→索引管理が必要→__init__ が担う
+# PURPOSE: Symplokē Indices Package
 """
 Symplokē Indices Package
 

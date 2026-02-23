@@ -1,4 +1,5 @@
 # PROOF: [L3/テスト] <- mekhane/tests_root/ 対象モジュールが存在→検証が必要
+# PURPOSE: Basanos テストスイート
 #!/usr/bin/env python3
 """
 Basanos テストスイート

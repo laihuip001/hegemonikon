@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # PROOF: [L2/インフラ] <- mekhane/fep/ A0→Drift を計算可能にする→drift_calculatorが担う
+# PURPOSE: Drift Calculator — [0,1]-Enriched Category Hom Value Computation
 """
 Drift Calculator — [0,1]-Enriched Category Hom Value Computation
 

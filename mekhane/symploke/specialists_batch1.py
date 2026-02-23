@@ -5,9 +5,12 @@ Specialist v2 カテゴリ: 型・安全性、エラー処理、関数設計、�
 """
 
 try:
-    from .specialist_v2 import Specialist, Archetype, VerdictFormat, Severity
+    from mekhane.symploke.specialist_v2 import Specialist, Archetype, VerdictFormat, Severity
 except ImportError:
-    from specialist_v2 import Specialist, Archetype, VerdictFormat, Severity
+    try:
+        from .specialist_v2 import Specialist, Archetype, VerdictFormat, Severity
+    except ImportError:
+        from specialist_v2 import Specialist, Archetype, VerdictFormat, Severity
 
 
 # --- 型・安全性系 (9人) ---

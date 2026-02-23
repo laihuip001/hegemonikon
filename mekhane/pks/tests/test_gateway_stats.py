@@ -2,9 +2,13 @@
 """F6c: Gateway Stats API endpoint tests."""
 
 import pytest
-from unittest.mock import patch, MagicMock
-from fastapi.testclient import TestClient
 
+try:
+    from fastapi.testclient import TestClient
+except ImportError:
+    pytest.skip("fastapi not installed", allow_module_level=True)
+
+from unittest.mock import patch, MagicMock
 
 @pytest.fixture
 def client():

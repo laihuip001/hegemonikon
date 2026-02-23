@@ -1,3 +1,4 @@
+# PROOF: [L3/Periskope] <- mekhane/periskope/ Axiom->Search: Search engine integration and synthesis
 """
 Page Fetcher — 選択的全文クロール for Periskopē.
 

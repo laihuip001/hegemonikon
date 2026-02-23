@@ -1,3 +1,4 @@
+# PROOF: [L3/Integration] <- mekhane/mcp/ Axiom->Protocol: Model Context Protocol implementation
 """
 MCP Guard — ゾンビプロセス防止の自己防衛モジュール
 

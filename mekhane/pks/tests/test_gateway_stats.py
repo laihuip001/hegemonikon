@@ -3,7 +3,12 @@
 
 import pytest
 from unittest.mock import patch, MagicMock
-from fastapi.testclient import TestClient
+
+# Guard optional dependencies
+try:
+    from fastapi.testclient import TestClient
+except ImportError:
+    pytest.skip("fastapi required", allow_module_level=True)
 
 
 @pytest.fixture

@@ -1,3 +1,4 @@
+# PROOF: [L2/Periskope] <- mekhane/periskope/searchers/semantic_scholar_searcher.py Axiom->Reason->Module
 """
 Semantic Scholar API client for Periskopē.
 

@@ -1,3 +1,4 @@
+# PROOF: [L2/Periskope] <- mekhane/periskope/searchers/brave_searcher.py Axiom->Reason->Module
 """
 Brave Search API client for Periskopē.
 

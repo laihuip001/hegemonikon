@@ -1,3 +1,4 @@
+# PROOF: [L2/Periskope] <- mekhane/periskope/engine.py Axiom->Reason->Module
 """
 Periskopē Deep Research Engine — Orchestrator.
 

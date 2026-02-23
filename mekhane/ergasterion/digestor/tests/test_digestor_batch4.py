@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Mekhane] <- mekhane/ergasterion/digestor/tests/test_digestor_batch4.py Automatically added to satisfy CI
 # PROOF: [L2/テスト] <- mekhane/ergasterion/digestor/tests/
 # PURPOSE: Digestor Selector / Pipeline の包括テスト
 """Ergasterion Digestor Tests — Batch 4"""

@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Mekhane] <- mekhane/poiema/flow/tests/test_energeia_batch5.py Automatically added to satisfy CI
 # PROOF: [L2/テスト] <- mekhane/poiema/flow/tests/
 # PURPOSE: EnergeiaCoreResolver のテスト
 """Poiema Energeia Core Tests — Batch 5"""

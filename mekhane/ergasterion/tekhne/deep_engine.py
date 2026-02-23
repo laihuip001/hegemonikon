@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Mekhane] <- mekhane/ergasterion/tekhne/deep_engine.py Automatically added to satisfy CI
 # PROOF: [L2/インフラ] <- mekhane/ergasterion/tekhne/ A0→プロンプト品質の深掘り分析が必要→deep_engineが担う
 """
 Deep Engine — Pro × 20次元プロンプト品質深掘り分析

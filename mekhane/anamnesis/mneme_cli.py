@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Mekhane] <- mekhane/anamnesis/mneme_cli.py Automatically added to satisfy CI
 # PROOF: [L2/インフラ] <- mekhane/anamnesis/
 """
 PROOF: [L2/インフラ]

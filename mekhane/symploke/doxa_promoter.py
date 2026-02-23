@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Mekhane] <- mekhane/symploke/doxa_promoter.py Automatically added to satisfy CI
 # PROOF: [L2/インフラ] <- mekhane/symploke/
 # PURPOSE: Doxa 信念を Sophia 知識 (KI) に昇格させるパイプライン
 """

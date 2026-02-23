@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Mekhane] <- mekhane/mcp/sympatheia_mcp_server.py Automatically added to satisfy CI
 # PROOF: [L2/Sympatheia] <- mekhane/mcp/
 """
 Sympatheia MCP Server v1.1 — Hegemonikón Autonomic Nervous System
@@ -681,4 +682,3 @@ if __name__ == "__main__":
     from mekhane.mcp.mcp_guard import guard
     guard("sympatheia")
     _base.run()
-

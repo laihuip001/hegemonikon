@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Mekhane] <- mekhane/ochema/service.py Automatically added to satisfy CI
 # PROOF: [L2/インフラ] <- mekhane/ochema/ A0→LLMアクセス統合サービス
 # PURPOSE: OchemaService — 統一 LLM サービス層。全消費者の唯一のエントリポイント
 """

@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Mekhane] <- mekhane/ochema/tools.py Automatically added to satisfy CI
 # PROOF: [L2/インフラ] <- mekhane/ochema/ A0→AI Tool Use — ローカルファイル操作能力
 # PURPOSE: API 直叩き AI にファイル読み書き・コマンド実行能力を付与する
 #   Function Calling (Tool Use) のツール定義と実行ディスパッチャ

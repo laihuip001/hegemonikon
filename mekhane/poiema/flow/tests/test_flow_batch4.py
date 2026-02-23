@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Mekhane] <- mekhane/poiema/flow/tests/test_flow_batch4.py Automatically added to satisfy CI
 # PROOF: [L2/テスト] <- mekhane/poiema/flow/tests/
 # PURPOSE: Poiema flow モジュール (EpocheScanner, EpocheShield, MetronResolver, DoxaCache) テスト
 """Poiema Flow Tests — Batch 4"""

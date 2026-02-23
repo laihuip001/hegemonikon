@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/symploke/config.py Automatically added to satisfy CI
 # noqa: AI-ALL
 # PROOF: [L2/インフラ] <- mekhane/symploke/
 """

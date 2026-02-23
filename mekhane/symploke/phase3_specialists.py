@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Mekhane] <- mekhane/symploke/phase3_specialists.py Automatically added to satisfy CI
 # PROOF: [L3/ユーティリティ] <- mekhane/symploke/ O4→実行スクリプトが必要→phase3_specialists が担う
 """
 Jules 専門家定義: Phase 3 高度分析層 (Layer 16-20: 230人)

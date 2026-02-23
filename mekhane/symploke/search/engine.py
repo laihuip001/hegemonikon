@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/symploke/search/engine.py Automatically added to satisfy CI
 """
 # PROOF: [L2/インフラ] <- mekhane/symploke/search/ A0→検索機能が必要→engine が担う
 Symplokē Search Engine

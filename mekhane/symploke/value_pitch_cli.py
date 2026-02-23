@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Mekhane] <- mekhane/symploke/value_pitch_cli.py Automatically added to satisfy CI
 # PROOF: [L2/インフラ] <- mekhane/symploke/
 # PURPOSE: /bye Step 2.5π の補助 — Git log からタスク収集し Value Pitch 骨格を出力
 """

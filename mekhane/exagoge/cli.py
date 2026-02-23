@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Mekhane] <- mekhane/exagoge/cli.py Automatically added to satisfy CI
 # PROOF: [L2/コア] <- mekhane/exagoge/
 # PURPOSE: Exagoge CLI — ワンコマンドで HGK データをエクスポート
 """

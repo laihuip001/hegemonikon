@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/periskope/ Automatically added to satisfy CI
 """
 Periskopē — HGK Deep Research Engine
 

@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/dendron/falsification_checker.py A0->Auto->Added
 """
 S7: Falsification Condition Checker
 
@@ -20,6 +21,7 @@ REGISTRY_PATH = PROJECT_ROOT / "kernel" / "epistemic_status.yaml"
 
 
 def load_registry() -> dict:
+    # PURPOSE: Load the epistemic status registry from YAML file
     """Load the epistemic status registry"""
     if not REGISTRY_PATH.exists():
         print(f"❌ Registry not found: {REGISTRY_PATH}")
@@ -30,6 +32,7 @@ def load_registry() -> dict:
 
 
 def check_completeness(registry: dict) -> list[str]:
+    # PURPOSE: Validate that all registry entries contain mandatory fields
     """Check that all patches have required fields"""
     issues = []
     patches = registry.get("patches", {})
@@ -55,6 +58,7 @@ def check_completeness(registry: dict) -> list[str]:
 
 
 def check_file_references(registry: dict) -> list[str]:
+    # PURPOSE: Ensure that source claims exist in referenced files
     """Verify that claims exist in referenced files at specified lines"""
     issues = []
     patches = registry.get("patches", {})
@@ -97,6 +101,7 @@ def check_file_references(registry: dict) -> list[str]:
 
 
 def summary_stats(registry: dict) -> dict:
+    # PURPOSE: Calculate statistics on patch statuses
     """Generate summary statistics"""
     patches = registry.get("patches", {})
     status_counts = {}
@@ -110,6 +115,7 @@ def summary_stats(registry: dict) -> dict:
 
 
 def main():
+    # PURPOSE: Execute the full check suite
     registry = load_registry()
     
     print("=" * 60)

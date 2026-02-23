@@ -62,28 +62,28 @@ def add_header(filepath_str):
         print(f"Skipping {filepath_str}: read error {e}")
         return
 
-    if "# PROOF:" in content:
-        print(f"Skipping {filepath_str}: PROOF header exists")
-        return
-
     lines = content.splitlines(keepends=True)
+
+    # Remove existing PROOF headers to avoid duplicates
+    cleaned_lines = [line for line in lines if not (line.strip().startswith("# PROOF:") or line.strip().startswith("#PROOF:"))]
+
     new_lines = []
 
     # Simple logic: insert after shebang or encoding if present, else at top
     insert_index = 0
-    for i, line in enumerate(lines):
+    for i, line in enumerate(cleaned_lines):
         if line.startswith("#!") or line.startswith("# -*-") or line.startswith("# coding"):
             insert_index = i + 1
         else:
             break
 
     if insert_index > 0:
-        new_lines.extend(lines[:insert_index])
+        new_lines.extend(cleaned_lines[:insert_index])
         new_lines.append(HEADER)
-        new_lines.extend(lines[insert_index:])
+        new_lines.extend(cleaned_lines[insert_index:])
     else:
         new_lines.append(HEADER)
-        new_lines.extend(lines)
+        new_lines.extend(cleaned_lines)
 
     path.write_text("".join(new_lines), encoding="utf-8")
     print(f"Updated {filepath_str}")

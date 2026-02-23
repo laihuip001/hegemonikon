@@ -1,3 +1,4 @@
+# PROOF: [L2/API] <- api/routes/ S2->API endpoints
 """
 DevTools API routes — ファイル操作・ターミナル・Ochema (AI) をフロントエンド DevTools ビューに提供。
 

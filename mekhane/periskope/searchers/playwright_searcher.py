@@ -1,3 +1,4 @@
+# PROOF: [L2/Search] <- periskope/searchers/ K2->Search strategy implementation
 """
 Playwright-based searcher for Periskopē.
 

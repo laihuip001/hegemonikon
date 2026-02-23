@@ -1,3 +1,4 @@
+# PROOF: [L1/Hermeneus] <- hermeneus/ S1->CCL implementation
 """CCL Linter — CCL 式の静的検証。
 
 operators.md (SSOT) に基づいて CCL 式を検証し、

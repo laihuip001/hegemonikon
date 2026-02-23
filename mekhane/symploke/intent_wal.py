@@ -1,3 +1,4 @@
+# PROOF: [L2/Symploke] <- symploke/ O2->Intent WAL management
 #!/usr/bin/env python3
 """Intent-WAL (Write-Ahead Log) Manager.
 

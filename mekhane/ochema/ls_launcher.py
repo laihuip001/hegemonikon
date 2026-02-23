@@ -1,3 +1,4 @@
+# PROOF: [L2/Routing] <- ochema/ S2->LLM routing
 #!/usr/bin/env python3
 """LS Standalone Launcher — IDE なしで Language Server を直接起動する。
 

@@ -1,3 +1,4 @@
+# PROOF: [L2/Search] <- periskope/searchers/ K2->Search strategy implementation
 """
 Tavily Search API client for Periskopē.
 

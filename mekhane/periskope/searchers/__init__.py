@@ -1,3 +1,5 @@
+# PROOF: [L2/Mekhane] <- mekhane/ A0->Implementation
+# PURPOSE: Implementation module
 """
 Periskopē searchers — pluggable search source adapters.
 

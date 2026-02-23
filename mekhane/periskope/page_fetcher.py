@@ -1,3 +1,5 @@
+# PROOF: [L2/Mekhane] <- mekhane/ A0->Implementation
+# PURPOSE: Implementation module
 """
 Page Fetcher — 選択的全文クロール for Periskopē.
 

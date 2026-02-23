@@ -1,3 +1,5 @@
+# PROOF: [L2/Mekhane] <- mekhane/ A0->Implementation
+# PURPOSE: Implementation module
 import os
 import logging
 from google import genai

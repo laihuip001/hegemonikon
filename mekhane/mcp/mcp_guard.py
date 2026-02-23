@@ -1,3 +1,5 @@
+# PROOF: [L2/Mekhane] <- mekhane/ A0->Implementation
+# PURPOSE: Implementation module
 """
 MCP Guard — ゾンビプロセス防止の自己防衛モジュール
 

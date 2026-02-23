@@ -5,9 +5,12 @@ Specialist v2 カテゴリ: Git, テスト, API, セキュリティ, パフォ�
 """
 
 try:
-    from .specialist_v2 import Specialist, Archetype, VerdictFormat, Severity
+    from mekhane.symploke.specialist_v2 import Specialist, Archetype, VerdictFormat, Severity
 except ImportError:
-    from specialist_v2 import Specialist, Archetype, VerdictFormat, Severity
+    try:
+        from .specialist_v2 import Specialist, Archetype, VerdictFormat, Severity
+    except ImportError:
+        from specialist_v2 import Specialist, Archetype, VerdictFormat, Severity
 
 
 # --- Git系 (6人) ---

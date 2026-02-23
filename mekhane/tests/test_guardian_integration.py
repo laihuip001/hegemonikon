@@ -101,14 +101,17 @@ class TestMeaningfulTraceContextRegression:
                 intensity=2,
                 context="must persist to disk",
             )
-            save_traces(path)
 
-            # Load and verify
-            loaded = load_traces(path)
-            assert len(loaded) >= 1
-            found = [t for t in loaded if t.reason == "persist context"]
-            assert len(found) == 1
-            assert found[0].context == "must persist to disk"
+            # Patch TRACES_PATH to avoid permission errors in CI
+            with patch("mekhane.fep.meaningful_traces.TRACES_PATH", path):
+                save_traces(path)
+
+                # Load and verify
+                loaded = load_traces(path)
+                assert len(loaded) >= 1
+                found = [t for t in loaded if t.reason == "persist context"]
+                assert len(found) == 1
+                assert found[0].context == "must persist to disk"
 
             clear_session_traces()
 

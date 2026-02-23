@@ -6,9 +6,12 @@ Specialist v2 カテゴリ: AI生成コード, Hegemonikón/FEP, 認知科学, �
 """
 
 try:
-    from .specialist_v2 import Specialist, Archetype, VerdictFormat, Severity
+    from mekhane.symploke.specialist_v2 import Specialist, Archetype, VerdictFormat, Severity
 except ImportError:
-    from specialist_v2 import Specialist, Archetype, VerdictFormat, Severity
+    try:
+        from .specialist_v2 import Specialist, Archetype, VerdictFormat, Severity
+    except ImportError:
+        from specialist_v2 import Specialist, Archetype, VerdictFormat, Severity
 
 
 # --- AI生成コード系 (6人) ---

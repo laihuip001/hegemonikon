@@ -1,3 +1,4 @@
+# PROOF: [L2/Periskope] <- mekhane/periskope/searchers/__init__.py Automata->Fix->__init__
 """
 Periskopē searchers — pluggable search source adapters.
 

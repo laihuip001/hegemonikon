@@ -1,3 +1,4 @@
+# PROOF: [L2/Periskope] <- mekhane/periskope/models.py Automata->Fix->models
 """
 Periskopē data models.
 

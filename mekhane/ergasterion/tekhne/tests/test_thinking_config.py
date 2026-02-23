@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/ergasterion/tekhne/tests/ Automatically added to satisfy CI
 """Tests for thinking config resolution (HGK depth -> model params)."""
 
 import pytest

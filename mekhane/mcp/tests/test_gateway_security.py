@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Mekhane] <- mekhane/mcp/tests/ Automatically added to satisfy CI
 """
 L1 動的セキュリティテスト — hgk_gateway
 

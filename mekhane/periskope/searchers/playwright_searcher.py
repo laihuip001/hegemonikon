@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/periskope/searchers/playwright_searcher.py Axiom->Reason->Module
 """
 Playwright-based searcher for Periskopē.
 

@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/periskope/searchers/searxng.py Axiom->Reason->Module
 """
 SearXNG search client for Periskopē.
 

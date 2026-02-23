@@ -1,3 +1,4 @@
+# PROOF: [L2/Periskope] <- mekhane/periskope/searchers/playwright_searcher.py A0->General->playwright_searcher.py
 """
 Playwright-based searcher for Periskopē.
 

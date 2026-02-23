@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/tests/test_guardian_integration.py Automatically added to satisfy CI
 """
 Guardian Integration Tests — /bou ② テスト守護者
 

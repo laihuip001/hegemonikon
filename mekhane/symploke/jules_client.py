@@ -17,7 +17,10 @@ Usage:
 """
 
 import asyncio
-import aiohttp
+try:
+    import aiohttp
+except ImportError:
+    aiohttp = None
 import functools
 import logging
 import os
@@ -173,7 +176,7 @@ def with_retry(
     backoff_factor: float = 2.0,
     initial_delay: float = 1.0,
     max_delay: float = 60.0,
-    retryable_exceptions: tuple = (RateLimitError, aiohttp.ClientError),
+    retryable_exceptions: tuple = (RateLimitError,),
 ):
     """
     Decorator for async functions with exponential backoff retry.
@@ -185,6 +188,10 @@ def with_retry(
         max_delay: Maximum delay cap
         retryable_exceptions: Tuple of exceptions to retry on
     """
+
+    # Add aiohttp.ClientError to retryable exceptions if available
+    if aiohttp and aiohttp.ClientError not in retryable_exceptions:
+        retryable_exceptions += (aiohttp.ClientError,)
 
     # PURPOSE: decorator の処理
     def decorator(func):

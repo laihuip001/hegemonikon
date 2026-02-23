@@ -1,3 +1,4 @@
+# PROOF: [L2/Periskope] <- mekhane/periskope/query_expander.py Automata->Fix->query_expander
 """
 Query expander for Periskopē.
 

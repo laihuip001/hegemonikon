@@ -1,3 +1,4 @@
+# PROOF: [L2/Periskope] <- mekhane/periskope/engine.py Automata->Fix->engine
 """
 Periskopē Deep Research Engine — Orchestrator.
 

@@ -1,3 +1,4 @@
+# PROOF: [L2/接続] <- mekhane/mcp/mcp_guard.py/ A0→接続する私が必要→mcp_guard.py が担う
 """
 MCP Guard — ゾンビプロセス防止の自己防衛モジュール
 

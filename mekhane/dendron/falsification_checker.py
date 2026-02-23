@@ -1,3 +1,4 @@
+# PROOF: [L2/品質] <- mekhane/dendron/falsification_checker.py/ A0→品質を保つ私が必要→falsification_checker.py が担う
 """
 S7: Falsification Condition Checker
 

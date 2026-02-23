@@ -1,3 +1,4 @@
+# PROOF: [L2/検索] <- mekhane/periskope/synthesizer.py/ A0→検索する私が必要→synthesizer.py が担う
 """
 Multi-model synthesizer for Periskopē.
 

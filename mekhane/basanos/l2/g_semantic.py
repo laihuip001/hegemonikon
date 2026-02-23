@@ -1,3 +1,4 @@
+# PROOF: [L2/検証] <- mekhane/basanos/l2/g_semantic.py/ A0→検証する私が必要→g_semantic.py が担う
 # PURPOSE: G_semantic — LLM で HGK 専門用語を一般学術用語に翻訳する
 # REASON: G = G_struct ∘ G_semantic の G_semantic 部分。外部比較のために HGK 語彙を汎化する
 """G_semantic: LLM-based translation of HGK terms to general academic terms.

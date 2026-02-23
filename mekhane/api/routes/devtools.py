@@ -1,3 +1,4 @@
+# PROOF: [L2/API] <- mekhane/api/routes/devtools.py/ A0→APIを提供する私が必要→devtools.py が担う
 """
 DevTools API routes — ファイル操作・ターミナル・Ochema (AI) をフロントエンド DevTools ビューに提供。
 

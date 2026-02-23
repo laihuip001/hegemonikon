@@ -1,3 +1,4 @@
+# PROOF: [L2/検索] <- mekhane/periskope/searchers/__init__.py/ A0→検索する私が必要→__init__.py が担う
 """
 Periskopē searchers — pluggable search source adapters.
 

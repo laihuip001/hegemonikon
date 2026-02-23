@@ -1,3 +1,4 @@
+# PROOF: [L2/実装] <- mekhane/tape.py/ A0→実装する私が必要→tape.py が担う
 """
 Tape Writer — WF 実行トレースを JSONL として記録する。
 

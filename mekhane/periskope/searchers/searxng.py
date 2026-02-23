@@ -1,3 +1,4 @@
+# PROOF: [L2/検索] <- mekhane/periskope/searchers/searxng.py/ A0→検索する私が必要→searxng.py が担う
 """
 SearXNG search client for Periskopē.
 

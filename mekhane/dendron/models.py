@@ -278,6 +278,7 @@ EXEMPT_PATTERNS = [
     r"mekhane/symploke/intent_wal.py", # Intent WAL
     r"mekhane/tape.py",     # Tape
     r"mekhane/api/routes/", # API Routes
+    r"mekhane/dendron/falsification_", # Falsification checker (circular dependency risk)
 ]
 
 # PROOF ヘッダーパターン (v2: 親参照付き、任意の後続テキスト許容)

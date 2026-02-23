@@ -1,3 +1,4 @@
+# PROOF: [L2/検索] <- mekhane/periskope/searchers/brave_searcher.py/ A0→検索する私が必要→brave_searcher.py が担う
 """
 Brave Search API client for Periskopē.
 

@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/接続] <- mekhane/mcp/mcp_base.py/ A0→接続する私が必要→mcp_base.py が担う
 """
 MCP Base Module — Hegemonikón MCP Server Common Infrastructure
 

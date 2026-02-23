@@ -1,3 +1,4 @@
+# PROOF: [L2/検証] <- mekhane/basanos/l2/hom.py/ A0→検証する私が必要→hom.py が担う
 # PURPOSE: Hom 計算 — 3段階の関連性尺度で随伴条件の「破れ」を測定する
 # REASON: F⊣G 随伴の Hom(F(ext), hgk) ≅ Hom(ext, G(hgk)) の妥当性を定量化する
 """Hom computation for Basanos L2.

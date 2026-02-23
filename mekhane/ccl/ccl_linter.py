@@ -1,3 +1,4 @@
+# PROOF: [L1/言語] <- mekhane/ccl/ccl_linter.py/ A0→言語化する私が必要→ccl_linter.py が担う
 """CCL Linter — CCL 式の静的検証。
 
 operators.md (SSOT) に基づいて CCL 式を検証し、

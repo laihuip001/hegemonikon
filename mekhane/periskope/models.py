@@ -1,3 +1,4 @@
+# PROOF: [L2/検索] <- mekhane/periskope/models.py/ A0→検索する私が必要→models.py が担う
 """
 Periskopē data models.
 

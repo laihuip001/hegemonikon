@@ -1,3 +1,4 @@
+# PROOF: [L2/検索] <- mekhane/periskope/engine.py/ A0→検索する私が必要→engine.py が担う
 """
 Periskopē Deep Research Engine — Orchestrator.
 

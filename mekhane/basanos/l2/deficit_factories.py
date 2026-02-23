@@ -1,3 +1,4 @@
+# PROOF: [L2/検証] <- mekhane/basanos/l2/deficit_factories.py/ A0→検証する私が必要→deficit_factories.py が担う
 # PURPOSE: 3種の deficit (η, ε, Δε/Δt) を検出するファクトリ群
 # REASON: F⊣G 随伴構造の「破れ」を自動検出し、問いに変換するため
 # PROOF: 41/41 テスト (tests/test_l2.py, tests/test_extensions.py) + CLI scan 0 deficit

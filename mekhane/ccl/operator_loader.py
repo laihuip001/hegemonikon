@@ -1,3 +1,4 @@
+# PROOF: [L1/言語] <- mekhane/ccl/operator_loader.py/ A0→言語化する私が必要→operator_loader.py が担う
 """operators.md の SSOT パーサー。
 
 operators.md の Markdown テーブルから演算子定義を抽出し、

@@ -1,3 +1,4 @@
+# PROOF: [L2/API] <- mekhane/api/routes/cortex.py/ A0→APIを提供する私が必要→cortex.py が担う
 from typing import Any, AsyncGenerator
 
 import asyncio

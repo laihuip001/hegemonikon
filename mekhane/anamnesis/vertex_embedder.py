@@ -1,3 +1,4 @@
+# PROOF: [L2/記憶] <- mekhane/anamnesis/vertex_embedder.py/ A0→記憶する私が必要→vertex_embedder.py が担う
 import os
 import logging
 from google import genai

@@ -1,3 +1,4 @@
+# PROOF: [L2/検索] <- mekhane/periskope/citation_agent.py/ A0→検索する私が必要→citation_agent.py が担う
 """
 Citation verification agent for Periskopē.
 

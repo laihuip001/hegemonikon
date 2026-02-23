@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L3/Periskope] <- mekhane/periskope/ Axiom->Search: Search engine integration and synthesis
 """
 Periskopē CLI — Deep Research from the command line.
 

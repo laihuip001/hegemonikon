@@ -1,3 +1,4 @@
+# PROOF: [L3/Periskope] <- mekhane/periskope/ Axiom->Search: Search engine integration and synthesis
 """
 Internal knowledge searcher for Periskopē.
 

@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L3/Integration] <- mekhane/mcp/ Axiom->Protocol: Model Context Protocol implementation
 """
 MCP Base Module — Hegemonikón MCP Server Common Infrastructure
 

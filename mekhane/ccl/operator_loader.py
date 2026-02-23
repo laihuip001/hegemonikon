@@ -1,3 +1,4 @@
+# PROOF: [L1/Hermeneus] <- mekhane/ccl/ Axiom->Language: CCL language constructs
 """operators.md の SSOT パーサー。
 
 operators.md の Markdown テーブルから演算子定義を抽出し、

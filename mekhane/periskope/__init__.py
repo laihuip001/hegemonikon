@@ -1,3 +1,5 @@
+# PROOF: [L2/Mekhane] <- mekhane/periskope/ A0->Implementation->__init__.py
+# PURPOSE: Implementation of __init__
 """
 Periskopē — HGK Deep Research Engine
 

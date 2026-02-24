@@ -1,3 +1,5 @@
+# PROOF: [L2/Mekhane] <- mekhane/periskope/ A0->Implementation->page_fetcher.py
+# PURPOSE: Implementation of page_fetcher
 """
 Page Fetcher — 選択的全文クロール for Periskopē.
 

@@ -1,3 +1,5 @@
+# PROOF: [L2/Mekhane] <- mekhane/periskope/searchers/ A0->Implementation->playwright_searcher.py
+# PURPOSE: Implementation of playwright_searcher
 """
 Playwright-based searcher for Periskopē.
 

@@ -1,3 +1,5 @@
+# PROOF: [L2/Mekhane] <- mekhane/api/routes/ A0->Implementation->devtools.py
+# PURPOSE: Implementation of devtools
 """
 DevTools API routes — ファイル操作・ターミナル・Ochema (AI) をフロントエンド DevTools ビューに提供。
 

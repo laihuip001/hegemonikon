@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- tests/ A0->Auto->AddedByCI
 # PURPOSE: G_semantic, HomCalculator, CLI のテスト
 # REASON: 拡張モジュールが正しく動作するか検証
 """Tests for Basanos L2 extensions: G_semantic, HomCalculator, CLI."""

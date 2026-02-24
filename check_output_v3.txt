@@ -1,0 +1,6 @@
+❌ Dendron: 1 files missing PROOF
+  mekhane/basanos/l2/deficit_factories.py
+   Purpose: 2760 ok, 0 weak, 498 missing
+   TypeHints: 4261/4789 (89%), 7 short
+   EPT: 6759/7753 (87%) [NF2:3053/3291 NF3:2022/2424 BCNF:1684/2038]
+   Reason: 57/3804 (1%) [Dir:43/121 File:14/425 Func:0/3258]

@@ -49,7 +49,7 @@ export async function renderSettingsView(): Promise<void> {
         <div class="card settings-card">
           <h3>🎨 テーマ</h3>
           <div class="settings-row">
-            <label>カラーモード</label>
+            <label for="set-theme">カラーモード</label>
             <select id="set-theme" class="settings-select">
               <option value="dark" ${s.theme === 'dark' ? 'selected' : ''}>🌙 Dark</option>
               <option value="light" ${s.theme === 'light' ? 'selected' : ''}>☀️ Light</option>
@@ -61,9 +61,9 @@ export async function renderSettingsView(): Promise<void> {
         <div class="card settings-card">
           <h3>🔄 ポーリング</h3>
           <div class="settings-row">
-            <label>Dashboard 更新間隔</label>
+            <label for="set-polling">Dashboard 更新間隔</label>
             <div class="settings-range-wrap">
-              <input type="range" id="set-polling" min="10" max="120" step="5" value="${s.pollingInterval}" class="settings-range">
+              <input type="range" id="set-polling" min="10" max="120" step="5" value="${s.pollingInterval}" class="settings-range" aria-label="Polling interval in seconds">
               <span id="set-polling-val" class="settings-range-val">${s.pollingInterval}s</span>
             </div>
           </div>
@@ -73,7 +73,7 @@ export async function renderSettingsView(): Promise<void> {
         <div class="card settings-card">
           <h3>🔔 通知フィルタ</h3>
           <div class="settings-row">
-            <label>デフォルト表示</label>
+            <label for="set-notif">デフォルト表示</label>
             <select id="set-notif" class="settings-select">
               ${['ALL', 'CRITICAL', 'WARNING', 'INFO'].map(lv =>
         `<option value="${lv}" ${s.notifFilter === lv ? 'selected' : ''}>${esc(lv)}</option>`
@@ -86,7 +86,7 @@ export async function renderSettingsView(): Promise<void> {
         <div class="card settings-card">
           <h3>🌐 API エンドポイント</h3>
           <div class="settings-row">
-            <label>ベース URL</label>
+            <label for="set-api">ベース URL</label>
             <input type="text" id="set-api" value="${esc(s.apiBase)}" class="settings-input" spellcheck="false">
           </div>
         </div>
@@ -97,7 +97,7 @@ export async function renderSettingsView(): Promise<void> {
         <button id="set-reset" class="settings-btn secondary">🔄 リセット</button>
       </div>
 
-      <div id="set-toast" class="settings-toast hidden"></div>
+      <div id="set-toast" class="settings-toast hidden" role="status" aria-live="polite"></div>
     </div>
   `;
 

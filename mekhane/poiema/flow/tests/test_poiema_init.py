@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- tests/ A0->Auto->AddedByCI
 """
 Poiema __init__.py 統合テスト
 

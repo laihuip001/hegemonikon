@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Mekhane] <- mekhane/pks/tests/test_pks_v2.py A0->Auto->AddedByCI
 # PURPOSE: PKS v2 新コンポーネントのテスト
 """
 PKS v2 テストスイート

@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/basanos/l2/tests/test_l2.py A0->Auto->AddedByCI
 # PURPOSE: L2 問い生成機構のテスト — G_struct と deficit factory の検証
 # REASON: kernel/ の実データに対してパーサーと deficit 検出が正しく動作するか確認
 """Tests for Basanos L2 structural deficit detection."""

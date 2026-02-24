@@ -673,7 +673,9 @@ export async function renderGraph3D(): Promise<void> {
             camera.lookAt(0, 0, 0);
         }
 
-        if (simulation.alpha() > 0.001) {
+        const isSimulationActive = simulation.alpha() > 0.001;
+
+        if (isSimulationActive) {
             simulation.tick();
         } else if (!simStabilized) {
             simStabilized = true;
@@ -686,7 +688,11 @@ export async function renderGraph3D(): Promise<void> {
         simNodes.forEach(node => {
             const group = nodeMeshes.get(node.id);
             if (!group) return;
-            group.position.set(node.x, node.y, node.z);
+
+            // OPTIMIZATION: Only update positions if simulation is active (saves CPU/GPU overhead)
+            if (isSimulationActive) {
+                group.position.set(node.x, node.y, node.z);
+            }
 
             const core = group.children[0] as THREE.Mesh;
             const wire = group.children[1] as THREE.Mesh;
@@ -741,10 +747,15 @@ export async function renderGraph3D(): Promise<void> {
             const link = simLinks[i];
             if (!link) return;
             const s = link.source as SimNode, t = link.target as SimNode;
-            const pos = line.geometry.attributes.position as THREE.BufferAttribute;
-            pos.setXYZ(0, s.x, s.y, s.z);
-            pos.setXYZ(1, t.x, t.y, t.z);
-            pos.needsUpdate = true;
+
+            // OPTIMIZATION: Only update geometry if simulation is active (saves CPU/GPU overhead)
+            if (isSimulationActive) {
+                const pos = line.geometry.attributes.position as THREE.BufferAttribute;
+                pos.setXYZ(0, s.x, s.y, s.z);
+                pos.setXYZ(1, t.x, t.y, t.z);
+                pos.needsUpdate = true;
+            }
+
             const mat = line.material as THREE.LineBasicMaterial;
             const e = line.userData.edge as GraphEdge;
             mat.opacity = selectedNodeId

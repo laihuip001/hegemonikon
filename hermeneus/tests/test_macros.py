@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- hermeneus/tests/test_macros.py A0->Auto->AddedByCI
 # PURPOSE: CCL Macro ローダー + 展開 + E2E パイプライン テスト
 """
 Hermēneus Macro テストスイート

@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/periskope/tests/test_internal_searchers.py A0->Auto->AddedByCI
 """
 Tests for internal searchers (Gnōsis, Sophia, Kairos).
 """

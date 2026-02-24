@@ -1,5 +1,5 @@
-# PROOF: [L2/Impl] <- mekhane/ Automated fix for CI
 #!/usr/bin/env python3
+# PROOF: [L2/Impl] <- mekhane/ Automated fix for CI
 # PURPOSE: Basanos L3 自動解決ループ — deficit→問い→解決策の自動生成
 # REASON: deficit を検出するだけでなく、解決への道筋を自動提案するため
 """Auto-resolution loop for Basanos L3.

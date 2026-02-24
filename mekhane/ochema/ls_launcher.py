@@ -1,5 +1,5 @@
-# PROOF: [L2/Impl] <- mekhane/ Automated fix for CI
 #!/usr/bin/env python3
+# PROOF: [L2/Impl] <- mekhane/ Automated fix for CI
 """LS Standalone Launcher — IDE なしで Language Server を直接起動する。
 
 ManagementMetadata protobuf を stdin に送り込んで LS を起動。

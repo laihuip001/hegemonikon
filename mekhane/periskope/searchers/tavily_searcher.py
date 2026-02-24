@@ -1,3 +1,5 @@
+# PROOF: [L2/Mekhane] <- mekhane/searchers/ A0->Auto->AddedByCI
+# PURPOSE: Auto-generated purpose for tavily_searcher.py
 """
 Tavily Search API client for Periskopē.
 

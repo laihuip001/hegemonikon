@@ -1,3 +1,5 @@
+# PROOF: [L2/Mekhane] <- mekhane/anamnesis/ A0->Auto->AddedByCI
+# PURPOSE: Auto-generated purpose for vertex_embedder.py
 import os
 import logging
 from google import genai

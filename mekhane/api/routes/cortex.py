@@ -1,3 +1,5 @@
+# PROOF: [L2/Mekhane] <- mekhane/routes/ A0->Auto->AddedByCI
+# PURPOSE: Auto-generated purpose for cortex.py
 from typing import Any, AsyncGenerator
 
 import asyncio

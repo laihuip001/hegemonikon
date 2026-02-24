@@ -1,3 +1,5 @@
+# PROOF: [L2/Mekhane] <- mekhane/searchers/ A0->Auto->AddedByCI
+# PURPOSE: Auto-generated purpose for __init__.py
 """
 Periskopē searchers — pluggable search source adapters.
 

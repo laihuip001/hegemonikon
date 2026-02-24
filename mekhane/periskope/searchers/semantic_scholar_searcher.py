@@ -1,3 +1,5 @@
+# PROOF: [L2/Mekhane] <- mekhane/searchers/ A0->Auto->AddedByCI
+# PURPOSE: Auto-generated purpose for semantic_scholar_searcher.py
 """
 Semantic Scholar API client for Periskopē.
 

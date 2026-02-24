@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Mekhane] <- mekhane/mcp/ A0->Auto->AddedByCI
+# PURPOSE: Auto-generated purpose for mcp_base.py
 """
 MCP Base Module — Hegemonikón MCP Server Common Infrastructure
 

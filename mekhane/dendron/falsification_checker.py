@@ -1,3 +1,5 @@
+# PROOF: [L2/Mekhane] <- mekhane/dendron/ A0->Auto->AddedByCI
+# PURPOSE: Auto-generated purpose for falsification_checker.py
 """
 S7: Falsification Condition Checker
 

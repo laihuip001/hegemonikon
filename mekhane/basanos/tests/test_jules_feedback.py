@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/ A0->Auto->AddedByCI
 """Tests for JulesFeedback — L2結果→L0精度フィードバック。"""
 
 import json

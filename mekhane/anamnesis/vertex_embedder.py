@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/ A0→Implementation→Module
 import os
 import logging
 from google import genai

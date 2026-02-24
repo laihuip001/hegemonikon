@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/periskope/ P2→Search→Module
 """
 Query expander for Periskopē.
 

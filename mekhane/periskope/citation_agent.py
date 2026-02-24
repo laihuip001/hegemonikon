@@ -1,4 +1,3 @@
-# PROOF: [L2/Mekhane] <- mekhane/periskope/citation_agent.py A0->Auto->AddedByCI
 """
 Citation verification agent for Periskopē.
 

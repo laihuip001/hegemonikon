@@ -1,4 +1,3 @@
-# PROOF: [L2/Mekhane] <- mekhane/api/routes/devtools.py A0->Auto->AddedByCI
 """
 DevTools API routes — ファイル操作・ターミナル・Ochema (AI) をフロントエンド DevTools ビューに提供。
 

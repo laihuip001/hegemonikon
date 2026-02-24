@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/dendron/ A0->Existence
 """
 Semantic Scholar API client for Periskopē.
 

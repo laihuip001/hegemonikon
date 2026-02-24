@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/mcp/ S2->Mekhane->MCP Integration
 """
 MCP Guard — ゾンビプロセス防止の自己防衛モジュール
 

@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/ A0→Foundations→citation_agent.py
 """
 Citation verification agent for Periskopē.
 

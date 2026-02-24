@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/ A0→Foundations→falsification_checker.py
 """
 S7: Falsification Condition Checker
 

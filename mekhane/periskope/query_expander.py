@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/ A0→Foundations→query_expander.py
 """
 Query expander for Periskopē.
 

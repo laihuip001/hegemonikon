@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/ A0->Auto->AddedByCI
 """
 Tests for PageFetcher (W7: selective full-page crawling).
 """

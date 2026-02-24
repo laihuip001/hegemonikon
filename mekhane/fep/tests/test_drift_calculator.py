@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Mekhane] <- mekhane/ A0->Auto->AddedByCI
 """Tests for drift_calculator.py — [0,1]-Enriched Category Hom Value
 
 Tests the TF-IDF and coverage drift computation methods.

@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Mekhane] <- mekhane/ A0->Auto->AddedByCI
 """Tests for boot_integration template generation and postcheck."""
 
 import sys

@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/ A0->Auto->AddedByCI
 """
 Guardian Integration Tests — /bou ② テスト守護者
 

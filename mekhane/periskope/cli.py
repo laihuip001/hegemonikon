@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Mekhane] <- mekhane/periskope/ A0->Auto->AddedByCI
+# PURPOSE: Auto-generated purpose for cli.py
 """
 Periskopē CLI — Deep Research from the command line.
 

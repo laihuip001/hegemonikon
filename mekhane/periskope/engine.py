@@ -1,3 +1,5 @@
+# PROOF: [L2/Mekhane] <- mekhane/periskope/ A0->Auto->AddedByCI
+# PURPOSE: Auto-generated purpose for engine.py
 """
 Periskopē Deep Research Engine — Orchestrator.
 

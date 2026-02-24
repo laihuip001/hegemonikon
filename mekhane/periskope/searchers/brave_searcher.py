@@ -1,3 +1,5 @@
+# PROOF: [L2/Mekhane] <- mekhane/searchers/ A0->Auto->AddedByCI
+# PURPOSE: Auto-generated purpose for brave_searcher.py
 """
 Brave Search API client for Periskopē.
 

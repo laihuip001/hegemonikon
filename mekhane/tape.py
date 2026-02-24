@@ -1,3 +1,5 @@
+# PROOF: [L2/Mekhane] <- mekhane/mekhane/ A0->Auto->AddedByCI
+# PURPOSE: Auto-generated purpose for tape.py
 """
 Tape Writer — WF 実行トレースを JSONL として記録する。
 

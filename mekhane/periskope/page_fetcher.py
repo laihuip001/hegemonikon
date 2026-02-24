@@ -1,3 +1,5 @@
+# PROOF: [L2/Mekhane] <- mekhane/periskope/ A0->Auto->AddedByCI
+# PURPOSE: Auto-generated purpose for page_fetcher.py
 """
 Page Fetcher — 選択的全文クロール for Periskopē.
 

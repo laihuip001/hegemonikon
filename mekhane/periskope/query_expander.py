@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- periskope/ A0→Implementation→query_expander
 """
 Query expander for Periskopē.
 

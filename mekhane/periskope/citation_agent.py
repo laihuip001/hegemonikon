@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- periskope/ A0→Implementation→citation_agent
 """
 Citation verification agent for Periskopē.
 

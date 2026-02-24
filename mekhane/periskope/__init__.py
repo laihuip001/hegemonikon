@@ -1,3 +1,4 @@
+# PROOF: [L2/Periskope] <- mekhane/periskope/__init__.py Axiom->Reason->Module
 """
 Periskopē — HGK Deep Research Engine
 

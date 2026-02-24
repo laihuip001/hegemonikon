@@ -1,3 +1,4 @@
+# PROOF: [L2/Periskope] <- mekhane/periskope/searchers/internal_searcher.py Axiom->Reason->Module
 """
 Internal knowledge searcher for Periskopē.
 

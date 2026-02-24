@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/periskope/ A0->Implementation->Module
 """
 Periskopē Deep Research Engine — Orchestrator.
 

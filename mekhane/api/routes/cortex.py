@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/routes/ A0→Implementation→cortex.py
 from typing import Any, AsyncGenerator
 
 import asyncio

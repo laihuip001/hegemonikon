@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/tests/ A0->Auto->AddedByCI
 """
 Injection Regression Test Suite — 6攻撃ベクタによるセキュリティ検証
 

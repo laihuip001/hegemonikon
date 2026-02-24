@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/tests/ A0->Auto->AddedByCI
 """Tests for mekhane.fep.encoding — FEP encoding helpers."""
 
 import unittest

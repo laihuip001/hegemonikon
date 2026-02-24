@@ -1,3 +1,4 @@
+# PROOF: [L2/Impl] <- mekhane/ Automated fix for CI
 #!/usr/bin/env python3
 # PROOF: [L2/テスト] <- mekhane/symploke/tests/ O4→pre-audit→test_pre_audit が担う
 # PURPOSE: Pre-audit スコアリングとファイルソートのユニットテスト

@@ -1,3 +1,4 @@
+# PROOF: [L2/Impl] <- mekhane/ Automated fix for CI
 #!/usr/bin/env python3
 # PROOF: [L2/インフラ] <- mekhane/ochema/ A0→LLMアクセス統合サービス
 # PURPOSE: OchemaService — 統一 LLM サービス層。全消費者の唯一のエントリポイント

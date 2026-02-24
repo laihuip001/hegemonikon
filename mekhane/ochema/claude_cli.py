@@ -1,3 +1,4 @@
+# PROOF: [L2/Impl] <- mekhane/ Automated fix for CI
 #!/usr/bin/env python3
 # PROOF: [L2/ツール] <- mekhane/ochema/ V15 headless LS Claude wrapper
 # PURPOSE: IDE GUI なしで LS 経由 Claude を叩く CLI

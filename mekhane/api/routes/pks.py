@@ -1,3 +1,4 @@
+# PROOF: [L2/Impl] <- mekhane/ Automated fix for CI
 #!/usr/bin/env python3
 # PROOF: [L2/PKS] <- mekhane/api/routes/
 # PURPOSE: PKS (Proactive Knowledge Surface) API — 知識プッシュ + フィードバック

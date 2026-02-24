@@ -1,3 +1,4 @@
+# PROOF: [L2/Impl] <- mekhane/ Automated fix for CI
 #!/usr/bin/env python3
 # PROOF: [L2/インフラ] <- mekhane/ochema/ A0→AI Tool Use — ローカルファイル操作能力
 # PURPOSE: API 直叩き AI にファイル読み書き・コマンド実行能力を付与する

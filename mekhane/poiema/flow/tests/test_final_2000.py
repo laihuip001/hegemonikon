@@ -1,3 +1,4 @@
+# PROOF: [L2/Impl] <- mekhane/ Automated fix for CI
 #!/usr/bin/env python3
 # PROOF: [L2/テスト] <- mekhane/poiema/flow/tests/ + mekhane/anamnesis/tests/ + mekhane/ergasterion/
 # PURPOSE: 2000 到達用最終テスト — NoesisClient, ModuleDocument, Perspective

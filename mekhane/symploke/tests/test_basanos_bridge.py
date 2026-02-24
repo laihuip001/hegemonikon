@@ -1,3 +1,4 @@
+# PROOF: [L2/Impl] <- mekhane/ Automated fix for CI
 #!/usr/bin/env python3
 # PROOF: [L2/テスト] <- mekhane/symploke/tests/ A2→basanos_bridge→test_basanos_bridge が担う
 # PURPOSE: Basanos Bridge のユニットテスト

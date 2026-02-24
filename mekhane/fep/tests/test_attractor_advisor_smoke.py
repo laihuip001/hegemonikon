@@ -1,3 +1,4 @@
+# PROOF: [L2/Impl] <- mekhane/ Automated fix for CI
 """Smoke test: attractor_advisor.py が import 可能であることを保証する。
 
 /dia+ で指摘された死角:

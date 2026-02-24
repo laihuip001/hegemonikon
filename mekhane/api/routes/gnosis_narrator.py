@@ -1,3 +1,4 @@
+# PROOF: [L2/Impl] <- mekhane/ Automated fix for CI
 #!/usr/bin/env python3
 # PROOF: [L2/Gnōsis] <- mekhane/api/routes/
 # PURPOSE: Gnōsis Narrator API — 論文カード + 問い + ナレーション

@@ -1,3 +1,4 @@
+# PROOF: [L2/Impl] <- mekhane/ Automated fix for CI
 #!/usr/bin/env python3
 # PROOF: [L2/検証] <- A0→体系の健全性検証が必要→使われない定理=dead parameter
 """

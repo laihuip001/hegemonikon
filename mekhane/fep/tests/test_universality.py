@@ -1,3 +1,4 @@
+# PROOF: [L2/Impl] <- mekhane/ Automated fix for CI
 """Tests for mekhane.fep.universality — Kalon (圏論的普遍性検証)."""
 
 import json

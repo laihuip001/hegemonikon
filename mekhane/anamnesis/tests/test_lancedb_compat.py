@@ -1,3 +1,4 @@
+# PROOF: [L2/Impl] <- mekhane/ Automated fix for CI
 """Tests for mekhane.anamnesis.lancedb_compat."""
 
 import unittest

@@ -1,3 +1,4 @@
+# PROOF: [L2/Impl] <- mekhane/ Automated fix for CI
 #!/usr/bin/env python3
 # PROOF: [L2/コア] <- mekhane/exagoge/
 # PURPOSE: Exagoge CLI — ワンコマンドで HGK データをエクスポート

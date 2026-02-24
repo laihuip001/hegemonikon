@@ -1,3 +1,4 @@
+# PROOF: [L2/Impl] <- mekhane/ Automated fix for CI
 #!/usr/bin/env python3
 # PROOF: [L2/ユーティリティ] <- mekhane/symploke/ F5 benchmark で Gemini 3 Flash の品質を確認済み
 """

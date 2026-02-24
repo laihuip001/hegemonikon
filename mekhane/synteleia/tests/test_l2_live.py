@@ -1,3 +1,4 @@
+# PROOF: [L2/Impl] <- mekhane/ Automated fix for CI
 #!/usr/bin/env python3
 # PROOF: [L2/テスト] <- mekhane/synteleia/tests/
 # PURPOSE: L2 SemanticAgent 実弾テスト (OpenAI Backend)

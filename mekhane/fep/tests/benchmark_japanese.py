@@ -1,3 +1,4 @@
+# PROOF: [L2/Impl] <- mekhane/ Automated fix for CI
 #!/usr/bin/env python3
 # PROOF: [L3/テスト] <- mekhane/fep/tests/
 # PURPOSE: FEP日本語処理のベンチマーク測定

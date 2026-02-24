@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/dendron/ A0->Quality->Guard
 from typing import Any, AsyncGenerator
 
 import asyncio

@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/dendron/ A0->Quality->Guard
 """
 Periskopē searchers — pluggable search source adapters.
 

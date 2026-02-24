@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/dendron/ A0->Quality->Guard
 """
 MCP Guard — ゾンビプロセス防止の自己防衛モジュール
 

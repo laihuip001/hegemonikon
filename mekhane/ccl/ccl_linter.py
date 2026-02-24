@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/dendron/ A0->Quality->Guard
 """CCL Linter — CCL 式の静的検証。
 
 operators.md (SSOT) に基づいて CCL 式を検証し、

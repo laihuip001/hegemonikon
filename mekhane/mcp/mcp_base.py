@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Mekhane] <- mekhane/dendron/ A0->Quality->Guard
 """
 MCP Base Module — Hegemonikón MCP Server Common Infrastructure
 

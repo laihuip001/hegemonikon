@@ -1,3 +1,0 @@
-## 2026-02-24 - Coupling of Physics and Render Loops
-**Learning:** Directly coupling physics simulation updates (d3-force) with rendering updates (Three.js) in the same `animate` loop can lead to massive redundant work. Even when the physics simulation stabilizes (alpha < 0.001) and node positions are static, the render loop blindly updates thousands of object positions and uploads geometry buffers to the GPU every frame.
-**Action:** Decouple position updates from the render loop by checking simulation activity (alpha threshold). Only update scene graph positions and geometry buffers when the simulation is actually moving nodes. Keep purely visual effects (shaders, rotation) running every frame.

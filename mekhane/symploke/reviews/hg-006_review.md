@@ -1,3 +1,6 @@
+# PROOF: [L2/Mekhane] <- mekhane/symploke/boot_integration.py A0→Review→HG-006
+# PURPOSE: ワークフロー適合審査官 (HG-006) による boot_integration.py のレビュー結果
+
 # ワークフロー適合審査官 レビュー
 
 ## 対象ファイル

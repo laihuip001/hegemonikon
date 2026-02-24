@@ -1,4 +1,4 @@
-# PROOF: [L2/インフラ] <- hermeneus/src/ Formal Prover Interface
+# PROOF: [L2/Infra] <- hermeneus/src/ Formal Prover Interface
 """
 Hermēneus Prover — 形式的正確性検証
 
@@ -13,6 +13,7 @@ import json
 import sqlite3
 import subprocess
 import tempfile
+import time
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta

@@ -31,7 +31,11 @@ async def test_connection():
 
     try:
         import aiohttp
+    except ImportError:
+        pytest.skip("aiohttp not installed")
+        return False
 
+    try:
         headers = {"X-Goog-Api-Key": api_key, "Content-Type": "application/json"}
 
         async with aiohttp.ClientSession() as session:

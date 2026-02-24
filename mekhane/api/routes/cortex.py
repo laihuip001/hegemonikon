@@ -1,3 +1,5 @@
+# PROOF: [L2/Mekhane] <- mekhane/api/routes/ S2->Mekhane->Cortex API
+# PURPOSE: API Route
 from typing import Any, AsyncGenerator
 
 import asyncio

@@ -98,6 +98,7 @@ def extract_dispatch_info(context: str, gpu_ok: bool = True) -> dict:
     return dispatch_info
 
 
+# PURPOSE: Load project registry from .agent/projects/registry.yaml
 def _load_projects(project_root: Path) -> dict:
     """Load project registry from .agent/projects/registry.yaml.
 
@@ -893,4 +894,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-

@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/periskope/searchers/semantic_scholar_searcher.py A0->Auto->AddedByCI
 """
 Semantic Scholar API client for Periskopē.
 

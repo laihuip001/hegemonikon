@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- tests/ A0->Auto->AddedByCI
 """Tests for TrendAnalyzer — 合成データで全機能をテスト。"""
 
 import json

@@ -1,4 +1,4 @@
-# PROOF: [L2/インフラ] <- mekhane/symploke/
+# PROOF: [L2/インフラ] <- mekhane/symploke/ A0→継続する私が必要→boot_axes が担う
 # PURPOSE: Boot 軸ローダー群 — boot_integration.py から抽出された個別軸ロード関数
 """
 Boot Axes — get_boot_context() から抽出された 16 軸ローダー.

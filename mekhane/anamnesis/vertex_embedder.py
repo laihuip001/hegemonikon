@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/anamnesis/vertex_embedder.py S2->Implementation->Module
 import os
 import logging
 from google import genai

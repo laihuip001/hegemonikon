@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/dendron/ A0->Quality->Guard
 """
 Tape Writer — WF 実行トレースを JSONL として記録する。
 

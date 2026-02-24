@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L3/テスト] <- mekhane/pks/tests/ A0->Need->Verification
 """F6c: Gateway Stats API endpoint tests."""
 
 import pytest

@@ -1,3 +1,4 @@
+# PROOF: [L2/Periskope] <- mekhane/periskope/query_expander.py Axiom->Reason->Module
 """
 Query expander for Periskopē.
 

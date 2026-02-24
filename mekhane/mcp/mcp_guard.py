@@ -1,3 +1,4 @@
+# PROOF: [L2/MCP] <- mekhane/mcp/mcp_guard.py Axiom->Reason->Module
 """
 MCP Guard — ゾンビプロセス防止の自己防衛モジュール
 

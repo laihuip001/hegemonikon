@@ -1,3 +1,4 @@
+# PROOF: [L2/Anamnesis] <- mekhane/anamnesis/vertex_embedder.py Axiom->Reason->Module
 import os
 import logging
 from google import genai

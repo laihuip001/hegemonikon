@@ -1,3 +1,4 @@
+# PROOF: [L2/Impl] <- mekhane/ Automated fix for CI
 #!/usr/bin/env python3
 # PROOF: [L2/Sympatheia] <- mekhane/api/routes/
 # PURPOSE: Sympatheia 自律神経系 API — n8n Code node ロジックの中枢化

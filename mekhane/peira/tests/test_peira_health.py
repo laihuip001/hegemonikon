@@ -1,3 +1,4 @@
+# PROOF: [L2/Impl] <- mekhane/ Automated fix for CI
 #!/usr/bin/env python3
 # PROOF: [L2/テスト] <- mekhane/peira/tests/
 # PURPOSE: Peira HealthItem / HealthReport / format_terminal の包括テスト

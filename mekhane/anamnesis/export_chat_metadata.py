@@ -1,3 +1,4 @@
+# PROOF: [L2/Impl] <- mekhane/ Automated fix for CI
 #!/usr/bin/env python3
 # PROOF: [L2/インフラ] <- mekhane/anamnesis/ A0→セッション記録の永続化→メタデータ抽出が担う
 """

@@ -1,3 +1,4 @@
+# PROOF: [L2/Impl] <- mekhane/ Automated fix for CI
 #!/usr/bin/env python3
 # PROOF: [L3/ユーティリティ] <- mekhane/symploke/ O4→統合が必要→specialist_bridge が担う
 """

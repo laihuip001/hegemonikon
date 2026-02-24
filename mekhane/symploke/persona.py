@@ -1,3 +1,4 @@
+# PROOF: [L2/Impl] <- mekhane/ Automated fix for CI
 #!/usr/bin/env python3
 # PROOF: [L2/インフラ] <- mekhane/symploke/ A0→継続する私が必要→persona が担う
 """

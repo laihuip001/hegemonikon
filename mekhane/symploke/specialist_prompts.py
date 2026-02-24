@@ -1,3 +1,4 @@
+# PROOF: [L2/Impl] <- mekhane/ Automated fix for CI
 #!/usr/bin/env python3
 # PROOF: [L2/インフラ] <- mekhane/symploke/ A0→知識管理が必要→specialist_prompts が担う
 """

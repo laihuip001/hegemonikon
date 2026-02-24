@@ -1,3 +1,4 @@
+# PROOF: [L2/Impl] <- mekhane/ Automated fix for CI
 #!/usr/bin/env python3
 # PROOF: [L3/ユーティリティ] <- mekhane/anamnesis/ P3→データ処理が必要→analyze_pb が担う
 """Antigravity .pb ファイルからテキスト文字列を抽出"""

@@ -1,3 +1,4 @@
+# PROOF: [L2/Impl] <- mekhane/ Automated fix for CI
 #!/usr/bin/env python3
 # PROOF: [L2/インフラ] <- mekhane/dendron/ A0→PURPOSE自動付与が必要→purpose_inferが担う
 """

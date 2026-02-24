@@ -1,3 +1,4 @@
+# PROOF: [L2/Impl] <- mekhane/ Automated fix for CI
 # PURPOSE: Digestor 定時収集デーモン — OS 非依存の論文消化スケジューラ
 # PROOF: [L2/インフラ] <- mekhane/ergasterion/digestor/ A0→消化処理が必要→scheduler が担う
 #!/usr/bin/env python3

@@ -1,3 +1,4 @@
+# PROOF: [L2/Impl] <- mekhane/ Automated fix for CI
 # noqa: AI-ALL
 # PROOF: [L2/インフラ] <- mekhane/dendron/  # noqa: AI-022
 """

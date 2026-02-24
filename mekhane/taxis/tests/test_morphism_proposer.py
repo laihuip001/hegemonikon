@@ -1,3 +1,4 @@
+# PROOF: [L2/Impl] <- mekhane/ Automated fix for CI
 #!/usr/bin/env python3
 # PROOF: [L2/テスト] <- mekhane/taxis/tests/
 # PURPOSE: Morphism Proposer (X-series射提案エンジン) の包括テスト

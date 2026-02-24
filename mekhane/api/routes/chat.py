@@ -1,3 +1,4 @@
+# PROOF: [L2/Impl] <- mekhane/ Automated fix for CI
 #!/usr/bin/env python3
 # PROOF: [L2/インフラ] <- mekhane/api/routes/
 # PURPOSE: Chat API — OchemaService 経由の統合 LLM Chat プロキシ

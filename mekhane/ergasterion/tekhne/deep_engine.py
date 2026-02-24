@@ -1,3 +1,4 @@
+# PROOF: [L2/Impl] <- mekhane/ Automated fix for CI
 #!/usr/bin/env python3
 # PROOF: [L2/インフラ] <- mekhane/ergasterion/tekhne/ A0→プロンプト品質の深掘り分析が必要→deep_engineが担う
 """

@@ -1,3 +1,4 @@
+# PROOF: [L2/Impl] <- mekhane/ Automated fix for CI
 #!/usr/bin/env python3
 # PROOF: [L3/機能] <- mekhane/fep/ FEP Agent と Attractor の統合追跡
 """

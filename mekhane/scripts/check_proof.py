@@ -1,3 +1,4 @@
+# PROOF: [L2/Impl] <- mekhane/ Automated fix for CI
 #!/usr/bin/env python3
 # PROOF: [L3/ユーティリティ] <- mekhane/scripts/ 後方互換ラッパー（非推奨）
 # lineage: 旧 check_proof.py → dendron/checker.py へ昇華 (2026-02-01)

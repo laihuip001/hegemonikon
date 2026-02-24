@@ -1,3 +1,4 @@
+# PROOF: [L2/Impl] <- mekhane/ Automated fix for CI
 """Tests for JulesFeedback — L2結果→L0精度フィードバック。"""
 
 import json

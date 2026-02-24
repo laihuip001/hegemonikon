@@ -1,3 +1,4 @@
+# PROOF: [L2/Impl] <- mekhane/ Automated fix for CI
 #!/usr/bin/env python3
 # PROOF: [L2/インフラ] <- mekhane/anamnesis/ A0→記憶永続化→セッションのリアルタイム監視
 # PURPOSE: LS API ポーリングでアクティブセッションをリアルタイムにモニターし MD 保存する

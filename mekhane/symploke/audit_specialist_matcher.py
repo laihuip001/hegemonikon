@@ -1,3 +1,4 @@
+# PROOF: [L2/Impl] <- mekhane/ Automated fix for CI
 #!/usr/bin/env python3
 # PROOF: [L2/データフロー] <- mekhane/symploke/ S2→issue→specialist ルーティング
 # PURPOSE: AIAuditor issue コード → Specialist カテゴリ 自動マッチング

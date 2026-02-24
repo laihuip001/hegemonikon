@@ -1,3 +1,4 @@
+# PROOF: [L2/Impl] <- mekhane/ Automated fix for CI
 #!/usr/bin/env python3
 # PROOF: [L1/テスト] <- mekhane/mcp/tests/
 # PURPOSE: Gateway ツール群の正常パステスト（セキュリティテストの補完）

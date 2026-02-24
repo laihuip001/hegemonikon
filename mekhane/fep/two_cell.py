@@ -1,3 +1,4 @@
+# PROOF: [L2/Impl] <- mekhane/ Automated fix for CI
 #!/usr/bin/env python3
 # PROOF: [L3/弱2-圏] <- mekhane/fep/ A0→派生は2-cellとして存在する→two_cellが担う
 """

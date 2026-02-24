@@ -1,3 +1,4 @@
+# PROOF: [L2/Impl] <- mekhane/ Automated fix for CI
 #!/usr/bin/env python3
 # PROOF: [L2/インフラ] <- mekhane/ergasterion/tekhne/ A0→プロンプト自動改善が必要→self_refine_pipelineが担う
 """

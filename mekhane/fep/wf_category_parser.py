@@ -1,3 +1,4 @@
+# PROOF: [L2/Impl] <- mekhane/ Automated fix for CI
 #!/usr/bin/env python3
 # PROOF: [L2/インフラ] <- mekhane/fep/ A0→WFフロントマターのcategory_theoryを消費する必要→wf_category_parserが担う
 """

@@ -1,3 +1,4 @@
+# PROOF: [L2/Impl] <- mekhane/ Automated fix for CI
 # noqa: AI-ALL
 # PROOF: [L3/テスト] <- mekhane/tests_root/ 対象モジュールが存在→検証が必要
 import os

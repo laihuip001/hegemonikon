@@ -1,3 +1,4 @@
+# PROOF: [L2/Impl] <- mekhane/ Automated fix for CI
 #!/usr/bin/env python3
 # PROOF: [L2/インフラ] <- mekhane/dendron/
 # PURPOSE: コードの REASON (存在理由の経緯) を自動推定して付与し、R軸カバレッジを改善する

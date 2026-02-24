@@ -1,3 +1,4 @@
+# PROOF: [L2/Impl] <- mekhane/ Automated fix for CI
 # PURPOSE: MultiSemanticAgent のテスト (Layer B: Nous)
 """
 Tests for Multi-LLM Ensemble Audit Agent.

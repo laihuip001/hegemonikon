@@ -1,3 +1,4 @@
+# PROOF: [L2/Impl] <- mekhane/ Automated fix for CI
 #!/usr/bin/env python3
 # PROOF: [L2/テスト] <- mekhane/symploke/tests/
 # PURPOSE: Boot THEOREM_REGISTRY の包括テスト — 96要素体系の Boot 時参照を検証

@@ -1,3 +1,4 @@
+# PROOF: [L2/Impl] <- mekhane/ Automated fix for CI
 #!/usr/bin/env python3
 # PROOF: [L2/インフラ] <- mekhane/symploke/ A2→構造化レビュー統合→basanos_bridge が担う
 # PURPOSE: Basanos PerspectiveMatrix → Specialist v2 変換アダプタ

@@ -1,3 +1,4 @@
+# PROOF: [L2/Impl] <- mekhane/ Automated fix for CI
 #!/usr/bin/env python3
 # PROOF: [L2/インフラ] <- mekhane/symploke/
 # PURPOSE: Value Pitch の Benefit Angle 自動提案 + 骨格ドラフト生成

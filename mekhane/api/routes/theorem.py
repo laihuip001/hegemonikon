@@ -1,3 +1,4 @@
+# PROOF: [L2/Impl] <- mekhane/ Automated fix for CI
 #!/usr/bin/env python3
 # PROOF: [L2/API] <- mekhane/api/routes/
 # PURPOSE: Theorem Usage API — Dashboard 向け定理使用頻度データ

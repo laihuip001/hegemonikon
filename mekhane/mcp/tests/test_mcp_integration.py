@@ -1,3 +1,4 @@
+# PROOF: [L2/Impl] <- mekhane/ Automated fix for CI
 #!/usr/bin/env python3
 """
 MCP Server Integration Tests — mneme/ochema 統合後の回帰テスト

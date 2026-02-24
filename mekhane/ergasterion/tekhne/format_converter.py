@@ -1,3 +1,4 @@
+# PROOF: [L2/Impl] <- mekhane/ Automated fix for CI
 #!/usr/bin/env python3
 # PROOF: [L2/インフラ] <- mekhane/ergasterion/tekhne/ A0→プロンプト形式変換が必要→format_converterが担う
 """

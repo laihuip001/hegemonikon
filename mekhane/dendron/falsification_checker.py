@@ -1,3 +1,4 @@
+# PROOF: [L2/Dendron] <- mekhane/dendron/ A0→Epistemic Status
 """
 S7: Falsification Condition Checker
 

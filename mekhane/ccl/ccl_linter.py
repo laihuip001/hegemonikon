@@ -1,3 +1,5 @@
+# PROOF: [L2/Mekhane] <- mekhane/ccl/ A0->Implementation->ccl_linter.py
+# PURPOSE: Implementation of ccl_linter
 """CCL Linter — CCL 式の静的検証。
 
 operators.md (SSOT) に基づいて CCL 式を検証し、

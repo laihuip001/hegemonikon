@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Mekhane] <- mekhane/symploke/intent_wal.py O1->IntentWAL->Recovery
+# PURPOSE: Manage session intent logs for crash recovery and context continuity
 """Intent-WAL (Write-Ahead Log) Manager.
 
 Manages session intent WAL files for crash recovery and context continuity.

@@ -1,3 +1,5 @@
+# PROOF: [L2/Mekhane] <- mekhane/periskope/searchers/ A0->Implementation->searxng.py
+# PURPOSE: Implementation of searxng
 """
 SearXNG search client for Periskopē.
 

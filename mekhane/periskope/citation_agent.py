@@ -1,3 +1,5 @@
+# PROOF: [L2/Mekhane] <- mekhane/periskope/ A0->Implementation->citation_agent.py
+# PURPOSE: Implementation of citation_agent
 """
 Citation verification agent for Periskopē.
 

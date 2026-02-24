@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/poiema/flow/tests/test_poiema_init.py A0->Common->Module
 """
 Poiema __init__.py 統合テスト
 

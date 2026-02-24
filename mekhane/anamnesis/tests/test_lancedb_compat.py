@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/anamnesis/tests/test_lancedb_compat.py A0->Common->Module
 """Tests for mekhane.anamnesis.lancedb_compat."""
 
 import unittest

@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/periskope/citation_agent.py A0->Common->Module
 """
 Citation verification agent for Periskopē.
 

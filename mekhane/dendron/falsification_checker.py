@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/dendron/falsification_checker.py A0->Common->Module
 """
 S7: Falsification Condition Checker
 

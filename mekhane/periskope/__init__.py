@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/periskope/__init__.py A0->Common->Module
 """
 Periskopē — HGK Deep Research Engine
 

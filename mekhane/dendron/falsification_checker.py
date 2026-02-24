@@ -1,3 +1,4 @@
+# PROOF: [L2/品質] <- mekhane/dendron/ S7→反証可能性の管理→falsification_checker.py
 """
 S7: Falsification Condition Checker
 

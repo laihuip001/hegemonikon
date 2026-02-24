@@ -1,3 +1,4 @@
+<!-- PROOF: [L2/Review] <- SC-004 SQL Injection Review -->
 # SQL注入予防者 レビュー
 
 ## 対象ファイル

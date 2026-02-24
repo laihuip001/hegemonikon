@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Mekhane] <- mekhane/ochema/tests/test_f0_manual.py A0->Common->Module
 """F0 Tool Use — 手動検証スクリプト.
 
 Usage:

@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/basanos/tests/test_trend_analyzer.py A0->Common->Module
 """Tests for TrendAnalyzer — 合成データで全機能をテスト。"""
 
 import json

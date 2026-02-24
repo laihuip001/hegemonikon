@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/synteleia/tests/test_semantic_agent.py A0->Common->Module
 """
 Tests for SemanticAgent (L2)
 """

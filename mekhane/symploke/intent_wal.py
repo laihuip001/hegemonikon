@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# PROOF: [L2/Mekhane] <- mekhane/symploke/ O2→Intent→WAL
+# PROOF: [L2/インフラ] <- mekhane/symploke/ O2→Intent→WAL
 # PURPOSE: Intent-WAL (Write-Ahead Log) Manager.
 """Intent-WAL (Write-Ahead Log) Manager.
 

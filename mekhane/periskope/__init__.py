@@ -1,3 +1,4 @@
+# PROOF: [L2/Periskope] <- mekhane/periskope/__init__.py K2->PeriskopeInit
 """
 Periskopē — HGK Deep Research Engine
 

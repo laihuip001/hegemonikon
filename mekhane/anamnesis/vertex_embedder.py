@@ -1,3 +1,4 @@
+# PROOF: [L3/Anamnesis] <- mekhane/anamnesis/vertex_embedder.py K3->VertexEmbedder
 import os
 import logging
 from google import genai

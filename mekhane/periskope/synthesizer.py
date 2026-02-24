@@ -1,3 +1,4 @@
+# PROOF: [L2/Periskope] <- mekhane/periskope/synthesizer.py K2->Synthesizer
 """
 Multi-model synthesizer for Periskopē.
 

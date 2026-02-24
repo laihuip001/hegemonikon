@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/dendron/ A0->Existence
 """
 Multi-model synthesizer for Periskopē.
 

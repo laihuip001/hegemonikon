@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- ccl/ A0→Implementation→operator_loader
 """operators.md の SSOT パーサー。
 
 operators.md の Markdown テーブルから演算子定義を抽出し、

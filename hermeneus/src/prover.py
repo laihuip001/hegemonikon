@@ -13,6 +13,7 @@ import json
 import sqlite3
 import subprocess
 import tempfile
+import time
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
@@ -287,7 +288,6 @@ class SchemaProver(ProverInterface):
         **kwargs
     ) -> ProofResult:
         """JSON をスキーマで検証"""
-        import time
         start = time.time()
         
         if not schema:

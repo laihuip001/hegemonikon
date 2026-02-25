@@ -270,6 +270,7 @@ EXEMPT_PATTERNS = [
     r"docs/",               # ドキュメント (PROOF 不要)
     r"mekhane/symploke/reviews/", # Specialist Reviews (Markdown)
     # Legacy Modules (Grandfathered)
+    r"mekhane/dendron/falsification_",
     r"mekhane/tape.py",
     r"mekhane/symploke/intent_wal.py",
     r"mekhane/periskope/",

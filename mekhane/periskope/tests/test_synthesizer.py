@@ -1,3 +1,4 @@
+# PROOF: [L3/テスト] <- mekhane/periskope/tests/ A0→Implementation→test_synthesizer
 """
 Tests for multi-model synthesizer.
 """

@@ -1,3 +1,4 @@
+# PROOF: [L3/テスト] <- mekhane/pks/tests/ A0→Implementation→test_gateway_bridge
 """
 GatewayBridge テスト — E2E + 単体テスト
 

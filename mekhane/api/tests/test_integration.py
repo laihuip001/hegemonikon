@@ -1,3 +1,4 @@
+# PROOF: [L3/テスト] <- mekhane/api/tests/ A0→Implementation→test_integration
 """
 Tests for Timeline, Kalon, and Symploke Mnēmē API routes.
 """

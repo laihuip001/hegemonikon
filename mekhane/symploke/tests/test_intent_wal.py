@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L3/テスト] <- mekhane/symploke/tests/ A0→Implementation→test_intent_wal
 """Tests for Intent-WAL Manager."""
 
 import sys

@@ -1,3 +1,4 @@
+# PROOF: [L3/テスト] <- mekhane/synteleia/tests/ A0→Implementation→test_multi_semantic
 # PURPOSE: MultiSemanticAgent のテスト (Layer B: Nous)
 """
 Tests for Multi-LLM Ensemble Audit Agent.

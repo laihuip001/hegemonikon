@@ -1,3 +1,4 @@
+# PROOF: [L3/テスト] <- mekhane/poiema/flow/tests/ A0→Implementation→test_poiema_init
 """
 Poiema __init__.py 統合テスト
 

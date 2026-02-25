@@ -1,3 +1,4 @@
+# PROOF: [L3/テスト] <- mekhane/basanos/tests/ A0→Implementation→test_jules_feedback
 """Tests for JulesFeedback — L2結果→L0精度フィードバック。"""
 
 import json

@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L3/テスト] <- mekhane/ochema/tests/ A0→Implementation→test_f0_manual
 """F0 Tool Use — 手動検証スクリプト.
 
 Usage:

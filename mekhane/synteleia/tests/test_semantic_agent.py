@@ -1,3 +1,4 @@
+# PROOF: [L3/テスト] <- mekhane/synteleia/tests/ A0→Implementation→test_semantic_agent
 """
 Tests for SemanticAgent (L2)
 """

@@ -1,3 +1,4 @@
+# PROOF: [L3/テスト] <- mekhane/ergasterion/tekhne/tests/ A0→Implementation→test_thinking_config
 """Tests for thinking config resolution (HGK depth -> model params)."""
 
 import pytest

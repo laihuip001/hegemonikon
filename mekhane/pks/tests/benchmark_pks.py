@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L3/テスト] <- mekhane/pks/tests/ A0→Implementation→benchmark_pks
 # PURPOSE: PKS 検索品質ベンチマーク — Precision@K, MRR, Coverage, Latency を自動計測
 """
 PKS Search Quality Benchmark

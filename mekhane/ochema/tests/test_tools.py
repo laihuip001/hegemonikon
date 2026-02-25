@@ -1,3 +1,4 @@
+# PROOF: [L3/テスト] <- mekhane/ochema/tests/ A0→Implementation→test_tools
 """Ochema AI Tool Use — Unit Tests.
 
 Tests for tools.py: 7 tools + Claude parser + system templates + audit log.

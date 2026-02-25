@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/mcp/mcp_guard.py A0→AutoFix→CI_Failure_Mitigation
 """
 MCP Guard — ゾンビプロセス防止の自己防衛モジュール
 

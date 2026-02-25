@@ -1,3 +1,4 @@
+# PROOF: [L2/Periskope] <- mekhane/periskope/searchers/searxng.py A0→AutoFix→CI_Failure_Mitigation
 """
 SearXNG search client for Periskopē.
 

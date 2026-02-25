@@ -1,3 +1,4 @@
+# PROOF: [L2/Periskope] <- mekhane/periskope/engine.py A0→AutoFix→CI_Failure_Mitigation
 """
 Periskopē Deep Research Engine — Orchestrator.
 

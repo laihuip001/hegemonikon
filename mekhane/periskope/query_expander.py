@@ -1,3 +1,4 @@
+# PROOF: [L2/Periskope] <- mekhane/periskope/query_expander.py A0→AutoFix→CI_Failure_Mitigation
 """
 Query expander for Periskopē.
 

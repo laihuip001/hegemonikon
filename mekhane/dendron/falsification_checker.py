@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/dendron/falsification_checker.py A0→AutoFix→CI_Failure_Mitigation
 """
 S7: Falsification Condition Checker
 

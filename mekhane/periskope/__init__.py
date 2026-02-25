@@ -1,3 +1,4 @@
+# PROOF: [L2/Periskope] <- mekhane/periskope/__init__.py A0→AutoFix→CI_Failure_Mitigation
 """
 Periskopē — HGK Deep Research Engine
 

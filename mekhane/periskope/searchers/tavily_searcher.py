@@ -1,3 +1,4 @@
+# PROOF: [L2/Periskope] <- mekhane/periskope/searchers/tavily_searcher.py A0→AutoFix→CI_Failure_Mitigation
 """
 Tavily Search API client for Periskopē.
 

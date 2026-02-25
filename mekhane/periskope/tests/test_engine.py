@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- tests/ A0→Implementation→test_engine.py
 """
 Tests for Periskopē Engine (orchestrator).
 """

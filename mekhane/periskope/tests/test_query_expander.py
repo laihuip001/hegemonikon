@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- tests/ A0→Implementation→test_query_expander.py
 """Tests for W3 QueryExpander and P3 weight distribution."""
 
 from __future__ import annotations

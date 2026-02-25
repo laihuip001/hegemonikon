@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- tests/ A0→Implementation→test_internal_searchers.py
 """
 Tests for internal searchers (Gnōsis, Sophia, Kairos).
 """

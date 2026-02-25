@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Mekhane] <- tests/ A0→Implementation→test_intent_wal.py
 """Tests for Intent-WAL Manager."""
 
 import sys

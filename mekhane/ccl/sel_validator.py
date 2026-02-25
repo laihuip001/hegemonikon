@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/ccl/ A0->Auto->AddedByCI
 # PROOF: [L2/インフラ] <- mekhane/ccl/
 """
 SEL Validator — Semantic Enforcement Layer 遵守検証

@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/dendron/ A0->Auto->AddedByCI
 # PROOF: [L2/インフラ] <- mekhane/dendron/
 """
 Dendron — 存在証明検証ツール

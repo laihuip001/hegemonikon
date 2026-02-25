@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Mekhane] <- mekhane/pks/ A0->Auto->AddedByCI
 # PROOF: [L2/インフラ] <- mekhane/pks/
 """
 PROOF: [L2/インフラ] このファイルは存在しなければならない

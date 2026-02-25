@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/dendron/tests/ A0->Auto->AddedByCI
 # PROOF: [L3/テスト] <- mekhane/dendron/
 """
 Dendron EPT (Existence Purpose Tensor) テスト
@@ -285,9 +286,11 @@ class TestEPTIntegration:
         assert result.total_verification_checks == 0
 
 
+# PURPOSE: ファイル間類似度検出 (F5: L1×NF3)
 class TestFileSimilarity:
     """ファイル間類似度検出 (F5: L1×NF3)"""
 
+    # PURPOSE: sim_checker の処理
     @pytest.fixture
     def sim_checker(self):
         return DendronChecker(

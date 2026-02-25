@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Mekhane] <- mekhane/ccl/tests/ A0->Auto->AddedByCI
 # PROOF: [L2/テスト] <- mekhane/ccl/tests/
 # PURPOSE: CCL Macro Registry & Expander の包括テスト
 """CCL Macro System Tests"""

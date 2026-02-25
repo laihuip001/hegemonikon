@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/exagoge/ A0->Auto->AddedByCI
 # PROOF: [L2/コア] <- mekhane/exagoge/
 # PURPOSE: Exagoge パッケージ — データエクスポート・変換機能
 """

@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/fep/ A0->Auto->AddedByCI
 # PROOF: [L2/FEP] <- mekhane/fep/
 # PURPOSE: Underused theorem activation — keyword-based suggestion for all 24 theorems
 """

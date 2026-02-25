@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/anamnesis/tests/ A0->Auto->AddedByCI
 """Tests for mekhane.anamnesis.lancedb_compat."""
 
 import unittest

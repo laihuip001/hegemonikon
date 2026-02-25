@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/fep/ A0->Auto->AddedByCI
 # PROOF: [L1/FEP] <- mekhane/fep/
 # PURPOSE: Credit Assignment — Creator フィードバックで A行列を教師付き学習する
 """

@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/ccl/ A0->Auto->AddedByCI
 # PROOF: [L2/インフラ] <- mekhane/ccl/
 # Phase 0: CCL 実行前の仕様強制注入
 

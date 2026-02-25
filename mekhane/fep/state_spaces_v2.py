@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/fep/ A0->Auto->AddedByCI
 # PROOF: [L2/インフラ] <- mekhane/fep/
 # PURPOSE: 48-state FEP Model (v2) — Series 統合状態空間
 """

@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/fep/ A0->Auto->AddedByCI
 # PROOF: [L2/品質検証] <- mekhane/fep/
 """
 PROOF: [L2/品質検証] このファイルは存在しなければならない

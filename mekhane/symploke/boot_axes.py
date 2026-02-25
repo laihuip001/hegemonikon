@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/symploke/ A0->Auto->AddedByCI
 # PROOF: [L2/インフラ] <- mekhane/symploke/
 # PURPOSE: Boot 軸ローダー群 — boot_integration.py から抽出された個別軸ロード関数
 """

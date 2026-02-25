@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/anamnesis/collectors/ A0->Auto->AddedByCI
 # PROOF: [L2/インフラ] <- mekhane/anamnesis/collectors/
 """
 PROOF: [L2/インフラ]

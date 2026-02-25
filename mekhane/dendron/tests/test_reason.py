@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/dendron/tests/ A0->Auto->AddedByCI
 # PROOF: [L2/テスト] <- mekhane/dendron/
 # PURPOSE: R-axis (Reason) 検出機能の単体テスト — Wave 1 (NF1 Surface)
 """
@@ -15,6 +16,7 @@ from mekhane.dendron.checker import DendronChecker
 from mekhane.dendron.models import ProofStatus
 
 
+# PURPOSE: Standard checker for reason tests
 @pytest.fixture
 def checker():
     """Standard checker for reason tests.
@@ -28,6 +30,7 @@ def checker():
     )
 
 
+# PURPOSE: Create a minimal project structure with REASON declarations
 @pytest.fixture
 def tmp_project(tmp_path):
     """Create a minimal project structure with REASON declarations"""
@@ -78,21 +81,25 @@ def tmp_project(tmp_path):
     return tmp_path
 
 
+# PURPOSE: R10: File-level REASON: detection
 class TestFileReasonDetection:
     """R10: File-level REASON: detection"""
 
+    # PURPOSE: REASON: comment in file header is detected
     def test_file_with_reason(self, checker, tmp_project):
         """REASON: comment in file header is detected"""
         result = checker.check_file_proof(tmp_project / "src" / "with_reason.py")
         assert result.has_reason is True
         assert result.reason_text == "Created to validate R-axis detection in Wave 1"
 
+    # PURPOSE: File without REASON: comment has has_reason=False
     def test_file_without_reason(self, checker, tmp_project):
         """File without REASON: comment has has_reason=False"""
         result = checker.check_file_proof(tmp_project / "src" / "without_reason.py")
         assert result.has_reason is False
         assert result.reason_text is None
 
+    # PURPOSE: REASON presence doesn't change PROOF status (still OK)
     def test_reason_does_not_affect_proof_status(self, checker, tmp_project):
         """REASON presence doesn't change PROOF status (still OK)"""
         with_reason = checker.check_file_proof(tmp_project / "src" / "with_reason.py")
@@ -101,9 +108,11 @@ class TestFileReasonDetection:
         assert without_reason.status == ProofStatus.OK
 
 
+# PURPOSE: R20: Function-level REASON: detection
 class TestFunctionReasonDetection:
     """R20: Function-level REASON: detection"""
 
+    # PURPOSE: REASON: comment above function is detected
     def test_function_with_reason(self, checker, tmp_project):
         """REASON: comment above function is detected"""
         results = checker.check_functions_in_file(tmp_project / "src" / "with_reason.py")
@@ -112,6 +121,7 @@ class TestFunctionReasonDetection:
         assert func_with_reason[0].has_reason is True
         assert func_with_reason[0].reason_text == "Added because the old approach was too slow"
 
+    # PURPOSE: Function without REASON: comment has has_reason=False
     def test_function_without_reason(self, checker, tmp_project):
         """Function without REASON: comment has has_reason=False"""
         results = checker.check_functions_in_file(tmp_project / "src" / "with_reason.py")
@@ -120,6 +130,7 @@ class TestFunctionReasonDetection:
         assert func_no_reason[0].has_reason is False
         assert func_no_reason[0].reason_text is None
 
+    # PURPOSE: REASON presence doesn't change PURPOSE status
     def test_reason_does_not_affect_purpose_status(self, checker, tmp_project):
         """REASON presence doesn't change PURPOSE status"""
         results = checker.check_functions_in_file(tmp_project / "src" / "with_reason.py")
@@ -127,9 +138,11 @@ class TestFunctionReasonDetection:
             assert r.status == ProofStatus.OK  # Both functions have PURPOSE
 
 
+# PURPOSE: R-axis statistics in CheckResult
 class TestReasonAggregation:
     """R-axis statistics in CheckResult"""
 
+    # PURPOSE: CheckResult includes correct R-axis statistics
     def test_reason_coverage_stats(self, checker, tmp_project):
         """CheckResult includes correct R-axis statistics"""
         result = checker.check(tmp_project / "src")
@@ -137,6 +150,7 @@ class TestReasonAggregation:
         assert result.files_total_checkable > 0
         assert result.files_with_reason == 1  # with_reason.py
 
+    # PURPOSE: CheckResult includes function reason statistics
     def test_function_reason_stats(self, checker, tmp_project):
         """CheckResult includes function reason statistics"""
         result = checker.check(tmp_project / "src")
@@ -146,15 +160,18 @@ class TestReasonAggregation:
         assert result.functions_with_reason == 1
 
 
+# PURPOSE: R00: Directory PROOF.md REASON: detection (existing feature)
 class TestDirReasonDetection:
     """R00: Directory PROOF.md REASON: detection (existing feature)"""
 
+    # PURPOSE: PROOF.md with REASON: is detected
     def test_dir_with_reason(self, checker, tmp_project):
         """PROOF.md with REASON: is detected"""
         dir_proof = checker.check_dir_proof(tmp_project / "src")
         assert dir_proof.has_reason is True
         assert "modularity" in dir_proof.reason_text
 
+    # PURPOSE: PROOF.md without REASON: has has_reason=False
     def test_dir_without_reason(self, checker, tmp_project):
         """PROOF.md without REASON: has has_reason=False"""
         dir_proof = checker.check_dir_proof(tmp_project)
@@ -166,6 +183,7 @@ class TestDirReasonDetection:
 # ============================================================
 
 
+# PURPOSE: Project with NF2 violation: REASON without PURPOSE
 @pytest.fixture
 def nf2_project(tmp_path):
     """Project with NF2 violation: REASON without PURPOSE"""
@@ -199,9 +217,11 @@ def nf2_project(tmp_path):
     return tmp_path
 
 
+# PURPOSE: R01: Dir REASON→PURPOSE NF2 dependency
 class TestNF2DirReasonDependency:
     """R01: Dir REASON→PURPOSE NF2 dependency"""
 
+    # PURPOSE: Dir with REASON but no PURPOSE is WEAK
     def test_reason_without_purpose_is_weak(self, checker, nf2_project):
         """Dir with REASON but no PURPOSE is WEAK"""
         dir_proof = checker.check_dir_proof(nf2_project / "mymod")
@@ -209,6 +229,7 @@ class TestNF2DirReasonDependency:
         assert "NF2" in dir_proof.reason
         assert dir_proof.has_reason is True
 
+    # PURPOSE: Dir with both REASON and PURPOSE is OK
     def test_reason_with_purpose_is_ok(self, checker, tmp_project):
         """Dir with both REASON and PURPOSE is OK"""
         dir_proof = checker.check_dir_proof(tmp_project / "src")
@@ -216,9 +237,11 @@ class TestNF2DirReasonDependency:
         assert dir_proof.has_reason is True
 
 
+# PURPOSE: R21: Function REASON→PURPOSE NF2 dependency
 class TestNF2FunctionReasonDependency:
     """R21: Function REASON→PURPOSE NF2 dependency"""
 
+    # PURPOSE: Function with REASON but no PURPOSE is WEAK
     def test_function_reason_without_purpose_is_weak(self, checker, nf2_project):
         """Function with REASON but no PURPOSE is WEAK"""
         results = checker.check_functions_in_file(nf2_project / "mymod" / "nf2_violation.py")
@@ -228,6 +251,7 @@ class TestNF2FunctionReasonDependency:
         assert orphan[0].has_reason is True
         assert "従属違反" in orphan[0].quality_issue
 
+    # PURPOSE: Function with both REASON and PURPOSE is OK
     def test_function_reason_with_purpose_is_ok(self, checker, nf2_project):
         """Function with both REASON and PURPOSE is OK"""
         results = checker.check_functions_in_file(nf2_project / "mymod" / "nf2_violation.py")
@@ -242,27 +266,34 @@ class TestNF2FunctionReasonDependency:
 # ============================================================
 
 
+# PURPOSE: _text_similarity helper (Jaccard word similarity)
 class TestTextSimilarity:
     """_text_similarity helper (Jaccard word similarity)"""
 
+    # PURPOSE: identical_texts をテストする
     def test_identical_texts(self):
         assert DendronChecker._text_similarity("hello world", "hello world") == 1.0
 
+    # PURPOSE: completely_different をテストする
     def test_completely_different(self):
         assert DendronChecker._text_similarity("foo bar", "baz qux") == 0.0
 
+    # PURPOSE: partial_overlap をテストする
     def test_partial_overlap(self):
         sim = DendronChecker._text_similarity("read file data", "write file data")
         assert 0.4 < sim < 0.8  # 2/4 overlap
 
+    # PURPOSE: empty_strings をテストする
     def test_empty_strings(self):
         assert DendronChecker._text_similarity("", "hello") == 0.0
         assert DendronChecker._text_similarity("hello", "") == 0.0
 
+    # PURPOSE: case_insensitive をテストする
     def test_case_insensitive(self):
         assert DendronChecker._text_similarity("Hello World", "hello world") == 1.0
 
 
+# PURPOSE: Project with BCNF violations: REASON ≈ PURPOSE (tautology)
 @pytest.fixture
 def bcnf_project(tmp_path):
     """Project with BCNF violations: REASON ≈ PURPOSE (tautology)"""
@@ -296,15 +327,18 @@ def bcnf_project(tmp_path):
     return tmp_path
 
 
+# PURPOSE: R03/R23: REASON ≈ PURPOSE tautology detection
 class TestBCNFTautologyDetection:
     """R03/R23: REASON ≈ PURPOSE tautology detection"""
 
+    # PURPOSE: Dir with REASON ≈ PURPOSE is WEAK
     def test_dir_tautology_is_weak(self, checker, bcnf_project):
         """Dir with REASON ≈ PURPOSE is WEAK"""
         dir_proof = checker.check_dir_proof(bcnf_project / "tautmod")
         assert dir_proof.status == ProofStatus.WEAK
         assert "トートロジー" in dir_proof.reason
 
+    # PURPOSE: Function with REASON ≈ PURPOSE is WEAK
     def test_function_tautology_is_weak(self, checker, bcnf_project):
         """Function with REASON ≈ PURPOSE is WEAK"""
         results = checker.check_functions_in_file(bcnf_project / "tautmod" / "taut.py")
@@ -313,6 +347,7 @@ class TestBCNFTautologyDetection:
         assert connect[0].status == ProofStatus.WEAK
         assert "トートロジー" in connect[0].quality_issue
 
+    # PURPOSE: Function with distinct REASON and PURPOSE is OK
     def test_function_distinct_reason_is_ok(self, checker, bcnf_project):
         """Function with distinct REASON and PURPOSE is OK"""
         results = checker.check_functions_in_file(bcnf_project / "tautmod" / "taut.py")
@@ -326,6 +361,7 @@ class TestBCNFTautologyDetection:
 # ============================================================
 
 
+# PURPOSE: Project with NF3 violations: parent-child REASON overlap
 @pytest.fixture
 def nf3_project(tmp_path):
     """Project with NF3 violations: parent-child REASON overlap"""
@@ -362,9 +398,11 @@ def nf3_project(tmp_path):
     return tmp_path
 
 
+# PURPOSE: R02/R12/R22: Parent-child REASON overlap detected in aggregation
 class TestNF3ParentChildOverlap:
     """R02/R12/R22: Parent-child REASON overlap detected in aggregation"""
 
+    # PURPOSE: Aggregation counts R02 + R12 + R22 NF3 issues
     def test_nf3_count_includes_all_axes(self, checker, nf3_project):
         """Aggregation counts R02 + R12 + R22 NF3 issues"""
         result = checker.check(nf3_project)
@@ -373,6 +411,7 @@ class TestNF3ParentChildOverlap:
         # R22: process_data REASON ≈ worker.py file REASON (same pipeline text)
         assert result.reason_nf3_issues >= 2  # at least R02 + R12
 
+    # PURPOSE: Function with distinct REASON from file is not NF3
     def test_distinct_function_reason_not_counted(self, checker, nf3_project):
         """Function with distinct REASON from file is not NF3"""
         result = checker.check(nf3_project)

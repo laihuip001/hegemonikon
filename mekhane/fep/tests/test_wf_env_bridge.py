@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- tests/ A0→Implementation→test_wf_env_bridge.py
 """Tests for wf_env_bridge — WF turbo inter-step context store."""
 
 import json

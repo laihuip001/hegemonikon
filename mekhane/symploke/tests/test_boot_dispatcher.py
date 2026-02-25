@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- tests/ A0→Implementation→test_boot_dispatcher.py
 """
 Tests for Dispatcher integration in boot_integration.py
 

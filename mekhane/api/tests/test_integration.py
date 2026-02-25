@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- tests/ A0→Implementation→test_integration.py
 """
 Tests for Timeline, Kalon, and Symploke Mnēmē API routes.
 """

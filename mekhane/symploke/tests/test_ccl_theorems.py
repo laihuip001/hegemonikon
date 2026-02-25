@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- tests/ A0→Implementation→test_ccl_theorems.py
 """CCL マクロの定理含有テスト。
 
 各 CCL マクロが期待されるワークフロー (定理) を含んでいるかを検証する。

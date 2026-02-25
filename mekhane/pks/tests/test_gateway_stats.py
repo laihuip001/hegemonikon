@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Mekhane] <- tests/ A0→Implementation→test_gateway_stats.py
 """F6c: Gateway Stats API endpoint tests."""
 
 import pytest

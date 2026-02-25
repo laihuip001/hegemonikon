@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- tests/ A0→Implementation→test_uml_sel_bridge.py
 """UML Phase 2 — SEL 統合テスト"""
 
 import pytest

@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- tests/ A0→Implementation→test_pw_adapter.py
 """Tests for pw_adapter.py — L1↔L2 PW bridge."""
 
 import pytest

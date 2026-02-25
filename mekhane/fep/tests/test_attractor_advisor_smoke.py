@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- tests/ A0→Implementation→test_attractor_advisor_smoke.py
 """Smoke test: attractor_advisor.py が import 可能であることを保証する。
 
 /dia+ で指摘された死角:

@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- tests/ A0→Implementation→test_semantic_agent.py
 """
 Tests for SemanticAgent (L2)
 """

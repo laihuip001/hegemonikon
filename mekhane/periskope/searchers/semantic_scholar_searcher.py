@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- searchers/ A0→Implementation→semantic_scholar_searcher.py
 """
 Semantic Scholar API client for Periskopē.
 

@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Mekhane] <- tests/ A0→Implementation→test_f0_manual.py
 """F0 Tool Use — 手動検証スクリプト.
 
 Usage:

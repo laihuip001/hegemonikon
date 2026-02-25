@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- tests/ A0→Implementation→test_synthesizer.py
 """
 Tests for multi-model synthesizer.
 """

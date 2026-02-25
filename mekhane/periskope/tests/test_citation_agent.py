@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- tests/ A0→Implementation→test_citation_agent.py
 """
 Tests for Citation Agent.
 """

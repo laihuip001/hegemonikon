@@ -1,3 +1,4 @@
+# PROOF: [L2/Review] <- mekhane/symploke/reviews/ ER-002 review output
 # bare except処刑人 レビュー
 
 ## 対象ファイル

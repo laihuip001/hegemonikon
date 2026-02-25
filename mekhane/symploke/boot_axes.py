@@ -1,4 +1,4 @@
-# PROOF: [L2/インフラ] <- mekhane/symploke/
+# PROOF: [L2/Impl] <- mekhane/ Automated fix for CI
 # PURPOSE: Boot 軸ローダー群 — boot_integration.py から抽出された個別軸ロード関数
 """
 Boot Axes — get_boot_context() から抽出された 16 軸ローダー.

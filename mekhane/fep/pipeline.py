@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/fep/ A0->Auto->AddedByCI
 # PROOF: [L2/FEP] <- mekhane/fep/
 # PURPOSE: UML Pre → CCL → Hermēneus → Attractor → PW → Cone → UML Post のE2Eパイプライン
 """

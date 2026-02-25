@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/dendron/ A0->Auto->AddedByCI
 # PROOF: [L2/コア] <- mekhane/dendron/
 """
 Dendron Diff — Git 差分に基づく EPT 変化検出

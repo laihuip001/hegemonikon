@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/fep/ A0->Auto->AddedByCI
 # PROOF: [L2/FEP] <- mekhane/fep/
 # PURPOSE: 6 Series を動的 Attractor として実現する
 """

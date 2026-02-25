@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/ccl/learning/ A0->Auto->AddedByCI
 # PROOF: [L2/インフラ] <- mekhane/ccl/learning/
 # G4: クイズ効果ログ
 

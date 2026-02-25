@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/fep/ A0->Auto->AddedByCI
 # PROOF: [L1/FEP] <- mekhane/fep/
 # PURPOSE: Active Inference の E2E ループを統合実行する
 """

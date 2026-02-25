@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Mekhane] <- mekhane/api/routes/ A0->Auto->AddedByCI
 # PROOF: [L2/インフラ] <- mekhane/api/routes/
 # PURPOSE: Kalon 判定 API — Fix(G∘F) 判定の記録と参照
 """

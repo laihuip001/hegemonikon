@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/fep/ A0->Auto->AddedByCI
 # PROOF: [L1/FEP] <- mekhane/fep/
 # PURPOSE: 96 要素体系の Theorem-Level Attractor — 認知シミュレータ
 """

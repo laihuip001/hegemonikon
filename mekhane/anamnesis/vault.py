@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/anamnesis/ A0->Auto->AddedByCI
 # PROOF: [L2/インフラ] <- mekhane/anamnesis/
 """
 PROOF: [L2/インフラ] このファイルは存在しなければならない

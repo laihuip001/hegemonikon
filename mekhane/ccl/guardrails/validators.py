@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/ccl/guardrails/ A0->Auto->AddedByCI
 # PROOF: [L2/インフラ] <- mekhane/ccl/guardrails/
 # Phase 2: CCL 出力検証
 

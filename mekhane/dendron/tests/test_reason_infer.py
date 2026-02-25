@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/dendron/tests/ A0->Auto->AddedByCI
 # PROOF: [L2/テスト] <- mekhane/dendron/
 # PURPOSE: REASON 自動推定機能の単体テスト
 # REASON: REASON カバレッジ改善 (F1) のために reason_infer.py と同時に作成

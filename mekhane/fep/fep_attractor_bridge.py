@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/fep/ A0->Auto->AddedByCI
 # PROOF: [L1/FEP] <- mekhane/fep/
 # PURPOSE: FEP A行列の学習結果を Attractor の basin 感度にフィードバックする
 """

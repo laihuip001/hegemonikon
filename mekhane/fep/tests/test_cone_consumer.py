@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/fep/tests/ A0->Auto->AddedByCI
 # PROOF: [L3/テスト] <- mekhane/fep/tests/
 # PURPOSE: cone_consumer (advise + devil_attack) のテスト
 """Tests for mekhane.fep.cone_consumer."""

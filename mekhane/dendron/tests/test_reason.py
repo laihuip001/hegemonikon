@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/dendron/tests/ A0->Auto->AddedByCI
 # PROOF: [L2/テスト] <- mekhane/dendron/
 # PURPOSE: R-axis (Reason) 検出機能の単体テスト — Wave 1 (NF1 Surface)
 """

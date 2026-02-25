@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/dendron/ A0->Auto->AddedByCI
 # PROOF: [L2/インフラ] <- mekhane/dendron/
 """
 Skill & Workflow Frontmatter Checker — Safety Contract 検証

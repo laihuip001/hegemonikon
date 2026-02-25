@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/fep/ A0->Auto->AddedByCI
 # PROOF: [L1/定理] <- mekhane/fep/
 # PURPOSE: 48-state FEP Agent v2 — Series 統合認知モデル
 """

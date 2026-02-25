@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/fep/ A0->Auto->AddedByCI
 # PROOF: [L2/FEP] <- mekhane/fep/
 # PURPOSE: FEP 計算用 GPU ユーティリティ — 認知シミュレータの計算基盤
 """

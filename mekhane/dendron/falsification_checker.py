@@ -1,4 +1,3 @@
-# PROOF: [L2/Mekhane] <- mekhane/ A0->Existence
 """
 S7: Falsification Condition Checker
 
@@ -20,6 +19,7 @@ PROJECT_ROOT = Path(__file__).parent.parent.parent
 REGISTRY_PATH = PROJECT_ROOT / "kernel" / "epistemic_status.yaml"
 
 
+# PURPOSE: Load the epistemic status registry
 def load_registry() -> dict:
     """Load the epistemic status registry"""
     if not REGISTRY_PATH.exists():
@@ -30,6 +30,7 @@ def load_registry() -> dict:
         return yaml.safe_load(f)
 
 
+# PURPOSE: Check that all patches have required fields
 def check_completeness(registry: dict) -> list[str]:
     """Check that all patches have required fields"""
     issues = []
@@ -55,6 +56,7 @@ def check_completeness(registry: dict) -> list[str]:
     return issues
 
 
+# PURPOSE: Verify that claims exist in referenced files at specified lines
 def check_file_references(registry: dict) -> list[str]:
     """Verify that claims exist in referenced files at specified lines"""
     issues = []
@@ -97,6 +99,7 @@ def check_file_references(registry: dict) -> list[str]:
     return issues
 
 
+# PURPOSE: Generate summary statistics
 def summary_stats(registry: dict) -> dict:
     """Generate summary statistics"""
     patches = registry.get("patches", {})
@@ -110,6 +113,7 @@ def summary_stats(registry: dict) -> dict:
     }
 
 
+# PURPOSE: Main execution
 def main():
     registry = load_registry()
     

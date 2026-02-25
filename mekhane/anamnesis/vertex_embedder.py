@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- anamnesis/ A0→Implementation→vertex_embedder
 import os
 import logging
 from google import genai

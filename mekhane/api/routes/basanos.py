@@ -25,6 +25,7 @@ router = APIRouter(prefix="/basanos", tags=["basanos"])
 # --- Pydantic Models ---
 
 
+# PURPOSE: Sweep スキャンリクエスト。
 class SweepRequest(BaseModel):
     """Sweep スキャンリクエスト。"""
     filepath: str = Field(..., description="スキャン対象ファイルパス")
@@ -38,6 +39,7 @@ class SweepRequest(BaseModel):
     model: str = Field(default="gemini-2.0-flash", description="使用モデル")
 
 
+# PURPOSE: 検出された1件の issue。
 class SweepIssueResponse(BaseModel):
     """検出された1件の issue。"""
     perspective_id: str
@@ -48,6 +50,7 @@ class SweepIssueResponse(BaseModel):
     recommendation: str = ""
 
 
+# PURPOSE: Sweep スキャン結果。
 class SweepResultResponse(BaseModel):
     """Sweep スキャン結果。"""
     filepath: str
@@ -61,6 +64,7 @@ class SweepResultResponse(BaseModel):
     elapsed_seconds: float = 0.0
 
 
+# PURPOSE: 利用可能な perspective 情報。
 class PerspectiveInfo(BaseModel):
     """利用可能な perspective 情報。"""
     id: str
@@ -69,6 +73,7 @@ class PerspectiveInfo(BaseModel):
     system_instruction: str = ""
 
 
+# PURPOSE: ResponseCache 統計。
 class CacheStatsResponse(BaseModel):
     """ResponseCache 統計。"""
     total_entries: int = 0
@@ -81,6 +86,7 @@ class CacheStatsResponse(BaseModel):
     max_size_mb: float = 0.0
 
 
+# PURPOSE: キャッシュクリア結果。
 class CacheClearResponse(BaseModel):
     """キャッシュクリア結果。"""
     cleared: int = 0
@@ -90,6 +96,7 @@ class CacheClearResponse(BaseModel):
 # --- Routes ---
 
 
+# PURPOSE: ファイルを指定して多視点 sweep スキャンを実行。
 @router.post("/sweep", response_model=SweepResultResponse)
 async def sweep(request: SweepRequest):
     """ファイルを指定して多視点 sweep スキャンを実行。"""
@@ -139,6 +146,7 @@ async def sweep(request: SweepRequest):
         raise HTTPException(status_code=500, detail=f"Sweep failed: {exc}")
 
 
+# PURPOSE: 利用可能な perspective の一覧を取得。
 @router.get("/perspectives", response_model=list[PerspectiveInfo])
 async def list_perspectives():
     """利用可能な perspective の一覧を取得。"""
@@ -162,6 +170,7 @@ async def list_perspectives():
         raise HTTPException(status_code=500, detail=f"Failed: {exc}")
 
 
+# PURPOSE: ResponseCache の統計情報を取得。
 @router.get("/cache/stats", response_model=CacheStatsResponse)
 async def cache_stats():
     """ResponseCache の統計情報を取得。"""
@@ -192,6 +201,7 @@ async def cache_stats():
         raise HTTPException(status_code=500, detail=f"Cache stats failed: {exc}")
 
 
+# PURPOSE: ResponseCache をクリアする。
 @router.post("/cache/clear", response_model=CacheClearResponse)
 async def cache_clear():
     """ResponseCache をクリアする。"""
@@ -213,6 +223,7 @@ async def cache_clear():
 # --- L2 Structural Deficit Scan ---
 
 
+# PURPOSE: L2 で検出された deficit の1件。
 class L2DeficitItem(BaseModel):
     """L2 で検出された deficit の1件。"""
     type: str  # eta, epsilon-impl, epsilon-just, delta
@@ -223,6 +234,7 @@ class L2DeficitItem(BaseModel):
     suggested_action: str = ""
 
 
+# PURPOSE: L2 構造的差分スキャン結果。
 class L2ScanResponse(BaseModel):
     """L2 構造的差分スキャン結果。"""
     total: int = 0
@@ -232,6 +244,7 @@ class L2ScanResponse(BaseModel):
     error: str = ""
 
 
+# PURPOSE: L2 構造的差分スキャンを実行しサマリーを返す。
 @router.get("/l2/scan", response_model=L2ScanResponse)
 async def l2_scan():
     """L2 構造的差分スキャンを実行しサマリーを返す。"""
@@ -272,6 +285,7 @@ async def l2_scan():
         return L2ScanResponse(status="error", error=str(exc))
 
 
+# PURPOSE: 履歴レコード1件。
 class L2HistoryRecord(BaseModel):
     """履歴レコード1件。"""
     timestamp: str
@@ -280,12 +294,14 @@ class L2HistoryRecord(BaseModel):
     by_type: dict[str, int] = Field(default_factory=dict)
 
 
+# PURPOSE: 履歴一覧レスポンス。
 class L2HistoryResponse(BaseModel):
     """履歴一覧レスポンス。"""
     records: list[L2HistoryRecord] = Field(default_factory=list)
     count: int = 0
 
 
+# PURPOSE: トレンド分析レスポンス。
 class L2TrendResponse(BaseModel):
     """トレンド分析レスポンス。"""
     direction: str = "unknown"  # improving, worsening, stable
@@ -296,6 +312,7 @@ class L2TrendResponse(BaseModel):
     window: int = 0
 
 
+# PURPOSE: L2 deficit スキャン履歴を取得。
 @router.get("/l2/history", response_model=L2HistoryResponse)
 async def l2_history(limit: int = 20):
     """L2 deficit スキャン履歴を取得。"""
@@ -318,6 +335,7 @@ async def l2_history(limit: int = 20):
         return L2HistoryResponse()
 
 
+# PURPOSE: L2 deficit トレンドを取得。
 @router.get("/l2/trend", response_model=L2TrendResponse)
 async def l2_trend(window: int = 10):
     """L2 deficit トレンドを取得。"""
@@ -331,6 +349,7 @@ async def l2_trend(window: int = 10):
         return L2TrendResponse()
 
 
+# PURPOSE: 解決提案1件。
 class L2ResolutionItem(BaseModel):
     """解決提案1件。"""
     question: str
@@ -342,6 +361,7 @@ class L2ResolutionItem(BaseModel):
     status: str = "proposed"
 
 
+# PURPOSE: L3 自動解決レスポンス。
 class L2ResolveResponse(BaseModel):
     """L3 自動解決レスポンス。"""
     resolutions: list[L2ResolutionItem] = Field(default_factory=list)
@@ -349,6 +369,7 @@ class L2ResolveResponse(BaseModel):
     error: str = ""
 
 
+# PURPOSE: L3 自動解決ループ: deficit→問い→解決策を返す。
 @router.get("/l2/resolve", response_model=L2ResolveResponse)
 async def l2_resolve(limit: int = 5):
     """L3 自動解決ループ: deficit→問い→解決策を返す。"""

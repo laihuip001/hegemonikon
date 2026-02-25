@@ -15,9 +15,11 @@ sys.path.insert(0, str(Path(__file__).parent.parent.parent.parent))
 
 # ============ mneme: search_papers ============
 
+# PURPOSE: gnosis → mneme に移植した search_papers のテスト
 class TestMnemeSearchPapers:
     """gnosis → mneme に移植した search_papers のテスト"""
 
+    # PURPOSE: 正常ケース: 論文検索で結果が返る
     @pytest.mark.asyncio
     async def test_search_papers_returns_results(self):
         """正常ケース: 論文検索で結果が返る"""
@@ -46,6 +48,7 @@ class TestMnemeSearchPapers:
             assert "Karl Friston" in text
             assert "100" in text
 
+    # PURPOSE: 空クエリでエラーメッセージ
     @pytest.mark.asyncio
     async def test_search_papers_empty_query(self):
         """空クエリでエラーメッセージ"""
@@ -54,6 +57,7 @@ class TestMnemeSearchPapers:
         result = await _handle_search_papers({"query": ""})
         assert "Error" in result[0].text
 
+    # PURPOSE: 結果なしのケース
     @pytest.mark.asyncio
     async def test_search_papers_no_results(self):
         """結果なしのケース"""
@@ -69,9 +73,11 @@ class TestMnemeSearchPapers:
 
 # ============ mneme: recommend_model ============
 
+# PURPOSE: gnosis → mneme に移植した recommend_model のテスト
 class TestMnemeRecommendModel:
     """gnosis → mneme に移植した recommend_model のテスト"""
 
+    # PURPOSE: P1: セキュリティタスク → Claude
     @pytest.mark.asyncio
     async def test_p1_security(self):
         """P1: セキュリティタスク → Claude"""
@@ -82,6 +88,7 @@ class TestMnemeRecommendModel:
         assert "P1" in text
         assert "Claude" in text
 
+    # PURPOSE: P2: 画像/UI タスク → Gemini
     @pytest.mark.asyncio
     async def test_p2_visual(self):
         """P2: 画像/UI タスク → Gemini"""
@@ -92,6 +99,7 @@ class TestMnemeRecommendModel:
         assert "P2" in text
         assert "Gemini" in text
 
+    # PURPOSE: P4: 高速/バッチタスク → Gemini Flash
     @pytest.mark.asyncio
     async def test_p4_batch(self):
         """P4: 高速/バッチタスク → Gemini Flash"""
@@ -102,6 +110,7 @@ class TestMnemeRecommendModel:
         assert "P4" in text
         assert "Gemini Flash" in text
 
+    # PURPOSE: P5: マッチなし → Claude (default)
     @pytest.mark.asyncio
     async def test_p5_default(self):
         """P5: マッチなし → Claude (default)"""
@@ -112,6 +121,7 @@ class TestMnemeRecommendModel:
         assert "P5" in text
         assert "Claude" in text
 
+    # PURPOSE: 空の task_description でエラー
     @pytest.mark.asyncio
     async def test_empty_description(self):
         """空の task_description でエラー"""
@@ -123,9 +133,11 @@ class TestMnemeRecommendModel:
 
 # ============ mneme: backlinks ============
 
+# PURPOSE: sophia → mneme に移植した backlinks のテスト
 class TestMnemeBacklinks:
     """sophia → mneme に移植した backlinks のテスト"""
 
+    # PURPOSE: バックリンクが正しく返る
     @pytest.mark.asyncio
     async def test_backlinks_returns_links(self):
         """バックリンクが正しく返る"""
@@ -142,6 +154,7 @@ class TestMnemeBacklinks:
             assert "KI_A" in text
             assert "KI_B" in text
 
+    # PURPOSE: 空の ki_name でエラー
     @pytest.mark.asyncio
     async def test_backlinks_empty_ki(self):
         """空の ki_name でエラー"""
@@ -153,9 +166,11 @@ class TestMnemeBacklinks:
 
 # ============ mneme: graph_stats ============
 
+# PURPOSE: sophia → mneme に移植した graph_stats のテスト
 class TestMnemeGraphStats:
     """sophia → mneme に移植した graph_stats のテスト"""
 
+    # PURPOSE: グラフ統計が返る
     @pytest.mark.asyncio
     async def test_graph_stats_returns_stats(self):
         """グラフ統計が返る"""
@@ -179,9 +194,11 @@ class TestMnemeGraphStats:
 
 # ============ ochema: jules API key pool ============
 
+# PURPOSE: jules → ochema に移植した API key pool のテスト
 class TestOchemaJulesPool:
     """jules → ochema に移植した API key pool のテスト"""
 
+    # PURPOSE: API key pool の初期化
     def test_jules_init_pool(self):
         """API key pool の初期化"""
         import mekhane.mcp.ochema_mcp_server as ochema
@@ -193,6 +210,7 @@ class TestOchemaJulesPool:
             ochema._jules_init_pool()
             assert len(ochema._jules_api_key_pool) >= 3
 
+    # PURPOSE: Round-robin でキーが巡回する
     def test_jules_get_key_round_robin(self):
         """Round-robin でキーが巡回する"""
         import mekhane.mcp.ochema_mcp_server as ochema
@@ -209,6 +227,7 @@ class TestOchemaJulesPool:
         assert key2 == "key_b"
         assert key3 == "key_c"
 
+    # PURPOSE: 空プールでは None を返す
     def test_jules_get_key_empty_pool(self):
         """空プールでは None を返す"""
         import mekhane.mcp.ochema_mcp_server as ochema
@@ -222,9 +241,11 @@ class TestOchemaJulesPool:
 
 # ============ ochema: jules handler ============
 
+# PURPOSE: jules → ochema に移植した _handle_jules のテスト
 class TestOchemaJulesHandler:
     """jules → ochema に移植した _handle_jules のテスト"""
 
+    # PURPOSE: 必須パラメータ不足でエラー
     @pytest.mark.asyncio
     async def test_jules_create_task_missing_params(self):
         """必須パラメータ不足でエラー"""
@@ -238,6 +259,7 @@ class TestOchemaJulesHandler:
         result = await _handle_jules("jules_create_task", {"prompt": "", "repo": ""})
         assert "Error" in result[0].text
 
+    # PURPOSE: session_id 不足でエラー
     @pytest.mark.asyncio
     async def test_jules_get_status_missing_id(self):
         """session_id 不足でエラー"""
@@ -251,6 +273,7 @@ class TestOchemaJulesHandler:
         result = await _handle_jules("jules_get_status", {"session_id": ""})
         assert "Error" in result[0].text
 
+    # PURPOSE: list_repos は stub メッセージを返す
     @pytest.mark.asyncio
     async def test_jules_list_repos(self):
         """list_repos は stub メッセージを返す"""
@@ -264,6 +287,7 @@ class TestOchemaJulesHandler:
         result = await _handle_jules("jules_list_repos", {})
         assert "Repositories" in result[0].text
 
+    # PURPOSE: API キーなしでエラー
     @pytest.mark.asyncio
     async def test_jules_no_api_keys(self):
         """API キーなしでエラー"""
@@ -277,6 +301,7 @@ class TestOchemaJulesHandler:
             result = await _handle_jules("jules_create_task", {"prompt": "test", "repo": "owner/repo"})
             assert "Error" in result[0].text or "No JULES" in result[0].text
 
+    # PURPOSE: 空タスクリストでエラー
     @pytest.mark.asyncio
     async def test_jules_batch_empty_tasks(self):
         """空タスクリストでエラー"""
@@ -293,6 +318,7 @@ class TestOchemaJulesHandler:
 
 # ============ digestor: semantic scholar ============
 
+# PURPOSE: semantic-scholar → digestor に移植した S2 tools のテスト
 class TestDigestorS2:
     """semantic-scholar → digestor に移植した S2 tools のテスト"""
 
@@ -310,6 +336,7 @@ class TestDigestorS2:
         p.authors = ["Author A", "Author B"]
         return p
 
+    # PURPOSE: paper_search で結果が返る
     @pytest.mark.asyncio
     async def test_paper_search_returns_results(self):
         """paper_search で結果が返る"""
@@ -326,6 +353,7 @@ class TestDigestorS2:
             assert "Test Paper" in text
             assert "42" in text
 
+    # PURPOSE: 空クエリでエラー
     @pytest.mark.asyncio
     async def test_paper_search_empty_query(self):
         """空クエリでエラー"""
@@ -334,6 +362,7 @@ class TestDigestorS2:
         result = await handle_semantic_scholar("paper_search", {"query": ""})
         assert "Error" in result[0].text
 
+    # PURPOSE: paper_details で論文詳細が返る
     @pytest.mark.asyncio
     async def test_paper_details_returns_info(self):
         """paper_details で論文詳細が返る"""
@@ -350,6 +379,7 @@ class TestDigestorS2:
             assert "FEP Paper" in text
             assert "42" in text
 
+    # PURPOSE: 空 paper_id でエラー
     @pytest.mark.asyncio
     async def test_paper_details_empty_id(self):
         """空 paper_id でエラー"""
@@ -358,6 +388,7 @@ class TestDigestorS2:
         result = await handle_semantic_scholar("paper_details", {"paper_id": ""})
         assert "Error" in result[0].text
 
+    # PURPOSE: paper_citations で被引用論文リストが返る
     @pytest.mark.asyncio
     async def test_paper_citations_returns_list(self):
         """paper_citations で被引用論文リストが返る"""
@@ -374,6 +405,7 @@ class TestDigestorS2:
             assert "Citing Paper" in text
             assert "10" in text
 
+    # PURPOSE: 空 paper_id でエラー
     @pytest.mark.asyncio
     async def test_paper_citations_empty_id(self):
         """空 paper_id でエラー"""
@@ -385,9 +417,11 @@ class TestDigestorS2:
 
 # ============ sympatheia: basanos_scan ============
 
+# PURPOSE: basanos_scan ツールのテスト
 class TestSympatheiBasanosScan:
     """basanos_scan ツールのテスト"""
 
+    # PURPOSE: AIAuditor が正しくインポートできる
     @pytest.mark.asyncio
     async def test_basanos_import_ok(self):
         """AIAuditor が正しくインポートできる"""
@@ -395,6 +429,7 @@ class TestSympatheiBasanosScan:
         auditor = AIAuditor(strict=False)
         assert auditor is not None
 
+    # PURPOSE: path 未指定でエラー
     @pytest.mark.asyncio
     async def test_basanos_scan_missing_path(self):
         """path 未指定でエラー"""
@@ -402,6 +437,7 @@ class TestSympatheiBasanosScan:
         result = await _handle_basanos_scan({})
         assert "Error" in result[0].text
 
+    # PURPOSE: 存在しないパスでエラー
     @pytest.mark.asyncio
     async def test_basanos_scan_nonexistent_path(self):
         """存在しないパスでエラー"""
@@ -409,6 +445,7 @@ class TestSympatheiBasanosScan:
         result = await _handle_basanos_scan({"path": "/nonexistent/file.py"})
         assert "not found" in result[0].text
 
+    # PURPOSE: 正常ケース: 単一ファイルスキャン
     @pytest.mark.asyncio
     async def test_basanos_scan_file(self, tmp_path):
         """正常ケース: 単一ファイルスキャン"""
@@ -424,9 +461,11 @@ class TestSympatheiBasanosScan:
 
 # ============ sympatheia: peira_health ============
 
+# PURPOSE: peira_health ツールのテスト
 class TestSympatheiaPeiraHealth:
     """peira_health ツールのテスト"""
 
+    # PURPOSE: run_health_check / format_terminal が正しくインポートできる
     @pytest.mark.asyncio
     async def test_peira_import_ok(self):
         """run_health_check / format_terminal が正しくインポートできる"""
@@ -434,6 +473,7 @@ class TestSympatheiaPeiraHealth:
         assert callable(run_health_check)
         assert callable(format_terminal)
 
+    # PURPOSE: peira_health がテキスト結果を返す
     @pytest.mark.asyncio
     async def test_peira_health_returns_text(self):
         """peira_health がテキスト結果を返す"""
@@ -447,9 +487,11 @@ class TestSympatheiaPeiraHealth:
 
 # ============ mneme: dendron_check ============
 
+# PURPOSE: dendron_check ツールのテスト
 class TestMnemeDendronCheck:
     """dendron_check ツールのテスト"""
 
+    # PURPOSE: DendronChecker が正しくインポートできる
     @pytest.mark.asyncio
     async def test_dendron_import_ok(self):
         """DendronChecker が正しくインポートできる"""
@@ -457,6 +499,7 @@ class TestMnemeDendronCheck:
         checker = DendronChecker()
         assert checker is not None
 
+    # PURPOSE: path 未指定でエラー
     @pytest.mark.asyncio
     async def test_dendron_check_missing_path(self):
         """path 未指定でエラー"""
@@ -464,6 +507,7 @@ class TestMnemeDendronCheck:
         result = await _handle_dendron_check({})
         assert "Error" in result[0].text or "path" in result[0].text.lower()
 
+    # PURPOSE: 存在しないパスでエラー
     @pytest.mark.asyncio
     async def test_dendron_check_nonexistent_path(self):
         """存在しないパスでエラー"""
@@ -471,6 +515,7 @@ class TestMnemeDendronCheck:
         result = await _handle_dendron_check({"path": "/nonexistent/file.py"})
         assert "not found" in result[0].text or "Error" in result[0].text
 
+    # PURPOSE: 正常ケース: PROOF ヘッダー付きファイル
     @pytest.mark.asyncio
     async def test_dendron_check_file(self, tmp_path):
         """正常ケース: PROOF ヘッダー付きファイル"""

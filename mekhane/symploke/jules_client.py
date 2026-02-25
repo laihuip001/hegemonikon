@@ -17,7 +17,12 @@ Usage:
 """
 
 import asyncio
-import aiohttp
+try:
+    import aiohttp
+    HAS_AIOHTTP = True
+except ImportError:
+    aiohttp = None
+    HAS_AIOHTTP = False
 import functools
 import logging
 import os
@@ -173,7 +178,7 @@ def with_retry(
     backoff_factor: float = 2.0,
     initial_delay: float = 1.0,
     max_delay: float = 60.0,
-    retryable_exceptions: tuple = (RateLimitError, aiohttp.ClientError),
+    retryable_exceptions: tuple = (RateLimitError, getattr(aiohttp, "ClientError", Exception)) if HAS_AIOHTTP else (RateLimitError,),
 ):
     """
     Decorator for async functions with exponential backoff retry.
@@ -255,7 +260,7 @@ class JulesClient:
     def __init__(
         self,
         api_key: Optional[str] = None,
-        session: Optional[aiohttp.ClientSession] = None,
+        session: Optional["aiohttp.ClientSession"] = None,
         max_concurrent: Optional[int] = None,
         base_url: Optional[str] = None,
     ):
@@ -268,6 +273,9 @@ class JulesClient:
             max_concurrent: Global concurrency limit. Defaults to MAX_CONCURRENT.
             base_url: Override API base URL. Also reads JULES_BASE_URL env var.
         """
+        if not HAS_AIOHTTP:
+            raise ImportError("aiohttp is required for JulesClient")
+
         self.api_key = api_key or os.environ.get("JULES_API_KEY")
         if not self.api_key:
             raise ValueError("API key required. Set JULES_API_KEY or pass api_key.")
@@ -306,7 +314,7 @@ class JulesClient:
             self._owned_session = None
 
     @property
-    def _session(self) -> aiohttp.ClientSession:
+    def _session(self) -> "aiohttp.ClientSession":
         """Get the active session (shared or owned)."""
         return self._shared_session or self._owned_session or aiohttp.ClientSession()
 

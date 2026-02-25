@@ -68,6 +68,7 @@ def _encode_submessage_field(field_number: int, submsg: bytes) -> bytes:
     tag = _varint_encode((field_number << 3) | 2)
     return tag + _varint_encode(len(submsg)) + submsg
 
+# PURPOSE: Decode SubscribeToUnifiedStateSyncTopicRequest { string topic = 1 }
 def decode_subscribe_request(data: bytes) -> str:
     """Decode SubscribeToUnifiedStateSyncTopicRequest { string topic = 1 }.
     
@@ -92,6 +93,7 @@ def decode_subscribe_request(data: bytes) -> str:
                 return field_data.decode("utf-8")
     return ""
 
+# PURPOSE: ConnectRPC streaming envelope: flags(1) + length(4) + data
 def encode_connect_streaming_message(payload: bytes) -> bytes:
     """ConnectRPC streaming envelope: flags(1) + length(4) + data."""
     flags = 0  # no compression
@@ -101,6 +103,7 @@ def encode_connect_streaming_message(payload: bytes) -> bytes:
 
 # ====== OAuth Token Management ======
 
+# PURPOSE: OAuthTokenInfo protobuf structure
 class OAuthTokenInfo:
     """OAuthTokenInfo protobuf structure."""
     
@@ -116,6 +119,7 @@ class OAuthTokenInfo:
         self.refresh_token = refresh_token
         self.expiry_seconds = expiry_seconds
     
+    # PURPOSE: Serialize to protobuf binary
     def to_proto_bytes(self) -> bytes:
         """Serialize to protobuf binary.
         
@@ -136,6 +140,7 @@ class OAuthTokenInfo:
             result += _encode_submessage_field(4, ts_body)
         return result
 
+    # PURPOSE: Deserialize from protobuf binary
     @classmethod
     def from_proto_bytes(cls, data: bytes) -> OAuthTokenInfo:
         """Deserialize from protobuf binary."""
@@ -182,6 +187,7 @@ class OAuthTokenInfo:
 OAUTH_SENTINEL_KEY = "oauthTokenInfoSentinelKey"
 
 
+# PURPOSE: Build Topic protobuf for uss-oauth
 def build_uss_oauth_topic(token_info: OAuthTokenInfo) -> bytes:
     """Build Topic protobuf for uss-oauth.
     
@@ -205,6 +211,7 @@ def build_uss_oauth_topic(token_info: OAuthTokenInfo) -> bytes:
     return topic
 
 
+# PURPOSE: IDE の state.vscdb から OAuth トークンを読み取る
 def read_token_from_ide() -> OAuthTokenInfo | None:
     """IDE の state.vscdb から OAuth トークンを読み取る."""
     db_path = Path.home() / ".config" / "Antigravity" / "User" / "globalStorage" / "state.vscdb"
@@ -257,6 +264,7 @@ def _read_proto_field(data: bytes, offset: int) -> tuple[int, bytes, int]:
 
 # ====== ConnectRPC Handler ======
 
+# PURPOSE: ConnectRPC compatible HTTP handler
 class FakeExtensionServerHandler(http.server.BaseHTTPRequestHandler):
     """ConnectRPC compatible HTTP handler."""
 
@@ -266,6 +274,7 @@ class FakeExtensionServerHandler(http.server.BaseHTTPRequestHandler):
     _lock = threading.Lock()
     _token_update_events: list[threading.Event] = []
 
+    # PURPOSE: token_info を設定する
     @classmethod
     def set_token_info(cls, info: OAuthTokenInfo) -> None:
         cls._token_info = info
@@ -275,9 +284,11 @@ class FakeExtensionServerHandler(http.server.BaseHTTPRequestHandler):
             for ev in cls._token_update_events:
                 ev.set()
 
+    # PURPOSE: message を記録する
     def log_message(self, format, *args):
         logger.debug("HTTP: %s", format % args)
 
+    # PURPOSE: do_POST の処理
     def do_POST(self):
         path = self.path
         content_length = int(self.headers.get("Content-Length", 0))
@@ -363,6 +374,7 @@ class FakeExtensionServerHandler(http.server.BaseHTTPRequestHandler):
         return b""
 
 
+# PURPOSE: HTTP サーバー起動
 def serve(port: int, token_info: OAuthTokenInfo) -> http.server.HTTPServer:
     """HTTP サーバー起動."""
     FakeExtensionServerHandler.set_token_info(token_info)
@@ -371,6 +383,7 @@ def serve(port: int, token_info: OAuthTokenInfo) -> http.server.HTTPServer:
     return server
 
 
+# PURPOSE: main の処理
 def main() -> None:
     parser = argparse.ArgumentParser(description="Fake Extension Server (ConnectRPC)")
     parser.add_argument("--port", type=int, default=50051)

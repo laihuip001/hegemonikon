@@ -34,6 +34,7 @@ from mekhane.peira.theorem_activity import (
 
 # --- Doctrine Parser ---
 
+# PURPOSE: doctrine.md の統一随伴表から正本マッピングを抽出。
 def parse_adjunction_table(doctrine_path: Path) -> dict[str, str]:
     """
     doctrine.md の統一随伴表から正本マッピングを抽出。
@@ -67,6 +68,7 @@ def parse_adjunction_table(doctrine_path: Path) -> dict[str, str]:
     return canonical
 
 
+# PURPOSE: doctrine.md の定理群テーブルから Series 名を抽出。
 def parse_series_definitions(doctrine_path: Path) -> dict[str, str]:
     """
     doctrine.md の定理群テーブルから Series 名を抽出。
@@ -91,6 +93,7 @@ def parse_series_definitions(doctrine_path: Path) -> dict[str, str]:
 
 # --- Fixtures ---
 
+# PURPOSE: doctrine.md から正本マッピングを取得
 @pytest.fixture(scope="module")
 def canonical_mapping():
     """doctrine.md から正本マッピングを取得"""
@@ -98,6 +101,7 @@ def canonical_mapping():
     return parse_adjunction_table(DOCTRINE_PATH)
 
 
+# PURPOSE: doctrine.md から Series 名を取得
 @pytest.fixture(scope="module")
 def series_names():
     """doctrine.md から Series 名を取得"""
@@ -106,9 +110,11 @@ def series_names():
 
 # --- Tests ---
 
+# PURPOSE: THEOREM_WORKFLOWS テーブルの整合性検証
 class TestTheoremWorkflowsIntegrity:
     """THEOREM_WORKFLOWS テーブルの整合性検証"""
 
+    # PURPOSE: 24定理が全て定義されていること
     def test_all_24_theorems_present(self):
         """24定理が全て定義されていること"""
         assert len(THEOREM_WORKFLOWS) == 24, (
@@ -116,6 +122,7 @@ class TestTheoremWorkflowsIntegrity:
             f"{sorted(THEOREM_WORKFLOWS.keys())}"
         )
 
+    # PURPOSE: WF ID が doctrine.md の統一随伴表と一致すること
     def test_wf_ids_match_doctrine(self, canonical_mapping):
         """WF ID が doctrine.md の統一随伴表と一致すること"""
         doctrine_ids = set(canonical_mapping.keys())
@@ -134,6 +141,7 @@ class TestTheoremWorkflowsIntegrity:
             f"{extra_in_table}"
         )
 
+    # PURPOSE: 定理の Series 番号 (O1, S2, ...) が doctrine.md と一致すること
     def test_series_numbers_match_doctrine(self, canonical_mapping):
         """定理の Series 番号 (O1, S2, ...) が doctrine.md と一致すること"""
         mismatches = []
@@ -156,6 +164,7 @@ class TestTheoremWorkflowsIntegrity:
             "\n".join(mismatches)
         )
 
+    # PURPOSE: 各 Series (O/S/H/P/K/A) に4つの定理が存在すること
     def test_series_coverage(self):
         """各 Series (O/S/H/P/K/A) に4つの定理が存在すること"""
         series_count: dict[str, int] = {}
@@ -173,6 +182,7 @@ class TestTheoremWorkflowsIntegrity:
                 f"Series {series} has {count} theorems, expected 4"
             )
 
+    # PURPOSE: 各 Series 内で定理番号が 1-4 であること
     def test_theorem_numbers_sequential(self):
         """各 Series 内で定理番号が 1-4 であること"""
         series_nums: dict[str, list[int]] = {}
@@ -187,9 +197,11 @@ class TestTheoremWorkflowsIntegrity:
             )
 
 
+# PURPOSE: WF ファイルの存在検証
 class TestWorkflowFilesExist:
     """WF ファイルの存在検証"""
 
+    # PURPOSE: 全24定理の WF ファイルが存在すること
     def test_all_theorem_wf_files_exist(self):
         """全24定理の WF ファイルが存在すること"""
         missing = []
@@ -203,6 +215,7 @@ class TestWorkflowFilesExist:
             "\n".join(missing)
         )
 
+    # PURPOSE: 全 Peras WF ファイルが存在すること
     def test_all_peras_wf_files_exist(self):
         """全 Peras WF ファイルが存在すること"""
         missing = []
@@ -217,9 +230,11 @@ class TestWorkflowFilesExist:
         )
 
 
+# PURPOSE: HUB_EXPANSION テーブルの整合性検証
 class TestHubExpansionIntegrity:
     """HUB_EXPANSION テーブルの整合性検証"""
 
+    # PURPOSE: HUB_EXPANSION の展開先が全て THEOREM_WORKFLOWS に存在すること
     def test_hub_wf_ids_are_valid_theorems(self):
         """HUB_EXPANSION の展開先が全て THEOREM_WORKFLOWS に存在すること"""
         invalid = []
@@ -236,6 +251,7 @@ class TestHubExpansionIntegrity:
             "\n".join(invalid)
         )
 
+    # PURPOSE: 各 Series Peras が対応する4定理を展開すること
     def test_hub_covers_all_series(self):
         """各 Series Peras が対応する4定理を展開すること"""
         series_map = {"o": "O", "s": "S", "h": "H", "p": "P", "k": "K", "a": "A"}
@@ -256,6 +272,7 @@ class TestHubExpansionIntegrity:
                 f"HUB '{hub_id}' expands to {len(expanded)} theorems, expected 4"
             )
 
+    # PURPOSE: /ax が全24定理を展開すること
     def test_ax_covers_all_24(self):
         """/ax が全24定理を展開すること"""
         assert "ax" in HUB_EXPANSION
@@ -266,9 +283,11 @@ class TestHubExpansionIntegrity:
         assert not missing, f"/ax が展開しない定理: {missing}"
 
 
+# PURPOSE: MACRO_EXPANSION テーブルの整合性検証
 class TestMacroExpansionIntegrity:
     """MACRO_EXPANSION テーブルの整合性検証"""
 
+    # PURPOSE: MACRO_EXPANSION の展開先が全て THEOREM_WORKFLOWS に存在すること
     def test_macro_wf_ids_are_valid_theorems(self):
         """MACRO_EXPANSION の展開先が全て THEOREM_WORKFLOWS に存在すること"""
         invalid = []
@@ -285,12 +304,14 @@ class TestMacroExpansionIntegrity:
             "\n".join(invalid)
         )
 
+    # PURPOSE: 全マクロが少なくとも1つの定理を展開すること
     def test_macro_definitions_not_empty(self):
         """全マクロが少なくとも1つの定理を展開すること"""
         empty = [m for m, wfs in MACRO_EXPANSION.items() if not wfs]
         assert not empty, f"空のマクロ定義: {empty}"
 
 
+# PURPOSE: SKILL ディレクトリの存在検証
 class TestSkillDirectoriesExist:
     """SKILL ディレクトリの存在検証"""
 
@@ -303,6 +324,7 @@ class TestSkillDirectoriesExist:
         "A": "akribeia",
     }
 
+    # PURPOSE: 全 Series の SKILL ディレクトリが存在すること
     def test_all_series_skill_dirs_exist(self):
         """全 Series の SKILL ディレクトリが存在すること"""
         missing = []

@@ -39,6 +39,7 @@ def _is_safe_path(path: str) -> bool:
 
 # ─── File Operations ──────────────────────────────────────────
 
+# PURPOSE: List directory entries with name, is_dir, size, children count
 @router.get("/files/list")
 async def list_directory(
     path: str = Query(default="/home/makaron8426/oikos/hegemonikon"),
@@ -79,6 +80,7 @@ async def list_directory(
     return {"entries": entries, "path": path}
 
 
+# PURPOSE: Read file content as text
 @router.get("/files/read")
 async def read_file(
     path: str = Query(...),
@@ -106,6 +108,7 @@ async def read_file(
 
 # ─── Terminal ─────────────────────────────────────────────────
 
+# PURPOSE: Terminal request の実装
 class TerminalRequest(BaseModel):
     command: str
     cwd: str = "/home/makaron8426/oikos/hegemonikon"
@@ -118,6 +121,7 @@ BLOCKED_COMMANDS = {
 }
 
 
+# PURPOSE: Execute a shell command and return output
 @router.post("/terminal/execute")
 async def execute_command(req: TerminalRequest) -> dict[str, Any]:
     """Execute a shell command and return output."""
@@ -161,6 +165,7 @@ async def execute_command(req: TerminalRequest) -> dict[str, Any]:
 
 # ─── Git Operations ──────────────────────────────────────────
 
+# PURPOSE: Get git status (changed files) for a repository
 @router.get("/git/status")
 async def git_status(
     repo: str = Query(default="/home/makaron8426/oikos/hegemonikon"),
@@ -198,6 +203,7 @@ async def git_status(
         raise HTTPException(500, f"Git status error: {exc}")
 
 
+# PURPOSE: Get git diff for a file or entire repo
 @router.get("/git/diff")
 async def git_diff(
     repo: str = Query(default="/home/makaron8426/oikos/hegemonikon"),
@@ -236,6 +242,7 @@ async def git_diff(
 
 # ─── Ochema (AI with Tools) ──────────────────────────────────
 
+# PURPOSE: Ochema request の実装
 class OchemaRequest(BaseModel):
     message: str
     model: str = "gemini-2.0-flash"
@@ -245,6 +252,7 @@ class OchemaRequest(BaseModel):
     thinking_budget: int | None = None
 
 
+# PURPOSE: Proxy to Cortex API ask_with_tools
 @router.post("/ochema/ask_with_tools")
 async def ask_with_tools(req: OchemaRequest) -> dict[str, Any]:
     """Proxy to Cortex API ask_with_tools."""

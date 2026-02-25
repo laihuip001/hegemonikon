@@ -48,6 +48,7 @@ from mekhane.ochema.proto import MODEL_ALIASES, DEFAULT_MODEL, resolve_model
 
 # --- ANSI Colors ---
 
+# PURPOSE: ANSI color codes
 class C:
     """ANSI color codes."""
     BOLD = "\033[1m"
@@ -62,6 +63,7 @@ class C:
 
 # --- Display Helpers ---
 
+# PURPOSE: LLM 応答を整形出力する。
 def print_response(resp: LLMResponse) -> None:
     """LLM 応答を整形出力する。"""
     # Thinking (折りたたみ)
@@ -82,6 +84,7 @@ def print_response(resp: LLMResponse) -> None:
     print(f"\n{C.DIM}[{model_display}]{C.RESET}")
 
 
+# PURPOSE: Quota 情報を整形出力する。
 def print_quota(client: AntigravityClient) -> None:
     """Quota 情報を整形出力する。"""
     try:
@@ -106,6 +109,7 @@ def print_quota(client: AntigravityClient) -> None:
     print(f"\n{C.DIM}Total: {quota.get('total_models', 0)} models{C.RESET}")
 
 
+# PURPOSE: 利用可能なモデルエイリアスを表示。
 def print_models() -> None:
     """利用可能なモデルエイリアスを表示。"""
     print(f"\n{C.BOLD}🤖 Available Models{C.RESET}\n")
@@ -117,6 +121,7 @@ def print_models() -> None:
     print(f"\n{C.DIM}Use --model <alias> or --model MODEL_xxx{C.RESET}")
 
 
+# PURPOSE: 対話モード (REPL)。
 def repl(client: AntigravityClient, model: str, timeout: float) -> None:
     """対話モード (REPL)。"""
     model_short = model.replace("MODEL_", "").replace("_", " ").title()
@@ -173,6 +178,7 @@ def repl(client: AntigravityClient, model: str, timeout: float) -> None:
 
 # --- Main ---
 
+# PURPOSE: main の処理
 def main() -> None:
     parser = argparse.ArgumentParser(
         description="Headless Claude/Gemini CLI via Language Server",

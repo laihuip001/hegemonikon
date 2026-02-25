@@ -29,6 +29,7 @@ export async function renderSearch(): Promise<void> {
         const color = SOURCE_COLORS[key] ?? '#8b949e';
         return `<button class="search-source-chip ${active ? 'active' : ''}"
       data-source="${esc(key)}"
+      aria-pressed="${active}"
       style="--chip-color: ${color}">
       ${label}
     </button>`;
@@ -40,8 +41,9 @@ export async function renderSearch(): Promise<void> {
       <div style="display:flex; gap:0.5rem; margin-bottom:0.75rem;">
         <input type="text" id="symploke-search-input" class="input"
           placeholder="すべての知識ソースを横断検索..."
+          aria-label="検索キーワード"
           style="flex:1; font-size:1.05rem;" />
-        <button id="symploke-search-btn" class="btn">検索</button>
+        <button id="symploke-search-btn" class="btn" aria-label="検索">検索</button>
       </div>
       <div id="search-source-filters" style="display:flex; gap:0.4rem; flex-wrap:wrap;">
         ${sourceChips}
@@ -59,9 +61,11 @@ export async function renderSearch(): Promise<void> {
             if (searchActiveSources.has(source)) {
                 searchActiveSources.delete(source);
                 chip.classList.remove('active');
+                chip.setAttribute('aria-pressed', 'false');
             } else {
                 searchActiveSources.add(source);
                 chip.classList.add('active');
+                chip.setAttribute('aria-pressed', 'true');
             }
         });
     });
@@ -69,6 +73,11 @@ export async function renderSearch(): Promise<void> {
     const doSearch = async (): Promise<void> => {
         const query = searchInput.value.trim();
         if (!query) return;
+
+        const originalBtnText = searchBtn.innerHTML;
+        searchBtn.disabled = true;
+        searchBtn.innerHTML = '<span class="thinking-dots" style="display:inline-flex; transform:scale(0.8); vertical-align:middle; margin-right:4px;"><span style="background:white"></span><span style="background:white"></span><span style="background:white"></span></span> 検索中...';
+
         const resultsDiv = document.getElementById('symploke-search-results')!;
         resultsDiv.innerHTML = '<div class="loading">検索中...</div>';
 
@@ -117,6 +126,9 @@ export async function renderSearch(): Promise<void> {
             applyStaggeredFadeIn(resultsDiv);
         } catch (e) {
             resultsDiv.innerHTML = `<div class="card status-error">検索失敗: ${esc((e as Error).message)}</div>`;
+        } finally {
+            searchBtn.disabled = false;
+            searchBtn.innerHTML = originalBtnText;
         }
     };
 

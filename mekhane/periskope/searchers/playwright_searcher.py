@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- searchers/ A0→Implementation→playwright_searcher.py
 """
 Playwright-based searcher for Periskopē.
 

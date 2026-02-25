@@ -955,9 +955,6 @@
 }
 
 .chat-hint {
-  appearance: none;
-  font-family: inherit;
-  color: var(--text-color);
   background: var(--card-bg);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-md);
@@ -971,11 +968,6 @@
   border-color: var(--primary-color);
   background: var(--primary-glow);
   color: var(--text-color);
-}
-
-.chat-hint:focus-visible {
-  outline: 2px solid var(--primary-color);
-  outline-offset: 2px;
 }
 
 /* Messages */

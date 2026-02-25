@@ -89,10 +89,13 @@ class TestMeaningfulTraceContextRegression:
             save_traces,
             load_traces,
             clear_session_traces,
+            set_traces_path,
         )
 
         with tempfile.TemporaryDirectory() as tmpdir:
             path = Path(tmpdir) / "traces.json"
+            # Override global path to avoid PermissionError in CI
+            set_traces_path(path)
 
             # Write a trace with context
             clear_session_traces()

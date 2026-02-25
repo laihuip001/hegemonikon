@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Mekhane] <- routes/ A0→Implementation→wal
 # PROOF: [L2/インフラ] <- mekhane/api/routes/
 # PURPOSE: Intent-WAL ダッシュボードカード API — WAL ステータス・履歴の閲覧
 """

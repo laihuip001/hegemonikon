@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Mekhane] <- pks/ A0→Implementation→attractor_context
 # PROOF: [L2/インフラ] <- mekhane/pks/ A0→Attractor+PKS接続が必要→attractor_context が担う
 """
 Attractor → PKS コンテキスト変換ブリッジ

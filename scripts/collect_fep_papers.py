@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L3/Utility] <- scripts/ A0→Implementation→collect_fep_papers
 # PROOF: [L3/ユーティリティ] <- scripts/ O4→FEP 知識基盤の体系的構築
 # PURPOSE: FEP 関連論文のバッチ収集 + Gnōsis 投入
 """

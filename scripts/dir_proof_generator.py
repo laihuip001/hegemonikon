@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L3/Utility] <- scripts/ A0→Implementation→dir_proof_generator
 # PROOF: [L2/ツール] <- scripts/
 # PURPOSE: PROOF.md が欠落しているソースディレクトリに自動生成する。コンテキストを読んで適切な説明を付与。
 """

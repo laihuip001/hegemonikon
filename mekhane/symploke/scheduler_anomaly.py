@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Mekhane] <- symploke/ A0→Implementation→scheduler_anomaly
 # PROOF: [L2/ドメイン] <- mekhane/symploke/ O4→scheduler異常検知→自律監視
 """F22: Scheduler Anomaly Detector — 成功率低下や連続失敗を検知し Sympatheia に通知する。
 

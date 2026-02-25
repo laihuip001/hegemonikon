@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Mekhane] <- symploke/ A0→Implementation→persona
 # PROOF: [L2/インフラ] <- mekhane/symploke/ A0→継続する私が必要→persona が担う
 """
 Persona - セッション間の人格永続化

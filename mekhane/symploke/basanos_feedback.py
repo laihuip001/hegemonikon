@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Mekhane] <- symploke/ A0→Implementation→basanos_feedback
 # PROOF: [L2/分析] <- mekhane/symploke/ A4→品質フィードバック→basanos_feedback が担う
 # PURPOSE: Basanos Perspective の品質フィードバック — レビュー結果から有用性スコアを蓄積
 """

@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L3/Utility] <- scripts/ A0→Implementation→adjunction_status
 # PROOF: [L1/スクリプト] <- scripts/
 """adjunction_status.py — 12随伴ペアの実装状態をWFファイルからスキャン
 

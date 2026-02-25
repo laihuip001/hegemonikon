@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Mekhane] <- tekhne/ A0→Implementation→pipeline
 # PROOF: [L2/インフラ] <- mekhane/ergasterion/tekhne/ A0→SweepEngine部品の統合→end-to-endパイプライン
 """
 Tekhne Pipeline — SweepEngine end-to-end orchestrator.

@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L3/Utility] <- scripts/ A0→Implementation→gnosis_index_update
 # PROOF: [L2/インフラ] <- scripts/
 # PURPOSE: Gnōsis インデックスの増分更新
 """

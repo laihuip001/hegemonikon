@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Mekhane] <- indices/ A0→Implementation→gnosis_lance_bridge
 # PROOF: [L2/インフラ] <- mekhane/symploke/indices/ A0→LanceDB Gnōsis への直接アクセスが必要
 """
 Gnōsis LanceDB Bridge — Anamnesis LanceDB を Symplokē DomainIndex として公開

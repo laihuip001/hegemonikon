@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- adapters/ A0→Implementation→base
 # noqa: AI-ALL
 """
 # PROOF: [L2/インフラ] <- mekhane/symploke/adapters/ A0→ベクトルDBアダプタが必要→base が担う

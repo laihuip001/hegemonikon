@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L3/Utility] <- scripts/ A0→Implementation→context_generator
 # PROOF: [L2/自動化] <- scripts/ F6 設計 (designs/f6_context_auto_update.md) の実装 Phase 1
 """
 Context Generator — context/ ファイルの自動更新スケルトン

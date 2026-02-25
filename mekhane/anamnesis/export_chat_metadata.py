@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Mekhane] <- anamnesis/ A0→Implementation→export_chat_metadata
 # PROOF: [L2/インフラ] <- mekhane/anamnesis/ A0→セッション記録の永続化→メタデータ抽出が担う
 """
 Antigravity IDE チャット履歴メタデータ エクスポーター

@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L3/Utility] <- scripts/ A0→Implementation→generate_jules_context
 # PURPOSE: Generate domain-specific context files for Jules specialist reviews
 """
 Generate Jules Context Files

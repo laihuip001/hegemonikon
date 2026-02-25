@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Mekhane] <- symploke/ A0→Implementation→phase2_remaining
 # PROOF: [L3/ユーティリティ] <- mekhane/symploke/ O4→実行スクリプトが必要→phase2_remaining が担う
 """
 Jules 専門家定義: Phase 2 運用・実務層 続き (Layer 11-15: 120人)

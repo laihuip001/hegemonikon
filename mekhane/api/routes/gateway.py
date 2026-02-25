@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Mekhane] <- routes/ A0→Implementation→gateway
 # PROOF: [L2/インフラ] <- mekhane/api/routes/
 # PURPOSE: MCP Gateway のステータスと管理 API
 """

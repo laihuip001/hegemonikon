@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L3/Utility] <- scripts/ A0→Implementation→bye_persist
 # PROOF: [L2/インフラ] <- mekhane/symploke/ H4→永続化を自動化
 """
 /bye 永続化自動化スクリプト

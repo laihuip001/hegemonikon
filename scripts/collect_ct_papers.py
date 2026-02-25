@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L3/Utility] <- scripts/ A0→Implementation→collect_ct_papers
 # PROOF: [L3/ユーティリティ] <- scripts/ O4→圏論×AI論文のバッチ収集
 # PURPOSE: Semantic Scholar API で圏論関連論文を体系的に収集
 """

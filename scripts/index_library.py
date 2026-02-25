@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L3/Utility] <- scripts/ A0→Implementation→index_library
 # PROOF: [L2/インフラ] <- scripts/
 # PURPOSE: Library プロンプトのベクトルインデックス構築
 """

@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L3/Utility] <- scripts/ A0→Implementation→refactor_brain_modules
 # PROOF: [L3/移行] <- scripts/
 # PURPOSE: brain モジュールのリファクタリング自動化
 """

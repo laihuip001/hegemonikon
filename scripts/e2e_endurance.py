@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L3/Utility] <- scripts/ A0→Implementation→e2e_endurance
 # PROOF: [L3/ユーティリティ] <- scripts/
 # PURPOSE: FEP E2E v2 30分耐久テスト — 自律学習の証明
 """

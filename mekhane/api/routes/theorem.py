@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Mekhane] <- routes/ A0→Implementation→theorem
 # PROOF: [L2/API] <- mekhane/api/routes/
 # PURPOSE: Theorem Usage API — Dashboard 向け定理使用頻度データ
 """

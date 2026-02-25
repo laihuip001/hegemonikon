@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L3/Utility] <- scripts/ A0→Implementation→purpose_batch_add
 # PROOF: [L2/ツール] <- scripts/
 # PURPOSE: docstringと関数名から PURPOSE コメントを自動生成し、不足している関数に一括追加する
 """

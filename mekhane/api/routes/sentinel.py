@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Mekhane] <- routes/ A0→Implementation→sentinel
 # PROOF: [L2/Sentinel] <- mekhane/api/routes/
 # PURPOSE: Paper Sentinel API — 論文スキャン結果の提供
 """

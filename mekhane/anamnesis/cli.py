@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- anamnesis/ A0→Implementation→cli
 # noqa: AI-ALL
 # PROOF: [L2/インフラ] <- mekhane/anamnesis/
 """

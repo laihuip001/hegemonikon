@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- pks/ A0→Implementation→matrix_view
 # noqa: AI-ALL
 # PROOF: [L2/インフラ] <- mekhane/pks/
 """

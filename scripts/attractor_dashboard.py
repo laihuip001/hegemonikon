@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L3/Utility] <- scripts/ A0→Implementation→attractor_dashboard
 # PROOF: [L3/ユーティリティ] <- scripts/
 # PURPOSE: Attractor Engine ダッシュボード — mixture, inhibition, E/I flow の可視化
 """

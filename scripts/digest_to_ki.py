@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L3/Utility] <- scripts/ A0→Implementation→digest_to_ki
 # PROOF: [L2/インフラ] <- scripts/ 「回す」パイプライン: 論文→消化→KI
 """
 digest_to_ki.py — Digestor → Sophia KI 自動パイプライン

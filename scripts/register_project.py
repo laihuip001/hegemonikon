@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L3/Utility] <- scripts/ A0→Implementation→register_project
 # PROOF: [L2/インフラ] <- projects.yaml A0→新規PJの可視化が必要→register_project が担う
 """
 Project Registration Script

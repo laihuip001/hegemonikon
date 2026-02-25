@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Mekhane] <- routes/ A0→Implementation→basanos
 # PROOF: [L2/インフラ] <- mekhane/api/routes/
 # PURPOSE: Basanos — 多視点スキャン (SweepEngine) + L2 構造的差分スキャン REST API
 """

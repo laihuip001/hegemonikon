@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L3/Utility] <- scripts/ A0→Implementation→handoff_retention
 """Handoff 情報保存率 (R) の定量測定スクリプト.
 
 HGK ブートストラップの十分条件 S2:

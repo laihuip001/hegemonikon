@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Mekhane] <- symploke/ A0→Implementation→kairos_ingest
 # PROOF: [L2/インフラ] <- mekhane/symploke/ A0→知識管理が必要→kairos_ingest が担う
 """
 Kairos Ingest - Handoff を Kairos インデックスに自動投入

@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L3/Utility] <- scripts/ A0→Implementation→gnosis_advisor
 # PROOF: [L2/運用] <- scripts/
 # PURPOSE: Gnōsis 知識の能動的活用 — WF/タスクに関連する学術知見を自動提示
 """

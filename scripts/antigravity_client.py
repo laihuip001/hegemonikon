@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L3/Utility] <- scripts/ A0→Implementation→antigravity_client
 # PROOF: [L1/スクリプト] <- scripts/
 """Antigravity LLM Client — 4-Step API Wrapper.
 

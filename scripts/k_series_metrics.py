@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L3/Utility] <- scripts/ A0→Implementation→k_series_metrics
 """K-series metrics: Handoff からの K-series 出現頻度を計測する。
 
 Usage:

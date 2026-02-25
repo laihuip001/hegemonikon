@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Mekhane] <- exagoge/ A0→Implementation→ki_exporter
 # PROOF: [L2/コア] <- mekhane/exagoge/
 # PURPOSE: Knowledge Item (KI) データのエクスポート機能
 """

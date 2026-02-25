@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L3/Utility] <- scripts/ A0→Implementation→wf_postcheck
 # PROOF: [L2/運用] <- scripts/
 # PURPOSE: ワークフロー実行後の品質検証
 """

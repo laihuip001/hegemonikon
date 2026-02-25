@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L3/Utility] <- scripts/ A0→Implementation→boot_gnosis
 # PROOF: [L2/インフラ] <- scripts/
 # PURPOSE: Gnōsis ベクトルインデックスのブート時自動構築
 """Gnōsis Boot Integration — /boot Phase 3 expansion.

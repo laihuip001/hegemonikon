@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Mekhane] <- dendron/ A0→Implementation→migrate
 # PROOF: [L2/インフラ] <- mekhane/dendron/
 """
 Dendron 親参照移行スクリプト

@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L3/Utility] <- scripts/ A0→Implementation→hermeneus_mcp
 # PROOF: [L2/インフラ] <- hermeneus MCP サーバー起動ラッパー
 """
 Hermēneus MCP Server Launcher

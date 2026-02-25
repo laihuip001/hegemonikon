@@ -271,7 +271,7 @@ function renderMessage(msg: ChatMessage, index: number): string {
         <span class="chat-msg-role">${isUser ? '👤 You' : '🤖 AI'}</span>
         ${modelTag}
         <span class="chat-msg-time">${formatTime(msg.timestamp)}</span>
-        <button class="chat-msg-delete" title="削除" data-idx="${index}">✕</button>
+        <button class="chat-msg-delete" title="削除" aria-label="メッセージを削除" data-idx="${index}">✕</button>
       </div>
       <div class="chat-msg-body">${rendered}</div>
     </div>
@@ -289,9 +289,9 @@ function renderMessages(): void {
         <div class="chat-empty-title">Hegemonikón Chat</div>
         <div class="chat-empty-subtitle">AI と対話を始めましょう</div>
         <div class="chat-empty-hints">
-          <span class="chat-hint">HGK の現在の方向性は？</span>
-          <span class="chat-hint">FEP を簡単に説明して</span>
-          <span class="chat-hint">CCL の @helm を解説</span>
+          <button type="button" class="chat-hint">HGK の現在の方向性は？</button>
+          <button type="button" class="chat-hint">FEP を簡単に説明して</button>
+          <button type="button" class="chat-hint">CCL の @helm を解説</button>
         </div>
       </div>
     `;
@@ -336,6 +336,7 @@ function addCopyButtons(container: HTMLElement): void {
         btn.className = 'code-copy-btn';
         btn.textContent = '📋';
         btn.title = 'コピー';
+        btn.ariaLabel = 'コードをクリップボードにコピー';
         btn.addEventListener('click', () => {
             const code = pre.querySelector('code')?.textContent ?? pre.textContent ?? '';
             void navigator.clipboard.writeText(code).then(() => {
@@ -412,7 +413,7 @@ async function handleSend(retryText?: string): Promise<void> {
         const errMsg = esc((err as Error).message);
         errorDiv.innerHTML = `
             <div class="chat-msg-body">⚠️ ${errMsg}</div>
-            <button class="btn btn-sm btn-outline chat-retry-btn" style="margin-top:0.5rem;">🔄 再送</button>
+            <button class="btn btn-sm btn-outline chat-retry-btn" style="margin-top:0.5rem;" aria-label="再送">🔄 再送</button>
         `;
         messagesDiv?.appendChild(errorDiv);
         // F5: retry button
@@ -532,11 +533,11 @@ export async function renderChatView(): Promise<void> {
           </span>
         </div>
         <div class="chat-header-right">
-          <select id="chat-model-select" class="input chat-model-select">
+          <select id="chat-model-select" class="input chat-model-select" aria-label="AIモデルを選択">
             ${modelOptions}
           </select>
-          <button id="chat-settings-btn" class="btn btn-sm btn-outline" title="API キー設定">⚙️</button>
-          <button id="chat-clear-btn" class="btn btn-sm btn-outline" title="履歴クリア">🗑️</button>
+          <button id="chat-settings-btn" class="btn btn-sm btn-outline" title="API キー設定" aria-label="API キー設定">⚙️</button>
+          <button id="chat-clear-btn" class="btn btn-sm btn-outline" title="履歴クリア" aria-label="履歴クリア">🗑️</button>
         </div>
       </div>
 

@@ -11,6 +11,7 @@ from mekhane.periskope.citation_agent import CitationAgent
 
 # ── Unit Tests ──
 
+# PURPOSE: Exact substring should return 1.0
 def test_compute_similarity_exact():
     """Exact substring should return 1.0."""
     agent = CitationAgent()
@@ -21,6 +22,7 @@ def test_compute_similarity_exact():
     assert result == 1.0
 
 
+# PURPOSE: Partial match should return intermediate score
 def test_compute_similarity_partial():
     """Partial match should return intermediate score."""
     agent = CitationAgent()
@@ -31,6 +33,7 @@ def test_compute_similarity_partial():
     assert 0.0 < result < 1.0
 
 
+# PURPOSE: No match should return low score
 def test_compute_similarity_none():
     """No match should return low score."""
     agent = CitationAgent()
@@ -41,6 +44,7 @@ def test_compute_similarity_none():
     assert result < 0.3
 
 
+# PURPOSE: Should extract claims with [Source N] references
 def test_extract_claims():
     """Should extract claims with [Source N] references."""
     agent = CitationAgent()
@@ -61,6 +65,7 @@ def test_extract_claims():
     assert "https://b.com" in urls
 
 
+# PURPOSE: Text without [Source N] should produce no citations
 def test_extract_claims_no_refs():
     """Text without [Source N] should produce no citations."""
     agent = CitationAgent()
@@ -69,6 +74,7 @@ def test_extract_claims_no_refs():
     assert citations == []
 
 
+# PURPOSE: Verification with pre-fetched content should classify correctly
 @pytest.mark.asyncio
 async def test_verify_with_content():
     """Verification with pre-fetched content should classify correctly."""
@@ -93,6 +99,7 @@ async def test_verify_with_content():
     assert verified[0].similarity > 0.3
 
 
+# PURPOSE: Citation without URL should be TAINT
 @pytest.mark.asyncio
 async def test_verify_no_url():
     """Citation without URL should be TAINT."""
@@ -105,6 +112,7 @@ async def test_verify_no_url():
     assert "No source URL" in verified[0].verification_note
 
 
+# PURPOSE: Citation without claim should be UNCHECKED
 @pytest.mark.asyncio
 async def test_verify_no_claim():
     """Citation without claim should be UNCHECKED."""
@@ -116,6 +124,7 @@ async def test_verify_no_claim():
     assert verified[0].taint_level == TaintLevel.UNCHECKED
 
 
+# PURPOSE: Completely unrelated claim should be FABRICATED
 @pytest.mark.asyncio
 async def test_verify_fabricated():
     """Completely unrelated claim should be FABRICATED."""

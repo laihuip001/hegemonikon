@@ -29,6 +29,7 @@ BLOCKED_DOMAINS = {
 }
 
 
+# PURPOSE: Fetch and extract full text from web pages
 class PageFetcher:
     """Fetch and extract full text from web pages.
 
@@ -51,6 +52,7 @@ class PageFetcher:
         self._playwright = None  # Lazy-init
         self._cache: dict[str, str | None] = {}  # URL → content cache
 
+    # PURPOSE: Fetch a single URL and extract text content
     async def fetch_one(self, url: str) -> str | None:
         """Fetch a single URL and extract text content.
 
@@ -87,6 +89,7 @@ class PageFetcher:
         self._cache[url] = None
         return None
 
+    # PURPOSE: Fetch multiple URLs in parallel with concurrency limit
     async def fetch_many(
         self,
         urls: list[str],

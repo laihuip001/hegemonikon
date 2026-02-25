@@ -8,17 +8,24 @@ Tests if the API key is valid and can connect to Jules.
 import asyncio
 import os
 import sys
+from pathlib import Path
 import pytest
 
 # Add parent to path
-sys.path.insert(0, "/home/makaron8426/oikos/hegemonikon")
+sys.path.insert(0, str(Path(__file__).parents[3]))
 
-from mekhane.symploke.jules_client import JulesClient
+try:
+    import aiohttp
+    from mekhane.symploke.jules_client import JulesClient
+except ImportError:
+    aiohttp = None  # type: ignore
+    JulesClient = None  # type: ignore
 
 
 # PURPOSE: Test API connection by listing sources
 @pytest.mark.asyncio
 @pytest.mark.skipif(not os.environ.get("JULES_API_KEY"), reason="JULES_API_KEY not set")
+@pytest.mark.skipif(aiohttp is None, reason="aiohttp not installed")
 async def test_connection():
     """Test API connection by listing sources."""
     api_key = os.environ.get("JULES_API_KEY")

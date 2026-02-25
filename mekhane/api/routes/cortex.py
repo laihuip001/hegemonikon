@@ -1,3 +1,5 @@
+# PROOF: [L3/API] <- mekhane/api/routes/cortex.py A0→Implementation→cortex
+# PURPOSE: Implementation of cortex
 from typing import Any, AsyncGenerator
 
 import asyncio

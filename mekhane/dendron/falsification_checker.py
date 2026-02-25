@@ -1,3 +1,5 @@
+# PROOF: [L2/Mekhane] <- mekhane/dendron/falsification_checker.py A0→Implementation→falsification_checker
+# PURPOSE: Implementation of falsification_checker
 """
 S7: Falsification Condition Checker
 

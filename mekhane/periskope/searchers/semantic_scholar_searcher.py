@@ -1,3 +1,5 @@
+# PROOF: [L2/Mekhane] <- mekhane/periskope/searchers/semantic_scholar_searcher.py A0→Implementation→semantic_scholar_searcher
+# PURPOSE: Implementation of semantic_scholar_searcher
 """
 Semantic Scholar API client for Periskopē.
 

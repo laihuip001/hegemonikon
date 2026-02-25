@@ -1,3 +1,5 @@
+# PROOF: [L2/Mekhane] <- mekhane/periskope/models.py A0→Implementation→models
+# PURPOSE: Implementation of models
 """
 Periskopē data models.
 

@@ -1,3 +1,4 @@
+# PROOF: [L2/Review] <- mekhane/symploke/reviews/ NM-007 Boolean naming review
 # ブール命名の審判 レビュー
 
 ## 対象ファイル

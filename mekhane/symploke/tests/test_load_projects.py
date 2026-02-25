@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+# PROOF: [L2/品質] <- mekhane/symploke/tests/boot_integration の最適化検証
 """Test for _load_projects function in boot_integration.py."""
 
 import sys

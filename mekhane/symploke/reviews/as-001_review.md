@@ -1,3 +1,4 @@
+# PROOF: [L2/Impl] <- mekhane/ Automated fix for CI
 # await忘れ検出者 レビュー
 
 ## 対象ファイル

@@ -1,4 +1,4 @@
-# PROOF: [L2/Periskope] <- /app/mekhane/periskope/citation_agent.py
+# PROOF: [L2/Periskope] <- mekhane/periskope/citation_agent.py
 """
 Citation verification agent for Periskopē.
 

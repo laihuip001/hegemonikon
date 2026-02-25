@@ -1,4 +1,4 @@
-# PROOF: [L2/Ochema] <- /app/mekhane/ochema/fake_extension_server.py
+# PROOF: [L2/Ochema] <- mekhane/ochema/fake_extension_server.py
 """Fake Extension Server — ConnectRPC over HTTP.
 
 LS は ConnectRPC (extension_server_go_proto_connect) で Extension Server に接続する。

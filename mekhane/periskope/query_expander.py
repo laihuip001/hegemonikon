@@ -1,4 +1,4 @@
-# PROOF: [L2/Periskope] <- /app/mekhane/periskope/query_expander.py
+# PROOF: [L2/Periskope] <- mekhane/periskope/query_expander.py
 """
 Query expander for Periskopē.
 

@@ -1,4 +1,4 @@
-# PROOF: [L2/API] <- /app/mekhane/api/routes/cortex.py
+# PROOF: [L2/API] <- mekhane/api/routes/cortex.py
 from typing import Any, AsyncGenerator
 
 import asyncio

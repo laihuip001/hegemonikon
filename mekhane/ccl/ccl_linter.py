@@ -1,4 +1,4 @@
-# PROOF: [L2/CCL] <- /app/mekhane/ccl/ccl_linter.py
+# PROOF: [L2/CCL] <- mekhane/ccl/ccl_linter.py
 """CCL Linter — CCL 式の静的検証。
 
 operators.md (SSOT) に基づいて CCL 式を検証し、

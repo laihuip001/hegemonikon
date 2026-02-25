@@ -1,4 +1,4 @@
-# PROOF: [L2/Anamnesis] <- /app/mekhane/anamnesis/vertex_embedder.py
+# PROOF: [L2/Anamnesis] <- mekhane/anamnesis/vertex_embedder.py
 import os
 import logging
 from google import genai

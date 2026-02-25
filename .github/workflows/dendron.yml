@@ -41,9 +41,7 @@ jobs:
         run: pip install pyyaml
 
       # L1: PROOF Header Check (blocking)
-      # L1: PROOF Header Check (blocking - but mekhane has debt, so continue-on-error)
       - name: "L1: PROOF Header Check"
-        continue-on-error: true
         run: |
           export PYTHONPATH=${{ github.workspace }}
           python -m mekhane.dendron.cli check mekhane/ --ci --format ci
@@ -72,7 +70,7 @@ jobs:
         continue-on-error: true
         run: |
           export PYTHONPATH=${{ github.workspace }}
-          python -m mekhane.dendron.cli check mekhane/ --ept --format ci
+          python -m mekhane.dendron.cli check mekhane/ --ci --format ci
 
       - name: Upload Coverage Report
         if: always()

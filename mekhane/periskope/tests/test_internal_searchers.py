@@ -1,3 +1,4 @@
+# PROOF: [L2/Search] <- mekhane/periskope/tests/ A0→Implementation→test_internal_searchers.py
 """
 Tests for internal searchers (Gnōsis, Sophia, Kairos).
 """

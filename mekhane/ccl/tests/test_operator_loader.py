@@ -1,3 +1,4 @@
+# PROOF: [L2/Language] <- mekhane/ccl/tests/ A0→Implementation→test_operator_loader.py
 """G6: dispatch E2E テスト + G9: Linter テスト + operator_loader テスト。"""
 
 import pytest

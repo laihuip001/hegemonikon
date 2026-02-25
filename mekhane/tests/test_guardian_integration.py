@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/tests/ A0→Implementation→test_guardian_integration.py
 """
 Guardian Integration Tests — /bou ② テスト守護者
 

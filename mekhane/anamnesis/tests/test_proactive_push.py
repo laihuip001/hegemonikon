@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/anamnesis/tests/ A0→Implementation→test_proactive_push.py
 """Proactive Push + Link Graph のテスト."""
 
 import json

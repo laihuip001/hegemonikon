@@ -1,3 +1,4 @@
+<!-- PROOF: [L2/Review] <- A2 (Krisis) -->
 # HTTPS推進者 レビュー
 
 ## 対象ファイル

@@ -122,12 +122,11 @@ def _load_projects(project_root: Path) -> dict:
         if not projects:
             return result
 
-        active = [p for p in projects if p.get("status") == "active"]
-        dormant = [p for p in projects if p.get("status") == "dormant"]
-        archived = [p for p in projects if p.get("status") == "archived"]
+        # Optimization: Single pass to filter status and categorize
+        active = []
+        dormant = []
+        archived = []
 
-        lines = ["📦 **Projects** (registry.yaml)"]
-        # Group by category based on path patterns
         categories = {
             "コアランタイム": [],
             "Mekhane モジュール": [],
@@ -135,9 +134,17 @@ def _load_projects(project_root: Path) -> dict:
             "研究・概念": [],
             "補助": [],
         }
+
         for p in projects:
-            path = p.get("path", "")
             status = p.get("status", "")
+            if status == "active":
+                active.append(p)
+            elif status == "dormant":
+                dormant.append(p)
+            elif status == "archived":
+                archived.append(p)
+
+            path = p.get("path", "")
             if status == "archived":
                 categories["補助"].append(p)
             elif path.startswith("mekhane/"):
@@ -150,6 +157,8 @@ def _load_projects(project_root: Path) -> dict:
                 categories["補助"].append(p)
             else:
                 categories["コアランタイム"].append(p)
+
+        lines = ["📦 **Projects** (registry.yaml)"]
 
         status_icons = {"active": "🟢", "dormant": "💤", "archived": "🗄️", "planned": "📋"}
         for cat_name, cat_projects in categories.items():

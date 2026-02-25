@@ -1,0 +1,6 @@
+❌ Purpose: 110/119 OK (92.4%), 0 weak, 9 missing
+  ❌ mekhane/dendron/falsification_checker.py:23 load_registry
+  ❌ mekhane/dendron/falsification_checker.py:33 check_completeness
+  ❌ mekhane/dendron/falsification_checker.py:58 check_file_references
+  ❌ mekhane/dendron/falsification_checker.py:100 summary_stats
+  ❌ mekhane/dendron/falsification_checker.py:113 main

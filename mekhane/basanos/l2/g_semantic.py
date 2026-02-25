@@ -1,3 +1,4 @@
+# PROOF: [L2/Basanos] <- mekhane/basanos/l2/ A0→AutoFix
 # PURPOSE: G_semantic — LLM で HGK 専門用語を一般学術用語に翻訳する
 # REASON: G = G_struct ∘ G_semantic の G_semantic 部分。外部比較のために HGK 語彙を汎化する
 """G_semantic: LLM-based translation of HGK terms to general academic terms.
@@ -59,6 +60,7 @@ STATIC_TRANSLATIONS: dict[str, str] = {
 }
 
 
+# PURPOSE: Translate HGK-specific terms to general academic vocabulary
 class GSemantic:
     """Translate HGK-specific terms to general academic vocabulary.
 
@@ -76,6 +78,7 @@ class GSemantic:
         """
         self.use_llm = use_llm
 
+    # PURPOSE: Translate HGK terms in ExternalForm to general terms
     def translate(self, external_form: ExternalForm) -> ExternalForm:
         """Translate HGK terms in ExternalForm to general terms.
 

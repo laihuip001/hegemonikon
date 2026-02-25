@@ -18,6 +18,7 @@ MNEME = Path.home() / "oikos" / "mneme" / ".hegemonikon"
 SENTINEL_DIR = MNEME / "sentinel"
 
 
+# PURPOSE: 最新の Sentinel サマリーを返す
 @router.get("/latest")
 async def sentinel_latest():
     """最新の Sentinel サマリーを返す"""
@@ -32,6 +33,7 @@ async def sentinel_latest():
         return {"status": "error", "message": str(e)}
 
 
+# PURPOSE: Sentinel レポート一覧を返す
 @router.get("/reports")
 async def sentinel_reports(limit: int = 10):
     """Sentinel レポート一覧を返す"""
@@ -50,6 +52,7 @@ async def sentinel_reports(limit: int = 10):
     return {"reports": reports, "total": len(reports)}
 
 
+# PURPOSE: 特定日のレポート内容を返す
 @router.get("/report/{date}")
 async def sentinel_report(date: str):
     """特定日のレポート内容を返す"""

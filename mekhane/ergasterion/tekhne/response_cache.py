@@ -36,6 +36,7 @@ DEFAULT_TTL = 86400 * 7  # 7 days
 MAX_CACHE_SIZE_MB = 100  # Auto-evict oldest when exceeded
 
 
+# PURPOSE: Cache usage statistics
 @dataclass
 class CacheStats:
     """Cache usage statistics."""
@@ -46,15 +47,18 @@ class CacheStats:
     misses: int
     oldest_age_hours: float
 
+    # PURPOSE: size_mb の処理
     @property
     def size_mb(self) -> float:
         return self.size_bytes / (1024 * 1024)
 
+    # PURPOSE: hit_rate の処理
     @property
     def hit_rate(self) -> float:
         total = self.hits + self.misses
         return self.hits / total if total > 0 else 0.0
 
+    # PURPOSE: summary の処理
     def summary(self) -> str:
         return (
             f"Cache: {self.total_entries} entries, {self.size_mb:.1f} MB, "
@@ -62,6 +66,7 @@ class CacheStats:
         )
 
 
+# PURPOSE: Content-addressable file cache for LLM responses
 class ResponseCache:
     """Content-addressable file cache for LLM responses.
 
@@ -87,6 +92,7 @@ class ResponseCache:
         # Ensure cache directory exists
         self.cache_dir.mkdir(parents=True, exist_ok=True)
 
+    # PURPOSE: Return current cache configuration as a dict
     def to_config_dict(self) -> dict:
         """Return current cache configuration as a dict."""
         return {
@@ -111,6 +117,7 @@ class ResponseCache:
         """Get file path for a cache key (2-level directory for filesystem perf)."""
         return self.cache_dir / key[:2] / f"{key}.json"
 
+    # PURPOSE: Retrieve cached response
     def get(
         self,
         prompt: str,
@@ -155,6 +162,7 @@ class ResponseCache:
             self._misses += 1
             return None
 
+    # PURPOSE: Store response in cache
     def put(
         self,
         prompt: str,
@@ -199,6 +207,7 @@ class ResponseCache:
 
         return key
 
+    # PURPOSE: Remove a specific cache entry
     def invalidate(
         self,
         prompt: str,
@@ -217,6 +226,7 @@ class ResponseCache:
             return True
         return False
 
+    # PURPOSE: Clear all cache entries
     def clear(self) -> int:
         """Clear all cache entries.
 
@@ -234,6 +244,7 @@ class ResponseCache:
         logger.info("Cache cleared: %d entries removed", count)
         return count
 
+    # PURPOSE: Evict oldest entries until under target size
     def evict_oldest(self, target_mb: Optional[float] = None) -> int:
         """Evict oldest entries until under target size.
 
@@ -275,6 +286,7 @@ class ResponseCache:
 
         return evicted
 
+    # PURPOSE: Get cache usage statistics
     def stats(self) -> CacheStats:
         """Get cache usage statistics."""
         entries = list(self.cache_dir.rglob("*.json"))

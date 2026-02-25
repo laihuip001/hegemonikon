@@ -29,12 +29,14 @@ pytestmark = pytest.mark.skipif(not HAS_OPENAI, reason="OPENAI_API_KEY not set")
 # ═══ Fixtures ═══════════════════════════════════════════════
 
 
+# PURPOSE: OpenAI Backend (module scope for cost efficiency)
 @pytest.fixture(scope="module")
 def backend():
     """OpenAI Backend (module scope for cost efficiency)"""
     return OpenAIBackend(model="gpt-4o-mini")
 
 
+# PURPOSE: SemanticAgent with OpenAI backend
 @pytest.fixture(scope="module")
 def agent(backend):
     """SemanticAgent with OpenAI backend"""
@@ -44,13 +46,16 @@ def agent(backend):
 # ═══ Test 1: Backend Connectivity ═══════════════════════════
 
 
+# PURPOSE: OpenAI Backend 疎通テスト
 class TestOpenAIConnectivity:
     """OpenAI Backend 疎通テスト"""
 
+    # PURPOSE: API key が設定されていれば利用可能
     def test_backend_is_available(self, backend):
         """API key が設定されていれば利用可能"""
         assert backend.is_available()
 
+    # PURPOSE: 簡単なクエリで JSON 応答を返す
     def test_backend_query_returns_json(self, backend):
         """簡単なクエリで JSON 応答を返す"""
         response = backend.query(
@@ -73,9 +78,11 @@ Hegemonikón は FEP (Free Energy Principle) に基づく認知ハイパーバ�
 """
 
 
+# PURPOSE: 実 HGK ドキュメントの L2 監査
 class TestRealDocumentAudit:
     """実 HGK ドキュメントの L2 監査"""
 
+    # PURPOSE: 実ドキュメントの L2 監査が AgentResult を返す
     def test_clean_document_audit(self, agent):
         """実ドキュメントの L2 監査が AgentResult を返す"""
         target = AuditTarget(
@@ -113,9 +120,11 @@ FEP は必要ないが、念のため採用した。
 """
 
 
+# PURPOSE: 意図的欠陥文書の SEM 検出テスト
 class TestDefectDetection:
     """意図的欠陥文書の SEM 検出テスト"""
 
+    # PURPOSE: 論理飛躍・設計不整合を含む文書から issues を検出
     def test_detects_semantic_issues(self, agent):
         """論理飛躍・設計不整合を含む文書から issues を検出"""
         target = AuditTarget(
@@ -132,6 +141,7 @@ class TestDefectDetection:
         expected_any = {"SEM-001", "SEM-004", "SEM-005"}
         assert codes & expected_any, f"Expected at least one of {expected_any}, got {codes}"
 
+    # PURPOSE: 欠陥文書は clean 文書と異なる結果を返す
     def test_defective_has_lower_pass_or_issues(self, agent):
         """欠陥文書は clean 文書と異なる結果を返す"""
         clean_target = AuditTarget(

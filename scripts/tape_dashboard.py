@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L3/Utility] <- scripts/ A0→Implementation→tape_dashboard
 # PROOF: [L2/インフラ] <- scripts/ tape 可視化ダッシュボード
 """
 Tape Dashboard — WF 実行統計の可視化 CLI

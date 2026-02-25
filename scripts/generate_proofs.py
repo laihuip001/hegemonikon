@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L3/Utility] <- scripts/ A0→Implementation→generate_proofs
 # PROOF: [L3/ユーティリティ] <- scripts/
 # PURPOSE: PROOF.md の自動生成と存在証明の機械的担保
 """Batch-generate PROOF.md for directories that have Python files but no PROOF.md.

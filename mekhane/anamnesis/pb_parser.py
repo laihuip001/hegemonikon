@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Mekhane] <- anamnesis/ A0→Implementation→pb_parser
 # PROOF: [L3/ユーティリティ] <- mekhane/anamnesis/ P3→データ処理が必要→pb_parser が担う
 """
 Protocol Buffers ファイルから記憶（テキスト）を抽出

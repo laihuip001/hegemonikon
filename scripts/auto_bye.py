@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L3/Utility] <- scripts/ A0→Implementation→auto_bye
 # PROOF: [L2/インフラ] <- scripts/ A0→/bye忘れ時の安全ネット→第零原則「意志より環境」の具体実装
 """Auto-Bye — セッション安全ネット
 

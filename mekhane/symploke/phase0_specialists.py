@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Mekhane] <- symploke/ A0→Implementation→phase0_specialists
 # PROOF: [L3/ユーティリティ] <- mekhane/symploke/ O4→実行スクリプトが必要→phase0_specialists が担う
 """
 Jules 専門家定義: Phase 0 従来的品質層 (Layer 1-6: 255人)

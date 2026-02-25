@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L3/Utility] <- scripts/ A0→Implementation→completion_map
 # PROOF: [L2/ツール] <- scripts/
 # PURPOSE: 96要素体系の実装状況を自動スキャンし、完成度マップを生成する
 """

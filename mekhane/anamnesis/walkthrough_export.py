@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Mekhane] <- anamnesis/ A0→Implementation→walkthrough_export
 # PROOF: [L2/インフラ] <- mekhane/anamnesis/
 #
 # P3 → セッション終了時に Walkthrough を保存する必要がある

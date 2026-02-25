@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L3/Utility] <- scripts/ A0→Implementation→generate_reasons
 # PROOF: [L3/ユーティリティ] <- mekhane/ O4→REASON自動生成が必要→generate_reasons が担う
 """
 REASON Auto-Generator — LLM-based PROOF.md REASON field generation

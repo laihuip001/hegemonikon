@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L3/Utility] <- scripts/ A0→Implementation→index_fep_papers
 # PROOF: [L3/ユーティリティ] <- scripts/ O4→収集した論文をGnōsisに投入
 # PURPOSE: collected_papers.json → Gnōsis LanceDB インデックスへの投入
 """

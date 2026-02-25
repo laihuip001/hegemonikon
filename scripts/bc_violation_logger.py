@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L3/Utility] <- scripts/ A0→Implementation→bc_violation_logger
 # PROOF: [L2/運用] <- scripts/
 # PURPOSE: BC違反・Creator フィードバックのリアルタイムログ
 """

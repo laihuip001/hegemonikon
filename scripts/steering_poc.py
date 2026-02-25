@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L3/Utility] <- scripts/ A0→Implementation→steering_poc
 # PROOF: [L3/実験] <- scripts/
 # PURPOSE: Activation Steering PoC — LLM行動制御の実験
 """Activation Steering PoC v2 — Final LayerNorm Injection.

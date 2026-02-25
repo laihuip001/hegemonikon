@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Mekhane] <- routes/ A0→Implementation→quota
 # PROOF: [L2/インフラ] <- mekhane/api/routes/
 # PURPOSE: /api/quota — Antigravity IDE Quota 情報エンドポイント
 """

@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Mekhane] <- symploke/ A0→Implementation→specialist_bridge
 # PROOF: [L3/ユーティリティ] <- mekhane/symploke/ O4→統合が必要→specialist_bridge が担う
 """
 Specialist Bridge — Phase 0-3 (866人) と v2 (140人) の統合アダプタ

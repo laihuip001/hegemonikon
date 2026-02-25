@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L3/Utility] <- scripts/ A0→Implementation→agq-sessions-parser
 # PROOF: [L1/スクリプト] <- scripts/
 # PURPOSE: [L2/インフラ] GetAllCascadeTrajectories JSON レスポンスの解析・整形
 """

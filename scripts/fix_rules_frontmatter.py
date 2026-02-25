@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L3/Utility] <- scripts/ A0→Implementation→fix_rules_frontmatter
 # PROOF: [L3/ユーティリティ] <- scripts/ ルールファイルのfrontmatter一括修正→構造整合性維持
 """
 Antigravity Rules frontmatter 一括修正スクリプト

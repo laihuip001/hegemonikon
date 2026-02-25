@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L3/Utility] <- scripts/ A0→Implementation→e2e_demo
 # PROOF: [L3/ユーティリティ] <- scripts/
 # PURPOSE: FEP E2E Loop のデモ実行
 """

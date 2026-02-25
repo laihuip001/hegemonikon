@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- search/ A0→Implementation→__init__
 """
 # PROOF: [L2/インフラ] <- mekhane/symploke/search/ A0→検索機能が必要→__init__ が担う
 Symplokē Search Package

@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L3/Utility] <- scripts/ A0→Implementation→e2e_daily_train
 # PROOF: [L2/FEP] <- scripts/
 # PURPOSE: 日次Dirichletトレーニングを自動実行し、Attractor精度を育てる
 """

@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- search/ A0→Implementation→engine
 """
 # PROOF: [L2/インフラ] <- mekhane/symploke/search/ A0→検索機能が必要→engine が担う
 Symplokē Search Engine

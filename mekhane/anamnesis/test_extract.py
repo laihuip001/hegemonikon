@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Mekhane] <- anamnesis/ A0→Implementation→test_extract
 # PROOF: [L3/テスト] <- mekhane/anamnesis/
 """
 PROOF: [L3/テスト] export_chats が存在→その検証が必要→test_extract が担う

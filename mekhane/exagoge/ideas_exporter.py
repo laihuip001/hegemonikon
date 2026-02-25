@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Mekhane] <- exagoge/ A0→Implementation→ideas_exporter
 # PROOF: [L2/コア] <- mekhane/exagoge/
 # PURPOSE: Gateway Ideas データのエクスポート機能
 """

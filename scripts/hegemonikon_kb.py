@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L3/Utility] <- scripts/ A0→Implementation→hegemonikon_kb
 """hegemonikon-kb: HGK 知識基盤への統合検索 CLI。
 
 Jules/Gemini が HGK の概念・定理・用語を直接引くためのインターフェース。

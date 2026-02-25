@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L3/Utility] <- scripts/ A0→Implementation→violation_analyzer
 # PROOF: [L2/運用] <- scripts/
 # PURPOSE: violations.md の自動分析 + /boot 用サマリー生成
 """

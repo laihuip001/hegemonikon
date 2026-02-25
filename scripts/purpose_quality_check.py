@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L3/Utility] <- scripts/ A0→Implementation→purpose_quality_check
 # PROOF: [L3/ユーティリティ] <- scripts/
 # PURPOSE: 形骸化PURPOSE注釈を検出し、品質改善の対象を特定する
 """

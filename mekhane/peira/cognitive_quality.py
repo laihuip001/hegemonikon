@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Mekhane] <- peira/ A0→Implementation→cognitive_quality
 # PROOF: [L2/検証] <- A0→認知品質の定量測定が必要→n=1でもデータで語る
 """
 Cognitive Quality Dashboard — 認知品質ダッシュボード

@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- symploke/ A0→Implementation→config
 # noqa: AI-ALL
 # PROOF: [L2/インフラ] <- mekhane/symploke/
 """

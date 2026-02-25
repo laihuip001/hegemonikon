@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Mekhane] <- anamnesis/ A0→Implementation→test_complete_extract
 # PROOF: [L3/テスト] <- mekhane/anamnesis/ export_chats が存在→その検証が必要→test_complete_extract が担う
 """
 完全版メッセージ抽出テスト v3

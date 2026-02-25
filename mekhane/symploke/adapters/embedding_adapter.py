@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- adapters/ A0→Implementation→embedding_adapter
 """
 # PROOF: [L2/インフラ] <- mekhane/symploke/adapters/ A0→ベクトルDBアダプタが必要→embedding_adapter が担う
 EmbeddingAdapter - sentence-transformers を使用した実ベクトル検索アダプタ

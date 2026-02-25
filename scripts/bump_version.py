@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L3/Utility] <- scripts/ A0→Implementation→bump_version
 """
 bump_version.py — Markdown Frontmatter Version Bumper
 

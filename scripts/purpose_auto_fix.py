@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L3/Utility] <- scripts/ A0→Implementation→purpose_auto_fix
 # PROOF: [L3/ユーティリティ] <- scripts/
 # PURPOSE: 形骸化PURPOSEの一括修正 — コンテキスト理解による自動置換
 """

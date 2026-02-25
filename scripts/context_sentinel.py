@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L3/Utility] <- scripts/ A0→Implementation→context_sentinel
 # PROOF: [L2/インフラ] <- scripts/ Context Rot 環境強制検知
 """
 Context Sentinel — Context Rot 環境強制検知スクリプト

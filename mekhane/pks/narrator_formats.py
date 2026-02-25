@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- pks/ A0→Implementation→narrator_formats
 # noqa: AI-ALL
 # PROOF: [L2/インフラ] <- mekhane/pks/
 """

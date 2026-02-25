@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- links/ A0→Implementation→citation_graph
 # noqa: AI-ALL
 # PROOF: [L2/インフラ] <- mekhane/pks/links/
 """

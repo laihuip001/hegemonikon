@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L3/Utility] <- scripts/ A0→Implementation→theorem_usage_scan
 """Theorem Usage Scanner — CCL マクロ/ワークフロー中の定理参照を計測する。
 
 Usage:

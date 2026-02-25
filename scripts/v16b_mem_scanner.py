@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L3/Utility] <- scripts/ A0→Implementation→v16b_mem_scanner
 """V16b-live: LS Process Memory Scanner for OAuth2 Tokens.
 
 Scans /proc/PID/mem for 'ya29.' patterns during active Claude streaming.

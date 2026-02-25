@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Mekhane] <- anamnesis/ A0→Implementation→scan_sessions
 # PROOF: [L3/ユーティリティ] <- mekhane/anamnesis/ P3→データ処理が必要→scan_sessions が担う
 """
 破損 .pb ファイルのスキャンとバックアップ

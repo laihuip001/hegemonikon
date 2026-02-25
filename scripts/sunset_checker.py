@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L3/Utility] <- scripts/ A0→Implementation→sunset_checker
 # PROOF: [L3/ユーティリティ] <- scripts/
 # PURPOSE: 廃止予定モジュールの依存関係チェック
 """Sunset Checker — Experimental マクロの再審査リマインダー

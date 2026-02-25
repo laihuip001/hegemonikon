@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Mekhane] <- symploke/ A0→Implementation→jules_client
 # PROOF: [L2/インフラ] <- mekhane/symploke/ A0→知識管理が必要→jules_client が担う
 """
 Jules API Client - Hegemonikón H3 Symplokē Layer

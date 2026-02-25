@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L3/Utility] <- scripts/ A0→Implementation→inject_epistemic_to_proof
 """
 F7: Epistemic Status → PROOF.md Injector
 

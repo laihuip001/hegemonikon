@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Mekhane] <- mcp/ A0→Implementation→typos_mcp_server
 # PROOF: [L2/インフラ] <- mekhane/mcp/ A0→Týpos MCP統合が必要→typos_mcp_serverが担う
 """
 Týpos MCP Server v2.1 — Hegemonikón Skill Generator

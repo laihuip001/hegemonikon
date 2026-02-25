@@ -1,3 +1,5 @@
+# PROOF: [L2/Mekhane] <- mekhane/mcp/mcp_guard.py A0→Implementation→mcp_guard
+# PURPOSE: Implementation of mcp_guard
 """
 MCP Guard — ゾンビプロセス防止の自己防衛モジュール
 

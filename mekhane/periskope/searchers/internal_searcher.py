@@ -1,3 +1,5 @@
+# PROOF: [L2/Mekhane] <- mekhane/periskope/searchers/internal_searcher.py A0→Implementation→internal_searcher
+# PURPOSE: Implementation of internal_searcher
 """
 Internal knowledge searcher for Periskopē.
 

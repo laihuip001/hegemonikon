@@ -1,3 +1,4 @@
+# PROOF: [L3/Test] <- mekhane/fep/tests/ A0→AutoFix→test_universality
 """Tests for mekhane.fep.universality — Kalon (圏論的普遍性検証)."""
 
 import json

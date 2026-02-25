@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/periskope/searchers/ A0→AutoFix→playwright_searcher
 """
 Playwright-based searcher for Periskopē.
 

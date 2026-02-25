@@ -1,3 +1,4 @@
+# PROOF: [L3/Test] <- mekhane/basanos/l2/tests/ A0→AutoFix→test_l2
 # PURPOSE: L2 問い生成機構のテスト — G_struct と deficit factory の検証
 # REASON: kernel/ の実データに対してパーサーと deficit 検出が正しく動作するか確認
 """Tests for Basanos L2 structural deficit detection."""

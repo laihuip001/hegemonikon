@@ -1,3 +1,4 @@
+# PROOF: [L3/Test] <- mekhane/basanos/gateway/tests/ A0→AutoFix→test_injection_regression
 """
 Injection Regression Test Suite — 6攻撃ベクタによるセキュリティ検証
 

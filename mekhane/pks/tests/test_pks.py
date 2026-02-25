@@ -1,3 +1,4 @@
+# PROOF: [L3/Test] <- mekhane/pks/tests/ A0→AutoFix→test_pks
 # PURPOSE: PKS v2 全モジュールの pytest テスト
 """
 PKS v2 テストスイート

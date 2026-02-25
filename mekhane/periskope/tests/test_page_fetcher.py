@@ -1,3 +1,4 @@
+# PROOF: [L3/Test] <- mekhane/periskope/tests/ A0→AutoFix→test_page_fetcher
 """
 Tests for PageFetcher (W7: selective full-page crawling).
 """

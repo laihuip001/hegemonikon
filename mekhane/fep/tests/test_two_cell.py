@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L3/Test] <- mekhane/fep/tests/ A0→AutoFix→test_two_cell
 """Tests for two_cell.py — Weak 2-category structure."""
 
 import sys

@@ -1,3 +1,4 @@
+# PROOF: [L3/Test] <- mekhane/fep/tests/ A0→AutoFix→test_encoding
 """Tests for mekhane.fep.encoding — FEP encoding helpers."""
 
 import unittest

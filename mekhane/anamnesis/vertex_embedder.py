@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/anamnesis/ A0→AutoFix→vertex_embedder
 import os
 import logging
 from google import genai

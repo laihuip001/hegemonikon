@@ -1,3 +1,4 @@
+# PROOF: [L3/Test] <- mekhane/basanos/tests/ A0→AutoFix→test_git_metrics
 """Tests for GitMetrics — git 履歴からのリスク予兆検出。"""
 
 import subprocess

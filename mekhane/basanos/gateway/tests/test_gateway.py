@@ -1,3 +1,4 @@
+# PROOF: [L3/Test] <- mekhane/basanos/gateway/tests/ A0→AutoFix→test_gateway
 """
 MCP Gateway — 統合テスト
 

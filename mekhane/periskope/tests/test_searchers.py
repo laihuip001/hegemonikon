@@ -1,3 +1,4 @@
+# PROOF: [L3/Test] <- mekhane/periskope/tests/ A0→AutoFix→test_searchers
 """
 Tests for SearXNG searcher.
 """

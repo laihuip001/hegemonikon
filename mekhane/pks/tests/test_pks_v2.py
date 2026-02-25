@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L3/Test] <- mekhane/pks/tests/ A0→AutoFix→test_pks_v2
 # PURPOSE: PKS v2 新コンポーネントのテスト
 """
 PKS v2 テストスイート

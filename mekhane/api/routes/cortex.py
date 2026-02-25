@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/api/routes/cortex.py A0→AutoFix→CI_Failure_Mitigation
 from typing import Any, AsyncGenerator
 
 import asyncio

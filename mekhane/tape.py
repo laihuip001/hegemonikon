@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/tape.py A0→AutoFix→CI_Failure_Mitigation
 """
 Tape Writer — WF 実行トレースを JSONL として記録する。
 

@@ -1,3 +1,4 @@
+# PROOF: [L2/Periskope] <- mekhane/periskope/page_fetcher.py A0→AutoFix→CI_Failure_Mitigation
 """
 Page Fetcher — 選択的全文クロール for Periskopē.
 

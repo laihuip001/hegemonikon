@@ -1,3 +1,4 @@
+# PROOF: [L2/Periskope] <- mekhane/periskope/searchers/__init__.py A0→AutoFix→CI_Failure_Mitigation
 """
 Periskopē searchers — pluggable search source adapters.
 

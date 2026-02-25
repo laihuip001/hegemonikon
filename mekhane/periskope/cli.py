@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Periskope] <- mekhane/periskope/cli.py A0→AutoFix→CI_Failure_Mitigation
 """
 Periskopē CLI — Deep Research from the command line.
 

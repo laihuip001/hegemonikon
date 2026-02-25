@@ -1,4 +1,3 @@
-# PROOF: [L2/Impl] <- mekhane/ Automated fix for CI
 """
 SearXNG search client for Periskopē.
 

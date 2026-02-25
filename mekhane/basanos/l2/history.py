@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# PROOF: [L2/Impl] <- mekhane/ Automated fix for CI
 # PURPOSE: Basanos L2 deficit 履歴の永続化 — JSONL 形式で時系列追跡
 # REASON: deficit の推移を記録し、体系の健全性トレンドを可視化するため
 """Deficit history persistence for Basanos L2.

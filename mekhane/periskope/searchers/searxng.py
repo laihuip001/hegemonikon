@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/searchers/ A0->Auto->AddedByCI
 """
 SearXNG search client for Periskopē.
 
@@ -305,4 +306,3 @@ def _truncate(text: str, max_len: int) -> str:
     if len(text) <= max_len:
         return text
     return text[:max_len - 3] + "..."
-

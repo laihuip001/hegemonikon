@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/periskope/ A0->Auto->AddedByCI
 """
 Periskopē Deep Research Engine — Orchestrator.
 
@@ -1187,4 +1188,3 @@ depth: {depth}
 - [ ] 消化プロセスの振り返り
 - [ ] 信念更新 (/dox)
 - [ ] 知識永続化 (/epi)"""
-

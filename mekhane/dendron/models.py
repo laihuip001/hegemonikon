@@ -274,6 +274,10 @@ EXEMPT_PATTERNS = [
 # 形式: # PROOF: [レベル] または # PROOF: [レベル] <- 親
 PROOF_PATTERN_V2 = re.compile(r"#\s*PROOF:\s*\[([^\]]+)\](?:\s*<-\s*([^\s#]+))?")
 
+# v3.5: Markdown 用 PROOF ヘッダーパターン (HTMLコメント形式)
+# 形式: <!-- PROOF: [レベル] <- 親 -->
+PROOF_PATTERN_MD = re.compile(r"<!--\s*PROOF:\s*\[([^\]]+)\](?:\s*<-\s*([^\s-]+))?.*-->")
+
 # PURPOSE ヘッダーパターン (v2.5: 関数直前コメント)
 # 形式: # PURPOSE: 目的の説明
 PURPOSE_PATTERN = re.compile(r"#\s*PURPOSE:\s*(.+)")

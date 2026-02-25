@@ -511,9 +511,10 @@ class DendronChecker:  # noqa: AI-007
         
         v2.2: docstring 内の PROOF を無視するため、
         行が # で始まるかチェック (前後の空白は許容)
+        v3.6: Markdown コメント (<!--) もサポート
         """
         stripped = line.strip()
-        return stripped.startswith("#")
+        return stripped.startswith("#") or stripped.startswith("<!--")
     
     # PURPOSE: 2つのテキスト間の単語レベル Jaccard 類似度を計算する
     @staticmethod

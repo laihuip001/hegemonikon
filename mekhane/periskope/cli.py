@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Impl] <- mekhane/periskope/ CLI interface for Deep Research
 """
 Periskopē CLI — Deep Research from the command line.
 

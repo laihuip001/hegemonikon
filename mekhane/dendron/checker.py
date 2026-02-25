@@ -28,6 +28,7 @@ from .models import (  # noqa: F401
     CheckResult,
     EXEMPT_PATTERNS,
     PROOF_PATTERN_V2,
+    PROOF_PATTERN_MD,
     PURPOSE_PATTERN,
     WEAK_PURPOSE_PATTERNS,
     SPECIAL_PARENTS,
@@ -161,6 +162,51 @@ class DendronChecker:  # noqa: AI-007
 
         # 最初の 10 行を検索
         for i, line in enumerate(lines, 1):
+            # v3.5: Markdown 対応 (HTMLコメント)
+            if path.suffix == ".md":
+                match_md = PROOF_PATTERN_MD.search(line)
+                if match_md:
+                    level_str = match_md.group(1)
+                    parent = match_md.group(2)
+                    level = self._parse_level(level_str)
+
+                    is_valid_level, level_reason = self._validate_level(level)
+                    if not is_valid_level:
+                        return FileProof(
+                            path=path, status=ProofStatus.INVALID,
+                            level=level, line_number=i,
+                            reason=f"{level_reason} (入力: {level_str})",
+                            has_reason=file_reason_text is not None,
+                            reason_text=file_reason_text,
+                        )
+
+                    if parent:
+                        parent = parent.strip()
+                        is_valid, reason = self.validate_parent(parent)
+                        if not is_valid:
+                            return FileProof(
+                                path=path, status=ProofStatus.INVALID,
+                                level=level, parent=parent, line_number=i,
+                                reason=reason,
+                                has_reason=file_reason_text is not None,
+                                reason_text=file_reason_text,
+                            )
+                        return FileProof(
+                            path=path, status=ProofStatus.OK,
+                            level=level, parent=parent, line_number=i,
+                            has_reason=file_reason_text is not None,
+                            reason_text=file_reason_text,
+                        )
+                    else:
+                        # Markdown でも親参照なしは ORPHAN
+                        return FileProof(
+                            path=path, status=ProofStatus.ORPHAN,
+                            level=level, line_number=i,
+                            reason="親参照なし (v2: <- parent 必須)",
+                            has_reason=file_reason_text is not None,
+                            reason_text=file_reason_text,
+                        )
+
             # v2.2: コードコメント行のみをチェック (docstring内を除外)
             if not self._is_code_comment(line):
                 continue

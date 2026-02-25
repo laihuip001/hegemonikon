@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Impl] <- mekhane/ Automated fix for CI
 """Tests for two_cell.py — Weak 2-category structure."""
 
 import sys

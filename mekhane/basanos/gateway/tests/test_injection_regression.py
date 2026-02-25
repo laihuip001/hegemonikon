@@ -1,3 +1,4 @@
+# PROOF: [L2/Impl] <- mekhane/ Automated fix for CI
 """
 Injection Regression Test Suite — 6攻撃ベクタによるセキュリティ検証
 

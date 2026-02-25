@@ -1,3 +1,4 @@
+# PROOF: [L2/Impl] <- mekhane/ Automated fix for CI
 """Ochēma unit tests: context_health, _select_model, archive_sessions.
 
 LS 非接続環境でもテスト可能。AntigravityClient のメソッドを

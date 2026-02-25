@@ -1,3 +1,4 @@
+# PROOF: [L2/Impl] <- mekhane/ Automated fix for CI
 """Tests for thinking config resolution (HGK depth -> model params)."""
 
 import pytest

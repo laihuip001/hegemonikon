@@ -92,25 +92,39 @@ class TestMeaningfulTraceContextRegression:
         )
 
         with tempfile.TemporaryDirectory() as tmpdir:
-            path = Path(tmpdir) / "traces.json"
+            # Mock Path.home() to use tmpdir to avoid PermissionError
+            with patch("pathlib.Path.home", return_value=Path(tmpdir)):
+                path = Path(tmpdir) / "traces.json"
 
-            # Write a trace with context
-            clear_session_traces()
-            mark_meaningful(
-                reason="persist context",
-                intensity=2,
-                context="must persist to disk",
-            )
-            save_traces(path)
+                # Write a trace with context
+                clear_session_traces()
+                # mark_meaningful() calls ensure_traces_dir() which uses Path.home()
+                # We need to ensure the parent dir exists because mark_meaningful might check it
+                # although ensure_traces_dir is usually called by save_traces, let's be safe.
 
-            # Load and verify
-            loaded = load_traces(path)
-            assert len(loaded) >= 1
-            found = [t for t in loaded if t.reason == "persist context"]
-            assert len(found) == 1
-            assert found[0].context == "must persist to disk"
+                mark_meaningful(
+                    reason="persist context",
+                    intensity=2,
+                    context="must persist to disk",
+                )
 
-            clear_session_traces()
+                # save_traces calls ensure_traces_dir() -> TRACES_PATH.parent.mkdir()
+                # TRACES_PATH is constructed at module import time using Path.home(),
+                # so mocking Path.home() here might be too late if TRACES_PATH is already defined.
+                # We must patch TRACES_PATH directly in the module.
+
+                from mekhane.fep import meaningful_traces
+                with patch.object(meaningful_traces, "TRACES_PATH", Path(tmpdir) / "traces.json"):
+                    save_traces(path)
+
+                    # Load and verify
+                    loaded = load_traces(path)
+                    assert len(loaded) >= 1
+                    found = [t for t in loaded if t.reason == "persist context"]
+                    assert len(found) == 1
+                    assert found[0].context == "must persist to disk"
+
+                clear_session_traces()
 
 
 # ============ 2. FailureDB — resolution regression ============

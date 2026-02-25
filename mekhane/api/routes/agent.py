@@ -1,4 +1,4 @@
-# PROOF: [L2/Mekhane] <- mekhane/api/routes/
+# PROOF: [L2/インフラ] <- mekhane/api/routes/
 # PURPOSE: /ask/agent/* — Agent Self-Modification PoC Endpoints
 """
 Agent Routes — Self-Modification PoC

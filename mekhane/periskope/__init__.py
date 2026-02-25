@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/periskope/__init__.py S2->Search Engine
 """
 Periskopē — HGK Deep Research Engine
 

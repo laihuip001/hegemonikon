@@ -1,0 +1,12 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.12, pytest-9.0.2, pluggy-1.6.0
+rootdir: /app
+configfile: pyproject.toml
+plugins: asyncio-1.3.0, anyio-4.12.1
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collected 41 items
+
+mekhane/basanos/l2/tests/test_extensions.py ..............ss..           [ 43%]
+mekhane/basanos/l2/tests/test_l2.py ....................sss              [100%]
+
+======================== 36 passed, 5 skipped in 0.36s =========================

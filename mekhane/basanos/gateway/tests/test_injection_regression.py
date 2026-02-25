@@ -1,3 +1,4 @@
+# PROOF: [L2/Test] <- mekhane/basanos/gateway/tests/ A0→Implementation→test_injection_regression.py
 """
 Injection Regression Test Suite — 6攻撃ベクタによるセキュリティ検証
 

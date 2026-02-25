@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/pks/tests/ A0→Implementation→test_gateway_bridge.py
 """
 GatewayBridge テスト — E2E + 単体テスト
 

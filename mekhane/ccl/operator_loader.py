@@ -1,3 +1,4 @@
+# PROOF: [L2/Language] <- mekhane/ccl/ A0→Implementation→operator_loader.py
 """operators.md の SSOT パーサー。
 
 operators.md の Markdown テーブルから演算子定義を抽出し、

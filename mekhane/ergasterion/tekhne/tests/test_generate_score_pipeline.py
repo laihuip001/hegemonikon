@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Mekhane] <- mekhane/ergasterion/tekhne/tests/ A0→Implementation→test_generate_score_pipeline.py
 """
 Generate → Score Pipeline CI Tests
 

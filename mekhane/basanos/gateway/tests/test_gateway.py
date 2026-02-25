@@ -1,3 +1,4 @@
+# PROOF: [L2/Test] <- mekhane/basanos/gateway/tests/ A0→Implementation→test_gateway.py
 """
 MCP Gateway — 統合テスト
 

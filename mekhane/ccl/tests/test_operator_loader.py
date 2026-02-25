@@ -1,3 +1,4 @@
+# PROOF: [L3/Test] <- mekhane/ccl/tests/ A0→AutoFix→test_operator_loader
 """G6: dispatch E2E テスト + G9: Linter テスト + operator_loader テスト。"""
 
 import pytest

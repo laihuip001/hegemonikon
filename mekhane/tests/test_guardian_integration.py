@@ -1,3 +1,4 @@
+# PROOF: [L3/Test] <- mekhane/tests/ A0→AutoFix→test_guardian_integration
 """
 Guardian Integration Tests — /bou ② テスト守護者
 

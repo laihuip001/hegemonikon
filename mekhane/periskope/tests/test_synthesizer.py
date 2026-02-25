@@ -1,3 +1,4 @@
+# PROOF: [L3/Test] <- mekhane/periskope/tests/ A0→AutoFix→test_synthesizer
 """
 Tests for multi-model synthesizer.
 """

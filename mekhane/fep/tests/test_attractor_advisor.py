@@ -1,3 +1,4 @@
+# PROOF: [L3/Test] <- mekhane/fep/tests/ A0→AutoFix→test_attractor_advisor
 """Tests for attractor_advisor helper functions."""
 
 import unittest

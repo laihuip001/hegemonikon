@@ -1,3 +1,4 @@
+# PROOF: [L3/Test] <- mekhane/synteleia/tests/ A0→AutoFix→test_multi_semantic
 # PURPOSE: MultiSemanticAgent のテスト (Layer B: Nous)
 """
 Tests for Multi-LLM Ensemble Audit Agent.

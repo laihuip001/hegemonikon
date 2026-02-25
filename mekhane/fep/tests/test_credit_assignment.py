@@ -1,3 +1,4 @@
+# PROOF: [L3/Test] <- mekhane/fep/tests/ A0→AutoFix→test_credit_assignment
 """Tests for Credit Assignment — Teacher Signal for FEP Agent."""
 
 import json

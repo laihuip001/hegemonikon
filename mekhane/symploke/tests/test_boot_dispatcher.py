@@ -1,3 +1,4 @@
+# PROOF: [L3/Test] <- mekhane/symploke/tests/ A0→AutoFix→test_boot_dispatcher
 """
 Tests for Dispatcher integration in boot_integration.py
 

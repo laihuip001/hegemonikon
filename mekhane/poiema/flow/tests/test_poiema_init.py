@@ -1,3 +1,4 @@
+# PROOF: [L3/Test] <- mekhane/poiema/flow/tests/ A0→AutoFix→test_poiema_init
 """
 Poiema __init__.py 統合テスト
 

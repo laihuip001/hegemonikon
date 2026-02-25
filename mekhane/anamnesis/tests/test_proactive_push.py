@@ -1,3 +1,4 @@
+# PROOF: [L3/Test] <- mekhane/anamnesis/tests/ A0→AutoFix→test_proactive_push
 """Proactive Push + Link Graph のテスト."""
 
 import json

@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L3/Test] <- mekhane/ergasterion/tekhne/tests/ A0→AutoFix→test_cortex_refine
 """
 Tests for Sweep Engine and Deep Engine — Cortex Refine Integration
 

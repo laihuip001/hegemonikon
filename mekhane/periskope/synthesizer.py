@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/periskope/ A0→AutoFix→synthesizer
 """
 Multi-model synthesizer for Periskopē.
 

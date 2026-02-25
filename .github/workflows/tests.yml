@@ -46,6 +46,7 @@ jobs:
                   # 2. Install standard PyPI dependencies (sentence-transformers will use existing torch)
                   pip install pytest pytest-asyncio pytest-timeout pyyaml pydantic lancedb numpy scipy \
                               networkx pandas tabulate requests httpx schedule fastapi uvicorn \
+                              aiohttp python-dotenv filelock \
                               sentence-transformers
                   # 3. Install project in development mode
                   pip install -e ".[test]" 2>/dev/null || true

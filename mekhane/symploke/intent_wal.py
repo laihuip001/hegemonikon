@@ -19,7 +19,7 @@ from typing import Optional
 import yaml
 
 # WAL default directory
-WAL_DIR = Path.home() / "oikos" / "mneme" / ".hegemonikon" / "wal"
+WAL_DIR = Path.home() / "oikos/mneme/.hegemonikon/wal"
 
 # Context health levels (BC-18)
 CONTEXT_HEALTH_LEVELS = ("green", "yellow", "orange", "red")

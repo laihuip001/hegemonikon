@@ -44,7 +44,8 @@ jobs:
                   # Install core test dependencies (CPU-only)
                   # Install torch first from CPU index to ensure we don't pull CUDA version
                   pip install torch --index-url https://download.pytorch.org/whl/cpu
-                  pip install pytest pytest-asyncio pytest-timeout pyyaml pydantic lancedb numpy scipy \
+                  pip install fastapi uvicorn python-dotenv aiohttp \
+                              pytest pytest-asyncio pytest-timeout pyyaml pydantic lancedb numpy scipy \
                               networkx pandas tabulate requests httpx schedule \
                               sentence-transformers
                   # Install project in development mode if setup exists

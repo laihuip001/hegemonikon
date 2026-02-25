@@ -1,3 +1,4 @@
+<!-- PROOF: [L3/Review] <- mekhane/symploke/boot_integration.py EC-003 Boundary Value Review -->
 # 境界値テスター レビュー
 
 ## 対象ファイル

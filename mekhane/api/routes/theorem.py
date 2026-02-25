@@ -14,6 +14,7 @@ from fastapi import APIRouter
 router = APIRouter(tags=["theorem"])
 
 
+# PURPOSE: Get theorem usage summary for dashboard display
 @router.get("/theorem/usage")
 async def theorem_usage() -> dict:
     """Get theorem usage summary for dashboard display."""
@@ -62,6 +63,7 @@ async def theorem_usage() -> dict:
     }
 
 
+# PURPOSE: Get today's theorem suggestions
 @router.get("/theorem/today")
 async def theorem_today() -> dict:
     """Get today's theorem suggestions."""
@@ -70,6 +72,7 @@ async def theorem_today() -> dict:
     return {"suggestions": suggestions}
 
 
+# PURPOSE: Suggest theorems based on text input
 @router.get("/theorem/suggest")
 async def theorem_suggest(q: str = "", max_results: int = 3) -> dict:
     """Suggest theorems based on text input."""

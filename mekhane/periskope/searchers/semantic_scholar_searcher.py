@@ -1,3 +1,4 @@
+# PROOF: [L2/Periskope] <- mekhane/periskope/searchers/ A0→AutoFix
 """
 Semantic Scholar API client for Periskopē.
 
@@ -25,6 +26,7 @@ _S2_API_URL = "https://api.semanticscholar.org/graph/v1"
 _S2_SEARCH_URL = f"{_S2_API_URL}/paper/search"
 
 
+# PURPOSE: Client for Semantic Scholar API
 class SemanticScholarSearcher:
     """Client for Semantic Scholar API.
 
@@ -41,11 +43,13 @@ class SemanticScholarSearcher:
         self._api_key = os.getenv("S2_API_KEY") or os.getenv("SEMANTIC_SCHOLAR_API_KEY", "")
         self._timeout = timeout
 
+    # PURPOSE: Always available (no key required, key is optional)
     @property
     def available(self) -> bool:
         """Always available (no key required, key is optional)."""
         return True
 
+    # PURPOSE: Search academic papers via Semantic Scholar
     async def search(
         self,
         query: str,

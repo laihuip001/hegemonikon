@@ -41,9 +41,11 @@ def _mock_chat_response(text="Hello!", cid="abc123", tid="def456", model_config=
 # --- chat() Tests ---
 
 
+# PURPOSE: CortexClient.chat() unit tests
 class TestChat:
     """CortexClient.chat() unit tests."""
 
+    # PURPOSE: chat() returns LLMResponse with text and model
     def test_chat_basic_response(self):
         """chat() returns LLMResponse with text and model."""
         client = _make_client()
@@ -58,6 +60,7 @@ class TestChat:
         assert result.text == "56"
         assert "abc123" in result.cascade_id
 
+    # PURPOSE: chat() passes history to _call_api payload
     def test_chat_with_history(self):
         """chat() passes history to _call_api payload."""
         client = _make_client()
@@ -78,6 +81,7 @@ class TestChat:
         assert payload["history"] == history
         assert result.text == "I remember"
 
+    # PURPOSE: chat() includes tier_id in payload when set
     def test_chat_with_tier_id(self):
         """chat() includes tier_id in payload when set."""
         client = _make_client()
@@ -91,6 +95,7 @@ class TestChat:
         payload = mock_call.call_args[0][1]
         assert payload["tier_id"] == "g1-ultra-tier"
 
+    # PURPOSE: chat(model=...) includes model_config_id in payload
     def test_chat_with_model_config_id(self):
         """chat(model=...) includes model_config_id in payload."""
         client = _make_client()
@@ -104,6 +109,7 @@ class TestChat:
         payload = mock_call.call_args[0][1]
         assert payload["model_config_id"] == "claude-sonnet-4-5"
 
+    # PURPOSE: chat() without model omits model_config_id from payload
     def test_chat_without_model_no_config_id(self):
         """chat() without model omits model_config_id from payload."""
         client = _make_client()
@@ -121,9 +127,11 @@ class TestChat:
 # --- _parse_chat_response Tests ---
 
 
+# PURPOSE: _parse_chat_response unit tests
 class TestParseChatResponse:
     """_parse_chat_response unit tests."""
 
+    # PURPOSE: Basic response without modelConfig uses fallback
     def test_basic_parse(self):
         """Basic response without modelConfig uses fallback."""
         client = _make_client()
@@ -134,6 +142,7 @@ class TestParseChatResponse:
         assert "cortex-chat" in result.model
         assert "test-cid" in result.model
 
+    # PURPOSE: modelConfig.displayName is preferred when present
     def test_model_config_display_name(self):
         """modelConfig.displayName is preferred when present."""
         client = _make_client()
@@ -144,6 +153,7 @@ class TestParseChatResponse:
         result = client._parse_chat_response(resp)
         assert result.model == "Gemini 3 Pro"
 
+    # PURPOSE: modelConfig.id is used when displayName is absent
     def test_model_config_id_fallback(self):
         """modelConfig.id is used when displayName is absent."""
         client = _make_client()
@@ -154,6 +164,7 @@ class TestParseChatResponse:
         result = client._parse_chat_response(resp)
         assert result.model == "gemini-3-pro-preview"
 
+    # PURPOSE: Falls back to cid-based name when no modelConfig and no request_model
     def test_no_model_config_fallback(self):
         """Falls back to cid-based name when no modelConfig and no request_model."""
         client = _make_client()
@@ -161,6 +172,7 @@ class TestParseChatResponse:
         result = client._parse_chat_response(resp)
         assert result.model == "cortex-chat (cid=xyz)"
 
+    # PURPOSE: request_model resolves via _MODEL_DISPLAY_NAMES when no modelConfig
     def test_request_model_display_name_mapping(self):
         """request_model resolves via _MODEL_DISPLAY_NAMES when no modelConfig."""
         client = _make_client()
@@ -168,6 +180,7 @@ class TestParseChatResponse:
         result = client._parse_chat_response(resp, request_model="claude-sonnet-4-5")
         assert result.model == "Claude Sonnet 4.5"
 
+    # PURPOSE: request_model used as-is when not in _MODEL_DISPLAY_NAMES
     def test_request_model_raw_fallback(self):
         """request_model used as-is when not in _MODEL_DISPLAY_NAMES."""
         client = _make_client()
@@ -175,6 +188,7 @@ class TestParseChatResponse:
         result = client._parse_chat_response(resp, request_model="unknown-model-x")
         assert result.model == "unknown-model-x"
 
+    # PURPOSE: modelConfig.displayName beats request_model
     def test_model_config_takes_priority_over_request_model(self):
         """modelConfig.displayName beats request_model."""
         client = _make_client()
@@ -189,9 +203,11 @@ class TestParseChatResponse:
 # --- ChatConversation Tests ---
 
 
+# PURPOSE: ChatConversation multi-turn tests
 class TestChatConversation:
     """ChatConversation multi-turn tests."""
 
+    # PURPOSE: Each send() increments turn count
     def test_turn_count_increments(self):
         """Each send() increments turn count."""
         client = _make_client()
@@ -209,6 +225,7 @@ class TestChatConversation:
             conv.send("Turn 2")
             assert conv.turn_count == 2
 
+    # PURPOSE: History grows with each send()
     def test_history_accumulates(self):
         """History grows with each send()."""
         client = _make_client()
@@ -228,6 +245,7 @@ class TestChatConversation:
         assert history[2] == {"author": 1, "content": "How are you?"}
         assert history[3] == {"author": 2, "content": "Reply"}
 
+    # PURPOSE: close() resets turn count and history
     def test_close_clears_state(self):
         """close() resets turn count and history."""
         client = _make_client()
@@ -243,6 +261,7 @@ class TestChatConversation:
         assert conv.turn_count == 0
         assert conv.history == []
 
+    # PURPOSE: history property returns a copy, not internal reference
     def test_history_is_readonly_copy(self):
         """history property returns a copy, not internal reference."""
         client = _make_client()
@@ -263,9 +282,11 @@ class TestChatConversation:
 # --- chat_stream() Tests ---
 
 
+# PURPOSE: CortexClient.chat_stream() unit tests
 class TestChatStream:
     """CortexClient.chat_stream() unit tests."""
 
+    # PURPOSE: chat_stream() correctly parses JSON array response
     def test_json_array_parsing(self):
         """chat_stream() correctly parses JSON array response."""
         client = _make_client()
@@ -287,6 +308,7 @@ class TestChatStream:
 
         assert chunks == ["chunk1", "chunk2", "chunk3"]
 
+    # PURPOSE: chat_stream() handles single JSON object (non-array)
     def test_single_object_parsing(self):
         """chat_stream() handles single JSON object (non-array)."""
         client = _make_client()
@@ -304,6 +326,7 @@ class TestChatStream:
 
         assert chunks == ["single response"]
 
+    # PURPOSE: chat_stream() skips items with empty markdown
     def test_empty_markdown_skipped(self):
         """chat_stream() skips items with empty markdown."""
         client = _make_client()

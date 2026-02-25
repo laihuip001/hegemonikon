@@ -41,6 +41,7 @@ _TOPIC_ALIASES: dict[str, list[str]] = {
 
 # --- Data Source Configuration ---
 
+# PURPOSE: Gateway データソースの設定。
 @dataclass
 class GatewaySource:
     """Gateway データソースの設定。"""
@@ -56,6 +57,7 @@ _MNEME_ROOT = Path.home() / "oikos" / "mneme" / ".hegemonikon"
 _KI_DIR = Path.home() / ".gemini" / "antigravity" / "knowledge"
 
 
+# PURPOSE: HGK 内部データと PKS を橋渡しするブリッジ。
 class GatewayBridge:
     """HGK 内部データと PKS を橋渡しするブリッジ。
 

@@ -1117,6 +1117,7 @@ class AntigravityClient:
 # --- Multi-Turn Conversation ---
 
 
+# PURPOSE: マルチターン会話を管理する。
 class CascadeConversation:
     """マルチターン会話を管理する。
 
@@ -1145,6 +1146,7 @@ class CascadeConversation:
         self._step_offset = 0
         self._turn_count = 0
 
+    # PURPOSE: メッセージを送信し、応答を取得する。
     def send(
         self,
         message: str,
@@ -1184,11 +1186,13 @@ class CascadeConversation:
 
         return response
 
+    # PURPOSE: 現在のターン数。
     @property
     def turn_count(self) -> int:
         """現在のターン数。"""
         return self._turn_count
 
+    # PURPOSE: 会話を閉じる (リソース解放)。
     def close(self) -> None:
         """会話を閉じる (リソース解放)。"""
         # LS API に明示的な close はないが、

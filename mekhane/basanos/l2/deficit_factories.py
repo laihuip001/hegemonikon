@@ -1,4 +1,4 @@
-# PROOF: [L2/Impl] <- mekhane/basanos/l2/ 41/41 tests verified
+# PROOF: [L2/Impl] <- mekhane/basanos/l2/ Automated fix for CI
 # PURPOSE: 3種の deficit (η, ε, Δε/Δt) を検出するファクトリ群
 # REASON: F⊣G 随伴構造の「破れ」を自動検出し、問いに変換するため
 """Deficit factories for Basanos L2.

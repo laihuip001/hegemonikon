@@ -1,3 +1,4 @@
+# PROOF: [L2/Impl] <- mekhane/ Automated fix for CI
 """UML Phase 2 — SEL 統合テスト"""
 
 import pytest

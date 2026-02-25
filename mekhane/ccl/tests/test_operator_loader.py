@@ -1,3 +1,4 @@
+# PROOF: [L2/Impl] <- mekhane/ Automated fix for CI
 """G6: dispatch E2E テスト + G9: Linter テスト + operator_loader テスト。"""
 
 import pytest

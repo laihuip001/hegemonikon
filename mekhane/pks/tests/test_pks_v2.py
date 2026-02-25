@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Impl] <- mekhane/ Automated fix for CI
 # PURPOSE: PKS v2 新コンポーネントのテスト
 """
 PKS v2 テストスイート

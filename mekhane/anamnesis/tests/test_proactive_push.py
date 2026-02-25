@@ -1,3 +1,4 @@
+# PROOF: [L2/Impl] <- mekhane/ Automated fix for CI
 """Proactive Push + Link Graph のテスト."""
 
 import json

@@ -1,0 +1,16 @@
+=== L2 Purpose Check (v2.6) ===
+OK: 110 | WEAK: 0 | MISSING: 9 | EXEMPT: 0
+Coverage: 92.4%
+
+❌ MISSING Purposes:
+  mekhane/dendron/falsification_checker.py:23 load_registry
+  mekhane/dendron/falsification_checker.py:33 check_completeness
+  mekhane/dendron/falsification_checker.py:58 check_file_references
+  mekhane/dendron/falsification_checker.py:100 summary_stats
+  mekhane/dendron/falsification_checker.py:113 main
+  mekhane/dendron/falsification_matcher.py:23 load_registry
+  mekhane/dendron/falsification_matcher.py:31 check_falsification
+  mekhane/dendron/falsification_matcher.py:99 format_alerts
+  mekhane/dendron/doc_staleness.py:109 warnings
+
+❌ 0 WEAK + 9 MISSING to fix

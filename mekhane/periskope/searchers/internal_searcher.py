@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/periskope/ S2->Mekhane->Periskope
 """
 Internal knowledge searcher for Periskopē.
 

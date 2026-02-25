@@ -28,6 +28,12 @@ import json
 # Default persistence path
 TRACES_PATH = Path("/home/makaron8426/oikos/mneme/.hegemonikon/meaningful_traces.json")
 
+# PURPOSE: Set custom traces path
+def set_traces_path(path: Path) -> None:
+    """Set custom traces path (for testing)."""
+    global TRACES_PATH
+    TRACES_PATH = path
+
 
 # PURPOSE: の統一的インターフェースを実現する
 @dataclass

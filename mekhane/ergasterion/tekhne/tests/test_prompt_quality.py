@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L3/テスト] <- mekhane/ergasterion/tekhne/tests/ A0→Implementation→test_prompt_quality
 """
 Prompt Quality Testing Suite
 

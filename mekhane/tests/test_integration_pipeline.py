@@ -28,9 +28,11 @@ sys.path.insert(0, str(PROJECT_ROOT))
 # Test 1: CCL Parse → AST via Hermeneus Dispatch
 # =============================================================================
 
+# PURPOSE: CCL 式が hermeneus dispatch() で正しく AST に変換されるか。
 class TestCCLParseToAST:
     """CCL 式が hermeneus dispatch() で正しく AST に変換されるか。"""
 
+    # PURPOSE: Simple workflow /noe+ should parse to a Workflow AST node
     def test_simple_workflow_parse(self):
         """Simple workflow /noe+ should parse to a Workflow AST node."""
         from hermeneus.src.dispatch import dispatch
@@ -41,6 +43,7 @@ class TestCCLParseToAST:
         assert len(result["workflows"]) > 0
         assert "/noe" in result["workflows"]
 
+    # PURPOSE: Sequence /bou_/ene should parse to multiple workflow nodes
     def test_sequence_parse(self):
         """Sequence /bou_/ene should parse to multiple workflow nodes."""
         from hermeneus.src.dispatch import dispatch
@@ -50,6 +53,7 @@ class TestCCLParseToAST:
         assert "/bou" in result["workflows"]
         assert "/ene" in result["workflows"]
 
+    # PURPOSE: Fusion /noe*/dia should parse correctly
     def test_fusion_parse(self):
         """Fusion /noe*/dia should parse correctly."""
         from hermeneus.src.dispatch import dispatch
@@ -59,6 +63,7 @@ class TestCCLParseToAST:
         assert "/noe" in result["workflows"]
         assert "/dia" in result["workflows"]
 
+    # PURPOSE: Oscillation /u+~/noe should parse correctly
     def test_oscillation_parse(self):
         """Oscillation /u+~/noe should parse correctly."""
         from hermeneus.src.dispatch import dispatch
@@ -68,6 +73,7 @@ class TestCCLParseToAST:
         assert "/u" in result["workflows"]
         assert "/noe" in result["workflows"]
 
+    # PURPOSE: Complex CCL with CPL: F:[×3]{/dia} should parse without crash
     def test_complex_ccl_with_cpl(self):
         """Complex CCL with CPL: F:[×3]{/dia} should parse without crash."""
         from hermeneus.src.dispatch import dispatch
@@ -78,6 +84,7 @@ class TestCCLParseToAST:
         assert result["success"], f"Parse failed: {result.get('error')}"
         assert result["ast"] is not None
 
+    # PURPOSE: Invalid CCL should return success=False with error message
     def test_invalid_ccl_returns_error(self):
         """Invalid CCL should return success=False with error message."""
         from hermeneus.src.dispatch import dispatch
@@ -86,6 +93,7 @@ class TestCCLParseToAST:
         # Empty string may be handled gracefully; ensure no crash
         assert isinstance(result, dict)
 
+    # PURPOSE: dispatch() should generate a plan_template for valid CCL
     def test_plan_template_generated(self):
         """dispatch() should generate a plan_template for valid CCL."""
         from hermeneus.src.dispatch import dispatch
@@ -100,9 +108,11 @@ class TestCCLParseToAST:
 # Test 2: Macro Expansion
 # =============================================================================
 
+# PURPOSE: CCL マクロが正しく展開されるか。
 class TestMacroExpansion:
     """CCL マクロが正しく展開されるか。"""
 
+    # PURPOSE: @go should expand to /s+_/ene+
     def test_go_macro_expands(self):
         """@go should expand to /s+_/ene+."""
         from mekhane.ccl.macro_expander import MacroExpander
@@ -113,6 +123,7 @@ class TestMacroExpansion:
         assert "/s+" in result
         assert "/ene+" in result
 
+    # PURPOSE: Unknown @nonexistent should pass through unchanged
     def test_unknown_macro_passthrough(self):
         """Unknown @nonexistent should pass through unchanged."""
         from mekhane.ccl.macro_expander import MacroExpander
@@ -122,6 +133,7 @@ class TestMacroExpansion:
         assert not expanded
         assert "@nonexistent_macro_xyz" in result
 
+    # PURPOSE: Macro embedded in CCL: /pro_@go should expand correctly
     def test_macro_in_ccl_context(self):
         """Macro embedded in CCL: /pro_@go should expand correctly."""
         from mekhane.ccl.macro_expander import MacroExpander
@@ -132,6 +144,7 @@ class TestMacroExpansion:
         assert "/pro_" in result
         assert "/ene+" in result
 
+    # PURPOSE: has_macros() should detect @go in expression
     def test_has_macros_detection(self):
         """has_macros() should detect @go in expression."""
         from mekhane.ccl.macro_expander import MacroExpander
@@ -140,6 +153,7 @@ class TestMacroExpansion:
         assert expander.has_macros("@go") is True
         assert expander.has_macros("/noe+") is False
 
+    # PURPOSE: list_macros_in_expr() should return macro objects
     def test_list_macros_in_expr(self):
         """list_macros_in_expr() should return macro objects."""
         from mekhane.ccl.macro_expander import MacroExpander
@@ -154,9 +168,11 @@ class TestMacroExpansion:
 # Test 3: Macro Expand → Dispatch (Cross-PJ Pipeline)
 # =============================================================================
 
+# PURPOSE: マクロ展開 → hermeneus dispatch の完全パイプライン。
 class TestMacroToDispatchPipeline:
     """マクロ展開 → hermeneus dispatch の完全パイプライン。"""
 
+    # PURPOSE: @go → expand → dispatch should produce valid AST
     def test_macro_expand_then_dispatch(self):
         """@go → expand → dispatch should produce valid AST."""
         from mekhane.ccl.macro_expander import MacroExpander
@@ -170,6 +186,7 @@ class TestMacroToDispatchPipeline:
         assert result["success"], f"Dispatch failed after expansion: {result.get('error')}"
         assert len(result["workflows"]) >= 2  # /s+ and /ene+
 
+    # PURPOSE: @dig → expand → dispatch should produce valid AST
     def test_complex_macro_expand_then_dispatch(self):
         """@dig → expand → dispatch should produce valid AST."""
         from mekhane.ccl.macro_expander import MacroExpander
@@ -189,9 +206,11 @@ class TestMacroToDispatchPipeline:
 # Test 4: Boot Integration Chain
 # =============================================================================
 
+# PURPOSE: symploke boot_integration のチェーンテスト。
 class TestBootIntegrationChain:
     """symploke boot_integration のチェーンテスト。"""
 
+    # PURPOSE: get_boot_context() should return a dict with expected keys
     def test_boot_context_returns_dict(self):
         """get_boot_context() should return a dict with expected keys."""
         from mekhane.symploke.boot_integration import get_boot_context
@@ -200,6 +219,7 @@ class TestBootIntegrationChain:
         assert isinstance(result, dict)
         assert "formatted" in result
 
+    # PURPOSE: Boot context should include project information
     def test_boot_context_has_projects(self):
         """Boot context should include project information."""
         from mekhane.symploke.boot_integration import _load_projects
@@ -209,6 +229,7 @@ class TestBootIntegrationChain:
         assert "projects" in result
         assert result["total"] > 0
 
+    # PURPOSE: Boot context should include skill information
     def test_boot_context_has_skills(self):
         """Boot context should include skill information."""
         from mekhane.symploke.boot_integration import _load_skills
@@ -218,6 +239,7 @@ class TestBootIntegrationChain:
         assert "skills" in result
         assert result["count"] > 0
 
+    # PURPOSE: THEOREM_REGISTRY should contain all 24 theorems
     def test_theorem_registry_completeness(self):
         """THEOREM_REGISTRY should contain all 24 theorems."""
         from mekhane.symploke.boot_integration import THEOREM_REGISTRY
@@ -227,6 +249,7 @@ class TestBootIntegrationChain:
         series = {v["series"] for v in THEOREM_REGISTRY.values()}
         assert series == {"O", "S", "H", "P", "K", "A"}
 
+    # PURPOSE: generate_boot_template() should produce valid template (file or str)
     def test_boot_template_generation(self):
         """generate_boot_template() should produce valid template (file or str)."""
         from mekhane.symploke.boot_integration import (
@@ -250,9 +273,11 @@ class TestBootIntegrationChain:
 # Test 5: Dendron Checker Integration
 # =============================================================================
 
+# PURPOSE: Dendron checker の統合テスト。
 class TestDendronIntegration:
     """Dendron checker の統合テスト。"""
 
+    # PURPOSE: DendronChecker should instantiate without errors
     def test_dendron_checker_instantiation(self):
         """DendronChecker should instantiate without errors."""
         from mekhane.dendron.checker import DendronChecker
@@ -265,6 +290,7 @@ class TestDendronIntegration:
         )
         assert checker is not None
 
+    # PURPOSE: Dendron should be able to check its own test directory
     def test_dendron_checks_own_directory(self):
         """Dendron should be able to check its own test directory."""
         from mekhane.dendron.checker import DendronChecker
@@ -279,6 +305,7 @@ class TestDendronIntegration:
         result = checker.check_dir_proof(PROJECT_ROOT / "mekhane" / "dendron")
         assert result is not None
 
+    # PURPOSE: Dendron should be able to check this integration test file
     def test_dendron_checks_this_file(self):
         """Dendron should be able to check this integration test file."""
         from mekhane.dendron.checker import DendronChecker
@@ -303,9 +330,11 @@ class TestDendronIntegration:
 # Test 6: Registry Consistency
 # =============================================================================
 
+# PURPOSE: registry.yaml の整合性テスト。
 class TestRegistryConsistency:
     """registry.yaml の整合性テスト。"""
 
+    # PURPOSE: registry.yaml should load without errors
     def test_registry_loads(self):
         """registry.yaml should load without errors."""
         import yaml
@@ -316,6 +345,7 @@ class TestRegistryConsistency:
         assert "projects" in data
         assert len(data["projects"]) > 0
 
+    # PURPOSE: All projects (except gnosis archived) should have a tier
     def test_all_projects_have_tier(self):
         """All projects (except gnosis archived) should have a tier."""
         import yaml
@@ -330,6 +360,7 @@ class TestRegistryConsistency:
             assert tier is not None, f"Project {project['id']} missing tier"
             assert tier in valid_tiers, f"Project {project['id']} has invalid tier: {tier}"
 
+    # PURPOSE: Active projects with relative paths should have existing directories
     def test_active_project_paths_exist(self):
         """Active projects with relative paths should have existing directories."""
         import yaml
@@ -358,6 +389,7 @@ class TestRegistryConsistency:
             + "\n".join(missing)
         )
 
+    # PURPOSE: Verify expected tier distribution
     def test_tier_distribution(self):
         """Verify expected tier distribution."""
         import yaml

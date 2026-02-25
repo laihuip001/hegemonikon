@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Mekhane] <- mekhane/basanos/l2/ A0→Implementation→history
 # PURPOSE: Basanos L2 deficit 履歴の永続化 — JSONL 形式で時系列追跡
 # REASON: deficit の推移を記録し、体系の健全性トレンドを可視化するため
 """Deficit history persistence for Basanos L2.
@@ -54,6 +55,7 @@ def _deserialize_deficit(data: dict[str, Any]) -> Deficit:
     )
 
 
+# PURPOSE: Append scan result to JSONL history file
 def record_scan(
     deficits: list[Deficit],
     history_dir: Optional[Path] = None,
@@ -93,6 +95,7 @@ def record_scan(
     return filepath
 
 
+# PURPOSE: Load scan history records (most recent first)
 def load_history(
     history_dir: Optional[Path] = None,
     limit: int = 50,
@@ -128,6 +131,7 @@ def load_history(
     return records[:limit]
 
 
+# PURPOSE: Calculate deficit trend from recent history
 def get_trend(
     history_dir: Optional[Path] = None,
     window: int = 10,

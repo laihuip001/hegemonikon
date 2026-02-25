@@ -1,3 +1,4 @@
+# PROOF: [L3/テスト] <- mekhane/anamnesis/tests/ A0→Implementation→test_lancedb_compat
 """Tests for mekhane.anamnesis.lancedb_compat."""
 
 import unittest

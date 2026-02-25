@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L3/テスト] <- mekhane/ergasterion/tekhne/tests/ A0→Implementation→test_generate_score_pipeline
 """
 Generate → Score Pipeline CI Tests
 
@@ -61,6 +62,9 @@ class TestDomainDetection:
     """detect_domain should correctly identify all 4 domains."""
 
     # PURPOSE: Verify detect domain behaves correctly
+    # PURPOSE: Verify detect domain behavior
+    # PURPOSE: Verify detect domain behavior
+    # PURPOSE: Verify detect domain behavior
     @pytest.mark.parametrize("text,expected", [
         ("SQLインジェクションのコードレビューをする", "technical"),
         ("Pythonのバグをデバッグする", "technical"),

@@ -1,3 +1,4 @@
+# PROOF: [L3/テスト] <- mekhane/symploke/tests/ A0→Implementation→test_ccl_theorems
 """CCL マクロの定理含有テスト。
 
 各 CCL マクロが期待されるワークフロー (定理) を含んでいるかを検証する。
@@ -53,14 +54,17 @@ def _file_contains_slug(content: str, slug: str) -> bool:
     return False
 
 
+# PURPOSE: CCL マクロファイルの定理含有検証。
 class TestCCLTheorems:
     """CCL マクロファイルの定理含有検証。"""
 
+    # PURPOSE: Ensure workflow directory exists
     @pytest.fixture(autouse=True)
     def setup(self):
         """Ensure workflow directory exists."""
         assert WORKFLOWS_DIR.exists(), f"Workflows dir not found: {WORKFLOWS_DIR}"
 
+    # PURPOSE: 各 CCL マクロが期待する定理を含んでいるか。
     @pytest.mark.parametrize("macro_file,expected_slugs", list(EXPECTED_THEOREMS.items()))
     def test_ccl_contains_expected_theorems(self, macro_file: str, expected_slugs: list[str]):
         """各 CCL マクロが期待する定理を含んでいるか。"""
@@ -78,6 +82,7 @@ class TestCCLTheorems:
             f"{macro_file} is missing expected theorems: {missing}"
         )
 
+    # PURPOSE: 期待テーブルの全ファイルが存在するか。
     def test_all_macro_files_exist(self):
         """期待テーブルの全ファイルが存在するか。"""
         missing_files = []
@@ -86,6 +91,7 @@ class TestCCLTheorems:
                 missing_files.append(fname)
         assert not missing_files, f"Missing CCL macro files: {missing_files}"
 
+    # PURPOSE: 期待テーブルに空リストがないか。
     def test_no_empty_macro_expectations(self):
         """期待テーブルに空リストがないか。"""
         for fname, slugs in EXPECTED_THEOREMS.items():
@@ -129,9 +135,11 @@ ALL_24_THEOREMS: dict[str, str] = {
 }
 
 
+# PURPOSE: 逆方向: 各定理が少なくとも1つのワークフローで使われているか。
 class TestTheoremCoverage:
     """逆方向: 各定理が少なくとも1つのワークフローで使われているか。"""
 
+    # PURPOSE: Ensure workflow directory exists and load all workflow contents
     @pytest.fixture(autouse=True)
     def setup(self):
         """Ensure workflow directory exists and load all workflow contents."""
@@ -140,6 +148,7 @@ class TestTheoremCoverage:
         for fpath in WORKFLOWS_DIR.glob("*.md"):
             self._all_wf_contents[fpath.name] = fpath.read_text(encoding="utf-8")
 
+    # PURPOSE: 各定理が少なくとも1つのワークフローで参照されているか。
     @pytest.mark.parametrize("slug,theorem_name", list(ALL_24_THEOREMS.items()))
     def test_theorem_used_in_at_least_one_workflow(self, slug: str, theorem_name: str):
         """各定理が少なくとも1つのワークフローで参照されているか。"""
@@ -153,6 +162,7 @@ class TestTheoremCoverage:
             f"Checked {len(self._all_wf_contents)} files."
         )
 
+    # PURPOSE: 24定理が全て定義されているか。
     def test_all_24_theorems_defined(self):
         """24定理が全て定義されているか。"""
         assert len(ALL_24_THEOREMS) == 24, (
@@ -174,9 +184,11 @@ _ANNOTATION_RE = re.compile(
 )
 
 
+# PURPOSE: WF ファイル内の定理注釈 (XX Name) が kernel 定義と一致するか。
 class TestAnnotationConsistency:
     """WF ファイル内の定理注釈 (XX Name) が kernel 定義と一致するか。"""
 
+    # PURPOSE: Load all workflow files
     @pytest.fixture(autouse=True)
     def setup(self):
         """Load all workflow files."""
@@ -188,6 +200,7 @@ class TestAnnotationConsistency:
                     slug, tid, tname = m.group(1), m.group(2), m.group(3)
                     self._wf_annotations.append((fpath.name, i, slug, tid, tname))
 
+    # PURPOSE: 注釈の定理ID (e.g. S1) がスラグ (e.g. met) と一致するか。
     def test_annotation_id_matches_slug(self):
         """注釈の定理ID (e.g. S1) がスラグ (e.g. met) と一致するか。"""
         mismatches = []
@@ -204,6 +217,7 @@ class TestAnnotationConsistency:
             f"Theorem ID mismatches in annotations:\n" + "\n".join(mismatches)
         )
 
+    # PURPOSE: 注釈の定理名 (e.g. Metron) が ID (e.g. S1) と一致するか。
     def test_annotation_name_matches_id(self):
         """注釈の定理名 (e.g. Metron) が ID (e.g. S1) と一致するか。"""
         mismatches = []
@@ -220,6 +234,7 @@ class TestAnnotationConsistency:
             f"Theorem name mismatches in annotations:\n" + "\n".join(mismatches)
         )
 
+    # PURPOSE: 注釈が少なくとも1つ存在するか (テスト自体の健全性確認)。
     def test_annotations_found(self):
         """注釈が少なくとも1つ存在するか (テスト自体の健全性確認)。"""
         assert len(self._wf_annotations) > 0, (

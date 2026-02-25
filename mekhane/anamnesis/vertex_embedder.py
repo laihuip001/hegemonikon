@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/anamnesis/ A0→Implementation→vertex_embedder
 import os
 import logging
 from google import genai
@@ -5,6 +6,7 @@ from google.genai import types
 
 logger = logging.getLogger(__name__)
 
+# PURPOSE: Google Cloud Vertex AI テキストエンベディング (text-embedding-004) を使用する
 class VertexEmbedder:
     """
     Google Cloud Vertex AI テキストエンベディング (text-embedding-004) を使用する
@@ -28,6 +30,7 @@ class VertexEmbedder:
             logger.error(f"[VertexEmbedder] initialization failed: {e}")
             raise e
 
+    # PURPOSE: 単一テキストの埋め込みベクトルを取得
     def embed(self, text: str) -> list[float]:
         """単一テキストの埋め込みベクトルを取得"""
         try:
@@ -41,6 +44,7 @@ class VertexEmbedder:
             logger.error(f"[VertexEmbedder] embed error: {e}")
             raise e
 
+    # PURPOSE: 複数テキストの埋め込みベクトルをバッチ取得
     def embed_batch(self, texts: list[str]) -> list[list[float]]:
         """複数テキストの埋め込みベクトルをバッチ取得
         Vertex AI API はデフォルトで最大250件の入力をサポート(それ以上は分割が必要)

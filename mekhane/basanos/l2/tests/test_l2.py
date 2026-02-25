@@ -1,3 +1,4 @@
+# PROOF: [L3/テスト] <- mekhane/basanos/l2/tests/ A0→Implementation→test_l2
 # PURPOSE: L2 問い生成機構のテスト — G_struct と deficit factory の検証
 # REASON: kernel/ の実データに対してパーサーと deficit 検出が正しく動作するか確認
 """Tests for Basanos L2 structural deficit detection."""
@@ -69,6 +70,7 @@ SAMPLE_KERNEL_MD = textwrap.dedent("""\
 """)
 
 
+# PURPOSE: Create a temporary kernel directory with sample files
 @pytest.fixture
 def tmp_kernel(tmp_path: Path) -> Path:
     """Create a temporary kernel directory with sample files."""
@@ -78,6 +80,7 @@ def tmp_kernel(tmp_path: Path) -> Path:
     return kernel
 
 
+# PURPOSE: Create a GStruct instance for the temp kernel
 @pytest.fixture
 def g_struct(tmp_kernel: Path) -> GStruct:
     """Create a GStruct instance for the temp kernel."""
@@ -89,15 +92,18 @@ def g_struct(tmp_kernel: Path) -> GStruct:
 # ---------------------------------------------------------------------------
 
 
+# PURPOSE: Test core data models
 class TestModels:
     """Test core data models."""
 
+    # PURPOSE: deficit_type_values をテストする
     def test_deficit_type_values(self) -> None:
         assert DeficitType.ETA.value == "η"
         assert DeficitType.EPSILON_IMPL.value == "ε-impl"
         assert DeficitType.EPSILON_JUST.value == "ε-just"
         assert DeficitType.DELTA.value == "Δε/Δt"
 
+    # PURPOSE: external_form_creation をテストする
     def test_external_form_creation(self) -> None:
         ef = ExternalForm(
             source_path="kernel/ousia.md",
@@ -109,6 +115,7 @@ class TestModels:
         assert "Noēsis" in ef.keywords
         assert len(ef.theorem_ids) == 2
 
+    # PURPOSE: deficit_to_question をテストする
     def test_deficit_to_question(self) -> None:
         d = Deficit(
             type=DeficitType.ETA,
@@ -123,6 +130,7 @@ class TestModels:
         assert "Active Inference Paper" in q.text
         assert not q.answered
 
+    # PURPOSE: hgk_concept をテストする
     def test_hgk_concept(self) -> None:
         c = HGKConcept(
             doc_id="OUSIA_SERIES",
@@ -140,9 +148,11 @@ class TestModels:
 # ---------------------------------------------------------------------------
 
 
+# PURPOSE: Test structural parser
 class TestGStruct:
     """Test structural parser."""
 
+    # PURPOSE: parse_file をテストする
     def test_parse_file(self, g_struct: GStruct, tmp_kernel: Path) -> None:
         concept = g_struct.parse_file(tmp_kernel / "test_series.md")
         assert concept is not None
@@ -151,40 +161,48 @@ class TestGStruct:
         assert "O1" in concept.theorem_ids
         assert "O2" in concept.theorem_ids
 
+    # PURPOSE: parse_frontmatter_extends をテストする
     def test_parse_frontmatter_extends(self, g_struct: GStruct, tmp_kernel: Path) -> None:
         concept = g_struct.parse_file(tmp_kernel / "test_series.md")
         assert concept is not None
         assert "L0.FEP" in concept.extends
         assert "L1.Flow" in concept.extends
 
+    # PURPOSE: extract_external_form をテストする
     def test_extract_external_form(self, g_struct: GStruct, tmp_kernel: Path) -> None:
         ef = g_struct.extract_external_form(tmp_kernel / "test_series.md")
         assert ef is not None
         assert len(ef.theorem_ids) >= 2
         assert "L0.FEP" in ef.dependencies
 
+    # PURPOSE: extract_claims をテストする
     def test_extract_claims(self, g_struct: GStruct, tmp_kernel: Path) -> None:
         ef = g_struct.extract_external_form(tmp_kernel / "test_series.md")
         assert ef is not None
         assert any("テスト" in c or "認識" in c or "推論" in c for c in ef.claims)
 
+    # PURPOSE: extract_keywords をテストする
     def test_extract_keywords(self, g_struct: GStruct, tmp_kernel: Path) -> None:
         ef = g_struct.extract_external_form(tmp_kernel / "test_series.md")
         assert ef is not None
         assert len(ef.keywords) > 0
 
+    # PURPOSE: scan_all をテストする
     def test_scan_all(self, g_struct: GStruct) -> None:
         concepts = g_struct.scan_all()
         assert len(concepts) == 1
         assert concepts[0].doc_id == "TEST_SERIES"
 
+    # PURPOSE: parse_nonexistent をテストする
     def test_parse_nonexistent(self, g_struct: GStruct) -> None:
         assert g_struct.parse_file(Path("/nonexistent.md")) is None
 
+    # PURPOSE: detect_series_ousia をテストする
     def test_detect_series_ousia(self, g_struct: GStruct) -> None:
         series = g_struct._detect_series("OUSIA_SERIES", "kernel/ousia.md")
         assert series == "O"
 
+    # PURPOSE: detect_series_schema をテストする
     def test_detect_series_schema(self, g_struct: GStruct) -> None:
         series = g_struct._detect_series("SCHEMA_SERIES", "kernel/schema.md")
         assert series == "S"
@@ -195,9 +213,11 @@ class TestGStruct:
 # ---------------------------------------------------------------------------
 
 
+# PURPOSE: Test η deficit detection
 class TestEtaDeficitFactory:
     """Test η deficit detection."""
 
+    # PURPOSE: detect_unabsorbed をテストする
     def test_detect_unabsorbed(self, g_struct: GStruct, tmp_kernel: Path) -> None:
         factory = EtaDeficitFactory(g_struct, tmp_kernel.parent)
         deficits = factory.detect(
@@ -207,6 +227,7 @@ class TestEtaDeficitFactory:
         assert len(deficits) >= 1
         assert all(d.type == DeficitType.ETA for d in deficits)
 
+    # PURPOSE: no_deficit_when_keyword_exists をテストする
     def test_no_deficit_when_keyword_exists(self, g_struct: GStruct, tmp_kernel: Path) -> None:
         factory = EtaDeficitFactory(g_struct, tmp_kernel.parent)
         deficits = factory.detect(
@@ -215,6 +236,7 @@ class TestEtaDeficitFactory:
         )
         assert len(deficits) == 0
 
+    # PURPOSE: question_generation をテストする
     def test_question_generation(self, g_struct: GStruct, tmp_kernel: Path) -> None:
         factory = EtaDeficitFactory(g_struct, tmp_kernel.parent)
         deficits = factory.detect(
@@ -226,15 +248,18 @@ class TestEtaDeficitFactory:
         assert "Important Paper" in q.text
 
 
+# PURPOSE: Test ε deficit detection
 class TestEpsilonDeficitFactory:
     """Test ε deficit detection."""
 
+    # PURPOSE: detect_impl_deficits をテストする
     def test_detect_impl_deficits(self, g_struct: GStruct, tmp_kernel: Path) -> None:
         factory = EpsilonDeficitFactory(g_struct, tmp_kernel.parent)
         deficits = factory.detect_impl_deficits()
         assert len(deficits) >= 1
         assert all(d.type == DeficitType.EPSILON_IMPL for d in deficits)
 
+    # PURPOSE: detect_justification_deficits をテストする
     def test_detect_justification_deficits(self, g_struct: GStruct, tmp_kernel: Path) -> None:
         factory = EpsilonDeficitFactory(g_struct, tmp_kernel.parent)
         deficits = factory.detect_justification_deficits(
@@ -243,13 +268,16 @@ class TestEpsilonDeficitFactory:
         assert all(d.type == DeficitType.EPSILON_JUST for d in deficits)
 
 
+# PURPOSE: Test Δε/Δt deficit detection
 class TestDeltaDeficitFactory:
     """Test Δε/Δt deficit detection."""
 
+    # PURPOSE: init をテストする
     def test_init(self, tmp_kernel: Path) -> None:
         factory = DeltaDeficitFactory(tmp_kernel.parent)
         assert factory.project_root == tmp_kernel.parent
 
+    # PURPOSE: detect_no_git をテストする
     def test_detect_no_git(self, tmp_kernel: Path) -> None:
         factory = DeltaDeficitFactory(tmp_kernel.parent)
         deficits = factory.detect()
@@ -261,12 +289,14 @@ class TestDeltaDeficitFactory:
 # ---------------------------------------------------------------------------
 
 
+# PURPOSE: Integration test against actual kernel/ directory
 class TestRealKernel:
     """Integration test against actual kernel/ directory."""
 
     PROJECT_ROOT = Path("/home/makaron8426/oikos/hegemonikon")
     KERNEL_ROOT = PROJECT_ROOT / "kernel"
 
+    # PURPOSE: parse_real_ousia をテストする
     @pytest.mark.skipif(
         not (Path("/home/makaron8426/oikos/hegemonikon/kernel/ousia.md").exists()),
         reason="Real kernel/ not available",
@@ -279,6 +309,7 @@ class TestRealKernel:
         assert concept.series == "O"
         assert "O1" in concept.theorem_ids
 
+    # PURPOSE: scan_real_kernel をテストする
     @pytest.mark.skipif(
         not (Path("/home/makaron8426/oikos/hegemonikon/kernel/ousia.md").exists()),
         reason="Real kernel/ not available",
@@ -288,6 +319,7 @@ class TestRealKernel:
         concepts = g.scan_all()
         assert len(concepts) >= 5
 
+    # PURPOSE: real_external_form をテストする
     @pytest.mark.skipif(
         not (Path("/home/makaron8426/oikos/hegemonikon/kernel/ousia.md").exists()),
         reason="Real kernel/ not available",

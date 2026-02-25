@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/periskope/searchers/ A0→Implementation→internal_searcher
 """
 Internal knowledge searcher for Periskopē.
 
@@ -27,6 +28,7 @@ if str(_PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(_PROJECT_ROOT))
 
 
+# PURPOSE: Search Gnōsis academic paper index (LanceDB)
 class GnosisSearcher:
     """Search Gnōsis academic paper index (LanceDB).
 
@@ -76,6 +78,7 @@ class GnosisSearcher:
                 return None
         return self._index
 
+    # PURPOSE: Search Gnōsis paper index
     async def search(
         self,
         query: str,
@@ -188,6 +191,7 @@ class GnosisSearcher:
         return [item for _, item in scored[:max_results]]
 
 
+# PURPOSE: Search Sophia Knowledge Items (KI) and Steps
 class SophiaSearcher:
     """Search Sophia Knowledge Items (KI) and Steps.
 
@@ -201,6 +205,7 @@ class SophiaSearcher:
     def __init__(self, ki_dir: Path | None = None) -> None:
         self.ki_dir = ki_dir or self.KI_DIR
 
+    # PURPOSE: Search Knowledge Items via TF-IDF
     async def search(
         self,
         query: str,
@@ -302,6 +307,7 @@ class SophiaSearcher:
         return scored[:k]
 
 
+# PURPOSE: Search Kairos session handoffs and ROM files
 class KairosSearcher:
     """Search Kairos session handoffs and ROM files.
 
@@ -319,6 +325,7 @@ class KairosSearcher:
         self.handoff_dir = handoff_dir or self.HANDOFF_DIR
         self.rom_dir = rom_dir or self.ROM_DIR
 
+    # PURPOSE: Search handoffs and ROM files
     async def search(
         self,
         query: str,

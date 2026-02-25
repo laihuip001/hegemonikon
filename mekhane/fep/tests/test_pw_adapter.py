@@ -1,3 +1,4 @@
+# PROOF: [L3/テスト] <- mekhane/fep/tests/ A0→Implementation→test_pw_adapter
 """Tests for pw_adapter.py — L1↔L2 PW bridge."""
 
 import pytest

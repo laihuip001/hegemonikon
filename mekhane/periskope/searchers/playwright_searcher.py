@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/periskope/searchers/ A0→Implementation→playwright_searcher
 """
 Playwright-based searcher for Periskopē.
 
@@ -17,6 +18,7 @@ from mekhane.periskope.models import SearchResult, SearchSource
 logger = logging.getLogger(__name__)
 
 
+# PURPOSE: Search by rendering dynamic pages via Playwright
 class PlaywrightSearcher:
     """Search by rendering dynamic pages via Playwright.
 
@@ -33,6 +35,7 @@ class PlaywrightSearcher:
         self.timeout = timeout
         self.headless = headless
 
+    # PURPOSE: Render a page and extract text content
     async def fetch_page(self, url: str) -> str | None:
         """Render a page and extract text content.
 
@@ -77,6 +80,7 @@ class PlaywrightSearcher:
             logger.warning("Playwright fetch failed for %s: %s", url[:60], e)
             return None
 
+    # PURPOSE: Render target URLs and extract text content
     async def search(
         self,
         query: str,

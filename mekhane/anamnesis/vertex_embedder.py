@@ -1,3 +1,4 @@
+# PROOF: [L2/Memory] <- mekhane/anamnesis/ A0→Implementation→vertex_embedder.py
 import os
 import logging
 from google import genai

@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/ergasterion/tekhne/tests/ A0->Auto->AddedByCI
 #!/usr/bin/env python3
 """
 Prompt Quality Testing Suite

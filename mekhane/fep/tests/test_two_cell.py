@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/fep/tests/ A0->Auto->AddedByCI
 #!/usr/bin/env python3
 """Tests for two_cell.py — Weak 2-category structure."""
 

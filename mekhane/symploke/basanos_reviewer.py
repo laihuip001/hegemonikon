@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/symploke/ A0->Auto->AddedByCI
 #!/usr/bin/env python3
 # PROOF: [L2/アプリケーション] <- mekhane/symploke/ A0→レビュー戦略が必要→basanos_reviewer が担う
 """

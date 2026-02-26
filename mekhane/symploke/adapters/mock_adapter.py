@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/symploke/adapters/ A0->Auto->AddedByCI
 """
 # PROOF: [L2/インフラ] <- mekhane/symploke/adapters/ A0→ベクトルDBアダプタが必要→mock_adapter が担う
 MockAdapter - テスト用ダミーアダプタ

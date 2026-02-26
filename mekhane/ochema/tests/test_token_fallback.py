@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/ochema/tests/ A0->Auto->AddedByCI
 #!/usr/bin/env python3
 # PROOF: [L2/テスト] <- mekhane/ochema/tests/ テスト
 # PURPOSE: _get_token() のフォールバック順序を検証するユニットテスト

@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/api/routes/ A0->Auto->AddedByCI
 #!/usr/bin/env python3
 # PROOF: [L2/Sympatheia] <- mekhane/api/routes/
 # PURPOSE: Sympatheia 自律神経系 API — n8n Code node ロジックの中枢化

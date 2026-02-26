@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/symploke/tests/ A0->Auto->AddedByCI
 #!/usr/bin/env python3
 # PROOF: [L2/テスト] <- mekhane/symploke/tests/
 # PURPOSE: Scheduler API (routes/scheduler.py) のユニットテスト

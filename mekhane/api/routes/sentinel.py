@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/api/routes/ A0->Auto->AddedByCI
 #!/usr/bin/env python3
 # PROOF: [L2/Sentinel] <- mekhane/api/routes/
 # PURPOSE: Paper Sentinel API — 論文スキャン結果の提供

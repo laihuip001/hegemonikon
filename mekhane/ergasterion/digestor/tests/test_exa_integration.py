@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/ergasterion/digestor/tests/ A0->Auto->AddedByCI
 #!/usr/bin/env python3
 # PROOF: [L2/テスト] <- mekhane/ergasterion/digestor/tests/
 # PURPOSE: Exa 統合テスト — _fetch_from_exa, _exa_to_paper

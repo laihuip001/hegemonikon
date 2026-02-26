@@ -68,6 +68,7 @@
 | ファイルツリー表示 | `GET /api/files/list` | ✅ 実装済み |
 | ファイル内容表示 | `GET /api/files/read` | ✅ 実装済み |
 | AI チャット | `POST /api/ochema/ask_with_tools` | ✅ 実装済み |
+| SSE ストリーミング | `POST /api/chat/send` | ✅ 実装済み |
 | Git 変更一覧 | `GET /api/git/status` | ✅ 実装済み |
 | Git Diff 表示 | `GET /api/git/diff` | ✅ 実装済み |
 | ターミナル実行 | `POST /api/terminal/execute` | ✅ 実装済み |
@@ -85,7 +86,6 @@
 | U2 | 縦タブ | アイコン+タイトルの縦タブ (§2.3) |
 | U3 | 右端スライドアウト | OPPO PAD 風、ホバーで透明度変化 (§2.4) |
 | U4 | タブシステム | Ctrl+T/W でタブ管理 |
-| U5 | SSE ストリーミング | チャットのリアルタイムストリーミング |
 | U6 | Diff 承認/却下 | 変更の approve/reject ボタン |
 
 ---

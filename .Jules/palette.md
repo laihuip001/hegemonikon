@@ -1,3 +1,0 @@
-## 2025-02-18 - [Accessibility in Template Literals]
-**Learning:** The `hgk` desktop app uses pure HTML template literals in TypeScript files (e.g., `src/views/chat.ts`) for UI generation. This pattern lacks the compile-time accessibility checks found in JSX/TSX environments, leading to patterns like interactive elements implemented as `<span>` tags (e.g., hint chips) instead of semantic `<button>` elements, which breaks keyboard accessibility.
-**Action:** When working on `hgk` views, manually audit template strings for semantic HTML usage (prefer `<button>` over `<span>` for clickables) and ensure `aria-label` attributes are present on icon-only buttons, as no linter will catch these issues.

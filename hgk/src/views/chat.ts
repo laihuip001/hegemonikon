@@ -271,7 +271,7 @@ function renderMessage(msg: ChatMessage, index: number): string {
         <span class="chat-msg-role">${isUser ? '👤 You' : '🤖 AI'}</span>
         ${modelTag}
         <span class="chat-msg-time">${formatTime(msg.timestamp)}</span>
-        <button class="chat-msg-delete" title="削除" aria-label="メッセージを削除" data-idx="${index}">✕</button>
+        <button class="chat-msg-delete" title="削除" data-idx="${index}">✕</button>
       </div>
       <div class="chat-msg-body">${rendered}</div>
     </div>
@@ -289,9 +289,9 @@ function renderMessages(): void {
         <div class="chat-empty-title">Hegemonikón Chat</div>
         <div class="chat-empty-subtitle">AI と対話を始めましょう</div>
         <div class="chat-empty-hints">
-          <button type="button" class="chat-hint" style="color: inherit;">HGK の現在の方向性は？</button>
-          <button type="button" class="chat-hint" style="color: inherit;">FEP を簡単に説明して</button>
-          <button type="button" class="chat-hint" style="color: inherit;">CCL の @helm を解説</button>
+          <span class="chat-hint">HGK の現在の方向性は？</span>
+          <span class="chat-hint">FEP を簡単に説明して</span>
+          <span class="chat-hint">CCL の @helm を解説</span>
         </div>
       </div>
     `;
@@ -336,7 +336,6 @@ function addCopyButtons(container: HTMLElement): void {
         btn.className = 'code-copy-btn';
         btn.textContent = '📋';
         btn.title = 'コピー';
-        btn.setAttribute('aria-label', 'コードをクリップボードにコピー');
         btn.addEventListener('click', () => {
             const code = pre.querySelector('code')?.textContent ?? pre.textContent ?? '';
             void navigator.clipboard.writeText(code).then(() => {
@@ -526,18 +525,18 @@ export async function renderChatView(): Promise<void> {
       <div class="chat-header">
         <div class="chat-header-left">
           <h1 style="margin:0; font-size:1.2rem;">💬 Chat</h1>
-          <span id="chat-status" class="chat-status" role="status">
+          <span id="chat-status" class="chat-status">
             ${apiKey
             ? `<span class="status-dot ok"></span> ${esc(MODELS[currentModel] || currentModel)}`
             : '<span class="status-dot error"></span> 未接続'}
           </span>
         </div>
         <div class="chat-header-right">
-          <select id="chat-model-select" class="input chat-model-select" aria-label="モデル選択">
+          <select id="chat-model-select" class="input chat-model-select">
             ${modelOptions}
           </select>
-          <button id="chat-settings-btn" class="btn btn-sm btn-outline" title="API キー設定" aria-label="APIキー設定">⚙️</button>
-          <button id="chat-clear-btn" class="btn btn-sm btn-outline" title="履歴クリア" aria-label="会話履歴を消去">🗑️</button>
+          <button id="chat-settings-btn" class="btn btn-sm btn-outline" title="API キー設定">⚙️</button>
+          <button id="chat-clear-btn" class="btn btn-sm btn-outline" title="履歴クリア">🗑️</button>
         </div>
       </div>
 
@@ -553,7 +552,6 @@ export async function renderChatView(): Promise<void> {
       <div class="chat-input-area">
         <textarea id="chat-input" class="input chat-textarea" 
           placeholder="メッセージを入力... (Enter で送信、Shift+Enter で改行)"
-          aria-label="チャットメッセージ入力"
           rows="1"></textarea>
         <button id="chat-send-btn" class="btn chat-send-btn">送信</button>
       </div>

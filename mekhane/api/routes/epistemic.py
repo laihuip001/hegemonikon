@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/api/routes/ A0->Auto->AddedByCI
 #!/usr/bin/env python3
 # PROOF: [L2/Epistemic] <- mekhane/api/routes/
 # PURPOSE: Epistemic Status API — 認識論的地位レジストリの提供

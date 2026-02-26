@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/mcp/tests/ A0->Auto->AddedByCI
 #!/usr/bin/env python3
 """
 MCP Server Integration Tests — mneme/ochema 統合後の回帰テスト

@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/pks/ A0->Auto->AddedByCI
 #!/usr/bin/env python3
 # PROOF: [L2/インフラ] <- mekhane/pks/ A0→プッシュ反応の学習が次回精度を上げる→feedback が担う
 """

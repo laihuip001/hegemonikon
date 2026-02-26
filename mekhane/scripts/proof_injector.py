@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/scripts/ A0->Auto->AddedByCI
 #!/usr/bin/env python3
 # PROOF: [L3/ツール] <- mekhane/scripts/
 """

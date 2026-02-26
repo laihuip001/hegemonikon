@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/peira/tests/ A0->Auto->AddedByCI
 #!/usr/bin/env python3
 # PROOF: [L2/テスト] <- mekhane/peira/ A0→テストが必要→test_hgk_healthが担う
 """

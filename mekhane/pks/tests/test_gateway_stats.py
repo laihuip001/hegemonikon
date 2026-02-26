@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/pks/tests/ A0->Auto->AddedByCI
 #!/usr/bin/env python3
 """F6c: Gateway Stats API endpoint tests."""
 

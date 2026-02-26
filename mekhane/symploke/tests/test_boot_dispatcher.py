@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/symploke/tests/ A0->Auto->AddedByCI
 """
 Tests for Dispatcher integration in boot_integration.py
 

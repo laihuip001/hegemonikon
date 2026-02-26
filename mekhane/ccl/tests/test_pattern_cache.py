@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/ccl/tests/ A0->Auto->AddedByCI
 """Tests for mekhane.ccl.pattern_cache.PatternCache."""
 
 import unittest

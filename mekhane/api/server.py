@@ -318,6 +318,14 @@ def _register_routers(app: FastAPI) -> None:
     except Exception as exc:
         logger.warning("DevTools router skipped: %s", exc)
 
+    # Agent — Self-modification POC
+    try:
+        from mekhane.api.routes.agent import router as agent_router
+        app.include_router(agent_router, prefix=API_PREFIX)
+        logger.info("Agent router registered")
+    except Exception as exc:
+        logger.warning("Agent router skipped: %s", exc)
+
 
 
 # PURPOSE: アプリケーションインスタンス（uvicorn 用）

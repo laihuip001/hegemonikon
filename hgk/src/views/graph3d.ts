@@ -35,6 +35,11 @@ const NATURALITY_COLORS: Record<string, string> = {
 
 const BG_COLOR = 0x050508;
 
+// Shared uniform for glow shaders to avoid per-node updates
+const sharedGlowUniforms = {
+    uTime: { value: 0 },
+};
+
 // ─── Glow Shell Shader ───────────────────────────────────────
 
 const glowVertexShader = `
@@ -104,7 +109,7 @@ function createGlowShell(series: string, isPure: boolean): THREE.Mesh {
             uColor: { value: new THREE.Color(c1) },
             uColor2: { value: new THREE.Color(c2) },
             uIntensity: { value: 0.6 },
-            uTime: { value: 0 },
+            uTime: sharedGlowUniforms.uTime,
         },
         vertexShader: glowVertexShader,
         fragmentShader: glowFragmentShader,
@@ -673,7 +678,8 @@ export async function renderGraph3D(): Promise<void> {
             camera.lookAt(0, 0, 0);
         }
 
-        if (simulation.alpha() > 0.001) {
+        const isSimulating = simulation.alpha() > 0.001;
+        if (isSimulating) {
             simulation.tick();
         } else if (!simStabilized) {
             simStabilized = true;
@@ -683,22 +689,29 @@ export async function renderGraph3D(): Promise<void> {
 
         const elapsed = now * 0.001;  // seconds for shader uniforms
 
+        // Update shared uniform once per frame (optimization)
+        sharedGlowUniforms.uTime.value = elapsed;
+
         simNodes.forEach(node => {
             const group = nodeMeshes.get(node.id);
             if (!group) return;
-            group.position.set(node.x, node.y, node.z);
+
+            // Only update position if simulation is active (optimization)
+            if (isSimulating) {
+                group.position.set(node.x, node.y, node.z);
+            }
 
             const core = group.children[0] as THREE.Mesh;
             const wire = group.children[1] as THREE.Mesh;
             const glow = group.children[2] as THREE.Mesh;
 
-            // Update glow shader time uniform
+            // Update glow intensity only if changed
             if (glow && glow.material instanceof THREE.ShaderMaterial) {
                 const u = glow.material.uniforms;
-                if (u.uTime) u.uTime.value = elapsed;
-                // Boost glow on hover
-                if (u.uIntensity) u.uIntensity.value =
-                    group === hoveredGroup ? 1.2 : 0.6;
+                if (u.uIntensity) {
+                    const target = group === hoveredGroup ? 1.2 : 0.6;
+                    if (u.uIntensity.value !== target) u.uIntensity.value = target;
+                }
             }
 
             if (group !== hoveredGroup) {
@@ -741,10 +754,15 @@ export async function renderGraph3D(): Promise<void> {
             const link = simLinks[i];
             if (!link) return;
             const s = link.source as SimNode, t = link.target as SimNode;
-            const pos = line.geometry.attributes.position as THREE.BufferAttribute;
-            pos.setXYZ(0, s.x, s.y, s.z);
-            pos.setXYZ(1, t.x, t.y, t.z);
-            pos.needsUpdate = true;
+
+            // Only update geometry if simulation is active (optimization)
+            if (isSimulating) {
+                const pos = line.geometry.attributes.position as THREE.BufferAttribute;
+                pos.setXYZ(0, s.x, s.y, s.z);
+                pos.setXYZ(1, t.x, t.y, t.z);
+                pos.needsUpdate = true;
+            }
+
             const mat = line.material as THREE.LineBasicMaterial;
             const e = line.userData.edge as GraphEdge;
             mat.opacity = selectedNodeId

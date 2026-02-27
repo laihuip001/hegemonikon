@@ -32,11 +32,8 @@ try:
     import aiohttp
     AIOHTTP_AVAILABLE = True
 except ImportError:
-    import unittest.mock
-    aiohttp = unittest.mock.MagicMock()
-    aiohttp.ClientError = Exception
-    aiohttp.ClientSession = object
     AIOHTTP_AVAILABLE = False
+    aiohttp = None
 
 # Optional OpenTelemetry support for distributed tracing
 try:
@@ -183,7 +180,7 @@ def with_retry(
     backoff_factor: float = 2.0,
     initial_delay: float = 1.0,
     max_delay: float = 60.0,
-    retryable_exceptions: tuple = (RateLimitError, aiohttp.ClientError),
+    retryable_exceptions: tuple = (RateLimitError, Exception) if not AIOHTTP_AVAILABLE else (RateLimitError, aiohttp.ClientError),
 ):
     """
     Decorator for async functions with exponential backoff retry.
@@ -390,7 +387,7 @@ class JulesClient:
 
     # PURPOSE: Create a new Jules session
     @with_retry(
-        max_attempts=3, retryable_exceptions=(RateLimitError, aiohttp.ClientError)
+        max_attempts=3, retryable_exceptions=(RateLimitError, Exception) if not AIOHTTP_AVAILABLE else (RateLimitError, aiohttp.ClientError)
     )
     async def create_session(
         self,
@@ -435,7 +432,7 @@ class JulesClient:
 
     # PURPOSE: Get session status
     @with_retry(
-        max_attempts=3, retryable_exceptions=(RateLimitError, aiohttp.ClientError)
+        max_attempts=3, retryable_exceptions=(RateLimitError, Exception) if not AIOHTTP_AVAILABLE else (RateLimitError, aiohttp.ClientError)
     )
     async def get_session(self, session_id: str) -> JulesSession:
         """

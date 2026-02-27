@@ -16,6 +16,7 @@ from typing import Any
 from .extractor import BaseExporter
 
 
+# PURPOSE: Gateway Ideas のエクスポーター。
 class IdeasExporter(BaseExporter):
     """Gateway Ideas のエクスポーター。
 

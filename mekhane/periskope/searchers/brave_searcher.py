@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/periskope/searchers/brave_searcher.py Auto-generated proof for CI compliance
 """
 Brave Search API client for Periskopē.
 
@@ -25,6 +26,7 @@ logger = logging.getLogger(__name__)
 _BRAVE_API_URL = "https://api.search.brave.com/res/v1/web/search"
 
 
+# PURPOSE: Client for Brave Search API
 class BraveSearcher:
     """Client for Brave Search API.
 
@@ -41,6 +43,7 @@ class BraveSearcher:
         self._timeout = timeout
         self._client: httpx.AsyncClient | None = None
 
+    # PURPOSE: Check if API key is configured
     @property
     def available(self) -> bool:
         """Check if API key is configured."""
@@ -58,6 +61,7 @@ class BraveSearcher:
             )
         return self._client
 
+    # PURPOSE: Search via Brave Search API
     async def search(
         self,
         query: str,
@@ -145,6 +149,7 @@ class BraveSearcher:
         logger.info("Brave: %d results for %r", len(results), query)
         return results
 
+    # PURPOSE: Close the HTTP client
     async def close(self) -> None:
         """Close the HTTP client."""
         if self._client and not self._client.is_closed:

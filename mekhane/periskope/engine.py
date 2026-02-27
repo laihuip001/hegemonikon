@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/periskope/engine.py Auto-generated proof for CI compliance
 """
 Periskopē Deep Research Engine — Orchestrator.
 
@@ -122,6 +123,7 @@ async def _phi1_blind_spot_analysis(
     return blind_spot_queries
 
 
+# PURPOSE: Φ4: 収束思考 — Structured decision support frame
 @dataclass
 class DecisionFrame:
     """Φ4: 収束思考 — Structured decision support frame.
@@ -210,6 +212,7 @@ async def _phi4_convergent_framing(
     return frame
 
 
+# PURPOSE: Complete research report from Periskopē
 @dataclass
 class ResearchReport:
     """Complete research report from Periskopē."""
@@ -223,6 +226,7 @@ class ResearchReport:
     elapsed_seconds: float = 0.0
     source_counts: dict[str, int] = field(default_factory=dict)
 
+    # PURPOSE: Generate a Markdown report
     def markdown(self) -> str:
         """Generate a Markdown report."""
         lines = [
@@ -306,6 +310,7 @@ class ResearchReport:
         return "\n".join(lines)
 
 
+# PURPOSE: Orchestrate the full Periskopē deep research pipeline
 class PeriskopeEngine:
     """Orchestrate the full Periskopē deep research pipeline.
 
@@ -383,6 +388,7 @@ class PeriskopeEngine:
         return {}
 
 
+    # PURPOSE: Execute the full research pipeline
     async def research(
         self,
         query: str,
@@ -958,6 +964,7 @@ class PeriskopeEngine:
             return "implementation"
         return "concept"
 
+    # PURPOSE: F12: Suggest optimal sources based on query classification
     @classmethod
     def select_sources(cls, query: str) -> list[str]:
         """F12: Suggest optimal sources based on query classification."""

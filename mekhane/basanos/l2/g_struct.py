@@ -1,3 +1,4 @@
+# PROOF: [L2/Test] <- mekhane/basanos/l2/g_struct.py Auto-generated proof for CI compliance
 # PURPOSE: kernel/ MD ファイルから HGK 概念を機械的に抽出する構造パーサー
 # REASON: F⊣G 随伴の G_struct 部分 — YAML frontmatter, 定理テーブル, 定義を抽出
 """G_struct: Mechanical parser for kernel/ markdown files.
@@ -17,6 +18,7 @@ import yaml
 from mekhane.basanos.l2.models import ExternalForm, HGKConcept
 
 
+# PURPOSE: Structural parser for kernel/ markdown files
 class GStruct:
     """Structural parser for kernel/ markdown files.
 
@@ -43,6 +45,7 @@ class GStruct:
     def __init__(self, kernel_root: Path | str) -> None:
         self.kernel_root = Path(kernel_root)
 
+    # PURPOSE: Parse a single kernel/ markdown file into HGKConcept
     def parse_file(self, path: Path | str) -> Optional[HGKConcept]:
         """Parse a single kernel/ markdown file into HGKConcept."""
         path = Path(path)
@@ -80,6 +83,7 @@ class GStruct:
             extends=extends,
         )
 
+    # PURPOSE: Extract ExternalForm (G_struct output) from a kernel/ file
     def extract_external_form(self, path: Path | str) -> Optional[ExternalForm]:
         """Extract ExternalForm (G_struct output) from a kernel/ file.
 
@@ -120,6 +124,7 @@ class GStruct:
             theorem_ids=theorem_ids,
         )
 
+    # PURPOSE: Scan all kernel/ markdown files and return HGKConcepts
     def scan_all(self) -> list[HGKConcept]:
         """Scan all kernel/ markdown files and return HGKConcepts."""
         concepts = []

@@ -17,6 +17,7 @@ from mekhane.periskope.searchers.internal_searcher import (
 
 # ── Gnōsis Tests ──
 
+# PURPOSE: Gnōsis should return results from the paper index
 @pytest.mark.asyncio
 async def test_gnosis_search():
     """Gnōsis should return results from the paper index."""
@@ -29,6 +30,7 @@ async def test_gnosis_search():
         assert r.title
 
 
+# PURPOSE: Gnōsis search with source filter should not crash
 @pytest.mark.asyncio
 async def test_gnosis_search_with_filter():
     """Gnōsis search with source filter should not crash."""
@@ -41,6 +43,7 @@ async def test_gnosis_search_with_filter():
 
 # ── Sophia Tests ──
 
+# PURPOSE: Sophia should search Knowledge Items
 @pytest.mark.asyncio
 async def test_sophia_search():
     """Sophia should search Knowledge Items."""
@@ -51,6 +54,7 @@ async def test_sophia_search():
         assert r.source == SearchSource.SOPHIA
 
 
+# PURPOSE: Sophia should work with custom KI directory
 @pytest.mark.asyncio
 async def test_sophia_with_custom_dir(tmp_path: Path):
     """Sophia should work with custom KI directory."""
@@ -66,6 +70,7 @@ async def test_sophia_with_custom_dir(tmp_path: Path):
 
 # ── Kairos Tests ──
 
+# PURPOSE: Kairos should search handoffs and ROMs
 @pytest.mark.asyncio
 async def test_kairos_search():
     """Kairos should search handoffs and ROMs."""
@@ -76,6 +81,7 @@ async def test_kairos_search():
         assert r.source == SearchSource.KAIROS
 
 
+# PURPOSE: Kairos should handle empty directories gracefully
 @pytest.mark.asyncio
 async def test_kairos_with_empty_dir(tmp_path: Path):
     """Kairos should handle empty directories gracefully."""
@@ -86,6 +92,7 @@ async def test_kairos_with_empty_dir(tmp_path: Path):
 
 # ── Integration ──
 
+# PURPOSE: All internal searchers should be importable and runnable
 @pytest.mark.asyncio
 async def test_all_internal_searchers():
     """All internal searchers should be importable and runnable."""

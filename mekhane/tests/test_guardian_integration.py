@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/tests/ A0->Auto->AddedByCI
 """
 Guardian Integration Tests — /bou ② テスト守護者
 
@@ -89,28 +90,34 @@ class TestMeaningfulTraceContextRegression:
             save_traces,
             load_traces,
             clear_session_traces,
+            ensure_traces_dir,
         )
 
         with tempfile.TemporaryDirectory() as tmpdir:
             path = Path(tmpdir) / "traces.json"
 
-            # Write a trace with context
-            clear_session_traces()
-            mark_meaningful(
-                reason="persist context",
-                intensity=2,
-                context="must persist to disk",
-            )
-            save_traces(path)
+            # Use mock to override TRACES_PATH for ensure_traces_dir
+            with patch("mekhane.fep.meaningful_traces.TRACES_PATH", Path(tmpdir) / "default_traces.json"):
+                # Write a trace with context
+                clear_session_traces()
+                mark_meaningful(
+                    reason="persist context",
+                    intensity=2,
+                    context="must persist to disk",
+                )
 
-            # Load and verify
-            loaded = load_traces(path)
-            assert len(loaded) >= 1
-            found = [t for t in loaded if t.reason == "persist context"]
-            assert len(found) == 1
-            assert found[0].context == "must persist to disk"
+                # Mock ensure_traces_dir to prevent creation of default directories in read-only environment
+                with patch("mekhane.fep.meaningful_traces.ensure_traces_dir") as mock_ensure:
+                    save_traces(path)
 
-            clear_session_traces()
+                # Load and verify
+                loaded = load_traces(path)
+                assert len(loaded) >= 1
+                found = [t for t in loaded if t.reason == "persist context"]
+                assert len(found) == 1
+                assert found[0].context == "must persist to disk"
+
+                clear_session_traces()
 
 
 # ============ 2. FailureDB — resolution regression ============

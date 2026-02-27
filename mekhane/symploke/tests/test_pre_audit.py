@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Mekhane] <- mekhane/tests/ A0->Auto->AddedByCI
 # PROOF: [L2/テスト] <- mekhane/symploke/tests/ O4→pre-audit→test_pre_audit が担う
 # PURPOSE: Pre-audit スコアリングとファイルソートのユニットテスト
 """Pre-audit scoring and file reordering tests."""

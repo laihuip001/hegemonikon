@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Mekhane] <- mekhane/basanos/ A0->Auto->AddedByCI
 # PROOF: [L2/インフラ] <- mekhane/basanos/ AI Auditor 抑制コメント自動挿入
 """Auto-insert # noqa suppression comments for AI Auditor findings.
 

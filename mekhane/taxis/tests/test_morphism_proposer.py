@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Mekhane] <- mekhane/tests/ A0->Auto->AddedByCI
 # PROOF: [L2/テスト] <- mekhane/taxis/tests/
 # PURPOSE: Morphism Proposer (X-series射提案エンジン) の包括テスト
 """Morphism Proposer Tests"""

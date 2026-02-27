@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/tests/ A0->Auto->AddedByCI
 """
 MCP Gateway — 統合テスト
 

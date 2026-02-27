@@ -1,3 +1,4 @@
+# PROOF: [L2/Search] <- mekhane/periskope/searchers/tavily_searcher.py O2→Intent→File
 """
 Tavily Search API client for Periskopē.
 

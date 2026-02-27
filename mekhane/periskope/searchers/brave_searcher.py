@@ -1,3 +1,4 @@
+# PROOF: [L2/Search] <- mekhane/periskope/searchers/brave_searcher.py O2→Intent→File
 """
 Brave Search API client for Periskopē.
 

@@ -1,3 +1,4 @@
+# PROOF: [L2/Search] <- mekhane/periskope/searchers/semantic_scholar_searcher.py O2→Intent→File
 """
 Semantic Scholar API client for Periskopē.
 

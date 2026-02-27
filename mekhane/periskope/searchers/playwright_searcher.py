@@ -1,3 +1,4 @@
+# PROOF: [L2/Search] <- mekhane/periskope/searchers/playwright_searcher.py O2→Intent→File
 """
 Playwright-based searcher for Periskopē.
 

@@ -1,3 +1,4 @@
+# PROOF: [L2/Infra] <- mekhane/mcp/mcp_guard.py O2→Intent→File
 """
 MCP Guard — ゾンビプロセス防止の自己防衛モジュール
 

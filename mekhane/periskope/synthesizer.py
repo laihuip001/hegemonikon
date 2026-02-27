@@ -1,3 +1,4 @@
+# PROOF: [L2/Search] <- mekhane/periskope/synthesizer.py O2→Intent→File
 """
 Multi-model synthesizer for Periskopē.
 

@@ -38,7 +38,16 @@ jobs:
           python-version: "3.11"
 
       - name: Install dependencies
-        run: pip install pyyaml
+        run: |
+          python -m pip install --upgrade pip
+          # 1. Install base tools from PyPI
+          pip install pyyaml pydantic lancedb numpy scipy \
+                      networkx pandas tabulate requests httpx schedule \
+                      fastapi uvicorn aiohttp python-dotenv filelock
+          # 2. Install torch (CPU) from pytorch index
+          pip install torch --index-url https://download.pytorch.org/whl/cpu
+          # 3. Install sentence-transformers (which depends on torch)
+          pip install sentence-transformers
 
       # L1: PROOF Header Check (blocking)
       - name: "L1: PROOF Header Check"

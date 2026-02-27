@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/tests/ A0->Auto->AddedByCI
 #!/usr/bin/env python3
 # PROOF: [L2/テスト] <- mekhane/ccl/tests/
 # PURPOSE: CCL SyntaxValidator の包括テスト — v2.0仕様準拠を検証

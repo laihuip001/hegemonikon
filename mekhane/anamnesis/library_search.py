@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/anamnesis/ A0->Auto->AddedByCI
 #!/usr/bin/env python3
 # PROOF: [L2/インフラ] <- mekhane/anamnesis/ A0→Library検索エンジンが必要→library_searchが担う
 """

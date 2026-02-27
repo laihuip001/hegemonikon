@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/anamnesis/ A0->Auto->AddedByCI
 #!/usr/bin/env python3
 # PROOF: [L3/ユーティリティ] <- mekhane/anamnesis/ P3→データ処理が必要→scan_sessions が担う
 """

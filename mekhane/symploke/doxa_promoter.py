@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/symploke/ A0->Auto->AddedByCI
 #!/usr/bin/env python3
 # PROOF: [L2/インフラ] <- mekhane/symploke/
 # PURPOSE: Doxa 信念を Sophia 知識 (KI) に昇格させるパイプライン

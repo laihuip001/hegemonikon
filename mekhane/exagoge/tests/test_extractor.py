@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/tests/ A0->Auto->AddedByCI
 #!/usr/bin/env python3
 # PROOF: [L1/テスト] <- mekhane/exagoge/tests/
 # PURPOSE: Exagoge extractor モジュールのユニットテスト

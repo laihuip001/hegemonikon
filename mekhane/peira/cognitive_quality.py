@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/peira/ A0->Auto->AddedByCI
 #!/usr/bin/env python3
 # PROOF: [L2/検証] <- A0→認知品質の定量測定が必要→n=1でもデータで語る
 """

@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/anamnesis/ A0->Auto->AddedByCI
 #!/usr/bin/env python3
 # PROOF: [L3/ユーティリティ] <- mekhane/anamnesis/ P3→DOM調査が必要→inspect_message_v2 が担う
 """

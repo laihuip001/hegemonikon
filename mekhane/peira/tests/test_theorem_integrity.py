@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/tests/ A0->Auto->AddedByCI
 #!/usr/bin/env python3
 # PROOF: [L2/検証] <- DX-008: THEOREM_WORKFLOWS バグ再発防止
 """

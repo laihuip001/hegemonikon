@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Mekhane] <- mekhane/anamnesis/extract_strings.py S2→Mekhane→Implementation
 # PROOF: [L3/ユーティリティ] <- mekhane/anamnesis/ P3→データ処理が必要→extract_strings が担う
 """
 バイナリファイルから strings を抽出（protobuf パース不要）

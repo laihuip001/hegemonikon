@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Mekhane] <- mekhane/ergasterion/digestor/tests/test_digestor_improvements.py S2→Mekhane→Implementation
 # PROOF: [L2/テスト] <- mekhane/ergasterion/digestor/tests/
 # PURPOSE: Digestor Pipeline 改善 A-F の包括テスト
 """Digestor Improvements Tests — A-F 全項目"""

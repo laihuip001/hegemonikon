@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Mekhane] <- mekhane/ccl/tests/test_ccl_modules.py S2→Mekhane→CCL
 # PROOF: [L2/テスト] <- mekhane/ccl/tests/
 # PURPOSE: CCL Pattern Cache, Workflow Signature, Output Schema, Tracer の包括テスト
 """CCL Module Tests — Batch 2"""

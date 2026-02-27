@@ -1,3 +1,4 @@
+# PROOF: [L2/Infra] <- mekhane/symploke/adapters/mock_adapter.py H3→Infra→Symploke
 """
 # PROOF: [L2/インフラ] <- mekhane/symploke/adapters/ A0→ベクトルDBアダプタが必要→mock_adapter が担う
 MockAdapter - テスト用ダミーアダプタ

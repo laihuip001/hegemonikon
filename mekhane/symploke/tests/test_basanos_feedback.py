@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Infra] <- mekhane/symploke/tests/test_basanos_feedback.py H3→Infra→Symploke
 # PROOF: [L2/テスト] <- mekhane/symploke/tests/
 # PURPOSE: F4 basanos_feedback.py のユニットテスト
 """Tests for Basanos Perspective Feedback system."""

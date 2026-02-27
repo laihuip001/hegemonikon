@@ -1,3 +1,4 @@
+# PROOF: [L2/Infra] <- mekhane/symploke/search/ranker.py H3→Infra→Symploke
 """
 # PROOF: [L2/インフラ] <- mekhane/symploke/search/ A0→検索機能が必要→ranker が担う
 Symplokē Ranker

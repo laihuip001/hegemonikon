@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Mekhane] <- mekhane/mcp/tests/test_gateway_functional.py S2→Mekhane→MCP
 # PROOF: [L1/テスト] <- mekhane/mcp/tests/
 # PURPOSE: Gateway ツール群の正常パステスト（セキュリティテストの補完）
 """

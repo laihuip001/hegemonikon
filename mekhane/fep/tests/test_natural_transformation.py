@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Mekhane] <- mekhane/fep/tests/test_natural_transformation.py S2→Mekhane→Implementation
 # PROOF: [L3/テスト] <- mekhane/fep/tests/
 """
 PROOF: [L3/テスト] このファイルは存在しなければならない

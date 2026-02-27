@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Quality] <- mekhane/dendron/proof_skeleton.py S2→Quality→Dendron
 # PROOF: [L2/インフラ] <- mekhane/dendron/ A0→PROOF自動生成が必要→proof_skeletonが担う
 """
 PROOF.md Skeleton Generator — 新ディレクトリ作成時に PROOF.md を自動生成する。

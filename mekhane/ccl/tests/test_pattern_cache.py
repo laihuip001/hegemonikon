@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/ccl/tests/test_pattern_cache.py S2→Mekhane→CCL
 """Tests for mekhane.ccl.pattern_cache.PatternCache."""
 
 import unittest

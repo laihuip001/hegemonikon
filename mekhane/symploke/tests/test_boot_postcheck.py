@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Infra] <- mekhane/symploke/tests/test_boot_postcheck.py H3→Infra→Symploke
 """Tests for boot_integration template generation and postcheck."""
 
 import sys

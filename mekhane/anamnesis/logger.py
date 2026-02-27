@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Mekhane] <- mekhane/anamnesis/logger.py S2→Mekhane→Implementation
 # PROOF: [L2/インフラ] <- mekhane/anamnesis/
 """
 PROOF: [L2/インフラ] このファイルは存在しなければならない

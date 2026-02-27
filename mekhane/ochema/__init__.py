@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Mekhane] <- mekhane/ochema/__init__.py S2→Mekhane→Ochema
 # PROOF: [L2/インフラ] <- mekhane/ochema/ A0→外部LLM接続
 # PURPOSE: Ochēma パッケージ初期化 — lazy import で proto 依存を回避
 """

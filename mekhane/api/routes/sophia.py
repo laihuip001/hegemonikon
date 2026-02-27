@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Mekhane] <- mekhane/api/routes/sophia.py S2→Mekhane→API
 # PROOF: [L2/インフラ] <- mekhane/api/routes/
 # PURPOSE: Sophia KI (Knowledge Items) CRUD API
 """

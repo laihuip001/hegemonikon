@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Infra] <- mekhane/symploke/specialist_analyzer.py H3→Infra→Symploke
 # PROOF: [L2/分析] <- mekhane/symploke/ A4→Specialist 効果測定→analyzer が担う
 # PURPOSE: Basanos Perspective の効果分析 — 有用率ランキング + domain/axis 集計
 """

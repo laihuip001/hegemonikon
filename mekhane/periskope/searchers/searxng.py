@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/periskope/searchers/searxng.py S2→Mekhane→Periskope
 """
 SearXNG search client for Periskopē.
 

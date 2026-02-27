@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Mekhane] <- mekhane/anamnesis/list_pages.py S2→Mekhane→Implementation
 # PROOF: [L3/ユーティリティ] <- mekhane/anamnesis/ P3→データ処理が必要→list_pages が担う
 """
 全ページを列挙し、内容を確認

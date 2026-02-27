@@ -1,3 +1,4 @@
+# PROOF: [L2/Infra] <- mekhane/symploke/tests/test_ccl_theorems.py H3→Infra→Symploke
 """CCL マクロの定理含有テスト。
 
 各 CCL マクロが期待されるワークフロー (定理) を含んでいるかを検証する。

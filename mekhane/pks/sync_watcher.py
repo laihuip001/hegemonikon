@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/pks/sync_watcher.py S2→Mekhane→Implementation
 # noqa: AI-ALL
 # PROOF: [L2/インフラ] <- mekhane/pks/
 """

@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Mekhane] <- mekhane/api/server.py S2→Mekhane→API
 # PROOF: [L2/インフラ] <- mekhane/api/
 # PURPOSE: FastAPI アプリケーション本体 — CORS, ルーター登録, uvicorn 起動
 """

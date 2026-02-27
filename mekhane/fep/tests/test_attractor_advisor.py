@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/fep/tests/test_attractor_advisor.py S2→Mekhane→Implementation
 """Tests for attractor_advisor helper functions."""
 
 import unittest

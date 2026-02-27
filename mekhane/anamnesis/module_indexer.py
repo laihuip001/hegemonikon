@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Mekhane] <- mekhane/anamnesis/module_indexer.py S2→Mekhane→Implementation
 # PROOF: [L2/インフラ] <- mekhane/anamnesis/
 """
 PROOF: [L3/ユーティリティ]

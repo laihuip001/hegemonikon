@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Mekhane] <- mekhane/ccl/tests/test_output_schema.py S2→Mekhane→CCL
 # PROOF: [L2/テスト] <- mekhane/ccl/tests/
 # PURPOSE: CCL Output Schema (Pydantic) の包括テスト
 """CCL Output Schema Tests"""

@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Mekhane] <- mekhane/ochema/tests/test_service.py S2→Mekhane→Ochema
 # PROOF: [L2/インフラ] <- mekhane/ochema/tests/ テスト
 # PURPOSE: OchemaService ユニットテスト
 """

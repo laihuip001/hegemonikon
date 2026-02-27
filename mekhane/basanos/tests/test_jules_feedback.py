@@ -1,3 +1,4 @@
+# PROOF: [L2/Test] <- mekhane/basanos/tests/test_jules_feedback.py A2→Test→Basanos
 """Tests for JulesFeedback — L2結果→L0精度フィードバック。"""
 
 import json

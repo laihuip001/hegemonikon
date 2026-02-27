@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Mekhane] <- mekhane/fep/adjunction_builder.py S2→Mekhane→Implementation
 # PROOF: [L2/インフラ] <- mekhane/fep/ A0→Adjunction型の消費者が必要→adjunction_builderが担う
 """
 Adjunction Builder — /boot ⊣ /bye の随伴構造を Adjunction 型で構築する

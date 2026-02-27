@@ -1,3 +1,4 @@
+# PROOF: [L2/Infra] <- mekhane/symploke/adapters/hnswlib_adapter.py H3→Infra→Symploke
 """
 # PROOF: [L2/インフラ] <- mekhane/symploke/adapters/ A0→ベクトルDBアダプタが必要→hnswlib_adapter が担う
 HNSWlib Adapter - High-speed approximate nearest neighbor search

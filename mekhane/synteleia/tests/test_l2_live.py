@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Mekhane] <- mekhane/synteleia/tests/test_l2_live.py S2→Mekhane→Implementation
 # PROOF: [L2/テスト] <- mekhane/synteleia/tests/
 # PURPOSE: L2 SemanticAgent 実弾テスト (OpenAI Backend)
 """L2 Live Fire Tests — OpenAI Backend で実 HGK ドキュメントを監査"""

@@ -1,3 +1,4 @@
+# PROOF: [L2/Test] <- mekhane/basanos/tests/test_git_metrics.py A2→Test→Basanos
 """Tests for GitMetrics — git 履歴からのリスク予兆検出。"""
 
 import subprocess

@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Infra] <- mekhane/symploke/run_cortex_review.py H3→Infra→Symploke
 # PROOF: [L2/ユーティリティ] <- mekhane/symploke/ F5 benchmark で Gemini 3 Flash の品質を確認済み
 """
 Cortex Review Runner — Gemini 3 Flash/Pro 直接呼び出しによるコードレビュー

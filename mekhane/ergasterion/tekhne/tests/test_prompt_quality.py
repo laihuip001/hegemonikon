@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Mekhane] <- mekhane/ergasterion/tekhne/tests/test_prompt_quality.py S2→Mekhane→Implementation
 """
 Prompt Quality Testing Suite
 

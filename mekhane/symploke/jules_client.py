@@ -17,7 +17,6 @@ Usage:
 """
 
 import asyncio
-import aiohttp
 import functools
 import logging
 import os
@@ -26,7 +25,12 @@ import uuid
 import random  # AI-022: Thundering Herd 対策用
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Optional
+from typing import Optional, Any
+
+try:
+    import aiohttp
+except ImportError:
+    aiohttp = None  # Handle missing optional dependency
 
 # Optional OpenTelemetry support for distributed tracing
 try:
@@ -167,13 +171,16 @@ class JulesResult:
 # ============ Retry Decorator ============
 
 
+# Default to catching aiohttp.ClientError if available, otherwise just RateLimitError
+_RETRY_EXCEPTIONS = (RateLimitError, aiohttp.ClientError) if aiohttp else (RateLimitError,)
+
 # PURPOSE: Decorator for async functions with exponential backoff retry
 def with_retry(
     max_attempts: int = 3,
     backoff_factor: float = 2.0,
     initial_delay: float = 1.0,
     max_delay: float = 60.0,
-    retryable_exceptions: tuple = (RateLimitError, aiohttp.ClientError),
+    retryable_exceptions: tuple = _RETRY_EXCEPTIONS,
 ):
     """
     Decorator for async functions with exponential backoff retry.
@@ -255,7 +262,7 @@ class JulesClient:
     def __init__(
         self,
         api_key: Optional[str] = None,
-        session: Optional[aiohttp.ClientSession] = None,
+        session: Optional[Any] = None,  # Use Any instead of aiohttp.ClientSession for missing dependency
         max_concurrent: Optional[int] = None,
         base_url: Optional[str] = None,
     ):
@@ -280,7 +287,7 @@ class JulesClient:
             "Content-Type": "application/json",
         }
         self._shared_session = session
-        self._owned_session: Optional[aiohttp.ClientSession] = None
+        self._owned_session: Optional[Any] = None
 
         # Global semaphore for cross-batch rate limiting (th-003 fix)
         self._global_semaphore = asyncio.Semaphore(
@@ -289,7 +296,7 @@ class JulesClient:
 
     async def __aenter__(self):
         """Context manager entry - creates pooled session for connection reuse."""
-        if self._shared_session is None:
+        if self._shared_session is None and aiohttp is not None:
             # Connection pooling: reuse TCP connections (cl-004, as-008 fix)
             connector = aiohttp.TCPConnector(
                 limit=self.MAX_CONCURRENT,  # Max concurrent connections
@@ -306,9 +313,13 @@ class JulesClient:
             self._owned_session = None
 
     @property
-    def _session(self) -> aiohttp.ClientSession:
+    def _session(self) -> Any:
         """Get the active session (shared or owned)."""
-        return self._shared_session or self._owned_session or aiohttp.ClientSession()
+        if self._shared_session or self._owned_session:
+            return self._shared_session or self._owned_session
+        if aiohttp is not None:
+            return aiohttp.ClientSession()
+        raise ImportError("aiohttp is required to create a ClientSession")
 
     async def _request(
         self,
@@ -336,6 +347,9 @@ class JulesClient:
             aiohttp.ClientResponseError: For other HTTP errors
         """
         url = f"{self.base_url}/{endpoint}"
+
+        if aiohttp is None:
+            raise ImportError("aiohttp is required to make HTTP requests")
 
         # Create session if not in context manager
         session = self._shared_session or self._owned_session

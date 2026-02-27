@@ -7,7 +7,7 @@ Iterates over all .py files in mekhane/ and adds a PROOF header if missing.
 import os
 from pathlib import Path
 
-def main():
+def main() -> None:
     root = Path("mekhane")
     count = 0
 

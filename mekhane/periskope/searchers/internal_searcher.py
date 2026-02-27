@@ -1,3 +1,4 @@
+# PROOF: [L2/Search] <- mekhane/periskope/searchers/internal_searcher.py O2→Intent→File
 """
 Internal knowledge searcher for Periskopē.
 

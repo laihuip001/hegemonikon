@@ -1,3 +1,4 @@
+# PROOF: [L3/Context] <- mekhane/anamnesis/vertex_embedder.py O2→Intent→File
 import os
 import logging
 from google import genai

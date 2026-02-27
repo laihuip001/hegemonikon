@@ -1,3 +1,4 @@
+# PROOF: [L2/Search] <- mekhane/periskope/engine.py O2→Intent→File
 """
 Periskopē Deep Research Engine — Orchestrator.
 

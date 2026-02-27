@@ -1,3 +1,4 @@
+# PROOF: [L2/API] <- mekhane/api/routes/devtools.py O2→Intent→File
 """
 DevTools API routes — ファイル操作・ターミナル・Ochema (AI) をフロントエンド DevTools ビューに提供。
 

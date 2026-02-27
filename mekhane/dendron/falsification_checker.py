@@ -1,3 +1,4 @@
+# PROOF: [L2/Quality] <- mekhane/dendron/falsification_checker.py O2→Intent→File
 """
 S7: Falsification Condition Checker
 

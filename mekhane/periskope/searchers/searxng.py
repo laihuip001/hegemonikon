@@ -1,3 +1,4 @@
+# PROOF: [L2/Search] <- mekhane/periskope/searchers/searxng.py O2→Intent→File
 """
 SearXNG search client for Periskopē.
 

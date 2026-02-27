@@ -43,7 +43,8 @@ jobs:
                   python -m pip install --upgrade pip
                   # 1. Install standard PyPI packages (explicit index)
                   pip install pytest pytest-asyncio pytest-timeout pyyaml pydantic lancedb numpy scipy \
-                              networkx pandas tabulate requests httpx schedule filelock python-dotenv aiohttp
+                              networkx pandas tabulate requests httpx schedule filelock python-dotenv aiohttp \
+                              fastapi uvicorn
 
                   # 2. Install PyTorch CPU (specific index)
                   pip install torch --index-url https://download.pytorch.org/whl/cpu

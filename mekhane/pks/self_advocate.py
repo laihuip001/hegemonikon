@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 # PROOF: [L2/Mekhane] <- mekhane/pks/self_advocate.py S2→Mekhane→Implementation
-# PROOF: [L2/インフラ] <- mekhane/pks/
 """
 PROOF: [L2/インフラ] このファイルは存在しなければならない
 

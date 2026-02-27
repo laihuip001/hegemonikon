@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 # PROOF: [L2/Mekhane] <- mekhane/ochema/hgk_dev.py S2→Mekhane→Ochema
-# PROOF: [L2/インフラ] <- mekhane/ochema/ A0→Cortex ヘッドレス HGK 開発 CLI
 # PURPOSE: IDE なしで Cortex API 経由の HGK 開発を可能にする対話型 CLI
 
 """

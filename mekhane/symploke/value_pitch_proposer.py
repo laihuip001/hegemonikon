@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 # PROOF: [L2/Infra] <- mekhane/symploke/value_pitch_proposer.py H3→Infra→Symploke
-# PROOF: [L2/インフラ] <- mekhane/symploke/
 # PURPOSE: Value Pitch の Benefit Angle 自動提案 + 骨格ドラフト生成
 """
 PROOF: [L2/インフラ] このファイルは存在しなければならない

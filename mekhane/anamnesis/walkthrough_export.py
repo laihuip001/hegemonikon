@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 # PROOF: [L2/Mekhane] <- mekhane/anamnesis/walkthrough_export.py S2→Mekhane→Implementation
-# PROOF: [L2/インフラ] <- mekhane/anamnesis/
 #
 # P3 → セッション終了時に Walkthrough を保存する必要がある
 #    → Antigravity brain から walkthrough.md を mneme にコピー

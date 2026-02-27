@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 # PROOF: [L2/Mekhane] <- mekhane/fep/tests/test_convergence_tracker.py S2→Mekhane→Implementation
-# PROOF: [L3/テスト] <- convergence_tracker の3層収束証明テスト
 """
 Tests for convergence_tracker.py
 

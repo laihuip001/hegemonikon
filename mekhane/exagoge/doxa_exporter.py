@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 # PROOF: [L2/Mekhane] <- mekhane/exagoge/doxa_exporter.py S2→Mekhane→Implementation
-# PROOF: [L2/コア] <- mekhane/exagoge/
 # PURPOSE: Doxa (信念) データのエクスポート機能
 """
 Doxa Exporter — 信念データのエクスポーター

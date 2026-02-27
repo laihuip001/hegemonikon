@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 # PROOF: [L2/Mekhane] <- mekhane/anamnesis/memory_search.py S2→Mekhane→Implementation
-# PROOF: [L2/インフラ] <- mekhane/anamnesis/
 """
 PROOF: [L2/インフラ]
 

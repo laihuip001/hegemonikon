@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 # PROOF: [L2/Infra] <- mekhane/symploke/basanos_reviewer.py H3→Infra→Symploke
-# PROOF: [L2/アプリケーション] <- mekhane/symploke/ A0→レビュー戦略が必要→basanos_reviewer が担う
 """
 Basanos Reviewer - Hegemonikón Specialist Review Orchestrator
 

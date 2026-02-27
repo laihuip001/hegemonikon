@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 # PROOF: [L2/Mekhane] <- mekhane/ochema/claude_cli.py S2→Mekhane→Ochema
-# PROOF: [L2/ツール] <- mekhane/ochema/ V15 headless LS Claude wrapper
 # PURPOSE: IDE GUI なしで LS 経由 Claude を叩く CLI
 # REASON: IDE を開かずにターミナルから Claude / Gemini 等を直接利用する
 """claude-cli — Headless Claude/Gemini CLI via Language Server.

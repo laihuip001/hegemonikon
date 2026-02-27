@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 # PROOF: [L2/Infra] <- mekhane/symploke/specialists_tier1.py H3→Infra→Symploke
-# PROOF: [L2/インフラ] <- mekhane/symploke/ A0→Tier1進化専門家→specialists_tier1 が担う
 """
 Tier 1 進化専門家: Hegemonikón の進化に直接寄与する純化された知性
 

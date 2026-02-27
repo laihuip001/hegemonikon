@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 # PROOF: [L2/Infra] <- mekhane/symploke/doxa_boot.py H3→Infra→Symploke
-# PROOF: [L2/インフラ] <- mekhane/symploke/
 # PURPOSE: /boot Phase 3 で Doxa 信念を読込み、Sophia 昇格候補を検出する
 """
 PROOF: [L2/インフラ] このファイルは存在しなければならない

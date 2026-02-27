@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 # PROOF: [L2/Infra] <- mekhane/symploke/sophia_ingest.py H3→Infra→Symploke
-# PROOF: [L2/インフラ] <- mekhane/symploke/ A0→知識管理が必要→sophia_ingest が担う
 """
 Sophia Ingest - Knowledge Items を Sophia インデックスに自動投入
 

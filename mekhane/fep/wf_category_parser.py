@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 # PROOF: [L2/Mekhane] <- mekhane/fep/wf_category_parser.py S2→Mekhane→Implementation
-# PROOF: [L2/インフラ] <- mekhane/fep/ A0→WFフロントマターのcategory_theoryを消費する必要→wf_category_parserが担う
 """
 WF Category Theory Frontmatter Parser
 

@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 # PROOF: [L2/Infra] <- mekhane/symploke/tests/test_pre_audit.py H3→Infra→Symploke
-# PROOF: [L2/テスト] <- mekhane/symploke/tests/ O4→pre-audit→test_pre_audit が担う
 # PURPOSE: Pre-audit スコアリングとファイルソートのユニットテスト
 """Pre-audit scoring and file reordering tests."""
 

@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 # PROOF: [L2/Mekhane] <- mekhane/anamnesis/inspect_message_v2.py S2→Mekhane→Implementation
-# PROOF: [L3/ユーティリティ] <- mekhane/anamnesis/ P3→DOM調査が必要→inspect_message_v2 が担う
 """
 メッセージ DOM 構造詳細調査 v2
 

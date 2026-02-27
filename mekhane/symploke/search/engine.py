@@ -1,6 +1,5 @@
 # PROOF: [L2/Infra] <- mekhane/symploke/search/engine.py H3→Infra→Symploke
 """
-# PROOF: [L2/インフラ] <- mekhane/symploke/search/ A0→検索機能が必要→engine が担う
 Symplokē Search Engine
 
 Hegemonikón H3: 4知識源の統合検索エンジン

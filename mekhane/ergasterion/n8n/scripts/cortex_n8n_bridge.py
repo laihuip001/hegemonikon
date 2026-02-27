@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 # PROOF: [L2/Mekhane] <- mekhane/ergasterion/n8n/scripts/cortex_n8n_bridge.py S2→Mekhane→Implementation
-# PROOF: [L3/ユーティリティ] <- mekhane/ergasterion/n8n/ O4→n8n Cortex 統合→bridge が担う
 # PURPOSE: n8n → Cortex API ブリッジ HTTP サーバー
 """
 Cortex n8n Bridge — HTTP → Cortex API Proxy

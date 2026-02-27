@@ -1,6 +1,5 @@
 # PROOF: [L2/Quality] <- mekhane/dendron/cli.py S2→Quality→Dendron
 # noqa: AI-ALL
-# PROOF: [L2/インフラ] <- mekhane/dendron/  # noqa: AI-022
 """
 Dendron CLI — コマンドラインインターフェース
 

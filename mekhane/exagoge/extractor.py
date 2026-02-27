@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 # PROOF: [L2/Mekhane] <- mekhane/exagoge/extractor.py S2→Mekhane→Implementation
-# PROOF: [L2/コア] <- mekhane/exagoge/
 # PURPOSE: データエクスポートの基底クラスとファイル形式変換機能
 """
 Exagoge Extractor — エクスポート基盤モジュール

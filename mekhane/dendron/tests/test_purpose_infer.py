@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 # PROOF: [L2/Quality] <- mekhane/dendron/tests/test_purpose_infer.py S2→Quality→Dendron
-# PROOF: [L2/テスト] <- mekhane/dendron/ A0→テストが必要→test_purpose_inferが担う
 """
 Tests for purpose_infer.py — PURPOSE 自動推定ツール
 """

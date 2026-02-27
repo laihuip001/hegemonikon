@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 # PROOF: [L2/Mekhane] <- mekhane/api/routes/periskope.py S2→Mekhane→API
-# PROOF: [L2/Periskopē] <- mekhane/api/routes/
 # PURPOSE: Periskopē Research API — 研究結果の提供・非同期リクエスト
 """
 Periskopē Routes — 研究エンジン API

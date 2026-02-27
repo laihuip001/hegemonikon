@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 # PROOF: [L2/Mekhane] <- mekhane/exagoge/tests/test_extractor.py S2→Mekhane→Implementation
-# PROOF: [L1/テスト] <- mekhane/exagoge/tests/
 # PURPOSE: Exagoge extractor モジュールのユニットテスト
 """
 Exagoge Extractor Tests

@@ -1,6 +1,5 @@
 # PROOF: [L2/Infra] <- mekhane/symploke/indices/base.py H3→Infra→Symploke
 # noqa: AI-ALL
-# PROOF: [L2/インフラ] <- mekhane/symploke/indices/ A0→索引管理が必要→base が担う
 """
 Symplokē Domain Index - Abstract Base Class
 

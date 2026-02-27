@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 # PROOF: [L2/Mekhane] <- mekhane/ergasterion/tekhne/self_refine_pipeline.py S2→Mekhane→Implementation
-# PROOF: [L2/インフラ] <- mekhane/ergasterion/tekhne/ A0→プロンプト自動改善が必要→self_refine_pipelineが担う
 """
 Self-Refine Pipeline — プロンプトの品質を自動改善
 

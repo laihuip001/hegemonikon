@@ -1,6 +1,5 @@
 # PROOF: [L2/Mekhane] <- mekhane/pks/links/link_engine.py S2→Mekhane→Implementation
 # noqa: AI-ALL
-# PROOF: [L2/インフラ] <- mekhane/pks/links/
 """
 PROOF: [L2/インフラ] このファイルは存在しなければならない
 

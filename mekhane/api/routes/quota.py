@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 # PROOF: [L2/Mekhane] <- mekhane/api/routes/quota.py S2→Mekhane→API
-# PROOF: [L2/インフラ] <- mekhane/api/routes/
 # PURPOSE: /api/quota — Antigravity IDE Quota 情報エンドポイント
 """
 Quota Routes — Language Server GetUserStatus API 呼び出し

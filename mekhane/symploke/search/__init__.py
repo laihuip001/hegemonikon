@@ -1,6 +1,5 @@
 # PROOF: [L2/Infra] <- mekhane/symploke/search/__init__.py H3→Infra→Symploke
 """
-# PROOF: [L2/インフラ] <- mekhane/symploke/search/ A0→検索機能が必要→__init__ が担う
 Symplokē Search Package
 
 統合検索エンジン

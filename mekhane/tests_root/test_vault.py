@@ -1,6 +1,5 @@
 # PROOF: [L2/Mekhane] <- mekhane/tests_root/test_vault.py S2→Mekhane→Implementation
 # noqa: AI-ALL
-# PROOF: [L3/テスト] <- mekhane/tests_root/ 対象モジュールが存在→検証が必要
 import os
 import shutil
 import tempfile

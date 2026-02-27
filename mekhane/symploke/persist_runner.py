@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 # PROOF: [L2/Infra] <- mekhane/symploke/persist_runner.py H3→Infra→Symploke
-# PROOF: [L2/インフラ] <- mekhane/symploke/ A0→安全な永続化が必要→persist_runner が担う
 """
 Persist Runner — /bye 永続化を軽量/重量で分離実行する
 

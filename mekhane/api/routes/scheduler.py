@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 # PROOF: [L2/Mekhane] <- mekhane/api/routes/scheduler.py S2→Mekhane→API
-# PROOF: [L2/インフラ] <- mekhane/api/routes/
 # PURPOSE: Jules Scheduler ダッシュボードカード用 API
 """
 Scheduler Status API

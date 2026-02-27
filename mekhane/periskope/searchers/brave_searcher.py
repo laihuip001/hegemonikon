@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/periskope/searchers/
 """
 Brave Search API client for Periskopē.
 

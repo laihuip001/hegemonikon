@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Mekhane] <- mekhane/symploke/ A0->Auto->AddedByCI
 # PROOF: [L2/インフラ] <- mekhane/symploke/ O4→結果統合が必要→jules_results_loader が担う
 """
 Jules 結果読み込みモジュール

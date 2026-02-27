@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Mekhane] <- mekhane/exagoge/ A0->Auto->AddedByCI
 # PROOF: [L2/コア] <- mekhane/exagoge/
 # PURPOSE: Gateway Ideas データのエクスポート機能
 """

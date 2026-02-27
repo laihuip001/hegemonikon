@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/ochema/tests/ A0->Auto->AddedByCI
 """Ochema AI Tool Use — Unit Tests.
 
 Tests for tools.py: 7 tools + Claude parser + system templates + audit log.

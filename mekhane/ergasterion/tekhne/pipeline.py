@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Mekhane] <- mekhane/ergasterion/tekhne/ A0->Auto->AddedByCI
 # PROOF: [L2/インフラ] <- mekhane/ergasterion/tekhne/ A0→SweepEngine部品の統合→end-to-endパイプライン
 """
 Tekhne Pipeline — SweepEngine end-to-end orchestrator.

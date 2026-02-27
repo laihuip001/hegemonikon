@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Mekhane] <- mekhane/anamnesis/tests/ A0->Auto->AddedByCI
 # PROOF: [L2/テスト] <- mekhane/anamnesis/tests/
 # PURPOSE: Gnōsis モジュールのテストカバレッジ拡大
 """Gnōsis Test Suite — lancedb_compat, pb_parser, night_review, cli"""

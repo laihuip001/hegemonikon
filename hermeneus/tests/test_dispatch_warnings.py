@@ -1,3 +1,4 @@
+# PROOF: [L1/Hermeneus] <- hermeneus/tests/ A0->Auto->AddedByCI
 """F7: dispatch.py の警告統合テスト。
 
 spec_injector / failure_db の警告が plan_template に正しく注入されることを検証する。

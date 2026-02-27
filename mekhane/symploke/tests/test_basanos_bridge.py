@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Mekhane] <- mekhane/symploke/tests/ A0->Auto->AddedByCI
 # PROOF: [L2/テスト] <- mekhane/symploke/tests/ A2→basanos_bridge→test_basanos_bridge が担う
 # PURPOSE: Basanos Bridge のユニットテスト
 """

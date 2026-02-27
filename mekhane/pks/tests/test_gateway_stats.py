@@ -10,14 +10,16 @@ except ImportError:
     TestClient = None  # type: ignore
 
 
-@pytest.mark.skipif(TestClient is None, reason="FastAPI not installed")
 @pytest.fixture
 def client():
     """TestClient for the API without starting PKSEngine."""
+    if TestClient is None:
+        pytest.skip("FastAPI not installed")
     from mekhane.api.server import app
     return TestClient(app)
 
 
+@pytest.mark.skipif(TestClient is None, reason="FastAPI not installed")
 class TestGatewayStatsEndpoint:
     """GET /api/pks/gateway-stats のテスト。"""
 

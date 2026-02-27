@@ -1,3 +1,4 @@
+# PROOF: [L2/Impl] <- mekhane/periskope/searchers/ Automated fix for CI
 """
 Semantic Scholar API client for Periskopē.
 

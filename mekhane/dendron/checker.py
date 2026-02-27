@@ -84,7 +84,13 @@ class DendronChecker:  # noqa: AI-007
     def is_exempt(self, path: Path) -> bool:
         """除外対象かどうか"""
         path_str = str(path)
-        return any(p.search(path_str) for p in self.exempt_patterns)
+        is_ex = any(p.search(path_str) for p in self.exempt_patterns)
+        if "intent_wal.py" in path_str and not is_ex:
+            print(f"DEBUG: Checking {path_str} against {len(self.exempt_patterns)} patterns. Matched: {is_ex}")
+            for p in self.exempt_patterns:
+                if "intent_wal" in p.pattern:
+                    print(f"  Pattern '{p.pattern}' search result: {p.search(path_str)}")
+        return is_ex
 
     # PURPOSE: 親参照パスの妥当性 (長さ, 存在, 安全性) を検証する
     def validate_parent(self, parent: str) -> tuple[bool, str]:

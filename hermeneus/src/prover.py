@@ -13,6 +13,7 @@ import json
 import sqlite3
 import subprocess
 import tempfile
+import time
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
@@ -70,7 +71,6 @@ class ProverInterface(ABC):
     
     # PURPOSE: 証明タイプ
     @property
-    # PURPOSE: [L2-auto] 証明タイプ
     @abstractmethod
     def proof_type(self) -> ProofType:
         """証明タイプ"""
@@ -96,8 +96,8 @@ class ProverInterface(ABC):
 # =============================================================================
 # Mypy Prover
 # =============================================================================
-# PURPOSE: [L2-auto] Mypy 型チェッカー
 
+# PURPOSE: [L2-auto] Mypy 型チェッカー
 class MypyProver(ProverInterface):
     """Mypy 型チェッカー
     
@@ -146,7 +146,6 @@ class MypyProver(ProverInterface):
         **kwargs
     ) -> ProofResult:
         """Python コードの型チェック"""
-        import time
         start = time.time()
         
         if not self._mypy_available:
@@ -248,8 +247,8 @@ class MypyProver(ProverInterface):
 # =============================================================================
 # Schema Prover
 # =============================================================================
-# PURPOSE: [L2-auto] スキーマ検証
 
+# PURPOSE: [L2-auto] スキーマ検証
 class SchemaProver(ProverInterface):
     """スキーマ検証
     
@@ -287,7 +286,6 @@ class SchemaProver(ProverInterface):
         **kwargs
     ) -> ProofResult:
         """JSON をスキーマで検証"""
-        import time
         start = time.time()
         
         if not schema:
@@ -371,8 +369,8 @@ class SchemaProver(ProverInterface):
 # =============================================================================
 # Lean4 Prover (オプション)
 # =============================================================================
-# PURPOSE: [L2-auto] Lean 4 形式証明
 
+# PURPOSE: [L2-auto] Lean 4 形式証明
 class Lean4Prover(ProverInterface):
     """Lean 4 形式証明
     
@@ -419,7 +417,6 @@ class Lean4Prover(ProverInterface):
         **kwargs
     ) -> ProofResult:
         """形式証明"""
-        import time
         start = time.time()
         
         if not self._lean_available:
@@ -487,8 +484,8 @@ class Lean4Prover(ProverInterface):
 # =============================================================================
 # Proof Cache
 # =============================================================================
-# PURPOSE: [L2-auto] 証明結果キャッシュ
 
+# PURPOSE: [L2-auto] 証明結果キャッシュ
 class ProofCache:
     """証明結果キャッシュ"""
     

@@ -391,7 +391,7 @@ class JulesClient:
 
     # PURPOSE: Create a new Jules session
     @with_retry(
-        max_attempts=3, retryable_exceptions=(RateLimitError, aiohttp.ClientError)
+        max_attempts=3, retryable_exceptions=_RETRY_EXCEPTIONS
     )
     async def create_session(
         self,
@@ -436,7 +436,7 @@ class JulesClient:
 
     # PURPOSE: Get session status
     @with_retry(
-        max_attempts=3, retryable_exceptions=(RateLimitError, aiohttp.ClientError)
+        max_attempts=3, retryable_exceptions=_RETRY_EXCEPTIONS
     )
     async def get_session(self, session_id: str) -> JulesSession:
         """

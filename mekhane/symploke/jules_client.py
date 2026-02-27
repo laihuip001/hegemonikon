@@ -17,11 +17,15 @@ Usage:
 """
 
 import asyncio
-import aiohttp
 import functools
 import logging
 import os
 import time
+
+try:
+    import aiohttp
+except ImportError:
+    aiohttp = None  # type: ignore
 import uuid
 import random  # AI-022: Thundering Herd 対策用
 from dataclasses import dataclass, field

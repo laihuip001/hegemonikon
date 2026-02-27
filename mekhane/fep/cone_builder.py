@@ -200,14 +200,27 @@ def compute_dispersion(outputs: Dict[str, str]) -> float:
     values = list(outputs.values())
     similarities: List[float] = []
 
+    # Precompute features to avoid redundant calculations in nested loop O(N^2)
+    # This reduces extraction cost to O(N)
+    bigram_sets = [set(_char_bigrams(v)) for v in values]
+    token_sets = (
+        [set(_tokenize_ja(v)) for v in values]
+        if _JANOME_AVAILABLE else []
+    )
+
     for i in range(len(values)):
+        val_i = values[i]
+        bigrams_a = bigram_sets[i]
+        tokens_a = token_sets[i] if _JANOME_AVAILABLE else None
+
         for j in range(i + 1, len(values)):
+            val_j = values[j]
+
             # Method 1: SequenceMatcher (character-level)
-            seq_ratio = SequenceMatcher(None, values[i], values[j]).ratio()
+            seq_ratio = SequenceMatcher(None, val_i, val_j).ratio()
 
             # Method 2: Bigram Jaccard (topic-level, better for Japanese)
-            bigrams_a = set(_char_bigrams(values[i]))
-            bigrams_b = set(_char_bigrams(values[j]))
+            bigrams_b = bigram_sets[j]
             if bigrams_a or bigrams_b:
                 jaccard = len(bigrams_a & bigrams_b) / len(bigrams_a | bigrams_b)
             else:
@@ -217,10 +230,9 @@ def compute_dispersion(outputs: Dict[str, str]) -> float:
             # Uses content words (nouns/verbs/adjectives) in base form.
             morph_jaccard = 0.0
             if _JANOME_AVAILABLE:
-                words_a = set(_tokenize_ja(values[i]))
-                words_b = set(_tokenize_ja(values[j]))
-                if words_a or words_b:
-                    morph_jaccard = len(words_a & words_b) / len(words_a | words_b)
+                tokens_b = token_sets[j]
+                if tokens_a or tokens_b:
+                    morph_jaccard = len(tokens_a & tokens_b) / len(tokens_a | tokens_b)
                 else:
                     morph_jaccard = 1.0
 

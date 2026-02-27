@@ -1,3 +1,4 @@
+# PROOF: [L2/Search] <- mekhane/periskope/query_expander.py A0→AutoFix
 """
 Query expander for Periskopē.
 

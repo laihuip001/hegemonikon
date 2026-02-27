@@ -1,3 +1,4 @@
+# PROOF: [L2/Search] <- mekhane/periskope/__init__.py A0→AutoFix
 """
 Periskopē — HGK Deep Research Engine
 

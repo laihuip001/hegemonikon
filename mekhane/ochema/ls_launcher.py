@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/LLM] <- mekhane/ochema/ls_launcher.py A0→AutoFix
 """LS Standalone Launcher — IDE なしで Language Server を直接起動する。
 
 ManagementMetadata protobuf を stdin に送り込んで LS を起動。

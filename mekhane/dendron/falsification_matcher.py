@@ -1,3 +1,4 @@
+# PROOF: [L2/Quality] <- mekhane/dendron/falsification_matcher.py S2→Quality→Dendron
 """
 Falsification Matcher — 消化論文の主張と epistemic_status.yaml の反証条件を照合
 

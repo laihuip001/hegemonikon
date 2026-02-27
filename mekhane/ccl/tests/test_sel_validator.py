@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# PROOF: [L2/テスト] <- mekhane/ccl/tests/
+# PROOF: [L2/Mekhane] <- mekhane/ccl/tests/test_sel_validator.py S2→Mekhane→CCL
 # PURPOSE: CCL SEL Validator の包括テスト — WF出力がSEL要件を満たすか検証
 """CCL SEL Validator Tests"""
 

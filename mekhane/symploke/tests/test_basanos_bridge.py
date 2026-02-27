@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# PROOF: [L2/テスト] <- mekhane/symploke/tests/ A2→basanos_bridge→test_basanos_bridge が担う
+# PROOF: [L2/Infra] <- mekhane/symploke/tests/test_basanos_bridge.py H3→Infra→Symploke
 # PURPOSE: Basanos Bridge のユニットテスト
 """
 Tests for basanos_bridge.py — Perspective → Specialist 変換の正当性検証

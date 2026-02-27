@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# PROOF: [L3/テスト] <- mekhane/fep/tests/
+# PROOF: [L2/Mekhane] <- mekhane/fep/tests/benchmark_japanese.py S2→Mekhane→Implementation
 # PURPOSE: FEP日本語処理のベンチマーク測定
 """
 Attractor Engine 日本語入力ベンチマーク

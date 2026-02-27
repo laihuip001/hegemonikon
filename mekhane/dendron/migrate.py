@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# PROOF: [L2/インフラ] <- mekhane/dendron/
+# PROOF: [L2/Quality] <- mekhane/dendron/migrate.py S2→Quality→Dendron
 """
 Dendron 親参照移行スクリプト
 

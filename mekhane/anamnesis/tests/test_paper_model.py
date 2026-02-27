@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# PROOF: [L2/テスト] <- mekhane/anamnesis/tests/
+# PROOF: [L2/Mekhane] <- mekhane/anamnesis/tests/test_paper_model.py S2→Mekhane→Implementation
 # PURPOSE: Paper model の包括テスト
 """Anamnesis Paper Model Tests — Batch 5"""
 

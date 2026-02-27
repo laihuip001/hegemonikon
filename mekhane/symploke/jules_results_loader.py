@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# PROOF: [L2/インフラ] <- mekhane/symploke/ O4→結果統合が必要→jules_results_loader が担う
+# PROOF: [L2/Infra] <- mekhane/symploke/jules_results_loader.py H3→Infra→Symploke
 """
 Jules 結果読み込みモジュール
 

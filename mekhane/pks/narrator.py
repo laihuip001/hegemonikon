@@ -1,5 +1,5 @@
+# PROOF: [L2/Mekhane] <- mekhane/pks/narrator.py S2→Mekhane→Implementation
 # noqa: AI-ALL
-# PROOF: [L2/インフラ] <- mekhane/pks/
 """
 PROOF: [L2/インフラ] このファイルは存在しなければならない
 

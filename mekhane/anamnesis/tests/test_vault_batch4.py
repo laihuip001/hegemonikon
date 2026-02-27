@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# PROOF: [L2/テスト] <- mekhane/anamnesis/tests/
+# PROOF: [L2/Mekhane] <- mekhane/anamnesis/tests/test_vault_batch4.py S2→Mekhane→Implementation
 # PURPOSE: VaultManager の包括テスト
 """Anamnesis Vault Tests — Batch 4"""
 

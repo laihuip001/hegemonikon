@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# PROOF: [L2/インフラ] <- mekhane/anamnesis/ A0→Library検索エンジンが必要→library_searchが担う
+# PROOF: [L2/Mekhane] <- mekhane/anamnesis/library_search.py S2→Mekhane→Implementation
 """
 Library Search Engine — 3層検索で Library 112プロンプトを発動する
 

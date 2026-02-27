@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# PROOF: [L2/テスト] <- mekhane/basanos/tests/
+# PROOF: [L2/Test] <- mekhane/basanos/tests/test_auto_noqa.py A2→Test→Basanos
 # PURPOSE: Basanos auto_noqa の包括テスト
 """Basanos auto_noqa Tests"""
 

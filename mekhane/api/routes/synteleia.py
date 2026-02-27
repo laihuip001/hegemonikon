@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# PROOF: [L2/インフラ] <- mekhane/api/routes/
+# PROOF: [L2/Mekhane] <- mekhane/api/routes/synteleia.py S2→Mekhane→API
 # PURPOSE: Synteleia 監査エンドポイント — 6視点認知アンサンブルによる多角監査
 """
 Synteleia Routes — 監査 REST API

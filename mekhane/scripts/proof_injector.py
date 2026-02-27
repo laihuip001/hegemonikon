@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# PROOF: [L3/ツール] <- mekhane/scripts/
+# PROOF: [L2/Mekhane] <- mekhane/scripts/proof_injector.py S2→Mekhane→Implementation
 """
 PROOF Header Batch Injector
 

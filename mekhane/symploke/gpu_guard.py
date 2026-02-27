@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# PROOF: [L2/インフラ] <- mekhane/symploke/ A0→GPU競合防止が必要→gpu_guard が担う
+# PROOF: [L2/Infra] <- mekhane/symploke/gpu_guard.py H3→Infra→Symploke
 """
 GPU Guard — GPU リソース競合を防止するユーティリティ
 

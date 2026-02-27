@@ -1,5 +1,5 @@
+# PROOF: [L2/Mekhane] <- mekhane/anamnesis/collectors/base.py S2→Mekhane→Implementation
 # noqa: AI-ALL
-# PROOF: [L2/インフラ] <- mekhane/anamnesis/collectors/
 """
 PROOF: [L2/インフラ]
 

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# PROOF: [L2/PKS] <- mekhane/api/routes/
+# PROOF: [L2/Mekhane] <- mekhane/api/routes/pks.py S2→Mekhane→API
 # PURPOSE: PKS (Proactive Knowledge Surface) API — 知識プッシュ + フィードバック
 """
 PKS Routes — 能動的知識表面化 API

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# PROOF: [L2/インフラ] <- mekhane/ochema/tests/ テスト
+# PROOF: [L2/Mekhane] <- mekhane/ochema/tests/test_cortex_chat.py S2→Mekhane→Ochema
 # PURPOSE: CortexClient chat API ユニットテスト
 """
 CortexClient chat(), chat_stream(), ChatConversation unit tests.

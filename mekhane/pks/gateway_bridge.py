@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# PROOF: [L2/コア] <- mekhane/pks/
+# PROOF: [L2/Mekhane] <- mekhane/pks/gateway_bridge.py S2→Mekhane→Implementation
 # PURPOSE: Gateway Bridge — Ideas/Doxa/Handoff を PKS の KnowledgeNugget に変換
 """
 Gateway Bridge — HGK 内部データを PKS プッシュ対象に統合

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# PROOF: [L2/ドメイン] <- mekhane/symploke/ O4→perspective繁殖→自律進化
+# PROOF: [L2/Infra] <- mekhane/symploke/perspective_breeder.py H3→Infra→Symploke
 """F25: Perspective Breeder — 高有用率 Perspective のバリエーションを生成する。
 
 高スコア Perspective の特性を分析し、未カバー領域に対する

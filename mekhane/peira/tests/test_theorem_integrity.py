@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# PROOF: [L2/検証] <- DX-008: THEOREM_WORKFLOWS バグ再発防止
+# PROOF: [L2/Mekhane] <- mekhane/peira/tests/test_theorem_integrity.py S2→Mekhane→Implementation
 """
 Theorem Integrity Tests — 定理テーブル整合性チェック
 

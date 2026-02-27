@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# PROOF: [L2/インフラ] <- mekhane/ergasterion/tekhne/ A0→プロンプト形式変換が必要→format_converterが担う
+# PROOF: [L2/Mekhane] <- mekhane/ergasterion/tekhne/format_converter.py S2→Mekhane→Implementation
 """
 Format Converter — 3形式 (SKILL.md / .prompt / SAGE XML) の相互変換
 

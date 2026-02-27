@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# PROOF: [L2/テスト] <- mekhane/symploke/tests/
+# PROOF: [L2/Infra] <- mekhane/symploke/tests/test_audit_matcher.py H3→Infra→Symploke
 # PURPOSE: F7/F8 のユニットテスト
 """Tests for Audit-Specialist Matcher and Dynamic Perspective Generator."""
 

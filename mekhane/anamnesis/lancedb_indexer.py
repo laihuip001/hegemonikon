@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# PROOF: [L2/インフラ] <- mekhane/anamnesis/
+# PROOF: [L2/Mekhane] <- mekhane/anamnesis/lancedb_indexer.py S2→Mekhane→Implementation
 r"""
 PROOF: [L2/インフラ]
 

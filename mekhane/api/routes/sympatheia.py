@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# PROOF: [L2/Sympatheia] <- mekhane/api/routes/
+# PROOF: [L2/Mekhane] <- mekhane/api/routes/sympatheia.py S2→Mekhane→API
 # PURPOSE: Sympatheia 自律神経系 API — n8n Code node ロジックの中枢化
 """
 Sympatheia Routes — 自律神経系 API

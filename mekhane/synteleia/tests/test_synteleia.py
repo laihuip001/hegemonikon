@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# PROOF: [L2/テスト] <- mekhane/synteleia/tests/
+# PROOF: [L2/Mekhane] <- mekhane/synteleia/tests/test_synteleia.py S2→Mekhane→Implementation
 # PURPOSE: Synteleia 2層オーケストレーター + 基底クラスの包括テスト
 """Synteleia Audit System Tests"""
 

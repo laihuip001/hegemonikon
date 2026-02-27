@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# PROOF: [L2/テスト] <- mekhane/ergasterion/digestor/tests/
+# PROOF: [L2/Mekhane] <- mekhane/ergasterion/digestor/tests/test_exa_integration.py S2→Mekhane→Implementation
 # PURPOSE: Exa 統合テスト — _fetch_from_exa, _exa_to_paper
 """Exa Integration Tests — Phase C of DigestorPipeline"""
 

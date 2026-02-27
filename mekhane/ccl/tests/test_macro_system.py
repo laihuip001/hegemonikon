@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# PROOF: [L2/テスト] <- mekhane/ccl/tests/
+# PROOF: [L2/Mekhane] <- mekhane/ccl/tests/test_macro_system.py S2→Mekhane→CCL
 # PURPOSE: CCL Macro Registry & Expander の包括テスト
 """CCL Macro System Tests"""
 

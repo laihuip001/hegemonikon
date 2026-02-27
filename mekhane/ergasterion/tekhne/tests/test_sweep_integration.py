@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# PROOF: [L3/テスト] <- mekhane/ergasterion/tekhne/ SweepEngine + ResponseCache 統合テスト
+# PROOF: [L2/Mekhane] <- mekhane/ergasterion/tekhne/tests/test_sweep_integration.py S2→Mekhane→Implementation
 """
 SweepEngine + ResponseCache Integration Tests.
 

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# PROOF: [L2/インフラ] <- mekhane/ergasterion/tekhne/ A0→プロンプト品質の広域スキャンが必要→sweep_engineが担う
+# PROOF: [L2/Mekhane] <- mekhane/ergasterion/tekhne/sweep_engine.py S2→Mekhane→Implementation
 """
 Sweep Engine — Flash × 480次元プロンプト品質広域スキャン
 

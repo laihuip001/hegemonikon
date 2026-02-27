@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# PROOF: [L2/インフラ] <- mekhane/symploke/
+# PROOF: [L2/Infra] <- mekhane/symploke/value_pitch_cli.py H3→Infra→Symploke
 # PURPOSE: /bye Step 2.5π の補助 — Git log からタスク収集し Value Pitch 骨格を出力
 """
 PROOF: [L2/インフラ] このファイルは存在しなければならない

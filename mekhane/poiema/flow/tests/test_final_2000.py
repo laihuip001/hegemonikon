@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# PROOF: [L2/テスト] <- mekhane/poiema/flow/tests/ + mekhane/anamnesis/tests/ + mekhane/ergasterion/
+# PROOF: [L2/Mekhane] <- mekhane/poiema/flow/tests/test_final_2000.py S2→Mekhane→Implementation
 # PURPOSE: 2000 到達用最終テスト — NoesisClient, ModuleDocument, Perspective
 """Final Batch — Crossing 2000 Tests"""
 

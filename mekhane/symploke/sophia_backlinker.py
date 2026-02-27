@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# PROOF: [L2/インフラ] <- mekhane/symploke/ A0→知識管理が必要→sophia_backlinker が担う
+# PROOF: [L2/Infra] <- mekhane/symploke/sophia_backlinker.py H3→Infra→Symploke
 """
 Sophia Backlinker - 知識アイテム間のリンクグラフ構築
 

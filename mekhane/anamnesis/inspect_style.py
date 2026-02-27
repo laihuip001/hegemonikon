@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# PROOF: [L3/ユーティリティ] <- mekhane/anamnesis/ P3→DOM調査が必要→inspect_style が担う
+# PROOF: [L2/Mekhane] <- mekhane/anamnesis/inspect_style.py S2→Mekhane→Implementation
 """
 STYLE 要素の完全調査
 

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# PROOF: [L2/ユーティリティ] <- mekhane/symploke/ A4→ログ分析→analyze_basanos_logs が担う
+# PROOF: [L2/Infra] <- mekhane/symploke/analyze_basanos_logs.py H3→Infra→Symploke
 # PURPOSE: Jules Daily Scheduler のログを集計し、ドメインローテーション網羅率を可視化
 """
 Basanos Log Analyzer

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# PROOF: [L3/実験] <- mekhane/symploke/ K3→文脈適応→perspective 動的生成
+# PROOF: [L2/Infra] <- mekhane/symploke/dynamic_perspective_generator.py H3→Infra→Symploke
 # PURPOSE: Basanos Perspective の動的生成 — ファイル特性に応じて Perspective を合成
 """
 Dynamic Perspective Generator

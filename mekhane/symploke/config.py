@@ -1,5 +1,5 @@
+# PROOF: [L2/Infra] <- mekhane/symploke/config.py H3→Infra→Symploke
 # noqa: AI-ALL
-# PROOF: [L2/インフラ] <- mekhane/symploke/
 """
 PROOF: [L2/インフラ]
 

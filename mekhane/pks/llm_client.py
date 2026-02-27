@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# PROOF: [L2/インフラ] <- mekhane/pks/ A0→LLM初期化パターンのDRY共通化→llm_clientが担う
+# PROOF: [L2/Mekhane] <- mekhane/pks/llm_client.py S2→Mekhane→Implementation
 # PURPOSE: PKS 共通 LLM クライアント
 """
 PROOF: [L2/インフラ] このファイルは存在しなければならない

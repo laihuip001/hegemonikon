@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/periskope/tests/test_page_fetcher.py S2→Mekhane→Periskope
 """
 Tests for PageFetcher (W7: selective full-page crawling).
 """

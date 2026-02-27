@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# PROOF: [L2/インフラ] <- mekhane/api/routes/ Digestor 候補閲覧 API
+# PROOF: [L2/Mekhane] <- mekhane/api/routes/digestor.py S2→Mekhane→API
 """
 Digestor API — digest_report の閲覧エンドポイント
 

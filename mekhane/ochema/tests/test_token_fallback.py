@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# PROOF: [L2/テスト] <- mekhane/ochema/tests/ テスト
+# PROOF: [L2/Mekhane] <- mekhane/ochema/tests/test_token_fallback.py S2→Mekhane→Ochema
 # PURPOSE: _get_token() のフォールバック順序を検証するユニットテスト
 """Token fallback order tests — verifies "Trust the runtime, not the config".
 

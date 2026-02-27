@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# PROOF: [L2/インフラ] <- mekhane/symploke/ A0→Tier1-2 Specialist定義が必要→specialists_batch2が担う
+# PROOF: [L2/Infra] <- mekhane/symploke/specialists_batch2.py H3→Infra→Symploke
 """
 Specialist v2 カテゴリ: Git, テスト, API, セキュリティ, パフォーマンス, 非同期, DB
 """

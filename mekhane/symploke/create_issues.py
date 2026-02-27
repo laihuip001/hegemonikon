@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# PROOF: [L3/ユーティリティ] <- mekhane/symploke/ O4→レビュー結果からIssue生成が必要→create_issues が担う
+# PROOF: [L2/Infra] <- mekhane/symploke/create_issues.py H3→Infra→Symploke
 """
 Jules Specialist レビュー結果 → GitHub Issue 自動作成 v1.0
 

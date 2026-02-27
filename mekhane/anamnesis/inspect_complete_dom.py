@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# PROOF: [L3/ユーティリティ] <- mekhane/anamnesis/ P3→DOM調査が必要→inspect_complete_dom が担う
+# PROOF: [L2/Mekhane] <- mekhane/anamnesis/inspect_complete_dom.py S2→Mekhane→Implementation
 """
 DOM 構造詳細調査 v3 — User/Claude 区別とツール呼び出し
 

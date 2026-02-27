@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# PROOF: [L2/Epistemic] <- mekhane/api/routes/
+# PROOF: [L2/Mekhane] <- mekhane/api/routes/epistemic.py S2→Mekhane→API
 # PURPOSE: Epistemic Status API — 認識論的地位レジストリの提供
 """
 Epistemic Routes — epistemic_status.yaml の内容を API で提供。

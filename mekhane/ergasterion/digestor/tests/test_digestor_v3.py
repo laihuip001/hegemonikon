@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# PROOF: [L2/テスト] <- mekhane/ergasterion/digestor/tests/
+# PROOF: [L2/Mekhane] <- mekhane/ergasterion/digestor/tests/test_digestor_v3.py S2→Mekhane→Implementation
 # PURPOSE: Digestor v3 改修テスト — 3層防御 + スコア v3 + 閾値変更
 """Digestor v3 Tests — 層1カテゴリフィルタ, 層3ドメインキーワード, スコア v3"""
 

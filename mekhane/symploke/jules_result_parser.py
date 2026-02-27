@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# PROOF: [L2/分析] <- mekhane/symploke/ F9→閉ループ→jules_result_parser が担う
+# PROOF: [L2/Infra] <- mekhane/symploke/jules_result_parser.py H3→Infra→Symploke
 # PURPOSE: Jules セッション結果から Perspective 有用性を判定
 """
 Jules Result Parser

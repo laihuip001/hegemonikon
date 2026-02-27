@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# PROOF: [L2/テスト] <- mekhane/api/tests/
+# PROOF: [L2/Mekhane] <- mekhane/api/tests/test_synteleia_api.py S2→Mekhane→API
 # PURPOSE: Synteleia REST API エンドポイントのテスト
 """Synteleia API Tests"""
 

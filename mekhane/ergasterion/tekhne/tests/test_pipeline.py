@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# PROOF: [L3/テスト] <- mekhane/ergasterion/tekhne/ TekhnePipeline 統合テスト
+# PROOF: [L2/Mekhane] <- mekhane/ergasterion/tekhne/tests/test_pipeline.py S2→Mekhane→Implementation
 """
 TekhnePipeline Integration Tests.
 

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# PROOF: [L2/FEP] <- mekhane/fep/
+# PROOF: [L2/Mekhane] <- mekhane/fep/basin_learner.py S2→Mekhane→Implementation
 # PURPOSE: Basin の bias データから prototype を自動補正する学習ループ
 """
 PROOF: [L2/FEP] このファイルは存在しなければならない

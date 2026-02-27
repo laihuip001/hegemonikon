@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# PROOF: [L2/インフラ] <- mekhane/pks/ A0→内部知識だけでは自由エネルギー最小化に限界→外部検索が担う
+# PROOF: [L2/Mekhane] <- mekhane/pks/external_search.py S2→Mekhane→Implementation
 # PURPOSE: 外部知識検索 (Perplexity API 統合)
 """
 PROOF: [L2/インフラ] このファイルは存在しなければならない

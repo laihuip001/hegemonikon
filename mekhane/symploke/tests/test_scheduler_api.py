@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# PROOF: [L2/テスト] <- mekhane/symploke/tests/
+# PROOF: [L2/Infra] <- mekhane/symploke/tests/test_scheduler_api.py H3→Infra→Symploke
 # PURPOSE: Scheduler API (routes/scheduler.py) のユニットテスト
 """Scheduler Status API tests.
 

@@ -3,9 +3,14 @@
 
 import pytest
 from unittest.mock import patch, MagicMock
-from fastapi.testclient import TestClient
+
+try:
+    from fastapi.testclient import TestClient
+except ImportError:
+    TestClient = None  # type: ignore
 
 
+@pytest.mark.skipif(TestClient is None, reason="FastAPI not installed")
 @pytest.fixture
 def client():
     """TestClient for the API without starting PKSEngine."""

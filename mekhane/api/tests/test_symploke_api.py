@@ -10,9 +10,19 @@ Symploke API Tests — 知識統合層 REST API のエンドポイント検証
 """
 
 import pytest
-from fastapi.testclient import TestClient
+
+# Optional dependency: fastapi
+try:
+    from fastapi.testclient import TestClient
+except ImportError:
+    TestClient = None
 
 from mekhane.api.server import create_app
+
+# Skip all tests if fastapi is missing
+pytestmark = pytest.mark.skipif(
+    TestClient is None, reason="fastapi not installed"
+)
 
 
 # PURPOSE: Verify client behaves correctly

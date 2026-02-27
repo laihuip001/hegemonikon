@@ -13,7 +13,18 @@ import pytest
 # Add parent to path
 sys.path.insert(0, "/home/makaron8426/oikos/hegemonikon")
 
-from mekhane.symploke.jules_client import JulesClient
+# Optional dependency: aiohttp (via JulesClient)
+try:
+    import aiohttp
+    from mekhane.symploke.jules_client import JulesClient
+except ImportError:
+    aiohttp = None
+    JulesClient = None
+
+# Skip all tests if aiohttp/JulesClient is missing
+pytestmark = pytest.mark.skipif(
+    JulesClient is None, reason="aiohttp not installed"
+)
 
 
 # PURPOSE: Test API connection by listing sources
@@ -30,8 +41,6 @@ async def test_connection():
     print("-" * 50)
 
     try:
-        import aiohttp
-
         headers = {"X-Goog-Api-Key": api_key, "Content-Type": "application/json"}
 
         async with aiohttp.ClientSession() as session:

@@ -8,10 +8,20 @@ Creates a minimal PR to test the full workflow.
 import asyncio
 import os
 import sys
+import pytest
 
 sys.path.insert(0, "/home/makaron8426/oikos/hegemonikon")
 
-from mekhane.symploke.jules_client import JulesClient, SessionState
+# Optional dependency: aiohttp (via JulesClient)
+try:
+    from mekhane.symploke.jules_client import JulesClient, SessionState
+except ImportError:
+    JulesClient = None
+    SessionState = None
+
+# Skip if JulesClient is missing
+if JulesClient is None:
+    pytestmark = pytest.mark.skip(reason="aiohttp not installed")
 
 
 # PURPOSE: Create a simple test task
@@ -70,6 +80,9 @@ async def create_test_task():
 
 
 if __name__ == "__main__":
+    if JulesClient is None:
+        print("Skipping: aiohttp not installed")
+        sys.exit(0)
     result = asyncio.run(create_test_task())
     print(f"\n{'='*60}")
     print(f"Result: {'SUCCESS' if result else 'FAILED'}")

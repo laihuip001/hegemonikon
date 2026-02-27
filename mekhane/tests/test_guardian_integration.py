@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/ Implementation Layer Test Guardian Integration
 """
 Guardian Integration Tests — /bou ② テスト守護者
 

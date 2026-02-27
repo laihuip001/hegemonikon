@@ -1,3 +1,4 @@
+# PROOF: [L2/Basanos] <- mekhane/basanos/ Basanos Engine Test Git Metrics
 """Tests for GitMetrics — git 履歴からのリスク予兆検出。"""
 
 import subprocess

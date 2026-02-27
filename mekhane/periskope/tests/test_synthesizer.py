@@ -1,3 +1,4 @@
+# PROOF: [L2/Periskope] <- mekhane/periskope/ Periskope Search Test Synthesizer
 """
 Tests for multi-model synthesizer.
 """

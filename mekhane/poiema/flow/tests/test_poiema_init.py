@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/ Implementation Layer Test Poiema Init
 """
 Poiema __init__.py 統合テスト
 

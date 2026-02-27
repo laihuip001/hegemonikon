@@ -1,3 +1,4 @@
+# PROOF: [L2/Periskope] <- mekhane/periskope/ Periskope Search Test Query Expander
 """Tests for W3 QueryExpander and P3 weight distribution."""
 
 from __future__ import annotations

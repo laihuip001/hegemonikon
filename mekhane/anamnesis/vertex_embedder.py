@@ -1,3 +1,4 @@
+# PROOF: [L2/Anamnesis] <- mekhane/anamnesis/ Anamnesis Memory Vertex Embedder
 import os
 import logging
 from google import genai

@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/ Implementation Layer Test Uml Sel Bridge
 """UML Phase 2 — SEL 統合テスト"""
 
 import pytest

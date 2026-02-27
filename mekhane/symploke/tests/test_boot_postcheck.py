@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Mekhane] <- mekhane/symploke/ Specialist Review Test Boot Postcheck
 """Tests for boot_integration template generation and postcheck."""
 
 import sys

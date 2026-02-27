@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/PKS] <- mekhane/pks/ PKS Engine Test Gateway Stats
 """F6c: Gateway Stats API endpoint tests."""
 
 import pytest

@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/symploke/ Specialist Review Test Boot Dispatcher
 """
 Tests for Dispatcher integration in boot_integration.py
 

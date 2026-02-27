@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Mekhane] <- mekhane/ Implementation Layer Test Generate Score Pipeline
 """
 Generate → Score Pipeline CI Tests
 

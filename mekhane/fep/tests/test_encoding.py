@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/ Implementation Layer Test Encoding
 """Tests for mekhane.fep.encoding — FEP encoding helpers."""
 
 import unittest

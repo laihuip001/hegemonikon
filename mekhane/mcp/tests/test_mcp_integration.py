@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/MCP] <- mekhane/mcp/ MCP Server Test Mcp Integration
 """
 MCP Server Integration Tests — mneme/ochema 統合後の回帰テスト
 

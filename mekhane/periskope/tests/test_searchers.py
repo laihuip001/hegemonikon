@@ -1,3 +1,4 @@
+# PROOF: [L2/Periskope] <- mekhane/periskope/ Periskope Search Test Searchers
 """
 Tests for SearXNG searcher.
 """

@@ -1,3 +1,4 @@
+# PROOF: [L2/Periskope] <- mekhane/periskope/ Periskope Search Test Internal Searchers
 """
 Tests for internal searchers (Gnōsis, Sophia, Kairos).
 """

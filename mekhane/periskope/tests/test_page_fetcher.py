@@ -1,3 +1,4 @@
+# PROOF: [L2/Periskope] <- mekhane/periskope/ Periskope Search Test Page Fetcher
 """
 Tests for PageFetcher (W7: selective full-page crawling).
 """

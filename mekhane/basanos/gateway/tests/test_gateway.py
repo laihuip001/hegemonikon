@@ -1,3 +1,4 @@
+# PROOF: [L2/Basanos] <- mekhane/basanos/ Basanos Engine Test Gateway
 """
 MCP Gateway — 統合テスト
 

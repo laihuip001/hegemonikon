@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Mekhane] <- mekhane/ergasterion/tekhne/tests/test_prompt_quality.py A0→AutoFix
 """
 Prompt Quality Testing Suite
 

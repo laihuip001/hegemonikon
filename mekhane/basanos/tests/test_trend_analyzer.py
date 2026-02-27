@@ -1,3 +1,4 @@
+# PROOF: [L2/Test] <- mekhane/basanos/tests/test_trend_analyzer.py A0→AutoFix
 """Tests for TrendAnalyzer — 合成データで全機能をテスト。"""
 
 import json

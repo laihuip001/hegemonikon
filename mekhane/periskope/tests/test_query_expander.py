@@ -1,3 +1,4 @@
+# PROOF: [L2/Periskope] <- mekhane/periskope/tests/test_query_expander.py A0→AutoFix
 """Tests for W3 QueryExpander and P3 weight distribution."""
 
 from __future__ import annotations

@@ -1,3 +1,4 @@
+# PROOF: [L2/Periskope] <- mekhane/periskope/searchers/semantic_scholar_searcher.py A0→AutoFix
 """
 Semantic Scholar API client for Periskopē.
 

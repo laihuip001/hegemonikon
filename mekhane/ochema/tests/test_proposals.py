@@ -1,3 +1,4 @@
+# PROOF: [L2/Ochema] <- mekhane/ochema/tests/test_proposals.py A0→AutoFix
 """Ochēma unit tests: context_health, _select_model, archive_sessions.
 
 LS 非接続環境でもテスト可能。AntigravityClient のメソッドを

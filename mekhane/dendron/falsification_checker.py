@@ -1,3 +1,4 @@
+# PROOF: [L2/Quality] <- mekhane/dendron/falsification_checker.py A0→AutoFix
 """
 S7: Falsification Condition Checker
 

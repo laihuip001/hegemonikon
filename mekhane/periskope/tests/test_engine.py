@@ -1,3 +1,4 @@
+# PROOF: [L2/Periskope] <- mekhane/periskope/tests/test_engine.py A0→AutoFix
 """
 Tests for Periskopē Engine (orchestrator).
 """

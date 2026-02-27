@@ -1,3 +1,4 @@
+# PROOF: [L2/Periskope] <- mekhane/periskope/engine.py A0→AutoFix
 """
 Periskopē Deep Research Engine — Orchestrator.
 

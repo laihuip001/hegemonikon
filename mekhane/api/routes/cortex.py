@@ -1,3 +1,4 @@
+# PROOF: [L2/API] <- mekhane/api/routes/cortex.py A0→AutoFix
 from typing import Any, AsyncGenerator
 
 import asyncio

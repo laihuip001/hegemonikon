@@ -1,3 +1,4 @@
+# PROOF: [L2/Periskope] <- mekhane/periskope/tests/test_internal_searchers.py A0→AutoFix
 """
 Tests for internal searchers (Gnōsis, Sophia, Kairos).
 """

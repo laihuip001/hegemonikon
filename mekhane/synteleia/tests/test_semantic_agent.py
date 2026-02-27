@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/synteleia/tests/test_semantic_agent.py A0→AutoFix
 """
 Tests for SemanticAgent (L2)
 """

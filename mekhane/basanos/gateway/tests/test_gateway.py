@@ -1,3 +1,4 @@
+# PROOF: [L2/Test] <- mekhane/basanos/gateway/tests/test_gateway.py A0→AutoFix
 """
 MCP Gateway — 統合テスト
 

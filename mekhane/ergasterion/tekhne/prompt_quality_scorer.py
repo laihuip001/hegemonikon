@@ -583,6 +583,7 @@ def score_prompt(filepath: str) -> QualityReport:
     return _score_content(content, filepath=filepath)
 
 
+# PURPOSE: Score prompt content directly (without reading from file)
 def score_prompt_text(content: str, name: str = "<inline>") -> QualityReport:
     """Score prompt content directly (without reading from file).
 

@@ -59,6 +59,7 @@ STATIC_TRANSLATIONS: dict[str, str] = {
 }
 
 
+# PURPOSE: Translate HGK-specific terms to general academic vocabulary
 class GSemantic:
     """Translate HGK-specific terms to general academic vocabulary.
 
@@ -76,6 +77,7 @@ class GSemantic:
         """
         self.use_llm = use_llm
 
+    # PURPOSE: Translate HGK terms in ExternalForm to general terms
     def translate(self, external_form: ExternalForm) -> ExternalForm:
         """Translate HGK terms in ExternalForm to general terms.
 

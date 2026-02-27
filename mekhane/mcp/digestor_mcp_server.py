@@ -345,6 +345,7 @@ async def handle_mark_processed(arguments: dict):
 
 # === Semantic Scholar handlers ===
 
+# PURPOSE: Handle Semantic Scholar API tools
 async def handle_semantic_scholar(name: str, arguments: dict):
     """Handle Semantic Scholar API tools."""
     try:

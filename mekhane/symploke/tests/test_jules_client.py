@@ -16,11 +16,23 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent.parent))
 
-from mekhane.symploke.jules_client import (
-    JulesClient,
-    JulesSession,
-    SessionState,
-    RateLimitError,
+# Optional dependency: aiohttp (via JulesClient)
+try:
+    from mekhane.symploke.jules_client import (
+        JulesClient,
+        JulesSession,
+        SessionState,
+        RateLimitError,
+    )
+except ImportError:
+    JulesClient = None
+    JulesSession = None
+    SessionState = None
+    RateLimitError = None
+
+# Skip if JulesClient is missing
+pytestmark = pytest.mark.skipif(
+    JulesClient is None, reason="aiohttp not installed"
 )
 
 

@@ -16,6 +16,12 @@ from unittest.mock import patch, MagicMock, AsyncMock
 from dataclasses import asdict
 import pytest
 
+# Optional dependency: aiohttp (via JulesClient)
+try:
+    from mekhane.symploke.jules_client import JulesClient
+except ImportError:
+    JulesClient = None
+
 
 # ============ 1. MeaningfulTrace — context regression ============
 
@@ -344,6 +350,8 @@ class TestJulesClientParamRegression:
     # PURPOSE: Verify jules session has source behaves correctly
     def test_jules_session_has_source(self):
         """JulesSession must accept and store source."""
+        if JulesClient is None:
+            pytest.skip("aiohttp not installed")
         from mekhane.symploke.jules_client import JulesSession, SessionState
 
         session = JulesSession(
@@ -358,6 +366,8 @@ class TestJulesClientParamRegression:
     # PURPOSE: Verify unknown state error has session id behaves correctly
     def test_unknown_state_error_has_session_id(self):
         """UnknownStateError must store session_id."""
+        if JulesClient is None:
+            pytest.skip("aiohttp not installed")
         from mekhane.symploke.jules_client import UnknownStateError
 
         error = UnknownStateError(state="WEIRD", session_id="sess-123")
@@ -368,6 +378,8 @@ class TestJulesClientParamRegression:
     # PURPOSE: Verify session state from string known behaves correctly
     def test_session_state_from_string_known(self):
         """SessionState.from_string should parse known states."""
+        if JulesClient is None:
+            pytest.skip("aiohttp not installed")
         from mekhane.symploke.jules_client import SessionState
 
         assert SessionState.from_string("COMPLETED") == SessionState.COMPLETED
@@ -377,6 +389,8 @@ class TestJulesClientParamRegression:
     # PURPOSE: Verify session state from string unknown behaves correctly
     def test_session_state_from_string_unknown(self):
         """SessionState.from_string should return UNKNOWN for unknown states."""
+        if JulesClient is None:
+            pytest.skip("aiohttp not installed")
         from mekhane.symploke.jules_client import SessionState
 
         state = SessionState.from_string("TOTALLY_NEW_STATE")
@@ -385,6 +399,8 @@ class TestJulesClientParamRegression:
     # PURPOSE: Verify jules result success requires completed behaves correctly
     def test_jules_result_success_requires_completed(self):
         """JulesResult.is_success must check session.state == COMPLETED."""
+        if JulesClient is None:
+            pytest.skip("aiohttp not installed")
         from mekhane.symploke.jules_client import (
             JulesResult,
             JulesSession,
@@ -492,6 +508,8 @@ class TestJulesClientJsonPassthrough:
     @pytest.mark.asyncio
     async def test_request_passes_json_to_session(self):
         """json payload must reach aiohttp.session.request()."""
+        if JulesClient is None:
+            pytest.skip("aiohttp not installed")
         from mekhane.symploke.jules_client import JulesClient
 
         client = JulesClient(api_key="test-key")

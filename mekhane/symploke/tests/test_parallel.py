@@ -15,7 +15,16 @@ import pytest
 
 sys.path.insert(0, "/home/makaron8426/oikos/hegemonikon")
 
-from mekhane.symploke.jules_client import JulesClient, SessionState
+# Optional dependency: aiohttp (via JulesClient)
+try:
+    from mekhane.symploke.jules_client import JulesClient, SessionState
+except ImportError:
+    JulesClient = None
+    SessionState = None
+
+# Skip if JulesClient is missing
+if JulesClient is None:
+    pytestmark = pytest.mark.skip(reason="aiohttp not installed")
 
 
 # PURPOSE: Test 5 parallel task execution
@@ -100,6 +109,9 @@ async def test_parallel_execution():
 
 
 if __name__ == "__main__":
+    if JulesClient is None:
+        print("Skipping: aiohttp not installed")
+        sys.exit(0)
     print("Starting parallel execution test...")
     print("Note: Tasks may take 2-5 minutes to complete.")
     print("Press Ctrl+C to cancel (sessions will continue in background).\n")

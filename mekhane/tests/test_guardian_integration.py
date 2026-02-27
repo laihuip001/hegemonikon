@@ -92,25 +92,28 @@ class TestMeaningfulTraceContextRegression:
         )
 
         with tempfile.TemporaryDirectory() as tmpdir:
-            path = Path(tmpdir) / "traces.json"
+            tmp_path = Path(tmpdir)
+            target_path = tmp_path / "traces.json"
 
-            # Write a trace with context
-            clear_session_traces()
-            mark_meaningful(
-                reason="persist context",
-                intensity=2,
-                context="must persist to disk",
-            )
-            save_traces(path)
+            # Patch TRACES_PATH to avoid PermissionError in CI
+            with patch("mekhane.fep.meaningful_traces.TRACES_PATH", target_path):
+                # Write a trace with context
+                clear_session_traces()
+                mark_meaningful(
+                    reason="persist context",
+                    intensity=2,
+                    context="must persist to disk",
+                )
+                save_traces(target_path)
 
-            # Load and verify
-            loaded = load_traces(path)
-            assert len(loaded) >= 1
-            found = [t for t in loaded if t.reason == "persist context"]
-            assert len(found) == 1
-            assert found[0].context == "must persist to disk"
+                # Load and verify
+                loaded = load_traces(target_path)
+                assert len(loaded) >= 1
+                found = [t for t in loaded if t.reason == "persist context"]
+                assert len(found) == 1
+                assert found[0].context == "must persist to disk"
 
-            clear_session_traces()
+                clear_session_traces()
 
 
 # ============ 2. FailureDB — resolution regression ============

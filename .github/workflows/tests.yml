@@ -45,7 +45,7 @@ jobs:
                   # Split install to avoid index conflict (torch from cpu index, others from pypi)
                   pip install torch --index-url https://download.pytorch.org/whl/cpu
                   pip install pytest pytest-asyncio pytest-timeout pyyaml pydantic lancedb numpy scipy \
-                              networkx pandas tabulate requests httpx schedule \
+                              networkx pandas tabulate requests httpx schedule fastapi \
                               sentence-transformers
                   # Install project in development mode if setup exists
                   pip install -e ".[test]" 2>/dev/null || true

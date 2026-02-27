@@ -46,7 +46,7 @@ jobs:
 
                   # Install core test dependencies (including sentence-transformers which needs torch)
                   pip install pytest pytest-asyncio pytest-timeout pyyaml pydantic lancedb numpy scipy \
-                              networkx pandas tabulate requests httpx schedule \
+                              networkx pandas tabulate requests httpx schedule fastapi \
                               sentence-transformers
 
                   # Install project in development mode if setup exists

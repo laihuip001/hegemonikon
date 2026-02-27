@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Infra] <- mekhane/symploke/tests/test_intent_wal.py A0→AutoFix
 """Tests for Intent-WAL Manager."""
 
 import sys

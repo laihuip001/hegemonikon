@@ -1,3 +1,4 @@
+# PROOF: [L2/Test] <- mekhane/basanos/l2/g_struct.py A0→AutoFix
 # PURPOSE: kernel/ MD ファイルから HGK 概念を機械的に抽出する構造パーサー
 # REASON: F⊣G 随伴の G_struct 部分 — YAML frontmatter, 定理テーブル, 定義を抽出
 """G_struct: Mechanical parser for kernel/ markdown files.

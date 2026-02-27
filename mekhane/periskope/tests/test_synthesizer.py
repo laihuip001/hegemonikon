@@ -1,3 +1,4 @@
+# PROOF: [L2/Periskope] <- mekhane/periskope/tests/test_synthesizer.py A0→AutoFix
 """
 Tests for multi-model synthesizer.
 """

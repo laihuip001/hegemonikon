@@ -1,3 +1,4 @@
+# PROOF: [L2/Periskope] <- mekhane/periskope/citation_agent.py A0→AutoFix
 """
 Citation verification agent for Periskopē.
 

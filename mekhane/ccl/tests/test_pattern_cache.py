@@ -1,3 +1,4 @@
+# PROOF: [L1/CCL] <- mekhane/ccl/tests/test_pattern_cache.py A0→AutoFix
 """Tests for mekhane.ccl.pattern_cache.PatternCache."""
 
 import unittest

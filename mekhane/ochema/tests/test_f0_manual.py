@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Ochema] <- mekhane/ochema/tests/test_f0_manual.py A0→AutoFix
 """F0 Tool Use — 手動検証スクリプト.
 
 Usage:

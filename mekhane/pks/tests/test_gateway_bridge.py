@@ -1,3 +1,4 @@
+# PROOF: [L2/PKS] <- mekhane/pks/tests/test_gateway_bridge.py A0→AutoFix
 """
 GatewayBridge テスト — E2E + 単体テスト
 

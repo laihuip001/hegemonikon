@@ -10,6 +10,7 @@ API Integration Tests — FastAPI TestClient によるエンドポイント検�
 """
 
 import pytest
+fastapi = pytest.importorskip("fastapi")
 from fastapi.testclient import TestClient
 
 from mekhane.api.server import create_app

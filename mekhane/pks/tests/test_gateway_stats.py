@@ -3,16 +3,24 @@
 
 import pytest
 from unittest.mock import patch, MagicMock
-from fastapi.testclient import TestClient
+
+# Optional dependency: FastAPI
+try:
+    from fastapi.testclient import TestClient
+except ImportError:
+    TestClient = None
 
 
 @pytest.fixture
 def client():
     """TestClient for the API without starting PKSEngine."""
+    if TestClient is None:
+        pytest.skip("FastAPI not installed")
     from mekhane.api.server import app
     return TestClient(app)
 
 
+@pytest.mark.skipif(TestClient is None, reason="FastAPI not installed")
 class TestGatewayStatsEndpoint:
     """GET /api/pks/gateway-stats のテスト。"""
 

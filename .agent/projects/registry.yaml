@@ -193,7 +193,7 @@ projects:
   status: active
   phase: theory
   etymology: 美 — 美しいもの
-  note: core_architecture.md に構造柱として明記。CCL と同等の深淵。
+  note: core_architecture.md に構造柱として明記
   entry_point:
     reference: ccl/operators.md §13 圏論的意味論マップ
   usage_trigger: 圏論的解釈が必要な時。演算子の数学的基盤、随伴・モナド・極限。
@@ -351,12 +351,12 @@ projects:
   phase: "design"
   entry_point: null
   usage_trigger: null
-
-  - id: governance
-    name: "Skill Governance"
-    path: ".agent/skills/governance.md"
-    summary: "外部Skillの4-Tier信頼ゲート"
-    status: "active"
-    phase: "design"
-    entry_point: null
-    usage_trigger: null
+- id: governance
+  name: "Skill Governance"
+  path: ".agent/skills/governance.md"
+  tier: "module"
+  summary: "外部Skillの4-Tier信頼ゲート"
+  status: "active"
+  phase: "design"
+  entry_point: null
+  usage_trigger: null

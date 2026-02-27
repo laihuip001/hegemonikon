@@ -1,3 +1,4 @@
+# PROOF: [L2/Impl] <- mekhane/periskope/ Automated fix for CI
 """
 Periskopē — HGK Deep Research Engine
 

@@ -1,4 +1,4 @@
-<!-- PROOF: [L2/Review] <- mekhane/symploke/ -->
+# PROOF: [L2/Review] <- mekhane/symploke/
 # pickle恐怖症 レビュー
 
 ## 対象ファイル

@@ -1,4 +1,4 @@
-<!-- PROOF: [L2/Review] <- mekhane/symploke/boot_integration.py -->
+# PROOF: [L2/Review] <- mekhane/symploke/boot_integration.py
 
 # 視覚リズムの指揮者 レビュー
 

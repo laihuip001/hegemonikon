@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Mekhane] <- mekhane/pks/ A0->Auto->AddedByCI
 # PROOF: [L2/コア] <- mekhane/pks/
 # PURPOSE: Gateway Bridge — Ideas/Doxa/Handoff を PKS の KnowledgeNugget に変換
 """

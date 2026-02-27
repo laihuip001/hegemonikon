@@ -38,44 +38,50 @@ jobs:
           python-version: "3.11"
 
       - name: Install dependencies
-        run: pip install pyyaml
+        run: pip install pyyaml pydantic tabulate
 
       # L1: PROOF Header Check (blocking)
       - name: "L1: PROOF Header Check"
+        env:
+          PYTHONPATH: ${{ github.workspace }}
         run: |
-          export PYTHONPATH=${{ github.workspace }}
           python -m mekhane.dendron.cli check mekhane/ --ci --format ci
 
       # L2: Purpose Quality Check — mekhane/dendron/ (strict: WEAK = FAIL)
       - name: "L2: Purpose Check (dendron/ — strict)"
+        env:
+          PYTHONPATH: ${{ github.workspace }}
         run: |
-          export PYTHONPATH=${{ github.workspace }}
           python -m mekhane.dendron.cli purpose mekhane/dendron/ --ci --strict
 
       # L2: Purpose Quality Check — mekhane/ 全体 (warn only)
       - name: "L2: Purpose Check (mekhane/ — warn)"
         continue-on-error: true
+        env:
+          PYTHONPATH: ${{ github.workspace }}
         run: |
-          export PYTHONPATH=${{ github.workspace }}
           python -m mekhane.dendron.cli purpose mekhane/ --ci
 
       # Safety Contract: risk_tier + lcm_state check (blocking)
       - name: "Safety Contract Audit"
+        env:
+          PYTHONPATH: ${{ github.workspace }}
         run: |
-          export PYTHONPATH=${{ github.workspace }}
           python -m mekhane.dendron.cli skill-audit .agent/ --ci
 
       # EPT: NF2/NF3/BCNF checks (warn only — informational)
       - name: "EPT: NF2/NF3/BCNF Check"
         continue-on-error: true
+        env:
+          PYTHONPATH: ${{ github.workspace }}
         run: |
-          export PYTHONPATH=${{ github.workspace }}
           python -m mekhane.dendron.cli check mekhane/ --ept --format ci
 
       - name: Upload Coverage Report
         if: always()
+        env:
+          PYTHONPATH: ${{ github.workspace }}
         run: |
-          export PYTHONPATH=${{ github.workspace }}
           python -m mekhane.dendron.cli check mekhane/ --format markdown > proof-coverage.md
           echo "" >> proof-coverage.md
           echo "## L2 Purpose Quality" >> proof-coverage.md

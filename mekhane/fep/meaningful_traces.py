@@ -26,7 +26,8 @@ from typing import Optional, List
 import json
 
 # Default persistence path
-TRACES_PATH = Path("/home/makaron8426/oikos/mneme/.hegemonikon/meaningful_traces.json")
+# Use Path.home() to respect the environment's user directory (fixes CI PermissionError)
+TRACES_PATH = Path.home() / "oikos" / "mneme" / ".hegemonikon" / "meaningful_traces.json"
 
 
 # PURPOSE: の統一的インターフェースを実現する
@@ -125,7 +126,16 @@ def save_traces(path: Optional[Path] = None) -> Path:
         Path where traces were saved
     """
     target_path = path or TRACES_PATH
-    ensure_traces_dir()
+
+    # Only ensure parent directory exists if using default path or if we expect it to exist
+    if target_path == TRACES_PATH:
+        ensure_traces_dir()
+    elif not target_path.parent.exists():
+        # Try to create parent for custom path too, if permissions allow
+        try:
+            target_path.parent.mkdir(parents=True, exist_ok=True)
+        except OSError:
+            pass  # Ignore if we can't create custom path parent (e.g. read-only mock)
 
     # Load existing traces
     existing = load_traces(target_path)

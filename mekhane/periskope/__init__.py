@@ -1,3 +1,4 @@
+# PROOF: [L2/Search] <- mekhane/periskope/__init__.py Auto-generated existence proof
 """
 Periskopē — HGK Deep Research Engine
 

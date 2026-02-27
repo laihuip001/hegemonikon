@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Search] <- mekhane/periskope/cli.py Auto-generated existence proof
 """
 Periskopē CLI — Deep Research from the command line.
 

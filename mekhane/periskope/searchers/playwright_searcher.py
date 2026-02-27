@@ -1,3 +1,4 @@
+# PROOF: [L2/Search] <- mekhane/periskope/searchers/playwright_searcher.py Auto-generated existence proof
 """
 Playwright-based searcher for Periskopē.
 

@@ -1,3 +1,4 @@
+# PROOF: [L2/Search] <- mekhane/periskope/synthesizer.py Auto-generated existence proof
 """
 Multi-model synthesizer for Periskopē.
 

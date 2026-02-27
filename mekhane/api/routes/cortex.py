@@ -1,3 +1,4 @@
+# PROOF: [L2/API] <- mekhane/api/routes/cortex.py Auto-generated existence proof
 from typing import Any, AsyncGenerator
 
 import asyncio

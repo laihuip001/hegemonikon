@@ -1,3 +1,4 @@
+# PROOF: [L2/Search] <- mekhane/periskope/engine.py Auto-generated existence proof
 """
 Periskopē Deep Research Engine — Orchestrator.
 

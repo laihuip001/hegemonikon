@@ -125,7 +125,7 @@ def save_traces(path: Optional[Path] = None) -> Path:
         Path where traces were saved
     """
     target_path = path or TRACES_PATH
-    ensure_traces_dir()
+    target_path.parent.mkdir(parents=True, exist_ok=True)
 
     # Load existing traces
     existing = load_traces(target_path)

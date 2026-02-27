@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/scripts/ A0->Auto->AddedByCI
 #!/usr/bin/env python3
 # PROOF: [L2/インフラ] <- mekhane/peira/ A0→note.com記事収集が必要→note-collectorが担う
 """

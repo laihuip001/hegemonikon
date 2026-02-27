@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/pks/ A0->Auto->AddedByCI
 #!/usr/bin/env python3
 # PROOF: [L2/インフラ] <- mekhane/pks/ A0→Attractor+PKS接続が必要→attractor_context が担う
 """

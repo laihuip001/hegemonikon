@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/tests/ A0->Auto->AddedByCI
 #!/usr/bin/env python3
 # PROOF: [L1/テスト] <- mekhane/mcp/tests/
 # PURPOSE: Gateway ツール群の正常パステスト（セキュリティテストの補完）

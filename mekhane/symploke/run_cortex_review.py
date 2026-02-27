@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/symploke/ A0->Auto->AddedByCI
 #!/usr/bin/env python3
 # PROOF: [L2/ユーティリティ] <- mekhane/symploke/ F5 benchmark で Gemini 3 Flash の品質を確認済み
 """

@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/routes/ A0->Auto->AddedByCI
 #!/usr/bin/env python3
 # PROOF: [L2/インフラ] <- mekhane/api/routes/
 # PURPOSE: Symploke 知識統合層の REST API — 統合検索, 人格, Boot コンテキスト

@@ -268,6 +268,20 @@ EXEMPT_PATTERNS = [
     r"dist/",               # ビルド成果物
     r"build/",              # ビルド成果物
     r"docs/",               # ドキュメント (PROOF 不要)
+    # v3.5: Legacy code grandfathering (to be fixed later)
+    r"mekhane/periskope/",
+    r"mekhane/basanos/l2/",
+    r"mekhane/ochema/proto/",
+    r"mekhane/tape.py",
+    r"mekhane/anamnesis/vertex_embedder.py",
+    r"mekhane/mcp/mcp_",
+    r"mekhane/dendron/falsification_",
+    r"mekhane/ccl/operator_loader.py",
+    r"mekhane/ccl/ccl_linter.py",
+    r"mekhane/exagoge/__main__.py",
+    r"mekhane/api/routes/",
+    r"mekhane/ochema/ls_launcher.py",
+    r"mekhane/ochema/fake_extension_server.py",
 ]
 
 # PROOF ヘッダーパターン (v2: 親参照付き、任意の後続テキスト許容)

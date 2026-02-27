@@ -91,26 +91,33 @@ class TestMeaningfulTraceContextRegression:
             clear_session_traces,
         )
 
-        with tempfile.TemporaryDirectory() as tmpdir:
-            path = Path(tmpdir) / "traces.json"
+        # Mock TRACES_PATH to a temporary directory to avoid PermissionError
+        with tempfile.TemporaryDirectory() as tmp_home_dir:
+            # We patch the global variable TRACES_PATH in the module
+            # because save_traces uses ensure_traces_dir which relies on TRACES_PATH
+            new_traces_path = Path(tmp_home_dir) / "oikos" / "mneme" / ".hegemonikon" / "traces"
 
-            # Write a trace with context
-            clear_session_traces()
-            mark_meaningful(
-                reason="persist context",
-                intensity=2,
-                context="must persist to disk",
-            )
-            save_traces(path)
+            with patch("mekhane.fep.meaningful_traces.TRACES_PATH", new_traces_path):
+                with tempfile.TemporaryDirectory() as tmpdir:
+                    path = Path(tmpdir) / "traces.json"
 
-            # Load and verify
-            loaded = load_traces(path)
-            assert len(loaded) >= 1
-            found = [t for t in loaded if t.reason == "persist context"]
-            assert len(found) == 1
-            assert found[0].context == "must persist to disk"
+                    # Write a trace with context
+                    clear_session_traces()
+                    mark_meaningful(
+                        reason="persist context",
+                        intensity=2,
+                        context="must persist to disk",
+                    )
+                    save_traces(path)
 
-            clear_session_traces()
+                    # Load and verify
+                    loaded = load_traces(path)
+                    assert len(loaded) >= 1
+                    found = [t for t in loaded if t.reason == "persist context"]
+                    assert len(found) == 1
+                    assert found[0].context == "must persist to disk"
+
+                    clear_session_traces()
 
 
 # ============ 2. FailureDB — resolution regression ============

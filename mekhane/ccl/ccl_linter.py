@@ -1,3 +1,4 @@
+# PROOF: [L1/Language] <- mekhane/ccl/ccl_linter.py Auto-generated proof
 """CCL Linter — CCL 式の静的検証。
 
 operators.md (SSOT) に基づいて CCL 式を検証し、

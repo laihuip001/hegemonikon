@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Mekhane] <- mekhane/ergasterion/tekhne/tests/ A0->Auto->AddedByCI
 # PROOF: [L3/テスト] <- mekhane/ergasterion/tekhne/ SweepEngine + ResponseCache 統合テスト
 """
 SweepEngine + ResponseCache Integration Tests.

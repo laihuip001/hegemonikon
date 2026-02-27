@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Mekhane] <- mekhane/dendron/tests/ A0->Auto->AddedByCI
 # PROOF: [L2/テスト] <- mekhane/dendron/ A0→テストが必要→test_purpose_inferが担う
 """
 Tests for purpose_infer.py — PURPOSE 自動推定ツール

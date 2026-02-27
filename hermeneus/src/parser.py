@@ -1,3 +1,4 @@
+# PROOF: [L1/Hermeneus] <- hermeneus/src/ A0->Auto->AddedByCI
 # pyre-ignore-all-errors
 # PROOF: [L2/インフラ] <- hermeneus/src/ CCL パーサー
 """

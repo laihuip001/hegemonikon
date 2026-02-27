@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Mekhane] <- mekhane/ochema/tests/ A0->Auto->AddedByCI
 # PROOF: [L2/インフラ] <- mekhane/ochema/tests/ テスト
 # PURPOSE: CortexClient chat API ユニットテスト
 """

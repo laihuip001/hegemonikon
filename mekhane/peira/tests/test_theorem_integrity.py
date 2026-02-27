@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Mekhane] <- mekhane/peira/tests/ A0->Auto->AddedByCI
 # PROOF: [L2/検証] <- DX-008: THEOREM_WORKFLOWS バグ再発防止
 """
 Theorem Integrity Tests — 定理テーブル整合性チェック

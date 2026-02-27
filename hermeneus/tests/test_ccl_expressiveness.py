@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L1/Hermeneus] <- hermeneus/tests/ A0->Auto->AddedByCI
 # PROOF: [L3/テスト] <- hermeneus/tests/
 """
 PROOF: [L3/テスト] このファイルは存在しなければならない

@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/symploke/search/ A0->Auto->AddedByCI
 """
 # PROOF: [L2/インフラ] <- mekhane/symploke/search/ A0→検索機能が必要→__init__ が担う
 Symplokē Search Package

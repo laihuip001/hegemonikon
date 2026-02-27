@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Mekhane] <- mekhane/mcp/ A0->Auto->AddedByCI
 # PROOF: [L2/Sympatheia] <- mekhane/mcp/
 """
 Sympatheia MCP Server v1.1 — Hegemonikón Autonomic Nervous System

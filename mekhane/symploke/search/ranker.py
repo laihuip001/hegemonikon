@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/symploke/search/ A0->Auto->AddedByCI
 """
 # PROOF: [L2/インフラ] <- mekhane/symploke/search/ A0→検索機能が必要→ranker が担う
 Symplokē Ranker

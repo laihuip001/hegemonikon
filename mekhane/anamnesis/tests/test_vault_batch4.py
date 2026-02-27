@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Mekhane] <- mekhane/anamnesis/tests/ A0->Auto->AddedByCI
 # PROOF: [L2/テスト] <- mekhane/anamnesis/tests/
 # PURPOSE: VaultManager の包括テスト
 """Anamnesis Vault Tests — Batch 4"""

@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Mekhane] <- mekhane/symploke/ A0->Auto->AddedByCI
 # PROOF: [L3/ユーティリティ] <- mekhane/symploke/ O4→Cortex直叩きレビュー→run_cortex_reviews が担う
 # PURPOSE: CortexClient (Gemini API 直叩き) による Specialist Reviews 実行
 """

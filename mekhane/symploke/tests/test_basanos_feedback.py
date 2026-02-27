@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Mekhane] <- mekhane/symploke/tests/ A0->Auto->AddedByCI
 # PROOF: [L2/テスト] <- mekhane/symploke/tests/
 # PURPOSE: F4 basanos_feedback.py のユニットテスト
 """Tests for Basanos Perspective Feedback system."""

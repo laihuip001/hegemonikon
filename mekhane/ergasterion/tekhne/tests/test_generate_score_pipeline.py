@@ -62,6 +62,7 @@ class TestDomainDetection:
 
     # PURPOSE: Verify detect domain behaves correctly
     # PURPOSE: Verify detect domain behavior
+    # PURPOSE: Verify detect domain behavior
     @pytest.mark.parametrize("text,expected", [
         ("SQLインジェクションのコードレビューをする", "technical"),
         ("Pythonのバグをデバッグする", "technical"),

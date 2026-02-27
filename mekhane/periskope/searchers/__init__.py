@@ -1,3 +1,4 @@
+# PROOF: [L2/Search] <- mekhane/periskope/searchers/__init__.py A0→AutoFix
 """
 Periskopē searchers — pluggable search source adapters.
 

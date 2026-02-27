@@ -1,3 +1,4 @@
+# PROOF: [L2/Search] <- mekhane/periskope/synthesizer.py A0→AutoFix
 """
 Multi-model synthesizer for Periskopē.
 

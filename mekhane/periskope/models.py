@@ -1,3 +1,4 @@
+# PROOF: [L2/Search] <- mekhane/periskope/models.py A0→AutoFix
 """
 Periskopē data models.
 

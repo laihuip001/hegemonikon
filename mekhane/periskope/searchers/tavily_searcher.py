@@ -1,3 +1,4 @@
+# PROOF: [L2/Search] <- mekhane/periskope/searchers/tavily_searcher.py A0→AutoFix
 """
 Tavily Search API client for Periskopē.
 

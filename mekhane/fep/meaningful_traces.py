@@ -53,9 +53,16 @@ class MeaningfulTrace:
 # PURPOSE: Ensure the persistence directory exists.
 
 
-def ensure_traces_dir() -> None:
-    """Ensure the persistence directory exists."""
-    TRACES_PATH.parent.mkdir(parents=True, exist_ok=True)
+def ensure_traces_dir(path: Optional[Path] = None) -> None:
+    """
+    Ensure the persistence directory exists.
+
+    Args:
+        path: Optional path to use instead of default global TRACES_PATH.
+              Useful for testing to avoid PermissionError.
+    """
+    target = path or TRACES_PATH
+    target.parent.mkdir(parents=True, exist_ok=True)
 # PURPOSE: Mark a moment as meaningful.
 
 
@@ -125,7 +132,7 @@ def save_traces(path: Optional[Path] = None) -> Path:
         Path where traces were saved
     """
     target_path = path or TRACES_PATH
-    ensure_traces_dir()
+    ensure_traces_dir(target_path)
 
     # Load existing traces
     existing = load_traces(target_path)

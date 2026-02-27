@@ -101,7 +101,11 @@ class TestMeaningfulTraceContextRegression:
                 intensity=2,
                 context="must persist to disk",
             )
-            save_traces(path)
+
+            # Patch ensure_traces_dir to prevent it from creating the hardcoded global directory
+            # save_traces(path) calls ensure_traces_dir(), which would fail in CI without this patch
+            with patch("mekhane.fep.meaningful_traces.ensure_traces_dir") as mock_ensure:
+                save_traces(path)
 
             # Load and verify
             loaded = load_traces(path)

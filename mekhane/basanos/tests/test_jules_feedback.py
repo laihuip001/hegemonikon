@@ -9,6 +9,7 @@ from mekhane.basanos.jules_feedback import JulesFeedback, FeedbackEntry
 from mekhane.basanos.pipeline import DomainWeight, RotationState
 
 
+# PURPOSE: feedback_dir の処理
 @pytest.fixture
 def feedback_dir(tmp_path):
     d = tmp_path / "jules_feedback"
@@ -16,11 +17,13 @@ def feedback_dir(tmp_path):
     return d
 
 
+# PURPOSE: fb の処理
 @pytest.fixture
 def fb(feedback_dir):
     return JulesFeedback(feedback_dir=feedback_dir)
 
 
+# PURPOSE: 過去のフィードバック履歴を持つインスタンス。
 @pytest.fixture
 def fb_with_history(feedback_dir):
     """過去のフィードバック履歴を持つインスタンス。"""
@@ -64,7 +67,9 @@ def fb_with_history(feedback_dir):
 # FeedbackEntry
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
+# PURPOSE: Test feedback entry の実装
 class TestFeedbackEntry:
+    # PURPOSE: to_dict をテストする
     def test_to_dict(self):
         e = FeedbackEntry(
             session_id="s1", date="2026-02-18", verdict="fix",
@@ -76,12 +81,14 @@ class TestFeedbackEntry:
         assert d["verdict"] == "fix"
         assert d["checker_adjustments"]["AI-001"] == 0.05
 
+    # PURPOSE: from_dict をテストする
     def test_from_dict(self):
         d = {"session_id": "s2", "date": "2026-02-17", "verdict": "false_positive"}
         e = FeedbackEntry.from_dict(d)
         assert e.session_id == "s2"
         assert e.verdict == "false_positive"
 
+    # PURPOSE: roundtrip をテストする
     def test_roundtrip(self):
         e = FeedbackEntry(
             session_id="s1", date="2026-02-18", verdict="fix",
@@ -96,7 +103,9 @@ class TestFeedbackEntry:
 # Registration
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
+# PURPOSE: Test registration の実装
 class TestRegistration:
+    # PURPOSE: register_session をテストする
     def test_register_session(self, fb, feedback_dir):
         issues = [
             {"code": "AI-001", "name": "Naming Hallucination"},
@@ -109,6 +118,7 @@ class TestRegistration:
         assert pending[0]["session_id"] == "session-abc"
         assert pending[0]["issue_count"] == 2
 
+    # PURPOSE: register_dedup をテストする
     def test_register_dedup(self, fb):
         issues = [{"code": "AI-001"}]
         fb.register_session("session-abc", issues)
@@ -117,6 +127,7 @@ class TestRegistration:
         pending = fb._load_pending()
         assert len(pending) == 1
 
+    # PURPOSE: register_multiple をテストする
     def test_register_multiple(self, fb):
         fb.register_session("s1", [{"code": "AI-001"}])
         fb.register_session("s2", [{"code": "AI-003"}])
@@ -129,7 +140,9 @@ class TestRegistration:
 # Checker Adjustments
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
+# PURPOSE: Test checker adjustments の実装
 class TestCheckerAdjustments:
+    # PURPOSE: fix_positive_adjustment をテストする
     def test_fix_positive_adjustment(self, fb):
         adj = fb._compute_checker_adjustments(
             ["AI-001", "AI-003"], "fix", {"fixed": 2}
@@ -137,12 +150,14 @@ class TestCheckerAdjustments:
         assert adj["AI-001"] == 0.05
         assert adj["AI-003"] == 0.05
 
+    # PURPOSE: false_positive_negative_adjustment をテストする
     def test_false_positive_negative_adjustment(self, fb):
         adj = fb._compute_checker_adjustments(
             ["AI-001"], "false_positive", {"dismissed": 1}
         )
         assert adj["AI-001"] == -0.1
 
+    # PURPOSE: error_no_adjustment をテストする
     def test_error_no_adjustment(self, fb):
         adj = fb._compute_checker_adjustments(
             ["AI-001"], "error", {}
@@ -154,7 +169,9 @@ class TestCheckerAdjustments:
 # Cumulative Adjustments
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
+# PURPOSE: Test cumulative adjustments の実装
 class TestCumulativeAdjustments:
+    # PURPOSE: cumulative をテストする
     def test_cumulative(self, fb_with_history):
         adj = fb_with_history.compute_cumulative_adjustments()
         # AI-001: +0.05 +(-0.1) +0.05 = 0.0
@@ -164,10 +181,12 @@ class TestCumulativeAdjustments:
         # AI-005: -0.1
         assert adj["AI-005"] == -0.1
 
+    # PURPOSE: empty_history をテストする
     def test_empty_history(self, fb):
         adj = fb.compute_cumulative_adjustments()
         assert adj == {}
 
+    # PURPOSE: clamp をテストする
     def test_clamp(self, feedback_dir):
         fb = JulesFeedback(feedback_dir=feedback_dir)
         # Create extreme history
@@ -190,7 +209,9 @@ class TestCumulativeAdjustments:
 # Apply to Rotation
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
+# PURPOSE: Test apply to rotation の実装
 class TestApplyToRotation:
+    # PURPOSE: apply_adjustments をテストする
     def test_apply_adjustments(self, fb_with_history):
         state = RotationState(
             domains={
@@ -204,6 +225,7 @@ class TestApplyToRotation:
         # But only if domain exists
         assert isinstance(changes, dict)
 
+    # PURPOSE: empty_feedback をテストする
     def test_empty_feedback(self, fb):
         state = RotationState(domains={})
         changes = fb.apply_to_rotation(state)
@@ -214,13 +236,16 @@ class TestApplyToRotation:
 # Summary
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
+# PURPOSE: Test summary の実装
 class TestSummary:
+    # PURPOSE: summary_with_data をテストする
     def test_summary_with_data(self, fb_with_history):
         s = fb_with_history.summary()
         assert "Jules Feedback" in s
         assert "fix" in s
         assert "false_positive" in s
 
+    # PURPOSE: summary_empty をテストする
     def test_summary_empty(self, fb):
         s = fb.summary()
         assert "No sessions" in s
@@ -230,11 +255,14 @@ class TestSummary:
 # Collect — without Jules API (mock)
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
+# PURPOSE: Test collect の実装
 class TestCollect:
+    # PURPOSE: collect_no_pending をテストする
     def test_collect_no_pending(self, fb):
         completed = fb.collect_completed()
         assert completed == []
 
+    # PURPOSE: API key がない場合、pending は保持される。
     def test_collect_with_no_api(self, fb):
         """API key がない場合、pending は保持される。"""
         fb.register_session("s1", [{"code": "AI-001"}])

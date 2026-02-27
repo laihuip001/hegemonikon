@@ -26,6 +26,7 @@ INCOMING_DIR = MNEME / "incoming"
 REPORTS_DIR = MNEME / "periskope"
 
 
+# PURPOSE: 非同期研究リクエスト
 class ResearchRequest(BaseModel):
     """非同期研究リクエスト"""
     query: str
@@ -34,6 +35,7 @@ class ResearchRequest(BaseModel):
     digest_depth: str = "quick"
 
 
+# PURPOSE: Periskopē エンジンのステータスサマリー
 @router.get("/status")
 async def periskope_status():
     """Periskopē エンジンのステータスサマリー"""
@@ -62,6 +64,7 @@ async def periskope_status():
     }
 
 
+# PURPOSE: 過去の研究レポート一覧
 @router.get("/history")
 async def periskope_history(limit: int = 20):
     """過去の研究レポート一覧"""
@@ -91,6 +94,7 @@ async def periskope_history(limit: int = 20):
     return {"reports": reports, "total": len(reports)}
 
 
+# PURPOSE: 特定レポートの内容を返す
 @router.get("/report/{filename}")
 async def periskope_report(filename: str):
     """特定レポートの内容を返す"""
@@ -105,6 +109,7 @@ async def periskope_report(filename: str):
         return {"status": "error", "message": str(e)}
 
 
+# PURPOSE: 非同期研究リクエスト (バックグラウンド実行)
 @router.post("/research")
 async def periskope_research(
     request: ResearchRequest,

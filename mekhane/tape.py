@@ -18,6 +18,7 @@ from pathlib import Path
 TAPE_DIR = Path(__file__).resolve().parents[2] / ".agent" / "tape"
 
 
+# PURPOSE: Append-only JSONL tape for WF execution traces
 class TapeWriter:
     """Append-only JSONL tape for WF execution traces."""
 
@@ -27,6 +28,7 @@ class TapeWriter:
         now = datetime.now(timezone.utc)
         self.filepath = self.tape_dir / f"tape_{now.strftime('%Y-%m-%d_%H%M')}.jsonl"
 
+    # PURPOSE: Append a trace entry to the tape file
     def log(self, wf: str, step: str, **kwargs) -> dict:
         """Append a trace entry to the tape file.
 
@@ -48,6 +50,7 @@ class TapeWriter:
             f.write(json.dumps(entry, ensure_ascii=False) + "\n")
         return entry
 
+    # PURPOSE: Read all entries from the current tape file
     def read(self) -> list[dict]:
         """Read all entries from the current tape file."""
         if not self.filepath.exists():
@@ -60,6 +63,7 @@ class TapeWriter:
                     entries.append(json.loads(line))
         return entries
 
+    # PURPOSE: Return a summary of the current tape
     def summary(self) -> dict:
         """Return a summary of the current tape."""
         entries = self.read()

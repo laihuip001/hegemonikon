@@ -49,6 +49,7 @@ class SessionAnalysis:
     was_useful: bool = False
     confidence: float = 0.0   # 判定の確信度
 
+    # PURPOSE: to_dict の処理
     def to_dict(self) -> dict:
         return {
             "session_id": self.session_id,
@@ -75,6 +76,7 @@ class UsefulnessJudge:
         5. Session failed → not useful (confidence: 0.8)
     """
 
+    # PURPOSE: 有用性と確信度を返す。
     @staticmethod
     def judge(analysis: SessionAnalysis) -> tuple[bool, float]:
         """有用性と確信度を返す。"""
@@ -104,6 +106,7 @@ class JulesResultParser:
         self._log_dir = log_dir or _SCHEDULER_LOG_DIR
         self._judge = UsefulnessJudge()
 
+    # PURPOSE: 単一セッションの結果を解析する。
     def analyze_session(self, session_id: str) -> SessionAnalysis:
         """単一セッションの結果を解析する。
 
@@ -142,6 +145,7 @@ class JulesResultParser:
 
         return analysis
 
+    # PURPOSE: ログファイル内の全セッションを解析する。
     def analyze_log_file(self, log_path: Path) -> list[SessionAnalysis]:
         """ログファイル内の全セッションを解析する。"""
         results = []

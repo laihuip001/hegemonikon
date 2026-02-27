@@ -26,6 +26,7 @@ from mekhane.basanos.l2.models import Deficit, DeficitType, ExternalForm, HGKCon
 # ---------------------------------------------------------------------------
 
 
+# PURPOSE: Detect η deficit: external knowledge not absorbed into HGK
 class EtaDeficitFactory:
     # PURPOSE: 外部知識の未吸収を検出する η deficit ファクトリ
     """Detect η deficit: external knowledge not absorbed into HGK.
@@ -40,6 +41,7 @@ class EtaDeficitFactory:
         self.project_root = Path(project_root)
         self._hgk_keywords: Optional[set[str]] = None
 
+    # PURPOSE: Detect η deficits by comparing paper keywords against HGK
     def detect(self, paper_keywords: list[str], paper_title: str) -> list[Deficit]:
         # PURPOSE: 論文キーワードと HGK kernel/ を照合し、未吸収概念を deficit として返す
         """Detect η deficits by comparing paper keywords against HGK.
@@ -94,6 +96,7 @@ class EtaDeficitFactory:
 # ---------------------------------------------------------------------------
 
 
+# PURPOSE: Detect ε deficit: HGK claims lacking implementation or justification
 class EpsilonDeficitFactory:
     # PURPOSE: HGK の主張に実装/根拠がない ε deficit を検出するファクトリ
     """Detect ε deficit: HGK claims lacking implementation or justification.
@@ -187,6 +190,7 @@ class EpsilonDeficitFactory:
         result.update(mapping)
         return result
 
+    # PURPOSE: Detect ε-impl: kernel definitions without implementations
     def detect_impl_deficits(self) -> list[Deficit]:
         # PURPOSE: kernel/ 定義に対応する WF/mekhane 実装の有無を検査
         """Detect ε-impl: kernel definitions without implementations."""
@@ -244,6 +248,7 @@ class EpsilonDeficitFactory:
 
         return False
 
+    # PURPOSE: Detect ε-justification: HGK claims without external support
     def detect_justification_deficits(
         self, gnosis_keywords: set[str]
     ) -> list[Deficit]:
@@ -302,6 +307,7 @@ class EpsilonDeficitFactory:
 # ---------------------------------------------------------------------------
 
 
+# PURPOSE: Detect Δε/Δt: changes that introduce structural discrepancies
 class DeltaDeficitFactory:
     # PURPOSE: git 変更差分から構造的不整合を検出する Δε/Δt ファクトリ
     """Detect Δε/Δt: changes that introduce structural discrepancies.
@@ -313,6 +319,7 @@ class DeltaDeficitFactory:
     def __init__(self, project_root: Path | str) -> None:
         self.project_root = Path(project_root)
 
+    # PURPOSE: Detect change-induced deficits from recent git history
     def detect(self, since: str = "HEAD~5") -> list[Deficit]:
         # PURPOSE: 直近の git コミットから kernel/mekhane 間の不整合を検出
         """Detect change-induced deficits from recent git history.

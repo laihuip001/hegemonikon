@@ -18,6 +18,7 @@ from mekhane.ccl.operator_loader import load_operators, OperatorDef
 from mekhane.ccl.spec_injector import ALL_OPERATORS, COMPOUND_OPERATORS, OPERATOR_DEFINITIONS
 
 
+# PURPOSE: Lint 警告。
 @dataclass
 class LintWarning:
     """Lint 警告。"""
@@ -40,6 +41,7 @@ _KNOWN_NON_OPERATORS = set("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ
 _STRUCTURAL_CHARS = set("(){}[]@:,.=|")
 
 
+# PURPOSE: CCL 式を静的検証し、警告リストを返す。
 def lint(ccl_expr: str) -> List[LintWarning]:
     """CCL 式を静的検証し、警告リストを返す。"""
     warnings: List[LintWarning] = []

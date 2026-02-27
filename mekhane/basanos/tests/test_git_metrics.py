@@ -34,6 +34,7 @@ MOCK_DAILY_OUTPUT = """2026-02-18
 """
 
 
+# PURPOSE: Mock された GitMetrics。
 @pytest.fixture
 def git_metrics(tmp_path):
     """Mock された GitMetrics。"""
@@ -45,26 +46,33 @@ def git_metrics(tmp_path):
 # Unit Tests
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
+# PURPOSE: Test file churn の実装
 class TestFileChurn:
+    # PURPOSE: churn_rate_zero_commits をテストする
     def test_churn_rate_zero_commits(self):
         fc = FileChurn(path="test.py")
         assert fc.churn_rate == 0.0
 
+    # PURPOSE: churn_rate をテストする
     def test_churn_rate(self):
         fc = FileChurn(path="test.py", commits=5, lines_added=50, lines_deleted=10)
         assert fc.churn_rate == 12.0  # 60 / 5
 
+    # PURPOSE: risk_score_single_author をテストする
     def test_risk_score_single_author(self):
         fc = FileChurn(path="test.py", commits=5, lines_added=50, lines_deleted=10, authors=1)
         assert fc.risk_score == fc.churn_rate * 1.0
 
+    # PURPOSE: risk_score_multi_author をテストする
     def test_risk_score_multi_author(self):
         fc = FileChurn(path="test.py", commits=5, lines_added=50, lines_deleted=10, authors=3)
         expected = fc.churn_rate * (1.0 + 2 * 0.3)  # 1.6x penalty
         assert abs(fc.risk_score - expected) < 0.01
 
 
+# PURPOSE: Test git metrics with mock の実装
 class TestGitMetricsWithMock:
+    # PURPOSE: file_churn をテストする
     def test_file_churn(self, git_metrics):
         with patch.object(git_metrics, '_git', return_value=MOCK_LOG_OUTPUT):
             churns = git_metrics.file_churn()
@@ -78,6 +86,7 @@ class TestGitMetricsWithMock:
         assert pipeline.lines_deleted == 18  # 5+2+10+1
         assert pipeline.authors == 2  # Alice, Bob
 
+    # PURPOSE: risky_files をテストする
     def test_risky_files(self, git_metrics):
         with patch.object(git_metrics, '_git', return_value=MOCK_LOG_OUTPUT):
             risky = git_metrics.risky_files(top_n=2)
@@ -86,6 +95,7 @@ class TestGitMetricsWithMock:
         # pipeline.py should be riskiest (high churn + 2 authors)
         assert risky[0].path == "mekhane/basanos/pipeline.py"
 
+    # PURPOSE: daily_stats をテストする
     def test_daily_stats(self, git_metrics):
         with patch.object(git_metrics, '_git', return_value=MOCK_DAILY_OUTPUT):
             stats = git_metrics.daily_stats()
@@ -95,12 +105,14 @@ class TestGitMetricsWithMock:
         day18 = [s for s in stats if s.date == "2026-02-18"][0]
         assert day18.count == 2
 
+    # PURPOSE: commit_velocity をテストする
     def test_commit_velocity(self, git_metrics):
         with patch.object(git_metrics, '_git', return_value=MOCK_DAILY_OUTPUT):
             v = git_metrics.commit_velocity()
 
         assert v > 0  # 4 commits / 3 days ≈ 1.33
 
+    # PURPOSE: empty_git をテストする
     def test_empty_git(self, git_metrics):
         with patch.object(git_metrics, '_git', return_value=""):
             churns = git_metrics.file_churn()
@@ -109,6 +121,7 @@ class TestGitMetricsWithMock:
             risky = git_metrics.risky_files()
             assert risky == []
 
+    # PURPOSE: summary をテストする
     def test_summary(self, git_metrics):
         with patch.object(git_metrics, '_git', return_value=MOCK_LOG_OUTPUT):
             # Need to provide daily stats too
@@ -118,7 +131,9 @@ class TestGitMetricsWithMock:
             assert "High-churn" in s
 
 
+# PURPOSE: Test hotspot overlaps の実装
 class TestHotspotOverlaps:
+    # PURPOSE: overlap_detection をテストする
     def test_overlap_detection(self, git_metrics):
         with patch.object(git_metrics, '_git', return_value=MOCK_LOG_OUTPUT):
             overlaps = git_metrics.hotspot_overlaps([
@@ -129,6 +144,7 @@ class TestHotspotOverlaps:
         assert "mekhane/basanos/pipeline.py" in overlaps
         assert "mekhane/some_other.py" not in overlaps
 
+    # PURPOSE: no_overlaps をテストする
     def test_no_overlaps(self, git_metrics):
         with patch.object(git_metrics, '_git', return_value=MOCK_LOG_OUTPUT):
             overlaps = git_metrics.hotspot_overlaps(["nonexistent.py"])
@@ -136,9 +152,11 @@ class TestHotspotOverlaps:
         assert overlaps == []
 
 
+# PURPOSE: 実際の git リポジトリで動作確認 (CI 環境でもスキップしない)。
 class TestLiveGitMetrics:
     """実際の git リポジトリで動作確認 (CI 環境でもスキップしない)。"""
 
+    # PURPOSE: hegemonikon リポジトリが存在すれば、実際に分析。
     def test_real_repo(self):
         """hegemonikon リポジトリが存在すれば、実際に分析。"""
         repo = Path.home() / "oikos/hegemonikon"

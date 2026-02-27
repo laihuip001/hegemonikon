@@ -28,6 +28,7 @@ from dataclasses import dataclass, asdict, field
 from typing import Dict, List, Optional
 
 
+# PURPOSE: クイズログの1エントリ
 @dataclass
 class QuizEntry:
     """クイズログの1エントリ"""
@@ -41,6 +42,7 @@ class QuizEntry:
     notes: str = ""                  # 自由記述メモ
 
 
+# PURPOSE: クイズ効果ログの管理
 class QuizLogger:
     """クイズ効果ログの管理"""
 
@@ -70,6 +72,7 @@ class QuizLogger:
             encoding="utf-8",
         )
 
+    # PURPOSE: クイズ生成を記録し、エントリIDを返す
     def log_quiz_generated(
         self,
         ccl_expr: str,
@@ -87,6 +90,7 @@ class QuizLogger:
         self._save()
         return entry_id
 
+    # PURPOSE: クイズ回答を記録
     def log_quiz_answered(
         self,
         entry_id: str,
@@ -102,6 +106,7 @@ class QuizLogger:
                 return True
         return False
 
+    # PURPOSE: クイズ後の実行効果を記録
     def log_quiz_effect(
         self,
         entry_id: str,
@@ -118,6 +123,7 @@ class QuizLogger:
                 return True
         return False
 
+    # PURPOSE: 演算子ごとの統計を取得
     def get_operator_stats(self, operator: str) -> Dict[str, int]:
         """演算子ごとの統計を取得"""
         relevant = [e for e in self._entries if operator in e.operators]
@@ -135,6 +141,7 @@ class QuizLogger:
             "prevented_failures": prevented,
         }
 
+    # PURPOSE: 全演算子の統計を辞書で返す
     def get_all_stats(self) -> Dict[str, Dict[str, int]]:
         """全演算子の統計を辞書で返す"""
         all_ops: set = set()
@@ -142,6 +149,7 @@ class QuizLogger:
             all_ops.update(e.operators)
         return {op: self.get_operator_stats(op) for op in sorted(all_ops)}
 
+    # PURPOSE: entries の処理
     @property
     def entries(self) -> List[QuizEntry]:
         return list(self._entries)
@@ -151,6 +159,7 @@ class QuizLogger:
 _instance: Optional[QuizLogger] = None
 
 
+# PURPOSE: QuizLogger のシングルトンインスタンスを取得
 def get_quiz_logger(db_path: Optional[Path] = None) -> QuizLogger:
     """QuizLogger のシングルトンインスタンスを取得"""
     global _instance

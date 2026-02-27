@@ -28,6 +28,7 @@ _WAL_DIR = _MNEME_DIR / "wal"
 
 # --- Response Models ---
 
+# PURPOSE: 個別 WAL エントリ
 class WALEntry(BaseModel):
     """個別 WAL エントリ"""
     filename: str
@@ -38,6 +39,7 @@ class WALEntry(BaseModel):
     created: str  # ISO 8601
 
 
+# PURPOSE: WAL ステータス概要
 class WALStatusResponse(BaseModel):
     """WAL ステータス概要"""
     total_wals: int
@@ -46,6 +48,7 @@ class WALStatusResponse(BaseModel):
     recent: list[WALEntry]
 
 
+# PURPOSE: WAL 詳細
 class WALDetailResponse(BaseModel):
     """WAL 詳細"""
     entry: WALEntry
@@ -98,6 +101,7 @@ def _scan_wals(limit: int = 20) -> list[WALEntry]:
 
 # --- Endpoints ---
 
+# PURPOSE: WAL ステータス概要を返す (ダッシュボードカード用)。
 @router.get("/wal/status", response_model=WALStatusResponse)
 async def wal_status():
     """WAL ステータス概要を返す (ダッシュボードカード用)。"""
@@ -112,6 +116,7 @@ async def wal_status():
     )
 
 
+# PURPOSE: WAL 履歴を返す。status でフィルタ可能。
 @router.get("/wal/history", response_model=list[WALEntry])
 async def wal_history(
     limit: int = Query(20, ge=1, le=100),
@@ -124,6 +129,7 @@ async def wal_history(
     return entries
 
 
+# PURPOSE: 個別 WAL ファイルの詳細を返す。
 @router.get("/wal/{filename}", response_model=WALDetailResponse)
 async def wal_detail(filename: str):
     """個別 WAL ファイルの詳細を返す。"""

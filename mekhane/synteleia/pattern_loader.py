@@ -52,21 +52,25 @@ _cache: Dict[str, Dict[str, Any]] = {}
 _hit_counter: Dict[str, int] = {}
 
 
+# PURPOSE: パターンヒットを記録。
 def record_hit(code: str) -> None:
     """パターンヒットを記録。"""
     _hit_counter[code] = _hit_counter.get(code, 0) + 1
 
 
+# PURPOSE: パターンヒット統計を返す（コード → ヒット数）。
 def get_stats() -> Dict[str, int]:
     """パターンヒット統計を返す（コード → ヒット数）。"""
     return dict(sorted(_hit_counter.items(), key=lambda x: x[1], reverse=True))
 
 
+# PURPOSE: 統計をリセット（テスト用）。
 def reset_stats() -> None:
     """統計をリセット（テスト用）。"""
     _hit_counter.clear()
 
 
+# PURPOSE: YAML からエージェント固有のパターンをロード。
 def load_patterns(yaml_path: Path, agent_key: str) -> Dict[str, Any]:
     """YAML からエージェント固有のパターンをロード。
 
@@ -103,6 +107,7 @@ def load_patterns(yaml_path: Path, agent_key: str) -> Dict[str, Any]:
 _USER_PATTERN_DIR = Path.home() / ".config" / "hegemonikon" / "synteleia"
 
 
+# PURPOSE: 3層マージでパターンをロード。
 def load_merged_patterns(
     project_yaml: Path,
     agent_key: str,
@@ -130,6 +135,7 @@ def load_merged_patterns(
     return merged
 
 
+# PURPOSE: YAML のパターンリスト → (regex, code, message) タプルに変換。
 def parse_pattern_list(
     raw: Any,
     default: List[Tuple[str, Optional[str], Optional[str]]],
@@ -159,6 +165,7 @@ def parse_pattern_list(
     return result or default
 
 
+# PURPOSE: YAML のパターンリスト → (regex, code, message, severity) タプルに変換。
 def parse_pattern_list_with_severity(
     raw: Any,
     default: List[Tuple[str, str, str, str]],
@@ -188,6 +195,7 @@ def parse_pattern_list_with_severity(
     return result or default
 
 
+# PURPOSE: YAML のキーワードリスト → List[str] に変換。
 def parse_keyword_list(raw: Any, default: List[str]) -> List[str]:
     """YAML のキーワードリスト → List[str] に変換。"""
     if isinstance(raw, list) and all(isinstance(x, str) for x in raw):
@@ -195,6 +203,7 @@ def parse_keyword_list(raw: Any, default: List[str]) -> List[str]:
     return default
 
 
+# PURPOSE: YAML の dict → Dict[str, str] に変換。
 def parse_string_dict(raw: Any, default: Dict[str, str]) -> Dict[str, str]:
     """YAML の dict → Dict[str, str] に変換。"""
     if isinstance(raw, dict) and all(
@@ -204,6 +213,7 @@ def parse_string_dict(raw: Any, default: Dict[str, str]) -> Dict[str, str]:
     return default
 
 
+# PURPOSE: YAML のペアリスト → List[Tuple[str, str]] に変換。
 def parse_pair_list(
     raw: Any,
     default: List[Tuple[str, str]],
@@ -223,6 +233,7 @@ def parse_pair_list(
     return result or default
 
 
+# PURPOSE: テスト用: キャッシュをクリア。
 def clear_cache() -> None:
     """テスト用: キャッシュをクリア。"""
     _cache.clear()

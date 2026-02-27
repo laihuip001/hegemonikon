@@ -1,4 +1,4 @@
-# PROOF: [L2/インフラ] <- hermeneus/src/ Formal Prover Interface
+# PROOF: [L1/Hermeneus] <- hermeneus/src/ S1->Hermeneia->Prover Interface
 """
 Hermēneus Prover — 形式的正確性検証
 

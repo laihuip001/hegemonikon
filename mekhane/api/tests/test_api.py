@@ -10,9 +10,19 @@ API Integration Tests — FastAPI TestClient によるエンドポイント検�
 """
 
 import pytest
-from fastapi.testclient import TestClient
+
+# Optional dependency: fastapi
+try:
+    from fastapi.testclient import TestClient
+except ImportError:
+    TestClient = None
 
 from mekhane.api.server import create_app
+
+# Skip all tests if fastapi is missing
+pytestmark = pytest.mark.skipif(
+    TestClient is None, reason="fastapi not installed"
+)
 
 
 # PURPOSE: テスト用アプリケーション
@@ -666,5 +676,3 @@ class TestGateway:
         """GET /api/gateway/policies → 200."""
         r = client.get("/api/gateway/policies")
         assert r.status_code in (200, 503)
-
-

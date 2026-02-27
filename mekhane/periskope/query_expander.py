@@ -1,3 +1,4 @@
+# PROOF: [L2/Search] <- mekhane/periskope/ Auto-generated existence proof
 """
 Query expander for Periskopē.
 

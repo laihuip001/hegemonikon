@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/pks/ A0->Auto->AddedByCI
 # noqa: AI-ALL
 # PROOF: [L2/インフラ] <- mekhane/pks/
 """

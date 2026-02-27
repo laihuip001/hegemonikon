@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Mekhane] <- mekhane/fep/ A0->Auto->AddedByCI
 # PROOF: [L2/FEP] <- mekhane/fep/
 # PURPOSE: Basin の bias データから prototype を自動補正する学習ループ
 """

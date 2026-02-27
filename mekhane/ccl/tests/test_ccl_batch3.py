@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Mekhane] <- mekhane/tests/ A0->Auto->AddedByCI
 # PROOF: [L2/テスト] <- mekhane/ccl/tests/
 # PURPOSE: CCL Guardrails, DoxaLearner, SemanticValidator の包括テスト
 """CCL Module Tests — Batch 3"""

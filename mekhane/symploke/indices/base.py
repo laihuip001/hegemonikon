@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/indices/ A0->Auto->AddedByCI
 # noqa: AI-ALL
 # PROOF: [L2/インフラ] <- mekhane/symploke/indices/ A0→索引管理が必要→base が担う
 """

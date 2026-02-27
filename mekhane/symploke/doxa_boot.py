@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Mekhane] <- mekhane/symploke/ A0->Auto->AddedByCI
 # PROOF: [L2/インフラ] <- mekhane/symploke/
 # PURPOSE: /boot Phase 3 で Doxa 信念を読込み、Sophia 昇格候補を検出する
 """

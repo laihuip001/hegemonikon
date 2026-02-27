@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Mekhane] <- mekhane/symploke/ A0->Auto->AddedByCI
 # PROOF: [L2/インフラ] <- mekhane/symploke/ A0→知識管理が必要→specialist_prompts が担う
 """
 Jules 専門家プロンプト生成モジュール v3.0

@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Mekhane] <- mekhane/pks/ A0->Auto->AddedByCI
 # PROOF: [L2/インフラ] <- mekhane/pks/ A0→LLM初期化パターンのDRY共通化→llm_clientが担う
 # PURPOSE: PKS 共通 LLM クライアント
 """

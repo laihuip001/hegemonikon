@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Mekhane] <- mekhane/tests/ A0->Auto->AddedByCI
 # PROOF: [L2/テスト] <- mekhane/ergasterion/digestor/tests/
 # PURPOSE: Digestor v3 改修テスト — 3層防御 + スコア v3 + 閾値変更
 """Digestor v3 Tests — 層1カテゴリフィルタ, 層3ドメインキーワード, スコア v3"""

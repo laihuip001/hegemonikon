@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Mekhane] <- mekhane/tests/ A0->Auto->AddedByCI
 # PROOF: [L3/テスト] <- mekhane/fep/tests/
 # PURPOSE: FEP日本語処理のベンチマーク測定
 """

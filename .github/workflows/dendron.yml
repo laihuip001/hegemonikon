@@ -42,14 +42,12 @@ jobs:
 
       # L1: PROOF Header Check (blocking)
       - name: "L1: PROOF Header Check"
-        continue-on-error: true
         run: |
           export PYTHONPATH=${{ github.workspace }}
           python -m mekhane.dendron.cli check mekhane/ --ci --format ci
 
       # L2: Purpose Quality Check — mekhane/dendron/ (strict: WEAK = FAIL)
       - name: "L2: Purpose Check (dendron/ — strict)"
-        continue-on-error: true
         run: |
           export PYTHONPATH=${{ github.workspace }}
           python -m mekhane.dendron.cli purpose mekhane/dendron/ --ci --strict

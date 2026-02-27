@@ -47,6 +47,7 @@ jobs:
                   # 2. Install other dependencies (default PyPI)
                   pip install pytest pytest-asyncio pytest-timeout pyyaml pydantic lancedb numpy scipy \
                               networkx pandas tabulate requests httpx schedule \
+                              fastapi uvicorn python-dotenv aiohttp \
                               sentence-transformers
 
                   # Install project in development mode if setup exists

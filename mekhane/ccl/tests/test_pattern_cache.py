@@ -1,3 +1,4 @@
+# PROOF: [L2/CCL] <- mekhane/ccl/ CCL Macros Test Pattern Cache
 """Tests for mekhane.ccl.pattern_cache.PatternCache."""
 
 import unittest

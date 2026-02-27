@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/ Implementation Layer Test Credit Assignment
 """Tests for Credit Assignment — Teacher Signal for FEP Agent."""
 
 import json

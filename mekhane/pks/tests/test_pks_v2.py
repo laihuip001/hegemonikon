@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/PKS] <- mekhane/pks/ PKS Engine Test Pks V2
 # PURPOSE: PKS v2 新コンポーネントのテスト
 """
 PKS v2 テストスイート

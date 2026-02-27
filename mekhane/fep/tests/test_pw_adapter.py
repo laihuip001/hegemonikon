@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/ Implementation Layer Test Pw Adapter
 """Tests for pw_adapter.py — L1↔L2 PW bridge."""
 
 import pytest

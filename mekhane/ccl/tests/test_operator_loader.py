@@ -1,3 +1,4 @@
+# PROOF: [L2/CCL] <- mekhane/ccl/ CCL Macros Test Operator Loader
 """G6: dispatch E2E テスト + G9: Linter テスト + operator_loader テスト。"""
 
 import pytest

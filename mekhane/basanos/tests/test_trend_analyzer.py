@@ -1,3 +1,4 @@
+# PROOF: [L2/Basanos] <- mekhane/basanos/ Basanos Engine Test Trend Analyzer
 """Tests for TrendAnalyzer — 合成データで全機能をテスト。"""
 
 import json

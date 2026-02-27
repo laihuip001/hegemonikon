@@ -1,3 +1,4 @@
+# PROOF: [L2/PKS] <- mekhane/pks/ PKS Engine Test Gateway Bridge
 """
 GatewayBridge テスト — E2E + 単体テスト
 

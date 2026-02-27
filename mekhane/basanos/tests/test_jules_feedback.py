@@ -1,3 +1,4 @@
+# PROOF: [L2/Basanos] <- mekhane/basanos/ Basanos Engine Test Jules Feedback
 """Tests for JulesFeedback — L2結果→L0精度フィードバック。"""
 
 import json

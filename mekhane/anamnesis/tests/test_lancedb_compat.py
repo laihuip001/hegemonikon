@@ -1,3 +1,4 @@
+# PROOF: [L2/Anamnesis] <- mekhane/anamnesis/ Anamnesis Memory Test Lancedb Compat
 """Tests for mekhane.anamnesis.lancedb_compat."""
 
 import unittest

@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Ochema] <- mekhane/ochema/ Ochema Routing Test F0 Manual
 """F0 Tool Use — 手動検証スクリプト.
 
 Usage:

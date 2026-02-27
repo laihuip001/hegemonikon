@@ -1,3 +1,4 @@
+# PROOF: [L2/PKS] <- mekhane/pks/ PKS Engine Test Pks
 # PURPOSE: PKS v2 全モジュールの pytest テスト
 """
 PKS v2 テストスイート

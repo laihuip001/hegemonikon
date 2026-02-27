@@ -1,3 +1,4 @@
+# PROOF: [L2/Periskope] <- mekhane/periskope/ Periskope Search Brave Searcher
 """
 Brave Search API client for Periskopē.
 

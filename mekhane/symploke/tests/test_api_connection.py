@@ -11,9 +11,12 @@ import sys
 import pytest
 
 # Add parent to path
-sys.path.insert(0, "/home/makaron8426/oikos/hegemonikon")
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../")))
 
-from mekhane.symploke.jules_client import JulesClient
+try:
+    from mekhane.symploke.jules_client import JulesClient
+except ImportError:
+    JulesClient = None  # Handle missing dependencies in CI
 
 
 # PURPOSE: Test API connection by listing sources
@@ -21,6 +24,11 @@ from mekhane.symploke.jules_client import JulesClient
 @pytest.mark.skipif(not os.environ.get("JULES_API_KEY"), reason="JULES_API_KEY not set")
 async def test_connection():
     """Test API connection by listing sources."""
+    try:
+        import aiohttp
+    except ImportError:
+        pytest.skip("aiohttp not installed")
+
     api_key = os.environ.get("JULES_API_KEY")
     if not api_key:
         print("❌ JULES_API_KEY not set")
@@ -30,8 +38,6 @@ async def test_connection():
     print("-" * 50)
 
     try:
-        import aiohttp
-
         headers = {"X-Goog-Api-Key": api_key, "Content-Type": "application/json"}
 
         async with aiohttp.ClientSession() as session:

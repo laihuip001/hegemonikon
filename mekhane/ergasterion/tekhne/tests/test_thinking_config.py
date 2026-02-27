@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/ Implementation Layer Test Thinking Config
 """Tests for thinking config resolution (HGK depth -> model params)."""
 
 import pytest

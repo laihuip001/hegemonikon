@@ -279,6 +279,7 @@ EXEMPT_PATTERNS = [
     r"mekhane/symploke/intent_wal.py",
     r"mekhane/anamnesis/vertex_embedder.py",
     r"mekhane/dendron/falsification_",
+    r"mekhane/exagoge/",
 ]
 
 # PROOF ヘッダーパターン (v2: 親参照付き、任意の後続テキスト許容)

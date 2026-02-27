@@ -94,17 +94,19 @@ class TestMeaningfulTraceContextRegression:
         with tempfile.TemporaryDirectory() as tmpdir:
             path = Path(tmpdir) / "traces.json"
 
-            # Write a trace with context
-            clear_session_traces()
-            mark_meaningful(
-                reason="persist context",
-                intensity=2,
-                context="must persist to disk",
-            )
-            save_traces(path)
+            # Patch TRACES_PATH to avoid PermissionError on hardcoded path
+            with patch("mekhane.fep.meaningful_traces.TRACES_PATH", path):
+                # Write a trace with context
+                clear_session_traces()
+                mark_meaningful(
+                    reason="persist context",
+                    intensity=2,
+                    context="must persist to disk",
+                )
+                save_traces(path)
 
-            # Load and verify
-            loaded = load_traces(path)
+                # Load and verify
+                loaded = load_traces(path)
             assert len(loaded) >= 1
             found = [t for t in loaded if t.reason == "persist context"]
             assert len(found) == 1

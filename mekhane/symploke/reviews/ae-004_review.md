@@ -1,5 +1,5 @@
-# PROOF: [L2/Mekhane] <- mekhane/symploke/reviews/ AE-004→Function Length→Survey
-# PURPOSE: AE-004 Function Length Surveyor review of mekhane/symploke/boot_integration.py
+<!-- PROOF: [L2/Mekhane] <- mekhane/symploke/reviews/ AE-004→Function Length→Survey -->
+<!-- PURPOSE: AE-004 Function Length Surveyor review of mekhane/symploke/boot_integration.py -->
 
 # 関数長の測量士 レビュー
 

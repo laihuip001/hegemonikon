@@ -81,7 +81,7 @@ function buildIconRail(): void {
     const isExpanded = g.id === expandedGroup;
 
     // Group icon button
-    html += `<button class="rail-btn ${isActive ? 'active' : ''}" data-group="${g.id}" title="${g.label}: ${g.desc}">
+    html += `<button class="rail-btn ${isActive ? 'active' : ''}" data-group="${g.id}" title="${g.label}: ${g.desc}" aria-label="${g.label}">
       <span class="rail-icon">${g.icon}</span>
     </button>`;
 
@@ -92,7 +92,7 @@ function buildIconRail(): void {
         const route = ROUTES.find(r => r.key === rKey);
         if (!route) continue;
         const isCurrent = rKey === getCurrentRoute();
-        html += `<button class="rail-sub-btn ${isCurrent ? 'active' : ''}" data-route="${route.key}" title="${route.label}">
+        html += `<button class="rail-sub-btn ${isCurrent ? 'active' : ''}" data-route="${route.key}" title="${route.label}" aria-label="${route.label}">
           <span class="rail-sub-icon">${route.icon}</span>
         </button>`;
       }
@@ -102,7 +102,7 @@ function buildIconRail(): void {
 
   // Tab nav toggle at bottom
   html += `<div class="rail-spacer"></div>`;
-  html += `<button class="rail-btn rail-toggle" title="${isTabNavOpen ? 'タブを閉じる' : 'タブを開く'}">
+  html += `<button class="rail-btn rail-toggle" title="${isTabNavOpen ? 'タブを閉じる' : 'タブを開く'}" aria-label="${isTabNavOpen ? 'タブを閉じる' : 'タブを開く'}">
     <span class="rail-icon">${isTabNavOpen ? '◀' : '▶'}</span>
   </button>`;
 
@@ -135,7 +135,7 @@ function buildTabNav(): void {
     const route = ROUTES.find(r => r.key === rKey);
     if (!route) return '';
     const isCurrent = rKey === getCurrentRoute();
-    return `<button class="tab-btn ${isCurrent ? 'active' : ''}" data-route="${route.key}">
+    return `<button class="tab-btn ${isCurrent ? 'active' : ''}" data-route="${route.key}" aria-label="${route.label}">
       <span class="tab-icon">${route.icon}</span>
       <span class="tab-label">${route.label}</span>
     </button>`;

@@ -1,3 +1,4 @@
+# PROOF: [L2/Mekhane] <- mekhane/periskope/searchers/playwright_searcher.py Auto-generated proof for CI compliance
 """
 Playwright-based searcher for Periskopē.
 

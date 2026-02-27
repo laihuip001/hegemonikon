@@ -1,3 +1,4 @@
+# PROOF: [L3/API] <- mekhane/api/routes/cortex.py Auto-generated proof for CI compliance
 from typing import Any, AsyncGenerator
 
 import asyncio

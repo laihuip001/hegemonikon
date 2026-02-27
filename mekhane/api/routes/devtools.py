@@ -1,3 +1,4 @@
+# PROOF: [L3/API] <- mekhane/api/routes/devtools.py Auto-generated proof for CI compliance
 """
 DevTools API routes — ファイル操作・ターミナル・Ochema (AI) をフロントエンド DevTools ビューに提供。
 

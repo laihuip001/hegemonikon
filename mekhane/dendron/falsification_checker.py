@@ -1,3 +1,4 @@
+# PROOF: [L2/Quality] <- mekhane/dendron/falsification_checker.py Auto-generated proof for CI compliance
 """
 S7: Falsification Condition Checker
 

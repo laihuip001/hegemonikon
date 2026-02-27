@@ -1,4 +1,3 @@
-# PROOF: [L2/Impl] <- mekhane/ Automated fix for CI
 """
 Multi-model synthesizer for Periskopē.
 

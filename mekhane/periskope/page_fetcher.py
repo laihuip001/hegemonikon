@@ -1,4 +1,3 @@
-# PROOF: [L2/Impl] <- mekhane/ Automated fix for CI
 """
 Page Fetcher — 選択的全文クロール for Periskopē.
 

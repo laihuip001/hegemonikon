@@ -1,4 +1,3 @@
-# PROOF: [L2/Impl] <- mekhane/ Automated fix for CI
 from typing import Any, AsyncGenerator
 
 import asyncio

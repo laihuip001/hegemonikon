@@ -101,7 +101,10 @@ class TestMeaningfulTraceContextRegression:
                 intensity=2,
                 context="must persist to disk",
             )
-            save_traces(path)
+
+            # Patch TRACES_PATH to use tmpdir to avoid PermissionError in CI
+            with patch("mekhane.fep.meaningful_traces.TRACES_PATH", path):
+                save_traces(path)
 
             # Load and verify
             loaded = load_traces(path)

@@ -13,7 +13,15 @@ import pytest
 # Add parent to path
 sys.path.insert(0, "/home/makaron8426/oikos/hegemonikon")
 
-from mekhane.symploke.jules_client import JulesClient
+try:
+    import aiohttp
+except ImportError:
+    aiohttp = None
+
+if aiohttp is not None:
+    from mekhane.symploke.jules_client import JulesClient
+else:
+    pytest.skip("aiohttp not installed, skipping test_api_connection.py", allow_module_level=True)
 
 
 # PURPOSE: Test API connection by listing sources

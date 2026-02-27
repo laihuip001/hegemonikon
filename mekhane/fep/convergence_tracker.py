@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Mekhane] <- mekhane/fep/ A0->Auto->AddedByCI
 # PROOF: [L3/機能] <- mekhane/fep/ FEP Agent と Attractor の統合追跡
 """
 Convergence Tracker — Agent/Attractor 統合スコアの永続的追跡

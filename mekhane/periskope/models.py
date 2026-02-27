@@ -1,3 +1,4 @@
+# PROOF: [L2/Search] <- mekhane/periskope/models.py Auto-generated existence proof
 """
 Periskopē data models.
 

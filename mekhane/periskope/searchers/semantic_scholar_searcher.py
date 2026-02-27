@@ -1,3 +1,4 @@
+# PROOF: [L2/Search] <- mekhane/periskope/searchers/semantic_scholar_searcher.py Auto-generated existence proof
 """
 Semantic Scholar API client for Periskopē.
 

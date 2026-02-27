@@ -1,3 +1,4 @@
+# PROOF: [L2/Search] <- mekhane/periskope/searchers/internal_searcher.py Auto-generated existence proof
 """
 Internal knowledge searcher for Periskopē.
 

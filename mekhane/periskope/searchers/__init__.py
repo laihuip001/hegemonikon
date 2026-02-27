@@ -1,3 +1,4 @@
+# PROOF: [L2/Search] <- mekhane/periskope/searchers/ Auto-generated existence proof
 """
 Periskopē searchers — pluggable search source adapters.
 

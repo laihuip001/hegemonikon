@@ -1,3 +1,4 @@
+# PROOF: [L2/Search] <- mekhane/periskope/ Auto-generated existence proof
 """
 Page Fetcher — 選択的全文クロール for Periskopē.
 

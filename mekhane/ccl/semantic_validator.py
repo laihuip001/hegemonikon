@@ -12,6 +12,7 @@ Design decisions:
 """
 
 import os
+import logging
 from dataclasses import dataclass
 from typing import Optional, List
 from pathlib import Path
@@ -23,6 +24,8 @@ try:
     HAS_LLM = True
 except ImportError:
     HAS_LLM = False
+
+logger = logging.getLogger(__name__)
 
 
 # PURPOSE: Get API key from environment.
@@ -205,8 +208,8 @@ CCL は Hegemonikón システムの認知制御言語で、以下のワーク�
                     reasoning=data.get("reasoning", ""),
                     suggestions=data.get("suggestions", []),
                 )
-            except (json.JSONDecodeError, ValueError):
-                pass  # TODO: Add proper error handling
+            except (json.JSONDecodeError, ValueError) as e:
+                logger.warning(f"Failed to parse LLM response as JSON: {e}. Falling back to text inference.")
 
         # Fallback: try to infer from text
         aligned = "不一致" not in text and "aligned.*false" not in text.lower()

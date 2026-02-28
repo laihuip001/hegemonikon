@@ -1,4 +1,3 @@
-# PROOF: [L2/インフラ] <- mekhane/anamnesis/ Vertex AI embedding adapter
 import os
 import logging
 from google import genai

@@ -24,6 +24,8 @@ from datetime import datetime
 from pathlib import Path
 from typing import Optional, List
 import json
+import tempfile
+import os
 
 # Default persistence path
 TRACES_PATH = Path("/home/makaron8426/oikos/mneme/.hegemonikon/meaningful_traces.json")
@@ -55,7 +57,14 @@ class MeaningfulTrace:
 
 def ensure_traces_dir() -> None:
     """Ensure the persistence directory exists."""
-    TRACES_PATH.parent.mkdir(parents=True, exist_ok=True)
+    global TRACES_PATH
+    try:
+        TRACES_PATH.parent.mkdir(parents=True, exist_ok=True)
+    except (PermissionError, OSError):
+        # Fall back to a temporary directory in restricted environments like CI
+        fallback_dir = Path(tempfile.gettempdir()) / '.hegemonikon'
+        fallback_dir.mkdir(parents=True, exist_ok=True)
+        TRACES_PATH = fallback_dir / 'meaningful_traces.json'
 # PURPOSE: Mark a moment as meaningful.
 
 

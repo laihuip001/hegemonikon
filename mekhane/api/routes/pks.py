@@ -12,6 +12,7 @@ GET  /api/pks/gateway-stats  — Gateway ソース統計
 """
 
 import logging
+import asyncio
 from datetime import datetime, timezone
 from typing import Optional
 
@@ -142,13 +143,13 @@ async def run_push(k: int = Query(20, ge=1, le=100)) -> PushResponse:
     # 将来的に重くなる場合は asyncio.to_thread() でラップすること。
 
     # Handoff からトピック抽出
-    topics = engine.auto_context_from_handoff()
+    topics = await asyncio.to_thread(engine.auto_context_from_handoff)
     if not topics:
         _last_push = PushResponse(timestamp=now.isoformat(), topics=[], nuggets=[], total=0)
         return _last_push
 
     # プッシュ実行
-    nuggets = engine.proactive_push(k=k)
+    nuggets = await asyncio.to_thread(engine.proactive_push, k=k)
     nugget_responses = [
         NuggetResponse(
             title=n.title,

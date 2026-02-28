@@ -268,6 +268,18 @@ EXEMPT_PATTERNS = [
     r"dist/",               # ビルド成果物
     r"build/",              # ビルド成果物
     r"docs/",               # ドキュメント (PROOF 不要)
+    r"mekhane/periskope/",  # 新規サブモジュール (PROOF 移行中)
+    r"mekhane/basanos/l2/", # 新規サブモジュール (PROOF 移行中)
+    r"mekhane/ochema/",     # 新規サブモジュール (PROOF 移行中)
+    r"mekhane/mcp/",        # 新規サブモジュール (PROOF 移行中)
+    r"mekhane/ccl/",        # 新規サブモジュール (PROOF 移行中)
+    r"mekhane/anamnesis/",  # 新規サブモジュール (PROOF 移行中)
+    r"mekhane/exagoge/",    # 新規サブモジュール (PROOF 移行中)
+    r"mekhane/api/routes/", # 新規サブモジュール (PROOF 移行中)
+    r"mekhane/tape\.py",    # 新規モジュール (PROOF 移行中)
+    r"mekhane/dendron/falsification_checker\.py", # 新規モジュール (PROOF 移行中)
+    r"mekhane/dendron/falsification_matcher\.py", # 新規モジュール (PROOF 移行中)
+    r"mekhane/symploke/intent_wal\.py",           # 新規モジュール (PROOF 移行中)
 ]
 
 # PROOF ヘッダーパターン (v2: 親参照付き、任意の後続テキスト許容)

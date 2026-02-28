@@ -11,9 +11,12 @@ Usage:
 
 import sys
 import argparse
+import logging
 from pathlib import Path
 from typing import List, Tuple
 from datetime import datetime, timedelta
+
+logger = logging.getLogger(__name__)
 
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
@@ -70,7 +73,7 @@ def build_handoff_index(docs: List[Document] = None) -> EmbeddingAdapter:
     # Save
     HANDOFF_INDEX_PATH.parent.mkdir(parents=True, exist_ok=True)
     adapter.save(str(HANDOFF_INDEX_PATH))
-    print(f"💾 Handoff index saved: {len(docs)} docs")
+    logger.info(f"Handoff index saved: {len(docs)} docs")
 
     return adapter
 
@@ -226,7 +229,7 @@ def get_boot_handoffs(mode: str = "standard", context: str = None) -> dict:
                     doc.metadata["raw_score"] = r.score
                     conversations.append(doc)
         except Exception as e:
-            print(f"⚠️ Conversation search error: {e}")
+            logger.warning(f"Conversation search error: {e}")
 
     # Proactive Recall: 最新 Handoff からキーワードを抽出し、追加検索
     proactive_memories = []
@@ -257,7 +260,7 @@ def get_boot_handoffs(mode: str = "standard", context: str = None) -> dict:
                             )
                             proactive_memories.append(doc)
             except Exception as e:
-                pass  # TODO: Add proper error handling
+                logger.warning(f"Proactive search error: {e}")
 
     return {
         "latest": latest,

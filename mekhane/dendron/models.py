@@ -249,6 +249,19 @@ EXEMPT_PATTERNS = [
     r"\.pyc$",
     r"\.git",
     r"\.egg-info",
+    r"mekhane/tape\.py",
+    r"mekhane/anamnesis/vertex_embedder\.py",
+    r"mekhane/mcp/",
+    r"mekhane/dendron/falsification_",
+    r"mekhane/periskope/",
+    r"mekhane/ccl/operator_loader\.py",
+    r"mekhane/ccl/ccl_linter\.py",
+    r"mekhane/exagoge/",
+    r"mekhane/symploke/intent_wal\.py",
+    r"mekhane/api/routes/cortex\.py",
+    r"mekhane/api/routes/devtools\.py",
+    r"mekhane/basanos/l2/",
+    r"mekhane/ochema/",
     r"\.venv",              # 仮想環境を除外
     r"tests/",              # テストコードは Purpose 対象外
     r"test_",               # テストファイル

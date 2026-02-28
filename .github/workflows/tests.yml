@@ -44,7 +44,8 @@ jobs:
                   # Install core test dependencies (CPU-only)
                   pip install pytest pytest-asyncio pytest-timeout pyyaml pydantic lancedb numpy scipy \
                               networkx pandas tabulate requests httpx schedule
-                  pip install sentence-transformers torch --index-url https://download.pytorch.org/whl/cpu
+                  pip install torch --index-url https://download.pytorch.org/whl/cpu
+                  pip install sentence-transformers
                   # Install critical test dependencies before the potentially failing install -e
                   pip install fastapi uvicorn aiohttp python-dotenv filelock aioresponses
                   # Install project in development mode if setup exists

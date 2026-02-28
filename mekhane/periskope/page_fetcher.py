@@ -1,3 +1,5 @@
+# PROOF: [L2/インフラ] <- Default Proof
+# PURPOSE: default file level purpose
 """
 Page Fetcher — 選択的全文クロール for Periskopē.
 

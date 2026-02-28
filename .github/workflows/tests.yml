@@ -48,7 +48,7 @@ jobs:
                   pip install sentence-transformers
 
                   # Explicitly install required dependencies before -e .[test] due to || true
-                  pip install fastapi uvicorn aiohttp python-dotenv filelock
+                  pip install fastapi==0.115.6 starlette==0.40.0 uvicorn aiohttp python-dotenv filelock aioresponses
 
                   # Install project in development mode if setup exists
                   pip install -e ".[test]" 2>/dev/null || true

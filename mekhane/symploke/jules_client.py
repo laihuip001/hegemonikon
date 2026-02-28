@@ -17,7 +17,15 @@ Usage:
 """
 
 import asyncio
-import aiohttp
+try:
+    import aiohttp
+    HAS_AIOHTTP = True
+except ImportError:
+    HAS_AIOHTTP = False
+    # Dummy class for exception typing
+    class DummyAiohttp:
+        class ClientError(Exception): pass
+    aiohttp = DummyAiohttp()
 import functools
 import logging
 import os

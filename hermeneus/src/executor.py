@@ -381,26 +381,30 @@ class WorkflowExecutor:
         start = time.time()
         
         try:
-            from hermeneus.src.audit import record_verification
+            def _sync_audit_record():
+                from hermeneus.src.audit import record_verification
+
+                consensus = verify_result.output if verify_result else None
+
+                if consensus:
+                    return record_verification(ccl, output, consensus)
+                else:
+                    # 検証なしの場合はダミー記録
+                    from .audit import AuditStore, AuditRecord
+                    store = AuditStore()
+                    record = AuditRecord(
+                        record_id="",
+                        ccl_expression=ccl,
+                        execution_result=output[:500],
+                        debate_summary="検証スキップ",
+                        consensus_accepted=True,
+                        confidence=0.5,
+                        dissent_reasons=[]
+                    )
+                    return store.record(record)
             
-            consensus = verify_result.output if verify_result else None
-            
-            if consensus:
-                audit_id = record_verification(ccl, output, consensus)
-            else:
-                # 検証なしの場合はダミー記録
-                from .audit import AuditStore, AuditRecord
-                store = AuditStore()
-                record = AuditRecord(
-                    record_id="",
-                    ccl_expression=ccl,
-                    execution_result=output[:500],
-                    debate_summary="検証スキップ",
-                    consensus_accepted=True,
-                    confidence=0.5,
-                    dissent_reasons=[]
-                )
-                audit_id = store.record(record)
+            loop = asyncio.get_event_loop()
+            audit_id = await loop.run_in_executor(None, _sync_audit_record)
             
             return PhaseResult(
                 phase=ExecutionPhase.AUDIT,

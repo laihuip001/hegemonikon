@@ -9,11 +9,14 @@ Origin: 2026-01-31 CCL Execution Guarantee Architecture
 """
 
 from typing import Any, Dict, List
+from typing import Optional
 from .ccl_ast import (
     OpType, Workflow, Condition, MacroRef,
     ConvergenceLoop, Sequence, Fusion, Oscillation,
     ForLoop, IfCondition, WhileLoop, Lambda
 )
+from .macros import get_all_macros
+from .parser import parse_ccl
 
 
 # =============================================================================
@@ -80,8 +83,9 @@ class LMQLTranslator:
     """CCL AST → LMQL プログラム変換"""
     
     # PURPOSE: Initialize instance
-    def __init__(self, model: str = "openai/gpt-4o"):
+    def __init__(self, model: str = "openai/gpt-4o", macro_registry: Optional[Dict[str, str]] = None):
         self.model = model
+        self.macro_registry = macro_registry if macro_registry is not None else get_all_macros()
     
     # PURPOSE: AST を LMQL プログラムに変換
     def translate(self, ast: Any) -> str:
@@ -119,10 +123,43 @@ class LMQLTranslator:
         if name in ("syn", "syn·", "poiesis", "dokimasia", "S"):
             return self._translate_synteleia_macro(name, args)
         
-        # 一般マクロ: ビルトインまたはユーザー定義
+        # 一般マクロ展開
+        if name in self.macro_registry:
+            expanded_ccl = self.macro_registry[name]
+
+            # 引数 (args) の置換 ($1, $2, ...)
+            if args:
+                # Sort indices in reverse order so $10 is replaced before $1
+                for i in range(len(args) - 1, -1, -1):
+                    arg = args[i]
+                    expanded_ccl = expanded_ccl.replace(f"${i+1}", str(arg))
+
+            try:
+                expanded_ast = parse_ccl(expanded_ccl)
+                translated = self.translate(expanded_ast)
+
+                return f'''
+# CCL マクロ展開: @{name} -> {expanded_ccl}
+{translated}
+'''
+            except Exception as e:
+                # パースや変換に失敗した場合はそのままエラーにする方が良いが、
+                # フォールバックとして警告とともにプレースホルダを返す
+                return f'''
+# CCL マクロ: @{name} (展開エラー: {e})
+@lmql.query
+def macro_{name}_error(context: str):
+    """マクロ @{name} の実行 (エラー)"""
+    argmax
+        "マクロ @{name} 展開中にエラーが発生しました: {e}"
+        "[RESULT]"
+    from
+        "{self.model}"
+'''
+
+        # 展開失敗または未知のマクロ
         return f'''
-# CCL マクロ: @{name}
-# TODO: マクロ展開 → 他の CCL 式に変換
+# CCL マクロ: @{name} (Unknown macro)
 @lmql.query
 def macro_{name}(context: str):
     """マクロ @{name} の実行"""

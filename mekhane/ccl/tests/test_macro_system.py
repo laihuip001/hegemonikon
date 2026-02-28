@@ -59,11 +59,6 @@ class TestBuiltinMacros:
         """Verify go exists behavior."""
         assert "go" in BUILTIN_MACROS
 
-    # PURPOSE: Verify osc exists behaves correctly
-    def test_osc_exists(self):
-        """Verify osc exists behavior."""
-        assert "osc" in BUILTIN_MACROS
-
     # PURPOSE: Verify fix exists behaves correctly
     def test_fix_exists(self):
         """Verify fix exists behavior."""

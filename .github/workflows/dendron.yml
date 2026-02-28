@@ -44,7 +44,13 @@ jobs:
       - name: "L1: PROOF Header Check"
         run: |
           export PYTHONPATH=${{ github.workspace }}
-          python -m mekhane.dendron.cli check mekhane/ --ci --format ci
+          if [ "${{ github.event_name }}" == "pull_request" ]; then
+            BASE_REF="origin/${{ github.base_ref }}"
+            echo "Running PR guard against ${BASE_REF}"
+            python -m mekhane.dendron.cli guard mekhane/ --since $BASE_REF --ci --format ci
+          else
+            python -m mekhane.dendron.cli check mekhane/ --ci --format ci
+          fi
 
       # L2: Purpose Quality Check — mekhane/dendron/ (strict: WEAK = FAIL)
       - name: "L2: Purpose Check (dendron/ — strict)"

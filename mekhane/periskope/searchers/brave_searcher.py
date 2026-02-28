@@ -1,3 +1,4 @@
+# PROOF: [L3/Gateway] <- mekhane/periskope/searchers/brave_searcher.py
 """
 Brave Search API client for Periskopē.
 

@@ -1,3 +1,4 @@
+# PROOF: [L3/Gateway] <- mekhane/periskope/engine.py
 """
 Periskopē Deep Research Engine — Orchestrator.
 

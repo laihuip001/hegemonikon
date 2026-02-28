@@ -1,3 +1,4 @@
+# PROOF: [L2/定理] <- mekhane/Auto/ AddedByCI
 """
 Periskopē Deep Research Engine — Orchestrator.
 

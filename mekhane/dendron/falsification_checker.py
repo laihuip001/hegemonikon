@@ -20,6 +20,7 @@ PROJECT_ROOT = Path(__file__).parent.parent.parent
 REGISTRY_PATH = PROJECT_ROOT / "kernel" / "epistemic_status.yaml"
 
 
+# PURPOSE: epistemic_status.yaml からエージェントルールなどのレジストリ情報を読み込み、検証の基準として利用可能にする
 def load_registry() -> dict:
     """Load the epistemic status registry"""
     if not REGISTRY_PATH.exists():
@@ -30,6 +31,7 @@ def load_registry() -> dict:
         return yaml.safe_load(f)
 
 
+# PURPOSE: 必須フィールドが登録ルールに含まれているか確認し、不完全な定義を検出して安全な稼働を保証する
 def check_completeness(registry: dict) -> list[str]:
     """Check that all patches have required fields"""
     issues = []
@@ -55,6 +57,7 @@ def check_completeness(registry: dict) -> list[str]:
     return issues
 
 
+# PURPOSE: ルールで指定されたファイルパスが実際に存在するか確認し、リンク切れによる静的エラーを未然に防ぐ
 def check_file_references(registry: dict) -> list[str]:
     """Verify that claims exist in referenced files at specified lines"""
     issues = []
@@ -97,6 +100,7 @@ def check_file_references(registry: dict) -> list[str]:
     return issues
 
 
+# PURPOSE: 検証したルールの統計情報を集計し、レビューアーにシステム全体の健全性指標を提示する
 def summary_stats(registry: dict) -> dict:
     """Generate summary statistics"""
     patches = registry.get("patches", {})
@@ -110,6 +114,7 @@ def summary_stats(registry: dict) -> dict:
     }
 
 
+# PURPOSE: CLIエントリポイントとして機能し、ユーザーやCIから直接呼び出してレジストリの完全性とファイル参照を検査できるようにする
 def main():
     registry = load_registry()
     

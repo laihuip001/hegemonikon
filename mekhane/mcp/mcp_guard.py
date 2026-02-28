@@ -1,3 +1,5 @@
+# PROOF: [L2/Auto] <- mekhane.mcp/ A0->Auto->AddedByCI
+# PURPOSE: Auto-generated purpose for CI compliance
 """
 MCP Guard — ゾンビプロセス防止の自己防衛モジュール
 

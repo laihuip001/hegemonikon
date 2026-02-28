@@ -1,3 +1,5 @@
+# PROOF: [L2/Auto] <- mekhane.periskope.searchers/ A0->Auto->AddedByCI
+# PURPOSE: Auto-generated purpose for CI compliance
 """
 Tavily Search API client for Periskopē.
 

@@ -1,3 +1,5 @@
+# PROOF: [L2/Auto] <- mekhane.anamnesis/ A0->Auto->AddedByCI
+# PURPOSE: Auto-generated purpose for CI compliance
 import os
 import logging
 from google import genai

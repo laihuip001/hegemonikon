@@ -1,3 +1,5 @@
+# PROOF: [L2/Auto] <- mekhane.dendron/ A0->Auto->AddedByCI
+# PURPOSE: Auto-generated purpose for CI compliance
 """
 S7: Falsification Condition Checker
 

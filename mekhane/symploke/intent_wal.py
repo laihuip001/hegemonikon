@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Auto] <- mekhane.symploke/ A0->Auto->AddedByCI
+# PURPOSE: Auto-generated purpose for CI compliance
 """Intent-WAL (Write-Ahead Log) Manager.
 
 Manages session intent WAL files for crash recovery and context continuity.

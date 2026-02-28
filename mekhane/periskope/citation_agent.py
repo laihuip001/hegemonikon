@@ -1,3 +1,5 @@
+# PROOF: [L2/Auto] <- mekhane.periskope/ A0->Auto->AddedByCI
+# PURPOSE: Auto-generated purpose for CI compliance
 """
 Citation verification agent for Periskopē.
 

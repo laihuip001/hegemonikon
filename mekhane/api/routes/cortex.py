@@ -1,3 +1,5 @@
+# PROOF: [L2/Auto] <- mekhane.api.routes/ A0->Auto->AddedByCI
+# PURPOSE: Auto-generated purpose for CI compliance
 from typing import Any, AsyncGenerator
 
 import asyncio

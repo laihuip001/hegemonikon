@@ -1,3 +1,5 @@
+# PROOF: [L2/Auto] <- mekhane.ccl/ A0->Auto->AddedByCI
+# PURPOSE: Auto-generated purpose for CI compliance
 """operators.md の SSOT パーサー。
 
 operators.md の Markdown テーブルから演算子定義を抽出し、

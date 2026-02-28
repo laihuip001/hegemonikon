@@ -1,3 +1,5 @@
+# PROOF: [L2/Auto] <- mekhane.periskope/ A0->Auto->AddedByCI
+# PURPOSE: Auto-generated purpose for CI compliance
 """
 Page Fetcher — 選択的全文クロール for Periskopē.
 

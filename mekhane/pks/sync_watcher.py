@@ -178,8 +178,6 @@ class SyncWatcher:
                         print(f" → error: {e}")
                 else:
                     print(" (no index)")
-
-                ingested += 1
                 continue
 
             if change.path.suffix not in self.extensions:

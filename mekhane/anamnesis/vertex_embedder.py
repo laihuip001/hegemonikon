@@ -1,4 +1,4 @@
-# PROOF: [Level/Category] <- mekhane/anamnesis/ A0->Auto->AddedByCI
+# PROOF: [L2/Category] <- mekhane/anamnesis/ A0->Auto->AddedByCI
 import os
 import logging
 from google import genai

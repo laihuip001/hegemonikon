@@ -1,4 +1,4 @@
-# PROOF: [Level/Category] <- mekhane/periskope/ A0->Auto->AddedByCI
+# PROOF: [L2/Category] <- mekhane/periskope/ A0->Auto->AddedByCI
 """
 Page Fetcher — 選択的全文クロール for Periskopē.
 

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# PROOF: [Level/Category] <- mekhane/mcp/ A0->Auto->AddedByCI
+# PROOF: [L2/Category] <- mekhane/mcp/ A0->Auto->AddedByCI
 """
 MCP Base Module — Hegemonikón MCP Server Common Infrastructure
 

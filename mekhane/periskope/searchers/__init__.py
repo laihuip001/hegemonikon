@@ -1,4 +1,4 @@
-# PROOF: [Level/Category] <- mekhane/searchers/ A0->Auto->AddedByCI
+# PROOF: [L2/Category] <- mekhane/searchers/ A0->Auto->AddedByCI
 """
 Periskopē searchers — pluggable search source adapters.
 

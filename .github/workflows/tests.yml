@@ -43,7 +43,7 @@ jobs:
                   python -m pip install --upgrade pip
                   # Install core test dependencies
                   pip install pytest pytest-asyncio pytest-timeout pyyaml pydantic lancedb numpy scipy \
-                              networkx pandas tabulate requests httpx schedule fastapi uvicorn aiohttp python-dotenv filelock aioresponses
+                              networkx pandas tabulate requests httpx schedule fastapi uvicorn aiohttp python-dotenv filelock aioresponses pymdp
                   # Install CPU-only PyTorch and sentence-transformers
                   pip install torch --index-url https://download.pytorch.org/whl/cpu
                   pip install sentence-transformers

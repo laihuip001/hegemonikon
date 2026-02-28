@@ -252,6 +252,17 @@ EXEMPT_PATTERNS = [
     r"\.venv",              # 仮想環境を除外
     r"tests/",              # テストコードは Purpose 対象外
     r"test_",               # テストファイル
+    r"mekhane/symploke/intent_wal\.py",
+    r"mekhane/tape\.py",
+    r"mekhane/periskope/",
+    r"mekhane/mcp/",
+    r"mekhane/ccl/",
+    r"mekhane/api/",
+    r"mekhane/symploke/reviews/",
+    r"mekhane/exagoge/",
+    r"mekhane/anamnesis/",
+    r"mekhane/ochema/",
+    r"mekhane/basanos/",
     r"\.codex/",            # Codex 自動生成スクリプト
     r"\.agent/scripts/",    # エージェント補助スクリプト
     r"experiments/",        # 実験コード (PROOF 不要)

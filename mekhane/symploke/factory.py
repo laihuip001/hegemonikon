@@ -15,9 +15,12 @@ VectorStore Factory
 アダプタを動的に生成するファクトリパターン実装。
 """
 
+import logging
 from typing import Dict, Type, Optional
 from .adapters.base import VectorStoreAdapter
 from .config import VectorStoreConfig
+
+logger = logging.getLogger(__name__)
 
 
 # PURPOSE: ベクトルストアファクトリ
@@ -107,7 +110,7 @@ def _register_adapters():
 
         VectorStoreFactory.register("hnswlib", HNSWlibAdapter)
     except ImportError:
-        pass  # TODO: Add proper error handling
+        logger.warning("hnswlib is not installed. HNSWlibAdapter will not be available. Please install 'hnswlib' to use it.")
 
     # 将来の拡張用
     # try:

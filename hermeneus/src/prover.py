@@ -8,6 +8,7 @@ Python 型チェック (mypy) と形式証明 (Lean4) による
 Origin: 2026-01-31 CCL Execution Guarantee Architecture
 """
 
+import time
 import hashlib
 import json
 import sqlite3

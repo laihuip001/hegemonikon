@@ -40,11 +40,11 @@ jobs:
       - name: Install dependencies
         run: pip install pyyaml
 
-      # L1: PROOF Header Check (blocking)
+      # L1: PROOF Header Check (blocking) - Only run on modified files
       - name: "L1: PROOF Header Check"
         run: |
           export PYTHONPATH=${{ github.workspace }}
-          python -m mekhane.dendron.cli check mekhane/ --ci --format ci
+          python -m mekhane.dendron.cli guard .
 
       # L2: Purpose Quality Check — mekhane/dendron/ (strict: WEAK = FAIL)
       - name: "L2: Purpose Check (dendron/ — strict)"

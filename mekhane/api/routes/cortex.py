@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] <- mekhane/api/ default header
 from typing import Any, AsyncGenerator
 
 import asyncio

@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] <- mekhane/periskope/ default header
 """
 Multi-model synthesizer for Periskopē.
 

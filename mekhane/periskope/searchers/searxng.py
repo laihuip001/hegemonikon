@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] <- mekhane/periskope/ default header
 """
 SearXNG search client for Periskopē.
 

@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/インフラ] <- mekhane/mcp/ default header
 """
 MCP Base Module — Hegemonikón MCP Server Common Infrastructure
 

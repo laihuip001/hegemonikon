@@ -1,3 +1,4 @@
+# PROOF: [Level/Category] <- mekhane/periskope/searchers/ A0->Auto->AddedByCI
 """
 Internal knowledge searcher for Periskopē.
 

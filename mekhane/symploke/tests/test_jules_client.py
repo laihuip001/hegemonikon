@@ -115,6 +115,10 @@ class TestCreateSession:
                     "id": "test-123",
                     "name": "sessions/test-123",
                     "state": "PLANNING",
+                    "prompt": "Fix bug",
+                    "sourceContext": {
+                        "source": "sources/github/owner/repo"
+                    }
                 },
             )
 

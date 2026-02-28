@@ -1,3 +1,4 @@
+# PROOF: [L2/機能] <- mekhane/periskope/ brave_searcher
 """
 Brave Search API client for Periskopē.
 

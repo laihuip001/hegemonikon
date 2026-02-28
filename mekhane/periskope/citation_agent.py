@@ -1,3 +1,4 @@
+# PROOF: [L2/機能] <- mekhane/periskope/ citation_agent
 """
 Citation verification agent for Periskopē.
 

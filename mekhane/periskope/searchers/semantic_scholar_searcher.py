@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ]
 """
 Semantic Scholar API client for Periskopē.
 

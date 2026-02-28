@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ]
 """
 Citation verification agent for Periskopē.
 

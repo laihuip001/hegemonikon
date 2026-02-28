@@ -1565,6 +1565,10 @@ def select_derivative(
             f"Unknown theorem: {theorem}. Expected O1-O4, S1-S4, H1-H4, P1-P4, K1-K4, or A1-A4."
         )
 
+    # v3.4: Apply FEP prior if enabled
+    if use_fep and keyword_result is not None:
+        keyword_result = _apply_fep_prior(keyword_result, problem_context)
+
     # v3.1: Apply Hybrid selection (LLM fallback for low confidence)
     if use_llm_fallback and keyword_result is not None:
         result = _hybrid_select(theorem, problem_context, keyword_result)
@@ -2827,8 +2831,125 @@ def list_derivatives(theorem: str) -> List[str]:
 
 
 # =============================================================================
-# FEP Integration (Future Enhancement)
+# FEP Integration
 # =============================================================================
+
+
+class DerivativeFEPAgent:
+    """FEP Agent for learning derivative preferences based on problem context.
+
+    Implements a theorem-specific state space mapping context to derivatives.
+    """
+
+    def __init__(self, theorem: str):
+        self.theorem = theorem
+        self.derivatives = THEOREM_DERIVATIVES.get(theorem, [])
+        self.num_states = len(self.derivatives)
+        self.num_obs = 18  # context(2) * urgency(3) * confidence(3)
+        self.learning_rate = 5.0
+
+        # Path for persistent learned Dirichlet counts (pA)
+        self.pA_path = Path.home() / f"oikos/mneme/.hegemonikon/fep/derivative_pA_{theorem}.npy"
+        self.pA = self._load_or_init_pA()
+
+    def _load_or_init_pA(self) -> "np.ndarray":
+        import numpy as np
+        if self.pA_path.exists():
+            try:
+                return np.load(self.pA_path)
+            except Exception:
+                pass
+        # Uniform Dirichlet prior counts (pseudo-counts of 1.0 per state/obs combo)
+        if self.num_states > 0:
+            return np.ones((self.num_obs, self.num_states))
+        return np.array([])
+
+    def _get_A(self) -> "np.ndarray":
+        """Compute the normalized A matrix from Dirichlet counts."""
+        import numpy as np
+        if self.pA.size == 0:
+            return self.pA
+        return self.pA / self.pA.sum(axis=0, keepdims=True)
+
+    def _obs_to_index(self, obs_tuple: Tuple[int, int, int]) -> int:
+        # obs_tuple: context(0-1), urgency(0-2), conf(0-2)
+        return obs_tuple[0] * 9 + obs_tuple[1] * 3 + obs_tuple[2]
+
+    def update_A_dirichlet(self, obs_tuple: Tuple[int, int, int], derivative: str) -> None:
+        """Dirichlet update for successful derivative selection."""
+        import numpy as np
+        if derivative not in self.derivatives or self.num_states == 0:
+            return
+
+        obs_idx = self._obs_to_index(obs_tuple)
+        deriv_idx = self.derivatives.index(derivative)
+
+        # One-hot vectors
+        obs_vec = np.zeros(self.num_obs)
+        obs_vec[obs_idx] = 1.0
+
+        belief_vec = np.zeros(self.num_states)
+        belief_vec[deriv_idx] = 1.0
+
+        # Positive-only Dirichlet update on pseudo-counts
+        self.pA += self.learning_rate * np.outer(obs_vec, belief_vec)
+
+        # Save to disk
+        try:
+            self.pA_path.parent.mkdir(parents=True, exist_ok=True)
+            np.save(self.pA_path, self.pA)
+        except Exception as e:
+            logger.warning(f"Failed to save derivative pA matrix: {e}")
+
+    def get_derivative_prior(self, obs_tuple: Tuple[int, int, int]) -> Dict[str, float]:
+        """Get posterior probability of each derivative given observation."""
+        if self.num_states == 0:
+            return {}
+
+        obs_idx = self._obs_to_index(obs_tuple)
+        A = self._get_A()
+        likelihood = A[obs_idx, :]
+
+        # P(deriv | obs) proportional to P(obs | deriv) assuming uniform P(deriv)
+        posterior = likelihood / (likelihood.sum() + 1e-10)
+
+        return {deriv: float(prob) for deriv, prob in zip(self.derivatives, posterior)}
+
+
+def _apply_fep_prior(
+    result: "DerivativeRecommendation", problem_context: str
+) -> "DerivativeRecommendation":
+    """Apply FEP learned prior to adjust confidence."""
+    try:
+        from mekhane.fep.encoding import encode_input
+
+        obs_tuple = encode_input(problem_context)
+        agent = DerivativeFEPAgent(result.theorem)
+        priors = agent.get_derivative_prior(obs_tuple)
+
+        if not priors:
+            return result
+
+        # prior for chosen derivative
+        prior = priors.get(result.derivative, 1.0 / len(agent.derivatives))
+
+        # If prior > average (1/N), boost confidence. If < average, reduce.
+        avg_prior = 1.0 / len(agent.derivatives)
+        boost = prior / avg_prior
+
+        # Apply boost
+        result.confidence = max(0.0, min(0.99, result.confidence * boost))
+
+        # Update rationale
+        if boost > 1.1:
+            result.rationale += f" (FEP boost: {prior:.0%})"
+        elif boost < 0.9:
+            result.rationale += f" (FEP penalty: {prior:.0%})"
+
+        return result
+    except Exception as e:
+        logger.warning(f"Failed to apply FEP prior: {e}")
+        return result
 
 
 # PURPOSE: Record feedback for derivative selection learning.
@@ -2838,8 +2959,8 @@ def update_derivative_selector(
     """
     Record feedback for derivative selection learning.
 
-    Future enhancement: integrate with Dirichlet learning in FEP agent
-    to improve derivative selection based on outcomes.
+    Integrates with Dirichlet learning in FEP agent to improve
+    derivative selection based on outcomes.
 
     Args:
         theorem: O-series theorem
@@ -2847,9 +2968,19 @@ def update_derivative_selector(
         problem_context: Problem description
         success: Whether the derivative was effective
     """
-    # TODO: Integrate with HegemonikónFEPAgent.update_A_dirichlet()
-    # This will require:
-    # 1. Derivative-specific state space in FEP
-    # 2. Observation encoding for derivative context
-    # 3. Persistence of learned derivative preferences
-    pass
+    if not success:
+        return  # Positive-only Dirichlet learning
+
+    try:
+        from mekhane.fep.encoding import encode_input
+
+        # 2. Observation encoding for derivative context
+        obs_tuple = encode_input(problem_context)
+
+        # 1 & 3. Derivative-specific state space & Persistence
+        agent = DerivativeFEPAgent(theorem)
+        agent.update_A_dirichlet(obs_tuple, derivative)
+
+        logger.info(f"Updated Derivative FEPAgent for {theorem}:{derivative}")
+    except Exception as e:
+        logger.warning(f"Failed to update derivative selector FEP: {e}")

@@ -124,6 +124,16 @@ class WorkflowExecutor:
         self.audit_by_default = audit_by_default
         self.min_confidence = min_confidence
         self._tape = None
+        self._audit_store = None
+
+    # PURPOSE: AuditStore インスタンスを遅延取得
+    async def _get_audit_store(self):
+        """AuditStore を遅延初期化して共有する (非同期I/O回避)"""
+        if self._audit_store is None:
+            from .audit import AuditStore
+            # AuditStore initialization writes to SQLite to ensure tables exist
+            self._audit_store = await asyncio.to_thread(AuditStore)
+        return self._audit_store
     
     # PURPOSE: レジストリを取得 (遅延初期化)
     @property
@@ -386,11 +396,14 @@ class WorkflowExecutor:
             consensus = verify_result.output if verify_result else None
             
             if consensus:
-                audit_id = record_verification(ccl, output, consensus)
+                # Offload to thread to maintain event loop responsiveness
+                audit_id = await asyncio.to_thread(
+                    record_verification, ccl, output, consensus
+                )
             else:
                 # 検証なしの場合はダミー記録
-                from .audit import AuditStore, AuditRecord
-                store = AuditStore()
+                from .audit import AuditRecord
+                store = await self._get_audit_store()
                 record = AuditRecord(
                     record_id="",
                     ccl_expression=ccl,
@@ -400,7 +413,7 @@ class WorkflowExecutor:
                     confidence=0.5,
                     dissent_reasons=[]
                 )
-                audit_id = store.record(record)
+                audit_id = await asyncio.to_thread(store.record, record)
             
             return PhaseResult(
                 phase=ExecutionPhase.AUDIT,

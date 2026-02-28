@@ -520,3 +520,31 @@ class GnosisIndex:
             return results[0] if results else None
         except Exception:
             return None  # Intentional: query may fail on malformed key or empty table
+
+    # PURPOSE: 単一ドキュメントをインデックスに追加 (下位互換性)
+    def add_document(self, doc_id: str, content: str, source: str) -> None:
+        """単一ドキュメントをインデックスに追加"""
+        paper = Paper(
+            id=f"gnosis_{source}_{doc_id}",
+            source=source,
+            source_id=doc_id,
+            title=doc_id,
+            abstract=content,
+        )
+        self.add_papers([paper], dedupe=False)
+
+    # PURPOSE: ソースを指定してドキュメントを削除
+    def delete_by_source(self, source: str) -> int:
+        """指定したソースのドキュメントを削除"""
+        if not self._table_exists():
+            return 0
+        try:
+            table = self.db.open_table(self.TABLE_NAME)
+            # F4: count prior to delete not directly exposed in lancedb delete result
+            # However we execute the delete via predicate
+            safe_source = source.replace("'", "''")  # escape single quotes
+            table.delete(f"source = '{safe_source}'")
+            return 1
+        except Exception as e:
+            print(f"[GnosisIndex] Failed to delete document from source '{source}': {e}")
+            return 0

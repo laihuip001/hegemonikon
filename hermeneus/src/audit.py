@@ -109,6 +109,9 @@ class AuditStore:
             except Exception:
                 self._conn.rollback()
                 raise
+            finally:
+                if self._conn.in_transaction:
+                    self._conn.rollback()
     
     # PURPOSE: 一意の ID を生成
     def _generate_id(self) -> str:

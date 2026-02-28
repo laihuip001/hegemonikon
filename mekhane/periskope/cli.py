@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] <- mekhane/
 #!/usr/bin/env python3
 """
 Periskopē CLI — Deep Research from the command line.

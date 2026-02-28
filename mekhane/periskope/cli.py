@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/Auto] <- Default PROOF Header
 """
 Periskopē CLI — Deep Research from the command line.
 

@@ -1,3 +1,4 @@
+# PROOF: [L2/Auto] <- Default PROOF Header
 import os
 import logging
 from google import genai

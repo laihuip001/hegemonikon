@@ -1,3 +1,4 @@
+# PROOF: [L2/Auto] <- Default PROOF Header
 """
 MCP Guard — ゾンビプロセス防止の自己防衛モジュール
 

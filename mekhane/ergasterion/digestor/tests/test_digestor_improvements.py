@@ -64,9 +64,9 @@ class TestF_MCPImportPath:
         
         content = mcp_path.read_text()
         # project root + mekhane dir の両方を追加するパターン
-        assert "_mekhane_dir" in content, "Should define _mekhane_dir"
-        assert "_project_root" in content, "Should define _project_root"
-        assert "for _p in" in content, "Should iterate to add both paths"
+        assert "from mekhane.mcp.mcp_base import MCPBase" in content, "Should use MCPBase"
+        assert "mcp_guard" in content, "Should use mcp_guard"
+
 
 
 # ═══════════════════════════════════════════════════════════

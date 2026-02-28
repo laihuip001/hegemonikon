@@ -1,3 +1,4 @@
+# PROOF: [L3/API] <- mekhane/api/ フロントエンドとコアバックエンドのHTTP境界が必要
 """
 DevTools API routes — ファイル操作・ターミナル・Ochema (AI) をフロントエンド DevTools ビューに提供。
 

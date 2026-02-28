@@ -37,7 +37,14 @@ LEARNED_A_METADATA_PATH = Path(
 # PURPOSE: Ensure the persistence directory exists.
 def ensure_persistence_dir() -> None:
     """Ensure the persistence directory exists."""
-    LEARNED_A_PATH.parent.mkdir(parents=True, exist_ok=True)
+    global LEARNED_A_PATH
+    try:
+        LEARNED_A_PATH.parent.mkdir(parents=True, exist_ok=True)
+    except (PermissionError, OSError):
+        # Fallback to local cache for testing or when production path is unavailable
+        fallback_dir = Path.home() / '.cache' / 'hegemonikon' / 'mneme' / '.hegemonikon'
+        fallback_dir.mkdir(parents=True, exist_ok=True)
+        LEARNED_A_PATH = fallback_dir / 'learned_A.npy'
 
 
 # PURPOSE: Save learned A matrix to file.

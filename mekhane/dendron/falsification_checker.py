@@ -1,3 +1,4 @@
+# PROOF: [L2/検証] <- mekhane/dendron/ K4(知識)の反証条件の検証と警告システムが必要
 """
 S7: Falsification Condition Checker
 
@@ -19,6 +20,7 @@ PROJECT_ROOT = Path(__file__).parent.parent.parent
 REGISTRY_PATH = PROJECT_ROOT / "kernel" / "epistemic_status.yaml"
 
 
+# PURPOSE: epistemic_status.yaml から反証条件のレジストリを読み込む
 def load_registry() -> dict:
     """Load the epistemic status registry"""
     if not REGISTRY_PATH.exists():
@@ -29,6 +31,7 @@ def load_registry() -> dict:
         return yaml.safe_load(f)
 
 
+# PURPOSE: コードベースのすべての主張が反証条件としてカバーされているか検証する
 def check_completeness(registry: dict) -> list[str]:
     """Check that all patches have required fields"""
     issues = []
@@ -54,6 +57,7 @@ def check_completeness(registry: dict) -> list[str]:
     return issues
 
 
+# PURPOSE: 反証条件が参照しているファイルが実在し、対象の記述を含むか検証する
 def check_file_references(registry: dict) -> list[str]:
     """Verify that claims exist in referenced files at specified lines"""
     issues = []
@@ -96,6 +100,7 @@ def check_file_references(registry: dict) -> list[str]:
     return issues
 
 
+# PURPOSE: 検証結果の統計情報を算出し、サマリーを生成する
 def summary_stats(registry: dict) -> dict:
     """Generate summary statistics"""
     patches = registry.get("patches", {})
@@ -109,6 +114,7 @@ def summary_stats(registry: dict) -> dict:
     }
 
 
+# PURPOSE: 反証条件チェッカーのCLIエントリポイント
 def main():
     registry = load_registry()
     

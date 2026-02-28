@@ -1,3 +1,4 @@
+# PROOF: [L2/記録] <- mekhane/ WF実行状態の追跡と可視化が必要→TapeWriterが担う
 """
 Tape Writer — WF 実行トレースを JSONL として記録する。
 

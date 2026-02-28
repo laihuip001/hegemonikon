@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L3/ルーティング] <- mekhane/ochema/ LLMと言語サーバー間の通信と機能プロキシが必要
 """LS Standalone Launcher — IDE なしで Language Server を直接起動する。
 
 ManagementMetadata protobuf を stdin に送り込んで LS を起動。

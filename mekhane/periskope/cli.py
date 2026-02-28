@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/探求] <- mekhane/periskope/ 深層調査エンジンによる並列検索と知識統合が必要
 """
 Periskopē CLI — Deep Research from the command line.
 

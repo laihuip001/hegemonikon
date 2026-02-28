@@ -29,6 +29,9 @@ from typing import Dict, Tuple, Optional, Any
 from dataclasses import dataclass
 import os
 import json
+import logging
+
+logger = logging.getLogger(__name__)
 
 # Check for available LLM clients
 GEMINI_AVAILABLE = False
@@ -37,8 +40,8 @@ try:
     from google import genai
 
     GEMINI_AVAILABLE = True
-except ImportError:
-    pass  # TODO: Add proper error handling
+except ImportError as e:
+    logger.warning("google-genai package is not installed. Gemini LLM evaluation will be disabled. Error: %s", e)
 
 
 # PURPOSE: の統一的インターフェースを実現する
@@ -194,7 +197,7 @@ def evaluate_with_gemini(text: str) -> Optional[Dict[str, float]]:
 
     except Exception as e:
         # Log error but don't crash
-        print(f"[L2 Gemini] Evaluation failed: {e}")
+        logger.warning(f"[L2 Gemini] Evaluation failed: {e}")
         return None
 
 

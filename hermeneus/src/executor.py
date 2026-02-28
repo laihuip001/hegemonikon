@@ -475,22 +475,33 @@ class WorkflowExecutor:
         if not pipeline.success:
             return
         
+        def _write_usages(wf_ids: list, context: str) -> None:
+            try:
+                from mekhane.fep.theorem_recommender import record_usage, THEOREM_KEYWORDS
+
+                # command → theorem_id の逆引きテーブル
+                cmd_to_theorem = {
+                    t["command"].lstrip("/"): t["id"]
+                    for t in THEOREM_KEYWORDS
+                }
+
+                for wf_id in wf_ids:
+                    theorem_id = cmd_to_theorem.get(wf_id)
+                    if theorem_id:
+                        record_usage(theorem_id, context)
+            except Exception:
+                pass
+
         try:
-            from mekhane.fep.theorem_recommender import record_usage, THEOREM_KEYWORDS
-            
-            # command → theorem_id の逆引きテーブル
-            cmd_to_theorem = {
-                t["command"].lstrip("/"): t["id"]
-                for t in THEOREM_KEYWORDS
-            }
-            
             wf_ids = self._extract_all_workflow_ids(pipeline.ccl)
             context = pipeline.context[:80] if pipeline.context else ""
             
-            for wf_id in wf_ids:
-                theorem_id = cmd_to_theorem.get(wf_id)
-                if theorem_id:
-                    record_usage(theorem_id, context)
+            try:
+                loop = asyncio.get_running_loop()
+                loop.run_in_executor(None, _write_usages, wf_ids, context)
+            except RuntimeError:
+                # No running loop, run synchronously
+                _write_usages(wf_ids, context)
         except Exception:
             # 定理記録の失敗はパイプライン実行を妨げない
             pass

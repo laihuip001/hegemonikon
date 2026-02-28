@@ -1,4 +1,3 @@
-# PROOF: [L2/L2] <- mekhane/
 import os
 import logging
 from google import genai

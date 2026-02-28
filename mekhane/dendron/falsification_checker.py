@@ -1,4 +1,3 @@
-# PROOF: [L2/L2] <- mekhane/
 """
 S7: Falsification Condition Checker
 

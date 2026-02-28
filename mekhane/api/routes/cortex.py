@@ -1,4 +1,3 @@
-# PROOF: [L2/L2] <- mekhane/
 from typing import Any, AsyncGenerator
 
 import asyncio

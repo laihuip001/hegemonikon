@@ -1,3 +1,0 @@
-## 2026-02-12 - Added ARIA Labels to Icon-Only Buttons
-**Learning:** Many icon-only action buttons (e.g., delete, clear chat, open settings) in the `hgk` frontend (`chat.ts`, `orchestrator.ts`) relied solely on the `title` attribute for tooltip text. While helpful for mouse users, screen readers benefit significantly from explicit `aria-label` attributes to accurately announce the button's purpose, especially when the visual content is just a Unicode emoji or icon.
-**Action:** Always ensure that any `<button>` or interactive element whose visual content is primarily an icon or emoji includes a descriptive, localized `aria-label` attribute alongside the `title` attribute.

@@ -63,10 +63,10 @@ class TestF_MCPImportPath:
             pytest.skip("digestor_mcp_server.py not found")
         
         content = mcp_path.read_text()
-        # project root + mekhane dir の両方を追加するパターン
-        assert "_mekhane_dir" in content, "Should define _mekhane_dir"
-        assert "_project_root" in content, "Should define _project_root"
-        assert "for _p in" in content, "Should iterate to add both paths"
+        # The import path pattern was refactored to use MCPBase.
+        # Ensure MCPBase import is present instead of legacy path manipulations.
+        assert "from mekhane.mcp.mcp_base import MCPBase" in content, "Should import MCPBase"
+        assert "from mekhane.mcp.mcp_guard import guard" in content, "Should import guard"
 
 
 # ═══════════════════════════════════════════════════════════

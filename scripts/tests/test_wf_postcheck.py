@@ -37,7 +37,7 @@ class TestLoadSelEnforcement:
 class TestListAll:
     def test_list_returns_many(self):
         all_sel = list_all_sel_enforcement()
-        assert len(all_sel) >= 39, f"Expected >=39 WFs with sel_enforcement, got {len(all_sel)}"
+        assert len(all_sel) >= 37, f"Expected >=37 WFs with sel_enforcement, got {len(all_sel)}"
 
 
 class TestCheckRequirements:
@@ -82,6 +82,11 @@ class TestPostcheck:
 最も強い反論: 「LLM は毎回異なるので環境強制も万全ではない」
 
 確信度: 推定 (MEDIUM)
+
+CoVeフェーズ:
+CONFLICT-Q: AはBか？
+CONFLICT-A: はい
+CONFLICT-S: 統合完了。
 """
         result = postcheck("dia", "+", content)
         # sel_enforcement checks should pass

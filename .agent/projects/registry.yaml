@@ -352,6 +352,7 @@ projects:
   entry_point: null
   usage_trigger: null
 
+skills:
   - id: governance
     name: "Skill Governance"
     path: ".agent/skills/governance.md"

@@ -236,20 +236,26 @@ class DigestorPipeline:
                 else:
                     return asyncio.run(coro)
 
-            for topic_id, query in queries:
-                if not query:
-                    continue
-                try:
-                    results = _run_async(
-                        searcher.search_academic(query, max_results=per_topic)
-                    )
-                    for r in results:
-                        paper = self._exa_to_paper(r, topic_id)
-                        if paper is not None:
-                            papers.append(paper)
-                            exa_count += 1
-                except Exception as e:
-                    print(f"[Digestor]   → Exa search for '{topic_id}' failed: {e}")
+            async def fetch_all():
+                async def fetch_single(topic_id, query):
+                    try:
+                        results = await searcher.search_academic(query, max_results=per_topic)
+                        return topic_id, results
+                    except Exception as e:
+                        print(f"[Digestor]   → Exa search for '{topic_id}' failed: {e}")
+                        return topic_id, []
+
+                tasks = [fetch_single(t_id, q) for t_id, q in queries if q]
+                return await asyncio.gather(*tasks)
+
+            all_results = _run_async(fetch_all())
+
+            for topic_id, results in all_results:
+                for r in results:
+                    paper = self._exa_to_paper(r, topic_id)
+                    if paper is not None:
+                        papers.append(paper)
+                        exa_count += 1
 
             print(f"[Digestor]   → Phase C (Exa): {exa_count} papers")
         except ImportError:

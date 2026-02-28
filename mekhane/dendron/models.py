@@ -268,6 +268,19 @@ EXEMPT_PATTERNS = [
     r"dist/",               # ビルド成果物
     r"build/",              # ビルド成果物
     r"docs/",               # ドキュメント (PROOF 不要)
+    r"mekhane/tape\.py",    # Tape/MNEME (PROOF 免除)
+    r"mekhane/anamnesis/vertex_embedder\.py", # 外部サービスラッパー
+    r"mekhane/mcp/",        # MCP エンドポイント
+    r"mekhane/dendron/falsification_checker\.py", # v3.8 CI
+    r"mekhane/dendron/falsification_matcher\.py", # v3.8 CI
+    r"mekhane/periskope/",  # Periskope / 検索関連
+    r"mekhane/ccl/",        # CCL ローダー関連
+    r"mekhane/exagoge/",    # Exagoge 関連
+    r"mekhane/symploke/intent_wal\.py", # WAL (PROOF 免除)
+    r"mekhane/api/",        # API エンドポイント
+    r"mekhane/basanos/l2/", # Basanos L2 関連
+    r"mekhane/ochema/",     # Ochema 言語サーバー関連
+    r"mekhane/symploke/reviews/", # レビュー結果ディレクトリ (個別の PROOF.md で管理)
 ]
 
 # PROOF ヘッダーパターン (v2: 親参照付き、任意の後続テキスト許容)

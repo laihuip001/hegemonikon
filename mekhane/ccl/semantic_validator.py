@@ -16,6 +16,9 @@ from dataclasses import dataclass
 from typing import Optional, List
 from pathlib import Path
 
+import logging
+logger = logging.getLogger(__name__)
+
 # Try to import LLM client
 try:
     from google import genai
@@ -74,8 +77,8 @@ class CCLSemanticValidator:
             if api_key:
                 try:
                     self.client = genai.Client(api_key=api_key)
-                except Exception:
-                    pass  # TODO: Add proper error handling
+                except Exception as e:
+                    logger.warning(f"Failed to initialize LLM client: {e}")
 
     # PURPOSE: Load the semantic check prompt.
     def _load_prompt(self) -> str:
@@ -205,8 +208,8 @@ CCL は Hegemonikón システムの認知制御言語で、以下のワーク�
                     reasoning=data.get("reasoning", ""),
                     suggestions=data.get("suggestions", []),
                 )
-            except (json.JSONDecodeError, ValueError):
-                pass  # TODO: Add proper error handling
+            except (json.JSONDecodeError, ValueError) as e:
+                logger.warning(f"Failed to parse LLM response as JSON: {e}. Raw text: {text}")
 
         # Fallback: try to infer from text
         aligned = "不一致" not in text and "aligned.*false" not in text.lower()

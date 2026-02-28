@@ -90,20 +90,18 @@ class TestMeaningfulTraceContextRegression:
             load_traces,
             clear_session_traces,
         )
-        from unittest.mock import patch
 
         with tempfile.TemporaryDirectory() as tmpdir:
             path = Path(tmpdir) / "traces.json"
 
-            with patch("mekhane.fep.meaningful_traces.TRACES_PATH", Path(tmpdir) / "traces_dir"):
-                # Write a trace with context
-                clear_session_traces()
-                mark_meaningful(
-                    reason="persist context",
-                    intensity=2,
-                    context="must persist to disk",
-                )
-                save_traces(path)
+            # Write a trace with context
+            clear_session_traces()
+            mark_meaningful(
+                reason="persist context",
+                intensity=2,
+                context="must persist to disk",
+            )
+            save_traces(path)
 
             # Load and verify
             loaded = load_traces(path)

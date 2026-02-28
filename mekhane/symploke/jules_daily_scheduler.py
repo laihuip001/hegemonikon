@@ -291,8 +291,21 @@ async def run_slot_batch(
     total_failed = 0
     all_results = []
 
-    try:
-        for file_idx, target_file in enumerate(files, 1):
+    stop_slot = False
+
+    # max_concurrent per slot to avoid overwhelming global API limits
+    # run_batch also has its own per-file max_concurrent limit,
+    # but we want to limit concurrent *files* being processed.
+    # We will use max_concurrent to limit concurrent files as well.
+    file_semaphore = asyncio.Semaphore(max_concurrent)
+
+    async def process_file(file_idx: int, target_file: str) -> Optional[dict]:
+        nonlocal total_started, total_failed, stop_slot
+
+        async with file_semaphore:
+            if stop_slot:
+                return None
+
             # 専門家プール選択
             if basanos_bridge is not None and hybrid_ratio > 0 and hybrid_ratio < 1.0:
                 # Hybrid mode: basanos + specialist を比率で混合
@@ -369,18 +382,18 @@ async def run_slot_batch(
 
             if dry_run:
                 print(f"  [{file_idx}/{len(files)}] {target_file} × {len(specs)} specialists (DRY-RUN)")
-                all_results.append({
+                return {
                     "file": target_file,
                     "specialists": len(specs),
                     "dry_run": True,
-                })
-                continue
+                }
 
             print(f"  [{file_idx}/{len(files)}] {target_file} × {len(specs)} specialists")
             results = await run_batch(specs, target_file, max_concurrent)
 
             started = sum(1 for r in results if "session_id" in r)
             failed = sum(1 for r in results if "error" in r)
+
             total_started += started
             total_failed += failed
 
@@ -397,23 +410,28 @@ async def run_slot_batch(
                     info["perspective_id"] = getattr(specs[i], "id", "")
                 sessions_info.append(info)
 
-            all_results.append({
+            # 安全弁: エラー率チェック
+            total_attempted = total_started + total_failed
+            if total_attempted > 10 and not stop_slot:
+                error_rate = total_failed / total_attempted
+                if error_rate > MAX_ERROR_RATE:
+                    print(f"  ⚠️  Error rate {error_rate:.1%} > {MAX_ERROR_RATE:.0%}, stopping slot")
+                    stop_slot = True
+
+            print(f"    → {started}/{len(specs)} started, {failed} failed")
+
+            return {
                 "file": target_file,
                 "specialists": len(specs),
                 "started": started,
                 "failed": failed,
                 "sessions": sessions_info,
-            })
+            }
 
-            # 安全弁: エラー率チェック
-            total_attempted = total_started + total_failed
-            if total_attempted > 10:
-                error_rate = total_failed / total_attempted
-                if error_rate > MAX_ERROR_RATE:
-                    print(f"  ⚠️  Error rate {error_rate:.1%} > {MAX_ERROR_RATE:.0%}, stopping slot")
-                    break
-
-            print(f"    → {started}/{len(specs)} started, {failed} failed")
+    try:
+        tasks = [process_file(file_idx, target_file) for file_idx, target_file in enumerate(files, 1)]
+        raw_results = await asyncio.gather(*tasks)
+        all_results = [r for r in raw_results if r is not None]
 
     finally:
         # API キー復元

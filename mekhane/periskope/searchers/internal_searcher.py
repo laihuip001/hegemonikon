@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ]
 """
 Internal knowledge searcher for Periskopē.
 

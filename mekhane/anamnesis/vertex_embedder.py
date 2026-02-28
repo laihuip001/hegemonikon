@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ]
 import os
 import logging
 from google import genai

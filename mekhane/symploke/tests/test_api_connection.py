@@ -10,6 +10,8 @@ import os
 import sys
 import pytest
 
+pytest.importorskip("aiohttp")
+
 # Add parent to path
 sys.path.insert(0, "/home/makaron8426/oikos/hegemonikon")
 

@@ -45,11 +45,51 @@ def _get_secret(key: str) -> Optional[str]:
     """Secret アクセスの一元化 (W08 Secret Sprawl 対策)
     
     全ての API キー・認証情報はこの関数経由で取得する。
-    散在する os.environ.get を排除し、将来的な Secret Manager
-    統合のフックポイントとする。
+    環境変数、GCP Secret Manager、AWS Secrets Manager
+    の順でシークレットを探索する。
     """
-    # TODO: Secret Manager (GCP/AWS) 統合時はここを変更
-    return os.environ.get(key)
+    # 1. 環境変数を優先 (ローカル、コンテナでのインジェクション)
+    val = os.environ.get(key)
+    if val:
+        return val
+
+    # 2. GCP Secret Manager からの取得
+    try:
+        from google.cloud import secretmanager
+        import google.auth
+
+        project_id = os.environ.get("GOOGLE_CLOUD_PROJECT") or os.environ.get("GCP_PROJECT")
+        if not project_id:
+            try:
+                _, project_id = google.auth.default()
+            except Exception:
+                pass
+
+        if project_id:
+            client = secretmanager.SecretManagerServiceClient()
+            name = f"projects/{project_id}/secrets/{key}/versions/latest"
+            response = client.access_secret_version(request={"name": name})
+            return response.payload.data.decode("UTF-8")
+    except ImportError:
+        pass
+    except Exception:
+        pass
+
+    # 3. AWS Secrets Manager からの取得
+    try:
+        import boto3
+        from botocore.exceptions import ClientError
+
+        client = boto3.client("secretsmanager")
+        response = client.get_secret_value(SecretId=key)
+        if "SecretString" in response:
+            return response["SecretString"]
+    except ImportError:
+        pass
+    except Exception:
+        pass
+
+    return None
 
 
 # PURPOSE: [L2-auto] メモリ内 Circuit Breaker (W06 Cascade Failure 対策)

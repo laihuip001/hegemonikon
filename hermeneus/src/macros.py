@@ -215,8 +215,16 @@ BUILTIN_MACROS = {
 }
 
 
-# PURPOSE: 全マクロを取得 (統合)
 @functools.lru_cache(maxsize=1)
+def _get_all_macros_cached() -> Dict[str, str]:
+    """内部キャッシュ用"""
+    result = BUILTIN_MACROS.copy()
+    result.update(get_macro_registry())  # ccl/macros/*.md
+    result.update(load_workflow_macros())  # ccl-*.md (最優先)
+    return result
+
+
+# PURPOSE: 全マクロを取得 (統合)
 def get_all_macros() -> Dict[str, str]:
     """
     全マクロを取得 (統合)
@@ -226,10 +234,7 @@ def get_all_macros() -> Dict[str, str]:
         2. ccl/macros/*.md (ファイル定義)
         3. .agent/workflows/ccl-*.md (正規定義 — 最優先)
     """
-    result = BUILTIN_MACROS.copy()
-    result.update(get_macro_registry())  # ccl/macros/*.md
-    result.update(load_workflow_macros())  # ccl-*.md (最優先)
-    return result
+    return _get_all_macros_cached().copy()
 
 
 # =============================================================================

@@ -1,3 +1,4 @@
+# PROOF: [L1/コア] <- mekhane/
 import os
 import logging
 from google import genai

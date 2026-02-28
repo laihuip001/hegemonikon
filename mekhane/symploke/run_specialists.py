@@ -271,11 +271,12 @@ async def create_session(
 
 # PURPOSE: 専門家バッチ実行 (レート制限 + リトライ付き)
 async def run_batch(
-    specialists: list[Specialist],
-    target_file: str,
+    tasks: list[tuple[Specialist, str]],
     max_concurrent: int = 3,
 ) -> list[dict]:
     """専門家バッチ実行 (レート制限 + リトライ付き)
+
+    tasks: [(Specialist, target_file), ...]
 
     対策:
       1. global semaphore で同時接続数を制限
@@ -300,7 +301,7 @@ async def run_batch(
     dispatch_count = [0]  # mutable counter
 
     # PURPOSE: bounded_create の処理
-    async def bounded_create(i: int, spec: Specialist):
+    async def bounded_create(i: int, spec: Specialist, target_file: str):
         # ブラックリストを避けてキー選択
         available = [k for k in active_keys if k not in broken_keys]
         if not available:
@@ -308,6 +309,7 @@ async def run_batch(
                 "id": spec.id,
                 "name": spec.name,
                 "category": spec.category,
+                "target_file": target_file,
                 "error": "all_keys_broken",
                 "error_text": "All API keys are broken (FAILED_PRECONDITION)",
             }
@@ -322,8 +324,9 @@ async def run_batch(
                 await asyncio.sleep(REQUEST_DELAY)
 
         async with global_semaphore:
-            print(f"[{i+1}/{len(specialists)}] {spec.id} {spec.name[:20]}...")
+            print(f"[{i+1}/{len(tasks)}] {spec.id} {spec.name[:20]}...")
             result = await create_session(key, spec, target_file)
+            result["target_file"] = target_file
 
             if "session_id" in result:
                 retries = result.get("retries", 0)
@@ -338,8 +341,8 @@ async def run_batch(
                 print(f"  ✗ Error: {result.get('error')}")
             return result
 
-    tasks = [bounded_create(i, spec) for i, spec in enumerate(specialists)]
-    results = await asyncio.gather(*tasks)
+    async_tasks = [bounded_create(i, spec, target_file) for i, (spec, target_file) in enumerate(tasks)]
+    results = await asyncio.gather(*async_tasks)
     return list(results)
 
 
@@ -567,7 +570,8 @@ async def main():
             continue
 
         # バッチ実行
-        results = await run_batch(specialists, target_file, args.max_concurrent)
+        tasks = [(spec, target_file) for spec in specialists]
+        results = await run_batch(tasks, args.max_concurrent)
 
         # ファイル単位のサマリー
         started = sum(1 for r in results if "session_id" in r)

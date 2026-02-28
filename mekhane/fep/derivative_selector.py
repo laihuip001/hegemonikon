@@ -1615,7 +1615,7 @@ def _select_o1_derivative(text: str) -> DerivativeRecommendation:
         selected = "nous"
         confidence = 0.5
 
-    alternatives = [d for d in ["nous", "phro", "meta"] if d != selected]
+    alternatives = [d for d in DerivativeStateSpace.O1_DERIVATIVES if d != selected]
     rationale = _generate_o1_rationale(selected, obs)
 
     return DerivativeRecommendation(
@@ -1651,7 +1651,7 @@ def _select_o2_derivative(text: str) -> DerivativeRecommendation:
         confidence = 0.5 + 0.1 * max_score
         confidence = min(confidence, 0.95)
 
-    alternatives = [d for d in ["desir", "voli", "akra"] if d != selected]
+    alternatives = [d for d in DerivativeStateSpace.O2_DERIVATIVES if d != selected]
     rationale = _generate_o2_rationale(selected, scores)
 
     return DerivativeRecommendation(
@@ -1683,7 +1683,7 @@ def _select_o3_derivative(text: str) -> DerivativeRecommendation:
         confidence = 0.55 + 0.1 * max_score
         confidence = min(confidence, 0.95)
 
-    alternatives = [d for d in ["anom", "hypo", "eval"] if d != selected]
+    alternatives = [d for d in DerivativeStateSpace.O3_DERIVATIVES if d != selected]
     rationale = _generate_o3_rationale(selected, scores)
 
     return DerivativeRecommendation(
@@ -1715,7 +1715,7 @@ def _select_o4_derivative(text: str) -> DerivativeRecommendation:
         confidence = 0.55 + 0.1 * max_score
         confidence = min(confidence, 0.95)
 
-    alternatives = [d for d in ["flow", "prax", "pois"] if d != selected]
+    alternatives = [d for d in DerivativeStateSpace.O4_DERIVATIVES if d != selected]
     rationale = _generate_o4_rationale(selected, scores)
 
     return DerivativeRecommendation(
@@ -1752,7 +1752,7 @@ def _select_s1_derivative(text: str) -> DerivativeRecommendation:
         confidence = 0.55 + 0.1 * max_score
         confidence = min(confidence, 0.95)
 
-    alternatives = [d for d in ["cont", "disc", "abst"] if d != selected]
+    alternatives = [d for d in DerivativeStateSpace.S1_DERIVATIVES if d != selected]
     rationale = _generate_s1_rationale(selected, scores)
 
     return DerivativeRecommendation(
@@ -1784,7 +1784,7 @@ def _select_s2_derivative(text: str) -> DerivativeRecommendation:
         confidence = 0.55 + 0.1 * max_score
         confidence = min(confidence, 0.95)
 
-    alternatives = [d for d in ["comp", "inve", "adap"] if d != selected]
+    alternatives = [d for d in DerivativeStateSpace.S2_DERIVATIVES if d != selected]
     rationale = _generate_s2_rationale(selected, scores)
 
     return DerivativeRecommendation(
@@ -1816,7 +1816,7 @@ def _select_s3_derivative(text: str) -> DerivativeRecommendation:
         confidence = 0.55 + 0.1 * max_score
         confidence = min(confidence, 0.95)
 
-    alternatives = [d for d in ["norm", "empi", "rela"] if d != selected]
+    alternatives = [d for d in DerivativeStateSpace.S3_DERIVATIVES if d != selected]
     rationale = _generate_s3_rationale(selected, scores)
 
     return DerivativeRecommendation(
@@ -1848,7 +1848,7 @@ def _select_s4_derivative(text: str) -> DerivativeRecommendation:
         confidence = 0.55 + 0.1 * max_score
         confidence = min(confidence, 0.95)
 
-    alternatives = [d for d in ["prax", "pois", "temp"] if d != selected]
+    alternatives = [d for d in DerivativeStateSpace.S4_DERIVATIVES if d != selected]
     rationale = _generate_s4_rationale(selected, scores)
 
     return DerivativeRecommendation(
@@ -1885,7 +1885,7 @@ def _select_h1_derivative(text: str) -> DerivativeRecommendation:
         confidence = 0.55 + 0.1 * max_score
         confidence = min(confidence, 0.95)
 
-    alternatives = [d for d in ["appr", "avoi", "arre"] if d != selected]
+    alternatives = [d for d in DerivativeStateSpace.H1_DERIVATIVES if d != selected]
     rationale = _generate_h1_rationale(selected, scores)
 
     return DerivativeRecommendation(
@@ -1917,7 +1917,7 @@ def _select_h2_derivative(text: str) -> DerivativeRecommendation:
         confidence = 0.55 + 0.1 * max_score
         confidence = min(confidence, 0.95)
 
-    alternatives = [d for d in ["subj", "inte", "obje"] if d != selected]
+    alternatives = [d for d in DerivativeStateSpace.H2_DERIVATIVES if d != selected]
     rationale = _generate_h2_rationale(selected, scores)
 
     return DerivativeRecommendation(
@@ -1949,7 +1949,7 @@ def _select_h3_derivative(text: str) -> DerivativeRecommendation:
         confidence = 0.55 + 0.1 * max_score
         confidence = min(confidence, 0.95)
 
-    alternatives = [d for d in ["targ", "acti", "stat"] if d != selected]
+    alternatives = [d for d in DerivativeStateSpace.H3_DERIVATIVES if d != selected]
     rationale = _generate_h3_rationale(selected, scores)
 
     return DerivativeRecommendation(
@@ -1981,7 +1981,7 @@ def _select_h4_derivative(text: str) -> DerivativeRecommendation:
         confidence = 0.55 + 0.1 * max_score
         confidence = min(confidence, 0.95)
 
-    alternatives = [d for d in ["sens", "conc", "form"] if d != selected]
+    alternatives = [d for d in DerivativeStateSpace.H4_DERIVATIVES if d != selected]
     rationale = _generate_h4_rationale(selected, scores)
 
     return DerivativeRecommendation(
@@ -2018,7 +2018,7 @@ def _select_p1_derivative(text: str) -> DerivativeRecommendation:
         confidence = 0.55 + 0.1 * max_score
         confidence = min(confidence, 0.95)
 
-    alternatives = [d for d in ["phys", "conc", "rela"] if d != selected]
+    alternatives = [d for d in DerivativeStateSpace.P1_DERIVATIVES if d != selected]
     rationale = _generate_p1_rationale(selected, scores)
 
     return DerivativeRecommendation(
@@ -2050,7 +2050,7 @@ def _select_p2_derivative(text: str) -> DerivativeRecommendation:
         confidence = 0.55 + 0.1 * max_score
         confidence = min(confidence, 0.95)
 
-    alternatives = [d for d in ["line", "bran", "cycl"] if d != selected]
+    alternatives = [d for d in DerivativeStateSpace.P2_DERIVATIVES if d != selected]
     rationale = _generate_p2_rationale(selected, scores)
 
     return DerivativeRecommendation(
@@ -2082,7 +2082,7 @@ def _select_p3_derivative(text: str) -> DerivativeRecommendation:
         confidence = 0.55 + 0.1 * max_score
         confidence = min(confidence, 0.95)
 
-    alternatives = [d for d in ["fixe", "adap", "emer"] if d != selected]
+    alternatives = [d for d in DerivativeStateSpace.P3_DERIVATIVES if d != selected]
     rationale = _generate_p3_rationale(selected, scores)
 
     return DerivativeRecommendation(
@@ -2114,7 +2114,7 @@ def _select_p4_derivative(text: str) -> DerivativeRecommendation:
         confidence = 0.55 + 0.1 * max_score
         confidence = min(confidence, 0.95)
 
-    alternatives = [d for d in ["manu", "mech", "auto"] if d != selected]
+    alternatives = [d for d in DerivativeStateSpace.P4_DERIVATIVES if d != selected]
     rationale = _generate_p4_rationale(selected, scores)
 
     return DerivativeRecommendation(
@@ -2151,7 +2151,7 @@ def _select_k1_derivative(text: str) -> DerivativeRecommendation:
         confidence = 0.55 + 0.1 * max_score
         confidence = min(confidence, 0.95)
 
-    alternatives = [d for d in ["urge", "opti", "miss"] if d != selected]
+    alternatives = [d for d in DerivativeStateSpace.K1_DERIVATIVES if d != selected]
     rationale = _generate_k1_rationale(selected, scores)
 
     return DerivativeRecommendation(
@@ -2183,7 +2183,7 @@ def _select_k2_derivative(text: str) -> DerivativeRecommendation:
         confidence = 0.55 + 0.1 * max_score
         confidence = min(confidence, 0.95)
 
-    alternatives = [d for d in ["shor", "medi", "long"] if d != selected]
+    alternatives = [d for d in DerivativeStateSpace.K2_DERIVATIVES if d != selected]
     rationale = _generate_k2_rationale(selected, scores)
 
     return DerivativeRecommendation(
@@ -2215,7 +2215,7 @@ def _select_k3_derivative(text: str) -> DerivativeRecommendation:
         confidence = 0.55 + 0.1 * max_score
         confidence = min(confidence, 0.95)
 
-    alternatives = [d for d in ["intr", "inst", "ulti"] if d != selected]
+    alternatives = [d for d in DerivativeStateSpace.K3_DERIVATIVES if d != selected]
     rationale = _generate_k3_rationale(selected, scores)
 
     return DerivativeRecommendation(
@@ -2247,7 +2247,7 @@ def _select_k4_derivative(text: str) -> DerivativeRecommendation:
         confidence = 0.55 + 0.1 * max_score
         confidence = min(confidence, 0.95)
 
-    alternatives = [d for d in ["taci", "expl", "meta"] if d != selected]
+    alternatives = [d for d in DerivativeStateSpace.K4_DERIVATIVES if d != selected]
     rationale = _generate_k4_rationale(selected, scores)
 
     return DerivativeRecommendation(
@@ -2284,7 +2284,7 @@ def _select_a1_derivative(text: str) -> DerivativeRecommendation:
         confidence = 0.55 + 0.1 * max_score
         confidence = min(confidence, 0.95)
 
-    alternatives = [d for d in ["prim", "seco", "regu"] if d != selected]
+    alternatives = [d for d in DerivativeStateSpace.A1_DERIVATIVES if d != selected]
     rationale = _generate_a1_rationale(selected, scores)
 
     return DerivativeRecommendation(
@@ -2316,7 +2316,7 @@ def _select_a2_derivative(text: str) -> DerivativeRecommendation:
         confidence = 0.55 + 0.1 * max_score
         confidence = min(confidence, 0.95)
 
-    alternatives = [d for d in ["affi", "nega", "susp"] if d != selected]
+    alternatives = [d for d in DerivativeStateSpace.A2_DERIVATIVES if d != selected]
     rationale = _generate_a2_rationale(selected, scores)
 
     return DerivativeRecommendation(
@@ -2348,7 +2348,7 @@ def _select_a3_derivative(text: str) -> DerivativeRecommendation:
         confidence = 0.55 + 0.1 * max_score
         confidence = min(confidence, 0.95)
 
-    alternatives = [d for d in ["conc", "abst", "univ"] if d != selected]
+    alternatives = [d for d in DerivativeStateSpace.A3_DERIVATIVES if d != selected]
     rationale = _generate_a3_rationale(selected, scores)
 
     return DerivativeRecommendation(
@@ -2380,7 +2380,7 @@ def _select_a4_derivative(text: str) -> DerivativeRecommendation:
         confidence = 0.55 + 0.1 * max_score
         confidence = min(confidence, 0.95)
 
-    alternatives = [d for d in ["tent", "just", "cert"] if d != selected]
+    alternatives = [d for d in DerivativeStateSpace.A4_DERIVATIVES if d != selected]
     rationale = _generate_a4_rationale(selected, scores)
 
     return DerivativeRecommendation(

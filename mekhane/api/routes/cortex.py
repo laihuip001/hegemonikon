@@ -1,3 +1,4 @@
+# PROOF: [L1/コア] <- mekhane/
 from typing import Any, AsyncGenerator
 
 import asyncio

@@ -1,3 +1,4 @@
+# PROOF: [L1/コア] <- mekhane/
 """
 Tavily Search API client for Periskopē.
 

@@ -1,3 +1,4 @@
+# PROOF: [L1/コア] <- mekhane/
 """
 Playwright-based searcher for Periskopē.
 

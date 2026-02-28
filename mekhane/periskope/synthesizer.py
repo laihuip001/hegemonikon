@@ -1,3 +1,4 @@
+# PROOF: [L1/コア] <- mekhane/
 """
 Multi-model synthesizer for Periskopē.
 

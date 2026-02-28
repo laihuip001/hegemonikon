@@ -1,3 +1,4 @@
+# PROOF: [L1/コア] <- mekhane/
 """
 Semantic Scholar API client for Periskopē.
 

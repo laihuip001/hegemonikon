@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L1/コア] <- mekhane/
 """
 Periskopē CLI — Deep Research from the command line.
 

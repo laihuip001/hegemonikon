@@ -1,3 +1,4 @@
+# PROOF: [L1/コア] <- mekhane/
 """
 S7: Falsification Condition Checker
 

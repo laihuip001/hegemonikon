@@ -1,3 +1,4 @@
+# PROOF: [L1/コア] <- mekhane/
 """
 Internal knowledge searcher for Periskopē.
 

@@ -148,6 +148,8 @@ cur.execute('''
 ''', (wf_id, version_id, nodes, connections, name))
 
 # webhook_entity にも登録 (webhook ノードを自動検出)
+webhook_deletes = []
+webhook_inserts = []
 for node in wf['nodes']:
     if node.get('type', '') in ('n8n-nodes-base.webhook',):
         wh_path = node.get('parameters', {}).get('path', '')
@@ -156,12 +158,17 @@ for node in wf['nodes']:
         node_name = node.get('name', '')
         if wh_path:
             # 既存 webhook を削除して再登録
-            cur.execute('DELETE FROM webhook_entity WHERE "workflowId" = ? AND "webhookPath" = ?', (wf_id, wh_path))
-            cur.execute('''
-                INSERT INTO webhook_entity ("workflowId", "webhookPath", method, node, "webhookId", "pathLength")
-                VALUES (?, ?, ?, ?, ?, 1)
-            ''', (wf_id, wh_path, wh_method, node_name, wh_id or wh_path))
+            webhook_deletes.append((wf_id, wh_path))
+            webhook_inserts.append((wf_id, wh_path, wh_method, node_name, wh_id or wh_path))
             print(f'  Webhook: {wh_method} /{wh_path}')
+
+if webhook_deletes:
+    cur.executemany('DELETE FROM webhook_entity WHERE "workflowId" = ? AND "webhookPath" = ?', webhook_deletes)
+if webhook_inserts:
+    cur.executemany('''
+        INSERT INTO webhook_entity ("workflowId", "webhookPath", method, node, "webhookId", "pathLength")
+        VALUES (?, ?, ?, ?, ?, 1)
+    ''', webhook_inserts)
 
 # shared_workflow が無ければ追加 (プロジェクト関連付け)
 cur.execute('SELECT COUNT(*) FROM shared_workflow WHERE \"workflowId\" = ?', (wf_id,))

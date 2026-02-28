@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] <- mekhane/periskope/ : Domain data models for citations and sources
 """
 Periskopē data models.
 

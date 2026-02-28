@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] <- mekhane/anamnesis/ : Text embedding generation using Vertex AI
 import os
 import logging
 from google import genai

@@ -1,3 +1,4 @@
+# PROOF: [L1/定理] <- mekhane/periskope/ : Autonomous agent for identifying and managing citations
 """
 Citation verification agent for Periskopē.
 

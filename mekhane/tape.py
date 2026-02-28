@@ -1,3 +1,4 @@
+# PROOF: [L1/定理] <- mekhane/tape.py : Execution tape for continuous reasoning history
 """
 Tape Writer — WF 実行トレースを JSONL として記録する。
 

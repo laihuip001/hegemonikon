@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] <- mekhane/periskope/ : Web page content retrieval and parsing
 """
 Page Fetcher — 選択的全文クロール for Periskopē.
 

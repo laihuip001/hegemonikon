@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] <- mekhane/periskope/ : Synthesis logic for assembling retrieved citations
 """
 Multi-model synthesizer for Periskopē.
 

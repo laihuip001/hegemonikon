@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] <- mekhane/periskope/searchers/ : Semantic Scholar search integration
 """
 Semantic Scholar API client for Periskopē.
 

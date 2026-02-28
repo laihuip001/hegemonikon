@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] <- mekhane/api/ : Cortex API endpoints for inference control
 from typing import Any, AsyncGenerator
 
 import asyncio

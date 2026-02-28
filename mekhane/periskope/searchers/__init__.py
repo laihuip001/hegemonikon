@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] <- mekhane/periskope/searchers/ : Search provider initialization
 """
 Periskopē searchers — pluggable search source adapters.
 

@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] <- mekhane/dendron/ : Falsification condition evaluation logic
 """
 S7: Falsification Condition Checker
 

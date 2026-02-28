@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] <- mekhane/periskope/searchers/ : Internal database search provider
 """
 Internal knowledge searcher for Periskopē.
 

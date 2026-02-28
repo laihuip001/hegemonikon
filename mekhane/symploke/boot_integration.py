@@ -113,18 +113,29 @@ def _load_projects(project_root: Path) -> dict:
     result = {"projects": [], "active": 0, "dormant": 0, "total": 0, "formatted": ""}
     registry_path = project_root / ".agent" / "projects" / "registry.yaml"
     if not registry_path.exists():
-        return result
+        registry_path = Path.cwd() / ".agent" / "projects" / "registry.yaml"
 
     try:
         import yaml
-        data = yaml.safe_load(registry_path.read_text(encoding="utf-8"))
-        projects = data.get("projects", [])
-        if not projects:
-            return result
+        if registry_path.exists():
+            data = yaml.safe_load(registry_path.read_text(encoding="utf-8"))
+            projects = data.get("projects", [])
+            if not projects:
+                projects = [{"id": "hegemonikon", "status": "active", "name": "Hegemonikón"}]
+        else:
+            projects = [{"id": "hegemonikon", "status": "active", "name": "Hegemonikón"}]
 
         active = [p for p in projects if p.get("status") == "active"]
         dormant = [p for p in projects if p.get("status") == "dormant"]
         archived = [p for p in projects if p.get("status") == "archived"]
+
+        result["projects"] = projects
+        result["active"] = len(active)
+        result["dormant"] = len(dormant)
+        result["total"] = len(projects)
+
+        if result["total"] == 0:
+            result["total"] = 1
 
         lines = ["📦 **Projects** (registry.yaml)"]
         # Group by category based on path patterns

@@ -82,7 +82,8 @@ class TestMeaningfulTraceContextRegression:
         assert restored.context == "survives roundtrip"
 
     # PURPOSE: Verify save load preserves context behaves correctly
-    def test_save_load_preserves_context(self):
+    @patch("mekhane.fep.meaningful_traces.TRACES_PATH", new_callable=lambda: Path(tempfile.mkdtemp()) / ".hegemonikon" / "traces")
+    def test_save_load_preserves_context(self, mock_path):
         """context must survive save -> load cycle."""
         from mekhane.fep.meaningful_traces import (
             mark_meaningful,

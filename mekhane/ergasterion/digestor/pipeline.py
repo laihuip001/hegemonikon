@@ -11,7 +11,7 @@ Hegemonikón 形式に変換して /eat ワークフローに渡す。
 - E: Exponential backoff 付きリトライ
 """
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
 from typing import Optional
@@ -78,14 +78,12 @@ class DigestorPipeline:
         if topics:
             queries = [
                 (t.get("id", ""), t.get("query", ""))
-                for t in topics_list if t.get("id") in topics
+                for t in topics_list
+                if t.get("id") in topics
             ]
         else:
             # 全トピックを使う（上位3に限定しない）
-            queries = [
-                (t.get("id", ""), t.get("query", ""))
-                for t in topics_list
-            ]
+            queries = [(t.get("id", ""), t.get("query", "")) for t in topics_list]
 
         # === Phase A: Gnōsis LanceDB ベクトル検索 ===
         # papers テーブル + knowledge テーブル内の外部論文を取得
@@ -94,7 +92,10 @@ class DigestorPipeline:
         gnosis_count = 0
         try:
             from mekhane.anamnesis.gnosis_chat import GnosisChat
-            gc = GnosisChat(use_reranker=False, top_k=15)  # Digestor 用: top_k を増やして外部論文の取得範囲を拡大
+
+            gc = GnosisChat(
+                use_reranker=False, top_k=15
+            )  # Digestor 用: top_k を増やして外部論文の取得範囲を拡大
             per_topic = max(max_papers // max(len(queries), 1), 5)
 
             for topic_id, query in queries:
@@ -153,12 +154,16 @@ class DigestorPipeline:
                         arxiv_count += len(results)
                         break
                     except Exception as e:
-                        wait = 3 * (2 ** attempt)
+                        wait = 3 * (2**attempt)
                         if attempt < max_retries - 1:
-                            print(f"[Digestor]   → arXiv '{topic_id}' failed (attempt {attempt + 1}): {e}")
+                            print(
+                                f"[Digestor]   → arXiv '{topic_id}' failed (attempt {attempt + 1}): {e}"
+                            )
                             _time.sleep(wait)
                         else:
-                            print(f"[Digestor]   → arXiv '{topic_id}' failed after {max_retries} attempts: {e}")
+                            print(
+                                f"[Digestor]   → arXiv '{topic_id}' failed after {max_retries} attempts: {e}"
+                            )
 
             print(f"[Digestor]   → Phase B (arXiv API): {arxiv_count} papers")
         except ImportError:
@@ -179,7 +184,9 @@ class DigestorPipeline:
                 seen.add(paper_id)
                 unique_papers.append(paper)
         papers = unique_papers
-        print(f"[Digestor]   → Deduplicated: {len(papers)} unique papers (Gnōsis: {gnosis_count}, arXiv: {arxiv_count})")
+        print(
+            f"[Digestor]   → Deduplicated: {len(papers)} unique papers (Gnōsis: {gnosis_count}, arXiv: {arxiv_count})"
+        )
 
         return papers
 
@@ -194,6 +201,7 @@ class DigestorPipeline:
         EXA_API_KEY がない場合は graceful にスキップ。
         """
         import os
+
         api_key = os.environ.get("EXA_API_KEY")
         if not api_key:
             print("[Digestor]   → Phase C skipped: EXA_API_KEY not set")
@@ -207,13 +215,11 @@ class DigestorPipeline:
         if topics:
             queries = [
                 (t.get("id", ""), t.get("query", ""))
-                for t in topics_list if t.get("id") in topics
+                for t in topics_list
+                if t.get("id") in topics
             ]
         else:
-            queries = [
-                (t.get("id", ""), t.get("query", ""))
-                for t in topics_list
-            ]
+            queries = [(t.get("id", ""), t.get("query", "")) for t in topics_list]
 
         try:
             from mekhane.periskope.searchers.exa_searcher import ExaSearcher
@@ -231,25 +237,41 @@ class DigestorPipeline:
                 if loop and loop.is_running():
                     # 既存ループ内 → 新スレッドで実行
                     import concurrent.futures
+
                     with concurrent.futures.ThreadPoolExecutor(max_workers=1) as pool:
                         return pool.submit(asyncio.run, coro).result(timeout=30)
                 else:
                     return asyncio.run(coro)
 
-            for topic_id, query in queries:
-                if not query:
-                    continue
-                try:
-                    results = _run_async(
-                        searcher.search_academic(query, max_results=per_topic)
-                    )
-                    for r in results:
+            async def fetch_all():
+                tasks = []
+                valid_queries = [
+                    (topic_id, query) for topic_id, query in queries if query
+                ]
+                for topic_id, query in valid_queries:
+                    tasks.append(searcher.search_academic(query, max_results=per_topic))
+
+                results = await asyncio.gather(*tasks, return_exceptions=True)
+                return valid_queries, results
+
+            try:
+                valid_queries, all_results = _run_async(fetch_all())
+
+                for i, (topic_id, query) in enumerate(valid_queries):
+                    result = all_results[i]
+                    if isinstance(result, Exception):
+                        print(
+                            f"[Digestor]   → Exa search for '{topic_id}' failed: {result}"
+                        )
+                        continue
+
+                    for r in result:
                         paper = self._exa_to_paper(r, topic_id)
                         if paper is not None:
                             papers.append(paper)
                             exa_count += 1
-                except Exception as e:
-                    print(f"[Digestor]   → Exa search for '{topic_id}' failed: {e}")
+            except Exception as e:
+                print(f"[Digestor]   → Exa batch search failed: {e}")
 
             print(f"[Digestor]   → Phase C (Exa): {exa_count} papers")
         except ImportError:
@@ -276,7 +298,8 @@ class DigestorPipeline:
             source="exa",
             source_id=getattr(result, "url", "") or f"exa_{title[:40]}",
             title=title,
-            abstract=getattr(result, "content", "")[:500] or getattr(result, "snippet", ""),
+            abstract=getattr(result, "content", "")[:500]
+            or getattr(result, "snippet", ""),
             url=getattr(result, "url", ""),
         )
 
@@ -327,12 +350,15 @@ class DigestorPipeline:
         if existing_keys:
             before = len(papers)
             papers = [
-                p for p in papers
-                if getattr(p, 'primary_key', p.id) not in existing_keys
+                p
+                for p in papers
+                if getattr(p, "primary_key", p.id) not in existing_keys
             ]
             removed = before - len(papers)
             if removed > 0:
-                print(f"[Digestor]   → Stage 1 (primary_key): {removed} duplicates removed")
+                print(
+                    f"[Digestor]   → Stage 1 (primary_key): {removed} duplicates removed"
+                )
 
         # === Stage 2: ベクトル類似度 ===
         try:
@@ -342,7 +368,9 @@ class DigestorPipeline:
 
         total_removed = original_count - len(papers)
         if total_removed > 0:
-            print(f"[Digestor]   → Total dedup: {original_count} → {len(papers)} papers")
+            print(
+                f"[Digestor]   → Total dedup: {original_count} → {len(papers)} papers"
+            )
 
         return papers
 
@@ -379,6 +407,7 @@ class DigestorPipeline:
             sophia_path = Path.home() / ".hegemonikon" / "sophia" / "sophia.pkl"
             if sophia_path.exists():
                 import pickle
+
                 with open(sophia_path, "rb") as f:
                     data = pickle.load(f)
                 metadata = data.get("metadata", {})
@@ -408,10 +437,12 @@ class DigestorPipeline:
 
         try:
             from mekhane.symploke.adapters.embedding_adapter import EmbeddingAdapter
+
             adapter = EmbeddingAdapter()
 
             # Sophia index のベクトルをロード
             import pickle
+
             with open(sophia_path, "rb") as f:
                 data = pickle.load(f)
             existing_vectors = data.get("vectors", [])
@@ -449,7 +480,9 @@ class DigestorPipeline:
 
             removed = len(papers) - len(filtered)
             if removed > 0:
-                print(f"[Digestor]   → Stage 2 (similarity): {removed} near-duplicates removed")
+                print(
+                    f"[Digestor]   → Stage 2 (similarity): {removed} near-duplicates removed"
+                )
             return filtered
 
         except ImportError:
@@ -468,7 +501,7 @@ class DigestorPipeline:
             /eat が処理できる形式の辞書
         """
         templates = []
-        if hasattr(candidate, 'suggested_templates') and candidate.suggested_templates:
+        if hasattr(candidate, "suggested_templates") and candidate.suggested_templates:
             templates = [
                 {"id": tid, "score": round(score, 3)}
                 for tid, score in candidate.suggested_templates
@@ -623,7 +656,14 @@ class DigestorPipeline:
 
         timestamp = datetime.now().strftime("%Y%m%d")
         for i, c in enumerate(candidates[:5], 1):  # 上位5件のみ
-            safe_title = "".join(ch if ch.isalnum() or ch in "-_ " else "" for ch in c.paper.title[:40]).strip().replace(" ", "_")
+            safe_title = (
+                "".join(
+                    ch if ch.isalnum() or ch in "-_ " else ""
+                    for ch in c.paper.title[:40]
+                )
+                .strip()
+                .replace(" ", "_")
+            )
             filename = f"eat_{timestamp}_{i:02d}_{safe_title}.md"
             filepath = incoming_dir / filename
 
@@ -637,10 +677,9 @@ class DigestorPipeline:
 
             # C: テンプレート推奨情報
             template_info = ""
-            if hasattr(c, 'suggested_templates') and c.suggested_templates:
+            if hasattr(c, "suggested_templates") and c.suggested_templates:
                 template_info = "\n".join(
-                    f"  - {tid}: {score:.2f}"
-                    for tid, score in c.suggested_templates
+                    f"  - {tid}: {score:.2f}" for tid, score in c.suggested_templates
                 )
             else:
                 template_info = "  - (未分析)"
@@ -649,17 +688,17 @@ class DigestorPipeline:
             content = f"""---
 title: "{c.paper.title}"
 source: {c.paper.source}
-url: {c.paper.url or 'N/A'}
+url: {c.paper.url or "N/A"}
 score: {c.score:.2f}
-matched_topics: [{', '.join(c.matched_topics)}]
+matched_topics: [{", ".join(c.matched_topics)}]
 digest_to: [{targets_str}]
 generated: {timestamp}
 ---
 
 # /eat 候補: {c.paper.title}
 
-> **Score**: {c.score:.2f} | **Topics**: {', '.join(c.matched_topics)}
-> **Source**: {c.paper.source} | **URL**: {c.paper.url or 'N/A'}
+> **Score**: {c.score:.2f} | **Topics**: {", ".join(c.matched_topics)}
+> **Source**: {c.paper.source} | **URL**: {c.paper.url or "N/A"}
 > **消化先候補**: {targets_str}
 
 ## 推奨テンプレート

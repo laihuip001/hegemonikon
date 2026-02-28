@@ -8,6 +8,7 @@
 """
 
 import asyncio
+import logging
 from pathlib import Path
 
 CDP_PORT = 9222
@@ -29,8 +30,8 @@ async def main():
                     try:
                         buttons = await pg.query_selector_all("button.select-none")
                         agent_pages.append((pg, len(buttons)))
-                    except Exception:
-                        pass  # TODO: Add proper error handling
+                    except Exception as e:
+                        logging.warning(f"Failed to query agent pages for {pg.url}: {e}")
 
         if not agent_pages:
             print("[!] Agent Manager not found")
@@ -110,10 +111,10 @@ async def main():
                                     lines.append(
                                         f"        [{k}] <{gc_tag}> class='{gc_class[:50]}' text_len={gc_len}"
                                     )
-                                except Exception:
-                                    pass  # TODO: Add proper error handling
-                    except Exception:
-                        pass  # TODO: Add proper error handling
+                                except Exception as e:
+                                    logging.warning(f"Error querying grandchild {k} under child {j}: {e}")
+                    except Exception as e:
+                        logging.warning(f"Error querying child {j}: {e}")
 
                 break  # 最初の大きなコンテナのみ
 

@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] <- mekhane/periskope/ default header
 """
 Brave Search API client for Periskopē.
 

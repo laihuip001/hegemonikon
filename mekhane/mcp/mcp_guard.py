@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] <- mekhane/mcp/ default header
 """
 MCP Guard — ゾンビプロセス防止の自己防衛モジュール
 

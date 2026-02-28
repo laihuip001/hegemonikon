@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] <- mekhane/dendron/ default header
 """
 S7: Falsification Condition Checker
 

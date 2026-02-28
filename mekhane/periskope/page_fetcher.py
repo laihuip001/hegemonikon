@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] <- mekhane/periskope/ default header
 """
 Page Fetcher — 選択的全文クロール for Periskopē.
 

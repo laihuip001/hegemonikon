@@ -1,3 +1,5 @@
+# PROOF: [L2/Auto] <- mekhane/ccl/
+# PURPOSE: Auto-added proof header
 """CCL Linter — CCL 式の静的検証。
 
 operators.md (SSOT) に基づいて CCL 式を検証し、

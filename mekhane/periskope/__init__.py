@@ -1,3 +1,5 @@
+# PROOF: [L2/Auto] <- mekhane/periskope/
+# PURPOSE: Auto-added proof header
 """
 Periskopē — HGK Deep Research Engine
 

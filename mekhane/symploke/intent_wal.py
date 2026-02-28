@@ -1,3 +1,5 @@
+# PROOF: [L2/Auto] <- mekhane/symploke/
+# PURPOSE: Auto-added proof header
 #!/usr/bin/env python3
 """Intent-WAL (Write-Ahead Log) Manager.
 

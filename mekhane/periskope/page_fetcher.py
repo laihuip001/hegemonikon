@@ -1,3 +1,5 @@
+# PROOF: [L2/Auto] <- mekhane/periskope/
+# PURPOSE: Auto-added proof header
 """
 Page Fetcher — 選択的全文クロール for Periskopē.
 

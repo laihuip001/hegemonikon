@@ -1,3 +1,5 @@
+# PROOF: [L2/Auto] <- mekhane/mcp/
+# PURPOSE: Auto-added proof header
 #!/usr/bin/env python3
 """
 MCP Base Module — Hegemonikón MCP Server Common Infrastructure

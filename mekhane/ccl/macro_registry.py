@@ -10,6 +10,7 @@ from typing import Dict, Optional, List
 from dataclasses import dataclass, asdict
 from pathlib import Path
 import json
+import logging
 
 
 # PURPOSE: の統一的インターフェースを実現する
@@ -51,6 +52,7 @@ def _build_macro_dict() -> Dict[str, "Macro"]:
 
 BUILTIN_MACROS: Dict[str, Macro] = _build_macro_dict()
 
+logger = logging.getLogger(__name__)
 
 
 # PURPOSE: Registry for CCL macros.
@@ -80,8 +82,9 @@ class MacroRegistry:
                 for item in data:
                     macro = Macro(**item)
                     self.user_macros[macro.name] = macro
-            except (json.JSONDecodeError, TypeError):
-                pass  # TODO: Add proper error handling
+            except (json.JSONDecodeError, TypeError) as e:
+                logger.error(f"Failed to load user macros from {self.path}: {e}")
+                self.user_macros = {}
 
     # PURPOSE: Save user macros to file.
     def _save(self):

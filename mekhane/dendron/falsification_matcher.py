@@ -1,3 +1,4 @@
+# PROOF: [L2/Safety] <- mekhane/dendron/ Matches new paper claims during /eat against epistemic_status.yaml falsification conditions
 """
 Falsification Matcher — 消化論文の主張と epistemic_status.yaml の反証条件を照合
 

@@ -1,3 +1,4 @@
+# PROOF: [L2-auto]
 """
 Brave Search API client for Periskopē.
 

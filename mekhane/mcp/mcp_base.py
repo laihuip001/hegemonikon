@@ -1,3 +1,4 @@
+# PROOF: [L2-auto]
 #!/usr/bin/env python3
 """
 MCP Base Module — Hegemonikón MCP Server Common Infrastructure

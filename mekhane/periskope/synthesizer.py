@@ -1,3 +1,4 @@
+# PROOF: [L2-auto]
 """
 Multi-model synthesizer for Periskopē.
 

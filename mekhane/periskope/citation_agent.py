@@ -1,3 +1,4 @@
+# PROOF: [L2-auto]
 """
 Citation verification agent for Periskopē.
 

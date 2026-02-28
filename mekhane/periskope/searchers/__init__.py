@@ -1,3 +1,4 @@
+# PROOF: [L2-auto]
 """
 Periskopē searchers — pluggable search source adapters.
 

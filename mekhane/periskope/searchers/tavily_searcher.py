@@ -1,3 +1,4 @@
+# PROOF: [L2-auto]
 """
 Tavily Search API client for Periskopē.
 

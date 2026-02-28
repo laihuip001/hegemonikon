@@ -1,3 +1,4 @@
+# PROOF: [L2-auto]
 from typing import Any, AsyncGenerator
 
 import asyncio

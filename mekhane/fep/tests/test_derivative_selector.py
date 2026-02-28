@@ -1160,3 +1160,55 @@ class TestASeriesHelperFunctions:
         """Verify unknown a theorem raises behavior."""
         with pytest.raises(ValueError):
             select_derivative("A5", "test")
+
+
+# PURPOSE: Test derivative FEP learning updates
+class TestUpdateDerivativeSelector:
+    """Test derivative FEP learning updates."""
+
+    def test_encode_derivative_context(self):
+        """Verify context encoding maps correctly."""
+        from mekhane.fep.derivative_selector import _encode_derivative_context
+        # High abstraction, low context, low reflection -> (2, 0, 0)
+        obs_idx = _encode_derivative_context("この概念の本質は何か？原理を理解したい", "O1")
+        assert obs_idx == 2 * 9 + 0 * 3 + 0
+
+    def test_update_creates_a_matrix_file(self, tmp_path, monkeypatch):
+        """Verify update creates A matrix file via HegemonikónFEPAgent."""
+        from mekhane.fep.derivative_selector import update_derivative_selector
+        import mekhane.fep.derivative_selector as ds
+
+        # Override SELECTION_LOG_PATH to use tmp_path
+        log_path = tmp_path / "test.yaml"
+        monkeypatch.setattr(ds, "SELECTION_LOG_PATH", log_path)
+
+        update_derivative_selector("O1", "nous", "この概念の本質は何か？原理を理解したい", True)
+
+        a_matrix_path = tmp_path / "derivative_fep" / "A_O1.npy"
+        assert a_matrix_path.exists()
+
+        import numpy as np
+        A_matrix = np.load(str(a_matrix_path))
+        assert A_matrix.shape == (27, 3)
+
+    def test_update_modifies_probabilities(self, tmp_path, monkeypatch):
+        """Verify Dirichlet update modifies probabilities correctly via Agent."""
+        from mekhane.fep.derivative_selector import update_derivative_selector, _encode_derivative_context
+        import mekhane.fep.derivative_selector as ds
+        import numpy as np
+
+        log_path = tmp_path / "test.yaml"
+        monkeypatch.setattr(ds, "SELECTION_LOG_PATH", log_path)
+
+        problem = "この概念の本質は何か？原理を理解したい"
+        obs_idx = _encode_derivative_context(problem, "O1")
+        state_idx = ds.list_derivatives("O1").index("nous")
+
+        # Initial uniform matrix logic: 1/27 ~ 0.037
+        # After success=True update, probability should increase.
+        update_derivative_selector("O1", "nous", problem, True)
+
+        a_matrix_path = tmp_path / "derivative_fep" / "A_O1.npy"
+        A_matrix = np.load(str(a_matrix_path))
+
+        assert A_matrix[obs_idx, state_idx] > 0.037

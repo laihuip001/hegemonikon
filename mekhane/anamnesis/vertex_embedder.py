@@ -1,3 +1,4 @@
+# PROOF: [L2/機能] <- mekhane/anamnesis/ A0->Auto->AddedByCI
 import os
 import logging
 from google import genai

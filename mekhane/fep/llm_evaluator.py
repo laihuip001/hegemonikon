@@ -38,7 +38,8 @@ try:
 
     GEMINI_AVAILABLE = True
 except ImportError:
-    pass  # TODO: Add proper error handling
+    import logging
+    logging.getLogger(__name__).warning("google-genai package not found. L2 evaluation with Gemini will be disabled.")
 
 
 # PURPOSE: の統一的インターフェースを実現する

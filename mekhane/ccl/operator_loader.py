@@ -1,3 +1,4 @@
+# PROOF: [L1/定理] <- mekhane/ccl/ CCL→CCLパーサーが必要→operator_loader が担う
 """operators.md の SSOT パーサー。
 
 operators.md の Markdown テーブルから演算子定義を抽出し、

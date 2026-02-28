@@ -11,6 +11,7 @@ Usage:
 
 import sys
 import argparse
+import logging
 from pathlib import Path
 from typing import List, Tuple
 from datetime import datetime, timedelta
@@ -257,7 +258,7 @@ def get_boot_handoffs(mode: str = "standard", context: str = None) -> dict:
                             )
                             proactive_memories.append(doc)
             except Exception as e:
-                pass  # TODO: Add proper error handling
+                logging.exception(f"Proactive recall search error: {e}")
 
     return {
         "latest": latest,

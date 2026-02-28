@@ -1,4 +1,3 @@
-# PROOF: [L2/Category] <- mekhane/searchers/ A0->Auto->AddedByCI
 """
 Playwright-based searcher for Periskopē.
 

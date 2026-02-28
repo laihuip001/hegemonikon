@@ -1,3 +1,4 @@
+# PROOF: [L2/App] <- mekhane/periskope/ A0->Auto->AddedByCI
 """
 Query expander for Periskopē.
 

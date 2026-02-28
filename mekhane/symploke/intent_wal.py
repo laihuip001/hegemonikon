@@ -1,4 +1,3 @@
-# PROOF: [L2/Symploke] <- mekhane/symploke/intent_wal.py
 #!/usr/bin/env python3
 """Intent-WAL (Write-Ahead Log) Manager.
 

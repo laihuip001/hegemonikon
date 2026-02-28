@@ -40,6 +40,8 @@ def _load_env():
 _load_env()
 
 
+_SECRET_CACHE: Dict[str, Optional[str]] = {}
+
 # PURPOSE: [L2-auto] Secret アクセスの一元化 (W08 Secret Sprawl 対策)
 def _get_secret(key: str) -> Optional[str]:
     """Secret アクセスの一元化 (W08 Secret Sprawl 対策)
@@ -48,8 +50,62 @@ def _get_secret(key: str) -> Optional[str]:
     散在する os.environ.get を排除し、将来的な Secret Manager
     統合のフックポイントとする。
     """
-    # TODO: Secret Manager (GCP/AWS) 統合時はここを変更
-    return os.environ.get(key)
+    if key in _SECRET_CACHE:
+        return _SECRET_CACHE[key]
+
+    # 1. 環境変数を最優先 (ローカル・コンテナオーバライド用)
+    val = os.environ.get(key)
+    if val is not None:
+        _SECRET_CACHE[key] = val
+        return val
+
+    # 2. GCP Secret Manager
+    project_id = os.environ.get("GOOGLE_CLOUD_PROJECT")
+    if project_id:
+        try:
+            from google.cloud import secretmanager
+            client = secretmanager.SecretManagerServiceClient()
+            # HG-003.µ (Stoic Control Adjudicator): timeout=5.0 を設定して外部呼び出しを制御
+            name = f"projects/{project_id}/secrets/{key}/versions/latest"
+            response = client.access_secret_version(request={"name": name}, timeout=5.0)
+            val = response.payload.data.decode("UTF-8")
+            _SECRET_CACHE[key] = val
+            return val
+        except ImportError:
+            pass  # SDK未インストール
+        except Exception as e:
+            # HG-002 (Prediction Error Inquisitor): NotFound は許容し、他はログ記録
+            if type(e).__name__ != 'NotFound':
+                print(f"GCP Secret Manager Error for {key}: {e}")
+            pass
+
+    # 3. AWS Secrets Manager
+    try:
+        import boto3
+        from botocore.config import Config
+        from botocore.exceptions import ClientError
+        # HG-003.µ (Stoic Control Adjudicator): connect_timeout と read_timeout を設定
+        aws_config = Config(connect_timeout=2, read_timeout=5, retries={'max_attempts': 2})
+        client = boto3.client('secretsmanager', config=aws_config)
+
+        response = client.get_secret_value(SecretId=key)
+        val = response.get('SecretString')
+        if val is not None:
+            _SECRET_CACHE[key] = val
+            return val
+    except ImportError:
+        pass  # SDK未インストール
+    except ClientError as e:
+        if e.response['Error']['Code'] != 'ResourceNotFoundException':
+            print(f"AWS Secrets Manager ClientError for {key}: {e}")
+        pass
+    except Exception as e:
+        # HG-002 (Prediction Error Inquisitor): 予期せぬエラーは握り潰さずにログ出力
+        print(f"AWS Secrets Manager Error for {key}: {e}")
+        pass
+
+    _SECRET_CACHE[key] = None
+    return None
 
 
 # PURPOSE: [L2-auto] メモリ内 Circuit Breaker (W06 Cascade Failure 対策)

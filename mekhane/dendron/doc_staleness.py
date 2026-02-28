@@ -40,6 +40,7 @@ class StalenessStatus(Enum):
 
 # PURPOSE: ドキュメント間の依存関係1件を表現し、STALE 判定の入力にする
 @dataclass
+# PURPOSE: 内部処理
 class DocDependency:
     """依存先 doc_id と期待する最低バージョン."""
     doc_id: str
@@ -48,6 +49,7 @@ class DocDependency:
 
 # PURPOSE: 1つのドキュメントの frontmatter 情報を構造化し、依存グラフの頂点にする
 @dataclass
+# PURPOSE: 内部処理
 class DocInfo:
     """ドキュメントの frontmatter メタデータ."""
     doc_id: str
@@ -59,6 +61,7 @@ class DocInfo:
 
 # PURPOSE: STALE/OK/WARNING/CIRCULAR の判定結果を個別に返し、レポート生成に渡す
 @dataclass
+# PURPOSE: 内部処理
 class StalenessResult:
     """1つの依存辺の検査結果."""
     doc_id: str
@@ -100,12 +103,15 @@ class DocStalenessChecker:
         "node_modules", ".pytest_cache",
     })
 
+    # PURPOSE: 内部処理
     def __init__(self) -> None:
         self._docs: Dict[str, DocInfo] = {}
         self._results: List[StalenessResult] = []
         self._warnings: List[str] = []
 
+    # PURPOSE: 内部処理
     @property
+    # PURPOSE: 内部処理
     def warnings(self) -> List[str]:
         """scan 時の警告 (doc_id 重複等)."""
         return list(self._warnings)
@@ -257,6 +263,7 @@ class DocStalenessChecker:
 
     # PURPOSE: 有向グラフの循環辺を検出し、CIRCULAR ステータスの判定材料にする
     @staticmethod
+    # PURPOSE: 内部処理
     def _detect_circular(edges: dict[str, set[str]]) -> set[tuple[str, str]]:
         """循環する辺ペアの集合を返す."""
         circular: set[tuple[str, str]] = set()

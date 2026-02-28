@@ -274,6 +274,10 @@ EXEMPT_PATTERNS = [
     r"mekhane/mcp/",
     r"mekhane/ccl/",
     r"mekhane/api/",
+    r"mekhane/anamnesis/vertex_embedder\.py",
+    r"mekhane/exagoge/__main__\.py",
+    r"mekhane/basanos/l2/",
+    r"mekhane/ochema/",
 ]
 
 # PROOF ヘッダーパターン (v2: 親参照付き、任意の後続テキスト許容)

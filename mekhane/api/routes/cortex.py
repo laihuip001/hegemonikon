@@ -1,3 +1,4 @@
+# PROOF: [L3/機能] <- mekhane/api/routes/
 from typing import Any, AsyncGenerator
 
 import asyncio

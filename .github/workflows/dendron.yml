@@ -38,7 +38,7 @@ jobs:
           python-version: "3.11"
 
       - name: Install dependencies
-        run: pip install pyyaml pydantic tabulate
+        run: pip install pyyaml
 
       # L1: PROOF Header Check (blocking)
       - name: "L1: PROOF Header Check"

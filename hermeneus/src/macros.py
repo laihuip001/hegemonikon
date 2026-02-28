@@ -15,7 +15,6 @@ Usage:
 import functools
 import re
 from pathlib import Path
-from types import MappingProxyType
 from typing import Dict, Optional
 from dataclasses import dataclass
 
@@ -92,56 +91,52 @@ def parse_macro_file(path: Path) -> Optional[MacroDefinition]:
     )
 
 
-# PURPOSE: ccl/macros/ から全マクロを読み込む
 @functools.lru_cache(maxsize=None)
-def load_standard_macros() -> Dict[str, MacroDefinition]:
-    """ccl/macros/ から全マクロを読み込む"""
+def _load_standard_macros_impl() -> Dict[str, MacroDefinition]:
     macros = {}
-    
     if not CCL_MACROS_DIR.exists():
-        return MappingProxyType(macros)
-    
+        return macros
     for path in CCL_MACROS_DIR.glob("*.md"):
         macro = parse_macro_file(path)
-        if macro and macro.expansion:  # 空展開は除外 (YAML multiline 未対応)
+        if macro and macro.expansion:
             macros[macro.name] = macro
-    
-    return MappingProxyType(macros)
+    return macros
+
+# PURPOSE: ccl/macros/ から全マクロを読み込む
+def load_standard_macros() -> Dict[str, MacroDefinition]:
+    """ccl/macros/ から全マクロを読み込む"""
+    return _load_standard_macros_impl().copy()
 
 
-# PURPOSE: .agent/workflows/ccl-*.md からマクロ展開形を読み込む
 @functools.lru_cache(maxsize=None)
-def load_workflow_macros() -> MappingProxyType[str, str]:
-    """
-    .agent/workflows/ccl-*.md からマクロ展開形を読み込む
-    
-    各ファイルの以下のパターンを認識:
-        > **CCL**: `@name = CCL_EXPANSION`
-    
-    Returns:
-        {"macro_name": "CCL expansion string", ...}
-    """
+def _load_workflow_macros_impl() -> Dict[str, str]:
     macros = {}
-    
     if not WF_MACROS_DIR.exists():
-        return MappingProxyType(macros)
-    
+        return macros
     for path in WF_MACROS_DIR.glob("ccl-*.md"):
-        # ファイル名からマクロ名を抽出: ccl-build.md → build
         name = path.stem.replace("ccl-", "")
-        
         try:
             content = path.read_text(encoding="utf-8")
         except Exception:
             continue
-        
-        # パターン: `@name = CCL_EXPANSION`
         match = re.search(r"`@\w+\s*=\s*(.+?)`", content)
         if match:
             expansion = match.group(1).strip()
             macros[name] = expansion
-    
-    return MappingProxyType(macros)
+    return macros
+
+# PURPOSE: .agent/workflows/ccl-*.md からマクロ展開形を読み込む
+def load_workflow_macros() -> Dict[str, str]:
+    """
+    .agent/workflows/ccl-*.md からマクロ展開形を読み込む
+
+    各ファイルの以下のパターンを認識:
+        > **CCL**: `@name = CCL_EXPANSION`
+
+    Returns:
+        {"macro_name": "CCL expansion string", ...}
+    """
+    return _load_workflow_macros_impl().copy()
 
 
 # PURPOSE: マクロ名から展開形を取得 (全ソース検索)
@@ -163,28 +158,26 @@ def get_macro_expansion(name: str) -> Optional[str]:
     return None
 
 
-# PURPOSE: Expander 互換形式でマクロレジストリを返す
 @functools.lru_cache(maxsize=None)
-def get_macro_registry() -> MappingProxyType[str, str]:
-    """
-    Expander 互換形式でマクロレジストリを返す
-    
-    Returns:
-        {"macro_name": "CCL expansion string", ...}
-    """
+def _get_macro_registry_impl() -> Dict[str, str]:
     macros = load_standard_macros()
     registry = {}
-    
     for name, macro in macros.items():
-        # 展開形から変換パターンを抽出
-        # 例: "@scoped($scope) $target → /kho{scope=$scope} _$target _/kho{exit}"
         if "→" in macro.expansion:
             parts = macro.expansion.split("→")
             if len(parts) >= 2:
-                # シンプルな展開のみ対応
                 registry[name] = parts[1].strip().split("\n")[0]
-    
-    return MappingProxyType(registry)
+    return registry
+
+# PURPOSE: Expander 互換形式でマクロレジストリを返す
+def get_macro_registry() -> Dict[str, str]:
+    """
+    Expander 互換形式でマクロレジストリを返す
+
+    Returns:
+        {"macro_name": "CCL expansion string", ...}
+    """
+    return _get_macro_registry_impl().copy()
 
 
 # 標準マクロ (ハードコード版 — ccl-*.md が見つからない場合のフォールバック)
@@ -221,7 +214,7 @@ BUILTIN_MACROS = {
 
 
 # PURPOSE: 全マクロを取得 (統合)
-def get_all_macros() -> MappingProxyType[str, str]:
+def get_all_macros() -> Dict[str, str]:
     """
     全マクロを取得 (統合)
     
@@ -233,7 +226,7 @@ def get_all_macros() -> MappingProxyType[str, str]:
     result = BUILTIN_MACROS.copy()
     result.update(get_macro_registry())  # ccl/macros/*.md
     result.update(load_workflow_macros())  # ccl-*.md (最優先)
-    return MappingProxyType(result)
+    return result
 
 
 # =============================================================================

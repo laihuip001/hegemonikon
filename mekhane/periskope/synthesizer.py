@@ -1,3 +1,4 @@
+# PROOF: [L2/機能] <- mekhane/ Auto-generated
 """
 Multi-model synthesizer for Periskopē.
 

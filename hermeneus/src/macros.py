@@ -91,8 +91,8 @@ def parse_macro_file(path: Path) -> Optional[MacroDefinition]:
     )
 
 
-# PURPOSE: ccl/macros/ から全マクロを読み込む
 @functools.lru_cache(maxsize=None)
+# PURPOSE: ccl/macros/ から全マクロを読み込む
 def load_standard_macros() -> Dict[str, MacroDefinition]:
     """ccl/macros/ から全マクロを読み込む"""
     macros = {}
@@ -108,8 +108,8 @@ def load_standard_macros() -> Dict[str, MacroDefinition]:
     return macros
 
 
-# PURPOSE: .agent/workflows/ccl-*.md からマクロ展開形を読み込む
 @functools.lru_cache(maxsize=None)
+# PURPOSE: .agent/workflows/ccl-*.md からマクロ展開形を読み込む
 def load_workflow_macros() -> Dict[str, str]:
     """
     .agent/workflows/ccl-*.md からマクロ展開形を読み込む
@@ -143,8 +143,8 @@ def load_workflow_macros() -> Dict[str, str]:
     return macros
 
 
-# PURPOSE: マクロ名から展開形を取得 (全ソース検索)
 @functools.lru_cache(maxsize=None)
+# PURPOSE: マクロ名から展開形を取得 (全ソース検索)
 def get_macro_expansion(name: str) -> Optional[str]:
     """マクロ名から展開形を取得 (全ソース検索)"""
     # 優先順位: ccl-*.md > ccl/macros/*.md > BUILTIN
@@ -162,8 +162,8 @@ def get_macro_expansion(name: str) -> Optional[str]:
     return None
 
 
-# PURPOSE: Expander 互換形式でマクロレジストリを返す
 @functools.lru_cache(maxsize=None)
+# PURPOSE: Expander 互換形式でマクロレジストリを返す
 def get_macro_registry() -> Dict[str, str]:
     """
     Expander 互換形式でマクロレジストリを返す
@@ -219,8 +219,8 @@ BUILTIN_MACROS = {
 }
 
 
-# PURPOSE: 全マクロを取得 (統合)
 @functools.lru_cache(maxsize=None)
+# PURPOSE: 全マクロを取得 (統合)
 def get_all_macros() -> Dict[str, str]:
     """
     全マクロを取得 (統合)

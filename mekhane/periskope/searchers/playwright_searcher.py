@@ -1,4 +1,3 @@
-# PROOF: [L2/Search] <- mekhane/periskope/searchers/
 """
 Playwright-based searcher for Periskopē.
 

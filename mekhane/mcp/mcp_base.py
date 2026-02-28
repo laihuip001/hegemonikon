@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# PROOF: [L2/Core] <- mekhane/mcp/
 """
 MCP Base Module — Hegemonikón MCP Server Common Infrastructure
 

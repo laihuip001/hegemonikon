@@ -2828,34 +2828,19 @@ def list_derivatives(theorem: str) -> List[str]:
 
 
 # =============================================================================
-# FEP Integration (Future Enhancement)
+# FEP Integration (Dirichlet Learning)
 # =============================================================================
 
-
-# -----------------------------------------------------------------------------
-# FEP Integration for Derivative Selection
-# -----------------------------------------------------------------------------
-DERIVATIVE_FEP_DIR = SELECTION_LOG_PATH.parent / "derivative_fep"
-
-# PURPOSE: Encode text context to a flat observation index (0-26).
-def encode_derivative_context(problem_text: str, theorem: str) -> int:
-    """Encode text context to a flat observation index (0-26)."""
+# PURPOSE: Encode text context to a flat observation index (0-26) for derivative FEP.
+def _encode_derivative_context(problem_text: str, theorem: str) -> int:
+    """Encode text context to a flat observation index (0-26) for derivative FEP."""
     abs_lvl, ctx_dep, ref_need = encode_for_derivative_selection(problem_text, theorem)
-    # Ensure values are within 0-2 bounds just in case
+    # Ensure values are within bounds
     abs_lvl = max(0, min(2, abs_lvl))
     ctx_dep = max(0, min(2, ctx_dep))
     ref_need = max(0, min(2, ref_need))
     return abs_lvl * 9 + ctx_dep * 3 + ref_need
 
-# PURPOSE: Map a derivative string to its state index (0-2).
-def _get_derivative_index(theorem: str, derivative: str) -> int:
-    """Map a derivative string to its state index (0-2)."""
-    derivatives = list_derivatives(theorem)
-    if not derivatives:
-        raise ValueError(f"Unknown theorem: {theorem}")
-    if derivative not in derivatives:
-        raise ValueError(f"Derivative '{derivative}' not valid for theorem '{theorem}'")
-    return derivatives.index(derivative)
 
 # PURPOSE: Record feedback for derivative selection learning.
 def update_derivative_selector(
@@ -2864,8 +2849,8 @@ def update_derivative_selector(
     """
     Record feedback for derivative selection learning.
 
-    Future enhancement: integrate with Dirichlet learning in FEP agent
-    to improve derivative selection based on outcomes.
+    Integrates with HegemonikónFEPAgent.update_A_dirichlet() using a
+    derivative-specific FEP state space and observation encoding.
 
     Args:
         theorem: O-series theorem
@@ -2873,48 +2858,76 @@ def update_derivative_selector(
         problem_context: Problem description
         success: Whether the derivative was effective
     """
-    # 1. Derivative-specific state space in FEP (3 states per theorem)
-    num_states = len(list_derivatives(theorem))
-    if num_states == 0:
+    if not success:
+        # Currently FEP Dirichlet learning only models positive observations
+        # Negative updates (forgetting) are not standard Dirichlet operations.
         return
+
+    derivatives = list_derivatives(theorem)
+    if not derivatives or derivative not in derivatives:
+        return
+
+    from mekhane.fep.fep_agent import HegemonikónFEPAgent
+
+    # 1. Derivative-specific state space in FEP (3 states per theorem)
+    num_states = len(derivatives)
+    state_idx = derivatives.index(derivative)
 
     # 2. Observation encoding for derivative context (27 possible observations)
     num_obs = 27
-    obs_idx = encode_derivative_context(problem_context, theorem)
+    obs_idx = _encode_derivative_context(problem_context, theorem)
 
-    try:
-        state_idx = _get_derivative_index(theorem, derivative)
-    except ValueError:
-        return
-
-    # 3. Persistence of learned derivative preferences (Unnormalized Dirichlet counts pA)
+    # Setup persistence path
+    DERIVATIVE_FEP_DIR = SELECTION_LOG_PATH.parent / "derivative_fep"
     DERIVATIVE_FEP_DIR.mkdir(parents=True, exist_ok=True)
-    pa_matrix_path = DERIVATIVE_FEP_DIR / f"pA_{theorem}.npy"
+    a_matrix_path = DERIVATIVE_FEP_DIR / f"A_{theorem}.npy"
 
-    # Initialize with uniform prior concentration parameters (e.g., 1.0)
-    if pa_matrix_path.exists():
-        pA_matrix = np.load(str(pa_matrix_path))
-        # Validate shape in case states/obs definitions change
-        if pA_matrix.shape != (num_obs, num_states):
-            pA_matrix = np.ones((num_obs, num_states))
+    # Initialize a custom HegemonikónFEPAgent for this theorem
+    # We must explicitly provide A, B, C, D to bypass the default 8-state model
+    if a_matrix_path.exists():
+        try:
+            A = np.load(str(a_matrix_path))
+            if A.shape != (num_obs, num_states):
+                A = np.ones((num_obs, num_states)) / num_obs
+        except Exception:
+            A = np.ones((num_obs, num_states)) / num_obs
     else:
-        pA_matrix = np.ones((num_obs, num_states))
+        A = np.ones((num_obs, num_states)) / num_obs
 
-    # Update logic (Dirichlet)
-    # If success=True, increase count. We only do positive reinforcement.
-    # The FEP learning rule pA += eta * outer(o, s).
-    # Negative updates to Dirichlet parameters are mathematically unsound and can lead to <=0 counts.
-    if success:
-        eta = 50.0  # standard learning rate used in HegemonikónFEPAgent
+    # Provide minimal B, C, D matrices to satisfy the Agent constructor
+    A_obj = np.empty(1, dtype=object)
+    A_obj[0] = A
 
-        obs_vector = np.zeros(num_obs)
-        obs_vector[obs_idx] = 1.0
+    B_matrix = np.zeros((num_states, num_states, 1))
+    for i in range(num_states):
+        B_matrix[i, i, 0] = 1.0  # Identity transition
+    B_obj = np.empty(1, dtype=object)
+    B_obj[0] = B_matrix
 
-        state_vector = np.zeros(num_states)
-        state_vector[state_idx] = 1.0
+    C_obj = np.empty(1, dtype=object)
+    C_obj[0] = np.zeros(num_obs)
 
-        update = eta * np.outer(obs_vector, state_vector)
+    D_obj = np.empty(1, dtype=object)
+    D_obj[0] = np.ones(num_states) / num_states
 
-        pA_matrix += update
+    # Instantiate HegemonikónFEPAgent with use_defaults=False
+    agent = HegemonikónFEPAgent(A=A_obj, B=B_obj, C=C_obj, D=D_obj, use_defaults=False)
 
-        np.save(str(pa_matrix_path), pA_matrix)
+    # 3. Use HegemonikónFEPAgent's core Dirichlet logic
+    # Set beliefs manually to a one-hot vector indicating the *known* correct state
+    # This allows `update_A_dirichlet` to attribute the observation to the correct derivative
+    agent.beliefs = np.zeros(num_states)
+    agent.beliefs[state_idx] = 1.0
+
+    # Call the exact method requested in the TODO
+    agent.update_A_dirichlet(observation=obs_idx)
+
+    # Persist the learned A matrix (extracting from pymdp agent format)
+    if isinstance(agent.agent.A, np.ndarray) and agent.agent.A.dtype == object:
+        A_learned = np.asarray(agent.agent.A[0], dtype=np.float64)
+    elif isinstance(agent.agent.A, list):
+        A_learned = np.asarray(agent.agent.A[0], dtype=np.float64)
+    else:
+        A_learned = np.asarray(agent.agent.A, dtype=np.float64)
+
+    np.save(str(a_matrix_path), A_learned)

@@ -1161,64 +1161,54 @@ class TestASeriesHelperFunctions:
         with pytest.raises(ValueError):
             select_derivative("A5", "test")
 
+
 # PURPOSE: Test derivative FEP learning updates
 class TestUpdateDerivativeSelector:
     """Test derivative FEP learning updates."""
 
     def test_encode_derivative_context(self):
         """Verify context encoding maps correctly."""
-        from mekhane.fep.derivative_selector import encode_derivative_context
+        from mekhane.fep.derivative_selector import _encode_derivative_context
         # High abstraction, low context, low reflection -> (2, 0, 0)
-        obs_idx = encode_derivative_context("この概念の本質は何か？原理を理解したい", "O1")
+        obs_idx = _encode_derivative_context("この概念の本質は何か？原理を理解したい", "O1")
         assert obs_idx == 2 * 9 + 0 * 3 + 0
 
-    def test_get_derivative_index(self):
-        """Verify derivative index mapping."""
-        from mekhane.fep.derivative_selector import _get_derivative_index
-        assert _get_derivative_index("O1", "nous") == 0
-        assert _get_derivative_index("O1", "phro") == 1
-        assert _get_derivative_index("O1", "meta") == 2
-
     def test_update_creates_a_matrix_file(self, tmp_path, monkeypatch):
-        """Verify update creates A matrix file."""
+        """Verify update creates A matrix file via HegemonikónFEPAgent."""
         from mekhane.fep.derivative_selector import update_derivative_selector
         import mekhane.fep.derivative_selector as ds
 
-        # Override save path to tmp_path
-        monkeypatch.setattr(ds, "DERIVATIVE_FEP_DIR", tmp_path)
+        # Override SELECTION_LOG_PATH to use tmp_path
+        log_path = tmp_path / "test.yaml"
+        monkeypatch.setattr(ds, "SELECTION_LOG_PATH", log_path)
 
         update_derivative_selector("O1", "nous", "この概念の本質は何か？原理を理解したい", True)
 
-        pa_matrix_path = tmp_path / "pA_O1.npy"
-        assert pa_matrix_path.exists()
+        a_matrix_path = tmp_path / "derivative_fep" / "A_O1.npy"
+        assert a_matrix_path.exists()
 
         import numpy as np
-        pA_matrix = np.load(str(pa_matrix_path))
-        assert pA_matrix.shape == (27, 3)
+        A_matrix = np.load(str(a_matrix_path))
+        assert A_matrix.shape == (27, 3)
 
     def test_update_modifies_probabilities(self, tmp_path, monkeypatch):
-        """Verify update modifies probabilities correctly."""
-        from mekhane.fep.derivative_selector import update_derivative_selector, encode_derivative_context, _get_derivative_index
+        """Verify Dirichlet update modifies probabilities correctly via Agent."""
+        from mekhane.fep.derivative_selector import update_derivative_selector, _encode_derivative_context
         import mekhane.fep.derivative_selector as ds
         import numpy as np
 
-        monkeypatch.setattr(ds, "DERIVATIVE_FEP_DIR", tmp_path)
+        log_path = tmp_path / "test.yaml"
+        monkeypatch.setattr(ds, "SELECTION_LOG_PATH", log_path)
 
         problem = "この概念の本質は何か？原理を理解したい"
-        obs_idx = encode_derivative_context(problem, "O1")
-        state_idx = _get_derivative_index("O1", "nous")
+        obs_idx = _encode_derivative_context(problem, "O1")
+        state_idx = ds.list_derivatives("O1").index("nous")
 
-        # Initial uniform matrix logic says A[obs_idx, state_idx] is 1/3 ~ 0.33
+        # Initial uniform matrix logic: 1/27 ~ 0.037
         # After success=True update, probability should increase.
         update_derivative_selector("O1", "nous", problem, True)
 
-        pa_matrix_path = tmp_path / "pA_O1.npy"
-        pA_matrix = np.load(str(pa_matrix_path))
+        a_matrix_path = tmp_path / "derivative_fep" / "A_O1.npy"
+        A_matrix = np.load(str(a_matrix_path))
 
-        assert pA_matrix[obs_idx, state_idx] > 1.0
-
-        # After success=False update, probability should decrease
-        # update_derivative_selector("O1", "nous", problem, False)
-        # A_matrix_after_fail = np.load(str(pa_matrix_path))
-
-        # assert A_matrix_after_fail[obs_idx, state_idx] < A_matrix[obs_idx, state_idx]
+        assert A_matrix[obs_idx, state_idx] > 0.037

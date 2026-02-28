@@ -55,7 +55,14 @@ class MeaningfulTrace:
 
 def ensure_traces_dir() -> None:
     """Ensure the persistence directory exists."""
-    TRACES_PATH.parent.mkdir(parents=True, exist_ok=True)
+    global TRACES_PATH
+    try:
+        TRACES_PATH.parent.mkdir(parents=True, exist_ok=True)
+    except (PermissionError, OSError):
+        # Fallback to local cache for testing or when production path is unavailable
+        fallback_dir = Path.home() / '.cache' / 'hegemonikon' / 'mneme' / '.hegemonikon'
+        fallback_dir.mkdir(parents=True, exist_ok=True)
+        TRACES_PATH = fallback_dir / 'meaningful_traces.json'
 # PURPOSE: Mark a moment as meaningful.
 
 

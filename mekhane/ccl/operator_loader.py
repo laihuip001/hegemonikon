@@ -83,7 +83,7 @@ def load_operators(
         effect = m.group(3).strip()
 
         # ヘッダ行を除外
-        if symbol in ("記号",) or name in ("名称",):
+        if symbol in ("記号", "CCL", "マクロ", "旧マクロ", "構造", "カテゴリ", "帯域", "演算子") or name in ("名称", "CCL 展開", "状態", "演算子", "pt", "文脈", "解釈"):
             continue
         # セパレータ行を除外 (2文字以上の場合のみ — '-' 単体は CCL 演算子)
         if len(symbol) >= 2 and set(symbol) <= {"-", ":"}:
@@ -96,6 +96,10 @@ def load_operators(
             if sec_start < pos:
                 category = sec_name
                 break
+
+        # Skip rows from context-dependent interpretation table which duplicate symbols
+        if "15." in category:
+            continue
 
         # エスケープされたパイプを復元
         symbol = symbol.replace("\\|\\|", "||")

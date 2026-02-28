@@ -1,3 +1,4 @@
+# PROOF: [L2/Auto] <- mekhane/periskope/ A0->Auto->AddedByCI
 """
 Multi-model synthesizer for Periskopē.
 

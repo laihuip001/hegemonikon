@@ -1,3 +1,4 @@
+# PROOF: [L2/L2] <- mekhane/
 """
 Brave Search API client for Periskopē.
 

@@ -1,3 +1,4 @@
+# PROOF: [L2/L2] <- mekhane/
 #!/usr/bin/env python3
 """Intent-WAL (Write-Ahead Log) Manager.
 

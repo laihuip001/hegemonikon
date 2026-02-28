@@ -1,3 +1,4 @@
+# PROOF: [L2/L2] <- mekhane/
 """
 DevTools API routes — ファイル操作・ターミナル・Ochema (AI) をフロントエンド DevTools ビューに提供。
 

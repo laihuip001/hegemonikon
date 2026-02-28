@@ -1,3 +1,4 @@
+# PROOF: [L2/L2] <- mekhane/
 """
 Multi-model synthesizer for Periskopē.
 

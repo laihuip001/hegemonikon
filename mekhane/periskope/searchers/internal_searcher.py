@@ -1,3 +1,4 @@
+# PROOF: [L2/L2] <- mekhane/
 """
 Internal knowledge searcher for Periskopē.
 

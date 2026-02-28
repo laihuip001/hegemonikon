@@ -1,3 +1,4 @@
+# PROOF: [L2/L2] <- mekhane/
 """
 Playwright-based searcher for Periskopē.
 

@@ -1,4 +1,3 @@
-# PROOF: [L1/定理] <- mekhane/ccl/ CCL→CCLパーサーが必要→ccl_linter が担う
 """CCL Linter — CCL 式の静的検証。
 
 operators.md (SSOT) に基づいて CCL 式を検証し、

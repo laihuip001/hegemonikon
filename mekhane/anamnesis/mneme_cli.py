@@ -161,20 +161,25 @@ def cmd_stats(args):
     print(f"Kairos: {handoff_count} handoff files")
 
     # Chronos stats
-    from mekhane.symploke.chronos_ingest import DEFAULT_INDEX_PATH as CHRONOS_INDEX_PATH, CONVERSATION_DIR, load_chronos_index
-    if CHRONOS_INDEX_PATH.exists():
-        try:
-            adapter = load_chronos_index(str(CHRONOS_INDEX_PATH))
-            print(f"Chronos: {adapter.count()} vectors")
-        except Exception as e:
-            print(f"Chronos: Error - {e}")
-    else:
-        print("Chronos: Not indexed")
+    try:
+        from mekhane.symploke.chronos_ingest import DEFAULT_INDEX_PATH as CHRONOS_INDEX_PATH, CONVERSATION_DIR, load_chronos_index
+        if CHRONOS_INDEX_PATH.exists():
+            try:
+                index = load_chronos_index(str(CHRONOS_INDEX_PATH))
+                print(f"Chronos: {index.count()} vectors")
+            except Exception as e:
+                print(f"Chronos: Error - {e}")
+        else:
+            print("Chronos: Not indexed")
 
-    conv_count = (
-        len(list(CONVERSATION_DIR.glob("*_conv_*.md"))) if CONVERSATION_DIR.exists() else 0
-    )
-    print(f"  ({conv_count} conversation files)")
+        conv_count = (
+            len(list(CONVERSATION_DIR.glob("*_conv_*.md"))) if CONVERSATION_DIR.exists() else 0
+        )
+        print(f"  ({conv_count} conversation files)")
+    except ImportError:
+        print("Chronos: Module not available")
+    except Exception as e:
+        print(f"Chronos: Error - {e}")
 
     print("=" * 40)
     return 0

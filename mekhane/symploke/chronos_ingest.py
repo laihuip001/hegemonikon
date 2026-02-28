@@ -180,7 +180,7 @@ def ingest_to_chronos(docs: list[Document], save_path: str = None) -> int:
     print(f"Ingested {count} documents to Chronos (real embeddings)")
 
     if save_path:
-        adapter.save(save_path)
+        index.save(save_path)
         print(f"💾 Saved index to: {save_path}")
 
     return count
@@ -192,16 +192,16 @@ def load_chronos_index(load_path: str):
     from mekhane.symploke.adapters.embedding_adapter import EmbeddingAdapter
 
     adapter = EmbeddingAdapter()
-    adapter.load(load_path)
-    print(f"📂 Loaded index from: {load_path} ({adapter.count()} vectors)")
-    return adapter
+    index = ChronosIndex(adapter, "chronos")
+    index.load(load_path)
+    print(f"📂 Loaded index from: {load_path} ({index.count()} vectors)")
+    return index
 
 
-# PURPOSE: Search using a loaded adapter directly
-def search_loaded_index(adapter, query: str, top_k: int = 5):
-    """Search using a loaded adapter directly."""
-    query_vec = adapter.encode([query])[0]
-    results = adapter.search(query_vec, k=top_k)
+# PURPOSE: Search using a loaded index directly
+def search_loaded_index(index: ChronosIndex, query: str, top_k: int = 5):
+    """Search using a loaded index directly."""
+    results = index.search(query, k=top_k)
     return results
 
 
@@ -235,10 +235,10 @@ def main():
         if not DEFAULT_INDEX_PATH.exists():
             print(f"❌ Index not found: {DEFAULT_INDEX_PATH}")
             return
-        adapter = load_chronos_index(str(DEFAULT_INDEX_PATH))
+        index = load_chronos_index(str(DEFAULT_INDEX_PATH))
 
         if args.search:
-            results = search_loaded_index(adapter, args.search, top_k=5)
+            results = search_loaded_index(index, args.search, top_k=5)
             print(f"\n=== Search: {args.search} ===")
             for r in results:
                 doc_type = r.metadata.get("type", "unknown")

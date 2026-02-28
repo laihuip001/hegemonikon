@@ -1,3 +1,4 @@
+# PROOF: [L2/自己言及] <- mekhane/basanos A3→システム配慮→構造・意味の検証
 # PURPOSE: G_semantic — LLM で HGK 専門用語を一般学術用語に翻訳する
 # REASON: G = G_struct ∘ G_semantic の G_semantic 部分。外部比較のために HGK 語彙を汎化する
 """G_semantic: LLM-based translation of HGK terms to general academic terms.

@@ -1,3 +1,4 @@
+# PROOF: [L2/API] <- mekhane/api S4→実践・接続→外部I/O
 from typing import Any, AsyncGenerator
 
 import asyncio

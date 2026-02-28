@@ -1,3 +1,4 @@
+# PROOF: [L2/ルーティング] <- mekhane/ochema S4→実践環境→LS拡張連携
 """Fake Extension Server — ConnectRPC over HTTP.
 
 LS は ConnectRPC (extension_server_go_proto_connect) で Extension Server に接続する。

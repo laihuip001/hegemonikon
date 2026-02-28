@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/外部接続] <- mekhane/mcp P1→空間・コンテキスト→ツール連携
 """
 MCP Base Module — Hegemonikón MCP Server Common Infrastructure
 

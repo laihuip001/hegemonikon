@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/調査] <- mekhane/periskope K2→知恵の探索→外部知識の統合
 """
 Periskopē CLI — Deep Research from the command line.
 

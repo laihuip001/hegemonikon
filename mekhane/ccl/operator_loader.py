@@ -1,3 +1,4 @@
+# PROOF: [L2/構文] <- mekhane/ccl S1→解釈→CCL実行基盤
 """operators.md の SSOT パーサー。
 
 operators.md の Markdown テーブルから演算子定義を抽出し、

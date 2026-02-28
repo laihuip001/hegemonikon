@@ -1,3 +1,4 @@
+# PROOF: [L2/調査] <- mekhane/periskope K2→知恵の探索→外部知識の統合
 """
 Internal knowledge searcher for Periskopē.
 

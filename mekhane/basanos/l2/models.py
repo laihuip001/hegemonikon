@@ -1,3 +1,4 @@
+# PROOF: [L2/自己言及] <- mekhane/basanos A3→システム配慮→構造・意味の検証
 # PURPOSE: L2 問い生成のコアデータモデル — deficit と question の型定義
 # REASON: F⊣G 随伴構造の概念を Python の型として具象化するため
 """Core data models for Basanos L2 structural deficit detection."""

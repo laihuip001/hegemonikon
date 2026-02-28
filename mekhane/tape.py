@@ -1,3 +1,4 @@
+# PROOF: [L2/記録] <- mekhane/tape H4→信念の記録→実行ログ
 """
 Tape Writer — WF 実行トレースを JSONL として記録する。
 

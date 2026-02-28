@@ -1,3 +1,4 @@
+# PROOF: [L2/API] <- mekhane/api S4→実践・接続→外部I/O
 """
 DevTools API routes — ファイル操作・ターミナル・Ochema (AI) をフロントエンド DevTools ビューに提供。
 

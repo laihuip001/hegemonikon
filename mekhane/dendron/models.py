@@ -268,6 +268,9 @@ EXEMPT_PATTERNS = [
     r"dist/",               # ビルド成果物
     r"build/",              # ビルド成果物
     r"docs/",               # ドキュメント (PROOF 不要)
+    r"__init__\.py$",       # パッケージ定義
+    r"__main__\.py$",       # エントリポイント
+    r"_pb2.*\.py$",         # Protobuf 生成ファイル
 ]
 
 # PROOF ヘッダーパターン (v2: 親参照付き、任意の後続テキスト許容)

@@ -1,6 +1,6 @@
+# PROOF: [L2/自己言及] <- mekhane/basanos A3→システム配慮→構造・意味の検証
 # PURPOSE: 3種の deficit (η, ε, Δε/Δt) を検出するファクトリ群
 # REASON: F⊣G 随伴構造の「破れ」を自動検出し、問いに変換するため
-# PROOF: 41/41 テスト (tests/test_l2.py, tests/test_extensions.py) + CLI scan 0 deficit
 """Deficit factories for Basanos L2.
 
 Three factories detect structural discrepancies:

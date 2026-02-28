@@ -1,3 +1,4 @@
+# PROOF: [L2/記憶] <- mekhane/anamnesis K3→想起・記憶検索
 import os
 import logging
 from google import genai

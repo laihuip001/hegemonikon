@@ -15,9 +15,12 @@ VectorStore Factory
 アダプタを動的に生成するファクトリパターン実装。
 """
 
+import logging
 from typing import Dict, Type, Optional
 from .adapters.base import VectorStoreAdapter
 from .config import VectorStoreConfig
+
+logger = logging.getLogger(__name__)
 
 
 # PURPOSE: ベクトルストアファクトリ
@@ -100,21 +103,26 @@ class VectorStoreFactory:
 
 
 # === 自動登録 ===
-def _register_adapters():
+# PURPOSE: アダプタ自動登録
+def _register_adapters() -> None:
     """利用可能なアダプタを自動登録"""
     try:
         from .adapters.hnswlib_adapter import HNSWlibAdapter
 
         VectorStoreFactory.register("hnswlib", HNSWlibAdapter)
-    except ImportError:
-        pass  # TODO: Add proper error handling
+    except ImportError as e:
+        logger.warning(
+            "Failed to import adapter 'hnswlib'. It will not be available. Error: %s", e
+        )
 
     # 将来の拡張用
     # try:
     #     from .adapters.faiss_adapter import FAISSAdapter
     #     VectorStoreFactory.register("faiss", FAISSAdapter)
-    # except ImportError:
-    #     pass
+    # except ImportError as e:
+    #     logger.warning(
+    #         "Failed to import adapter 'faiss'. It will not be available. Error: %s", e
+    #     )
 
 
 # モジュール読み込み時に自動登録

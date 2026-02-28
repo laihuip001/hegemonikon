@@ -151,8 +151,9 @@ def _process_session_dir(
             mod_date = datetime.fromisoformat(modified_at.replace("Z", "+00:00")).date()
             if mod_date != target_date:
                 return None
-        except Exception:
-            pass  # TODO: Add proper error handling
+        except Exception as e:
+            print(f"Warning: Failed to parse modified_at date '{modified_at}' for session {session_id}: {e}", file=sys.stderr)
+            return None
 
     return SessionInfo(
         session_id=session_id,

@@ -1,3 +1,4 @@
+# PROOF: [L2/監査] <- A2→品質の判定と監査→Basanos品質ゲート
 # PURPOSE: 3種の deficit (η, ε, Δε/Δt) を検出するファクトリ群
 # REASON: F⊣G 随伴構造の「破れ」を自動検出し、問いに変換するため
 # PROOF: 41/41 テスト (tests/test_l2.py, tests/test_extensions.py) + CLI scan 0 deficit

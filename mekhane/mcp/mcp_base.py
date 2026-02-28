@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/インターフェース] <- P4→外部ツール接続→MCPサーバー群
 """
 MCP Base Module — Hegemonikón MCP Server Common Infrastructure
 

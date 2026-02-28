@@ -1,3 +1,4 @@
+# PROOF: [L2/記憶] <- K3→文脈の想起と検索→Anamnesis検索基盤
 import os
 import logging
 from google import genai

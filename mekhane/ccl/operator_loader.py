@@ -1,3 +1,4 @@
+# PROOF: [L1/CCL] <- S1→構文解析と検証→CCLツール群
 """operators.md の SSOT パーサー。
 
 operators.md の Markdown テーブルから演算子定義を抽出し、

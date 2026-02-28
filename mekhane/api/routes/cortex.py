@@ -1,3 +1,4 @@
+# PROOF: [L2/API] <- S4→外部との実践的接続→FastAPIルーター
 from typing import Any, AsyncGenerator
 
 import asyncio

@@ -1,3 +1,4 @@
+# PROOF: [L2/品質] <- A2→認識の正確性検証→dendronチェッカー
 """
 S7: Falsification Condition Checker
 

@@ -1,3 +1,4 @@
+# PROOF: [L2/API] <- S4→外部との実践的接続→FastAPIルーター
 """
 DevTools API routes — ファイル操作・ターミナル・Ochema (AI) をフロントエンド DevTools ビューに提供。
 

@@ -1,3 +1,4 @@
+# PROOF: [L2/未分類] <- User
 from typing import Any, AsyncGenerator
 
 import asyncio

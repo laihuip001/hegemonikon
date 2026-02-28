@@ -1,3 +1,4 @@
+# PROOF: [L2/未分類] <- User
 #!/usr/bin/env python3
 """LS Standalone Launcher — IDE なしで Language Server を直接起動する。
 

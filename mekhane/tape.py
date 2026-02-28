@@ -1,3 +1,4 @@
+# PROOF: [L2/未分類] <- User
 """
 Tape Writer — WF 実行トレースを JSONL として記録する。
 

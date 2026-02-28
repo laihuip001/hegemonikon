@@ -12,7 +12,6 @@ import logging
 from .macro_registry import MacroRegistry, Macro, BUILTIN_MACROS
 
 logger = logging.getLogger(__name__)
-
 try:
     from sentence_transformers import SentenceTransformer
     import numpy as np

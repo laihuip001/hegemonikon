@@ -1,3 +1,4 @@
+# PROOF: [L2/未分類] <- User
 #!/usr/bin/env python3
 """
 MCP Base Module — Hegemonikón MCP Server Common Infrastructure

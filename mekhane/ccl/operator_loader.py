@@ -1,3 +1,4 @@
+# PROOF: [L2/言語] <- ccl 構成要素として必要
 """operators.md の SSOT パーサー。
 
 operators.md の Markdown テーブルから演算子定義を抽出し、

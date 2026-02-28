@@ -1,3 +1,4 @@
+# PROOF: [L2/外部連携] <- api 構成要素として必要
 """
 DevTools API routes — ファイル操作・ターミナル・Ochema (AI) をフロントエンド DevTools ビューに提供。
 

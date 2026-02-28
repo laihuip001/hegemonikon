@@ -1,3 +1,4 @@
+# PROOF: [L2/探索] <- periskope 構成要素として必要
 """
 Page Fetcher — 選択的全文クロール for Periskopē.
 

@@ -1,3 +1,4 @@
+# PROOF: [L2/推論] <- ochema 構成要素として必要
 """Fake Extension Server — ConnectRPC over HTTP.
 
 LS は ConnectRPC (extension_server_go_proto_connect) で Extension Server に接続する。

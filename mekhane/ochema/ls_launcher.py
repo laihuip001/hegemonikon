@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/推論] <- ochema 構成要素として必要
 """LS Standalone Launcher — IDE なしで Language Server を直接起動する。
 
 ManagementMetadata protobuf を stdin に送り込んで LS を起動。

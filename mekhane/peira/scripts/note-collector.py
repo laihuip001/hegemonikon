@@ -15,7 +15,7 @@ from datetime import datetime
 
 # 設定
 USER_URLNAME = "tasty_dunlin998"
-OUTPUT_DIR = Path("/tmp/note_collector_out")
+OUTPUT_DIR = Path.home() / "oikos/mneme/.hegemonikon/raw/note"
 API_BASE = "https://note.com/api/v2"
 
 async def fetch_page(session, page, semaphore):

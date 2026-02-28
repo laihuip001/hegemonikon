@@ -487,5 +487,66 @@
     "correct": null,
     "had_failure": null,
     "notes": ""
+  },
+  {
+    "id": "20260228_135800_779863",
+    "ccl_expr": "/dia!",
+    "operators": [
+      "!"
+    ],
+    "generated_at": "2026-02-28T13:58:00.779900",
+    "answered": null,
+    "correct": null,
+    "had_failure": null,
+    "notes": ""
+  },
+  {
+    "id": "20260228_135800_807129",
+    "ccl_expr": "/dia!",
+    "operators": [
+      "!"
+    ],
+    "generated_at": "2026-02-28T13:58:00.807162",
+    "answered": null,
+    "correct": null,
+    "had_failure": null,
+    "notes": ""
+  },
+  {
+    "id": "20260228_135800_839033",
+    "ccl_expr": "/noe!*^/dia",
+    "operators": [
+      "!",
+      "*^"
+    ],
+    "generated_at": "2026-02-28T13:58:00.839072",
+    "answered": null,
+    "correct": null,
+    "had_failure": null,
+    "notes": ""
+  },
+  {
+    "id": "20260228_135800_868496",
+    "ccl_expr": "/noe\\dia",
+    "operators": [
+      "\\"
+    ],
+    "generated_at": "2026-02-28T13:58:00.868529",
+    "answered": null,
+    "correct": null,
+    "had_failure": null,
+    "notes": ""
+  },
+  {
+    "id": "20260228_135800_880380",
+    "ccl_expr": "/noe\\dia",
+    "operators": [
+      "\\"
+    ],
+    "generated_at": "2026-02-28T13:58:00.880412",
+    "answered": null,
+    "correct": null,
+    "had_failure": null,
+    "notes": ""
   }
 ]

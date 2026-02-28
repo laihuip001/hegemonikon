@@ -1,3 +1,4 @@
+# PROOF: [L2/アプリケーション] <- mekhane/
 from typing import Any, AsyncGenerator
 
 import asyncio

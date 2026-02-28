@@ -1,3 +1,4 @@
+# PROOF: [L2/Missing] <- mekhane/periskope/searchers/
 """
 Semantic Scholar API client for Periskopē.
 

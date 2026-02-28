@@ -3,7 +3,10 @@
 
 import pytest
 from unittest.mock import patch, MagicMock
-from fastapi.testclient import TestClient
+try:
+    from fastapi.testclient import TestClient
+except ImportError:
+    TestClient = None
 
 
 @pytest.fixture
@@ -15,6 +18,11 @@ def client():
 
 class TestGatewayStatsEndpoint:
     """GET /api/pks/gateway-stats のテスト。"""
+
+    @pytest.fixture(autouse=True)
+    def skip_if_no_fastapi(self):
+        if TestClient is None:
+            pytest.skip("fastapi is not installed")
 
     def test_gateway_stats_returns_200(self, client):
         """エンドポイントが 200 を返す。"""

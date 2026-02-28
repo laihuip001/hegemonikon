@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] <- mekhane/searchers/ A0->Auto->AddedByCI
 """
 Internal knowledge searcher for Periskopē.
 

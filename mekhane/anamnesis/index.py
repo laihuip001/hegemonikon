@@ -417,6 +417,48 @@ class GnosisIndex:
         print(f"[GnosisIndex] Added {len(data)} papers")
         return len(data)
 
+    # PURPOSE: 単一ドキュメントをインデックスに追加（sync_watcher 等の互換用）
+    def add_document(self, doc_id: str, content: str, source: str) -> None:
+        """単一ドキュメントをインデックスに追加（sync_watcher 等の互換用）"""
+        paper = Paper(
+            id=doc_id,
+            source=source,
+            source_id=doc_id,
+            title=doc_id,
+            abstract=content,
+        )
+        self.add_papers([paper])
+
+    # PURPOSE: sourceに基づいてドキュメントを削除
+    def delete_by_source(self, source: str) -> int:
+        """sourceに基づいてドキュメントを削除"""
+        if not self._table_exists():
+            return 0
+
+        table = self.db.open_table(self.TABLE_NAME)
+        # Using string replacement to ensure safe quotes, assuming source doesn't contain single quotes
+        safe_source = source.replace("'", "''")
+
+        try:
+            # Count before
+            pre_count = len(table.search().where(f"source = '{safe_source}'").to_list())
+            if pre_count == 0:
+                return 0
+
+            table.delete(f"source = '{safe_source}'")
+            print(f"[GnosisIndex] Deleted {pre_count} papers with source '{source}'")
+
+            # Remove from cache if loaded
+            if getattr(self, '_primary_key_cache', None):
+                # We can't easily remove from cache without a full reload or tracking,
+                # but we can force a reload next time
+                self._primary_key_cache.clear()
+
+            return pre_count
+        except Exception as e:
+            print(f"[GnosisIndex] Error deleting documents for source '{source}': {e}")
+            return 0
+
     # PURPOSE: セマンティック検索
     def search(
         self,

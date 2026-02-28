@@ -29,6 +29,35 @@ logger = logging.getLogger("hegemonikon.api.sympatheia")
 # PURPOSE: State ファイルのベースパス
 MNEME = Path(os.getenv("HGK_MNEME", "/home/makaron8426/oikos/mneme/.hegemonikon"))
 
+
+# PURPOSE: read last n lines efficiently
+def _read_last_n_lines(file_path: Path, n: int = 200, chunk_size: int = 4096) -> list[str]:
+    """Read the last N lines of a file by seeking backwards from the end."""
+    if not file_path.exists():
+        return []
+
+    lines = []
+    with file_path.open("rb") as f:
+        f.seek(0, 2)
+        pos = f.tell()
+        buffer = b''
+        while pos > 0 and len(lines) <= n:
+            read_size = min(chunk_size, pos)
+            pos -= read_size
+            f.seek(pos)
+            chunk = f.read(read_size)
+            buffer = chunk + buffer
+
+            parts = buffer.split(b'\n')
+            if len(parts) > 1:
+                buffer = parts[0]
+                lines = [p.decode('utf-8', errors='ignore') for p in parts[1:] if p] + lines
+
+        if buffer and len(lines) <= n:
+            lines = [buffer.decode('utf-8', errors='ignore')] + lines
+
+    return lines[-n:]
+
 router = APIRouter(prefix="/sympatheia", tags=["sympatheia"])
 
 
@@ -325,7 +354,11 @@ async def weekly_digest(req: DigestRequest) -> DigestResponse:
     health_file = MNEME / "health_metrics.jsonl"
     health_scores: list[float] = []
     try:
-        for line in health_file.read_text("utf-8").strip().split("\n")[-200:]:
+        lines = _read_last_n_lines(health_file, 200)
+        for line in lines:
+            line = line.strip()
+            if not line:
+                continue
             try:
                 m = json.loads(line)
                 if m.get("timestamp", "") > one_week_ago:
@@ -467,7 +500,11 @@ async def feedback_loop(req: FeedbackRequest) -> FeedbackResponse:
     # --- Health Metrics 分析 ---
     scores: list[float] = []
     try:
-        for line in (MNEME / "health_metrics.jsonl").read_text("utf-8").strip().split("\n")[-200:]:
+        lines = _read_last_n_lines(MNEME / "health_metrics.jsonl", 200)
+        for line in lines:
+            line = line.strip()
+            if not line:
+                continue
             try:
                 m = json.loads(line)
                 if m.get("timestamp", "") > three_days_ago:
@@ -677,18 +714,20 @@ async def list_notifications(
     notif_file = MNEME / "notifications.jsonl"
     results: list[dict] = []
     try:
-        for line in notif_file.read_text("utf-8").strip().split("\n"):
-            if not line.strip():
-                continue
-            try:
-                record = json.loads(line)
-                if since and record.get("timestamp", "") < since:
+        with notif_file.open("r", encoding="utf-8") as f:
+            for line in f:
+                line = line.strip()
+                if not line:
                     continue
-                if level and record.get("level", "") != level.upper():
+                try:
+                    record = json.loads(line)
+                    if since and record.get("timestamp", "") < since:
+                        continue
+                    if level and record.get("level", "") != level.upper():
+                        continue
+                    results.append(record)
+                except Exception:
                     continue
-                results.append(record)
-            except Exception:
-                continue
     except FileNotFoundError:
         pass
     except Exception as e:

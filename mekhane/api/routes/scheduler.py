@@ -12,7 +12,20 @@ import logging
 from pathlib import Path
 from typing import Optional
 
-from fastapi import APIRouter
+try:
+    from fastapi import APIRouter
+    _HAS_FASTAPI = True
+except ImportError:
+    # CPU-only CI environments
+    class APIRouter:
+        def __init__(self, *args, **kwargs): pass
+        def get(self, *args, **kwargs):
+            def decorator(func): return func
+            return decorator
+        def post(self, *args, **kwargs):
+            def decorator(func): return func
+            return decorator
+    _HAS_FASTAPI = False
 
 logger = logging.getLogger("hegemonikon.api.scheduler")
 

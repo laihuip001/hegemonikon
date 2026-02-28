@@ -1,3 +1,4 @@
+# PROOF: [L2/通信] <- mekhane/api/routes/ LLM推論エンジンの外部公開用FastAPIルーティング
 from typing import Any, AsyncGenerator
 
 import asyncio

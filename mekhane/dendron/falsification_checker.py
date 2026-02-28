@@ -1,3 +1,4 @@
+# PROOF: [L1/監査] <- mekhane/dendron/ 反証条件の整合性チェックと epistemic_status 検証
 """
 S7: Falsification Condition Checker
 

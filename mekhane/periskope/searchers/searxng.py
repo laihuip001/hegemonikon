@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] <- mekhane/periskope/searchers/ SearXNGメタ検索エンジンのAPIクライアント
 """
 SearXNG search client for Periskopē.
 

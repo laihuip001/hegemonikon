@@ -1,3 +1,4 @@
+# PROOF: [L1/制御] <- mekhane/periskope/ 検索・分析・合成を一元管理する中核エンジン
 """
 Periskopē Deep Research Engine — Orchestrator.
 

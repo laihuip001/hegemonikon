@@ -1,3 +1,4 @@
+# PROOF: [L1/インターフェース] <- mekhane/periskope/searchers/ 検索プロバイダーの共通インターフェース
 """
 Periskopē searchers — pluggable search source adapters.
 

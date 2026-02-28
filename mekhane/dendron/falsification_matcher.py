@@ -1,3 +1,4 @@
+# PROOF: [L1/監査] <- mekhane/dendron/ FEPモデルとコードベース間の反証マッピング評価
 """
 Falsification Matcher — 消化論文の主張と epistemic_status.yaml の反証条件を照合
 

@@ -1,3 +1,4 @@
+# PROOF: [L1/データ構造] <- mekhane/periskope/ PKSモジュールの型定義とスキーマ表現
 """
 Periskopē data models.
 

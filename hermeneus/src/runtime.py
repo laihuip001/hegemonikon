@@ -48,7 +48,35 @@ def _get_secret(key: str) -> Optional[str]:
     散在する os.environ.get を排除し、将来的な Secret Manager
     統合のフックポイントとする。
     """
-    # TODO: Secret Manager (GCP/AWS) 統合時はここを変更
+    # 1. GCP Secret Manager
+    gcp_project_id = os.environ.get("GCP_PROJECT_ID")
+    if gcp_project_id:
+        try:
+            from google.cloud import secretmanager
+            client = secretmanager.SecretManagerServiceClient()
+            name = f"projects/{gcp_project_id}/secrets/{key}/versions/latest"
+            response = client.access_secret_version(request={"name": name})
+            return response.payload.data.decode("UTF-8")
+        except ImportError:
+            pass
+        except Exception:
+            pass
+
+    # 2. AWS Secrets Manager
+    aws_region = os.environ.get("AWS_REGION")
+    if aws_region:
+        try:
+            import boto3
+            client = boto3.client('secretsmanager', region_name=aws_region)
+            response = client.get_secret_value(SecretId=key)
+            if 'SecretString' in response:
+                return response['SecretString']
+        except ImportError:
+            pass
+        except Exception:
+            pass
+
+    # 3. Fallback to environment variables
     return os.environ.get(key)
 
 

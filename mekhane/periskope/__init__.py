@@ -1,3 +1,4 @@
+# PROOF: [L1/インターフェース] <- mekhane/periskope/ 外部検索と知識合成モジュールの公開API
 """
 Periskopē — HGK Deep Research Engine
 

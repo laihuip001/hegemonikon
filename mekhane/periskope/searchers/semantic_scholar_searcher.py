@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] <- mekhane/periskope/searchers/ Semantic Scholar APIによる学術論文検索
 """
 Semantic Scholar API client for Periskopē.
 

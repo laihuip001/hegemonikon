@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] <- mekhane/periskope/searchers/ Tavily AI検索APIのラッパー実装
 """
 Tavily Search API client for Periskopē.
 

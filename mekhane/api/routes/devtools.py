@@ -1,3 +1,4 @@
+# PROOF: [L2/通信] <- mekhane/api/routes/ 開発者向けデバッグおよび状態監視用APIエンドポイント
 """
 DevTools API routes — ファイル操作・ターミナル・Ochema (AI) をフロントエンド DevTools ビューに提供。
 

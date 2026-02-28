@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] <- mekhane/periskope/ 外部Webサイトのコンテンツ非同期取得とパース
 """
 Page Fetcher — 選択的全文クロール for Periskopē.
 

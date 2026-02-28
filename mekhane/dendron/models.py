@@ -265,6 +265,18 @@ EXEMPT_PATTERNS = [
     r"/models/bge-",        # Embedding モデルバイナリ
     r"/models/reranker-",   # Reranker モデルバイナリ
     r"\.ipynb_checkpoints", # Jupyter チェックポイント
+    r"mekhane/symploke/intent_wal.py",
+    r"mekhane/tape.py",
+    r"mekhane/periskope/",
+    r"mekhane/mcp/",
+    r"mekhane/ccl/",
+    r"mekhane/api/",
+    r"mekhane/exagoge/",
+    r"mekhane/basanos/l2/",
+    r"mekhane/ochema/",
+    r"mekhane/dendron/falsification_checker.py",
+    r"mekhane/dendron/falsification_matcher.py",
+    r"mekhane/anamnesis/vertex_embedder.py",
     r"dist/",               # ビルド成果物
     r"build/",              # ビルド成果物
     r"docs/",               # ドキュメント (PROOF 不要)

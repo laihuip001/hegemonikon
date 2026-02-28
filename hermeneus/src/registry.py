@@ -170,6 +170,7 @@ class WorkflowRegistry:
     DEFAULT_PATHS = [
         Path.home() / "oikos" / ".agent" / "workflows",
         Path.home() / "oikos" / "hegemonikon" / ".agent" / "workflows",
+        Path.cwd() / ".agent" / "workflows",  # Support execution from repository root
     ]
     
     # PURPOSE: Initialize instance

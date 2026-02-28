@@ -382,7 +382,8 @@ def record_verification(
     ccl: str,
     execution_result: str,
     consensus_result: Any,  # ConsensusResult from verifier
-    db_path: Optional[Path] = None
+    db_path: Optional[Path] = None,
+    store: Optional[AuditStore] = None
 ) -> str:
     """検証結果を記録 (便利関数)
     
@@ -391,7 +392,7 @@ def record_verification(
         >>> result = verify_execution("/noe+", "分析結果")
         >>> audit_id = record_verification("/noe+", "分析結果", result)
     """
-    store = AuditStore(db_path)
+    store = store or AuditStore(db_path)
     
     # ディベートサマリーを作成
     debate_summary = f"ラウンド数: {len(consensus_result.rounds)}, "

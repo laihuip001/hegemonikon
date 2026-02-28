@@ -1,3 +1,5 @@
+# PROOF: [L2/Auto] <- mekhane/api/routes/
+# PURPOSE: Auto-added proof header
 """
 DevTools API routes — ファイル操作・ターミナル・Ochema (AI) をフロントエンド DevTools ビューに提供。
 

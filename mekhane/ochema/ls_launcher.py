@@ -1,3 +1,5 @@
+# PROOF: [L2/Auto] <- mekhane/ochema/
+# PURPOSE: Auto-added proof header
 #!/usr/bin/env python3
 """LS Standalone Launcher — IDE なしで Language Server を直接起動する。
 

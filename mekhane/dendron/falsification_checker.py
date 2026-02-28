@@ -1,3 +1,5 @@
+# PROOF: [L2/Auto] <- mekhane/dendron/
+# PURPOSE: Auto-added proof header
 """
 S7: Falsification Condition Checker
 

@@ -1,3 +1,5 @@
+# PROOF: [L2/Auto] <- mekhane/periskope/
+# PURPOSE: Auto-added proof header
 #!/usr/bin/env python3
 """
 Periskopē CLI — Deep Research from the command line.

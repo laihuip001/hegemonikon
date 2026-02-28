@@ -1,3 +1,5 @@
+# PROOF: [L2/Auto] <- mekhane/anamnesis/
+# PURPOSE: Auto-added proof header
 import os
 import logging
 from google import genai

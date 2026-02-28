@@ -1,3 +1,5 @@
+# PROOF: [L2/Auto] <- mekhane/api/routes/
+# PURPOSE: Auto-added proof header
 from typing import Any, AsyncGenerator
 
 import asyncio

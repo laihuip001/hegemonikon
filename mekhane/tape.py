@@ -1,3 +1,5 @@
+# PROOF: [L2/Auto] <- mekhane/
+# PURPOSE: Auto-added proof header
 """
 Tape Writer — WF 実行トレースを JSONL として記録する。
 

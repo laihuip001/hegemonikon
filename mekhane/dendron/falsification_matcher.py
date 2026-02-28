@@ -1,3 +1,5 @@
+# PROOF: [L2/Auto] <- mekhane/dendron/
+# PURPOSE: Auto-added proof header
 """
 Falsification Matcher — 消化論文の主張と epistemic_status.yaml の反証条件を照合
 

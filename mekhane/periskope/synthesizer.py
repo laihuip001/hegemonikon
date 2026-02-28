@@ -1,3 +1,5 @@
+# PROOF: [L2/Auto] <- mekhane/periskope/
+# PURPOSE: Auto-added proof header
 """
 Multi-model synthesizer for Periskopē.
 

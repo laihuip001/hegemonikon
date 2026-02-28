@@ -121,8 +121,8 @@
       "last_reviewed": null
     }
   },
-  "cycle": 61,
-  "last_date": "2026-02-28",
+  "cycle": 56,
+  "last_date": "2026-02-19",
   "last_domains": [
     "Maintainability",
     "DataFlow",

@@ -3,7 +3,19 @@
 
 import pytest
 from unittest.mock import patch, MagicMock
-from fastapi.testclient import TestClient
+
+try:
+
+try:
+    from fastapi.testclient import TestClient
+    HAS_FASTAPI = True
+except ImportError:
+    HAS_FASTAPI = False
+
+    HAS_FASTAPI = True
+except ImportError:
+    HAS_FASTAPI = False
+
 
 
 @pytest.fixture
@@ -14,6 +26,8 @@ def client():
 
 
 class TestGatewayStatsEndpoint:
+    pytestmark = pytest.mark.skipif(not HAS_FASTAPI, reason="FastAPI is not installed")
+    pytestmark = pytest.mark.skipif(not HAS_FASTAPI, reason="FastAPI is not installed")
     """GET /api/pks/gateway-stats のテスト。"""
 
     def test_gateway_stats_returns_200(self, client):

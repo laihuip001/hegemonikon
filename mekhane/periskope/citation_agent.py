@@ -1,4 +1,3 @@
-# PROOF: [Level/Category] <- mekhane/periskope/ A0->Auto->AddedByCI
 """
 Citation verification agent for Periskopē.
 

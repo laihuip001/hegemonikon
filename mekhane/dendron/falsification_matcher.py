@@ -1,4 +1,3 @@
-# PROOF: [Level/Category] <- mekhane/dendron/ A0->Auto->AddedByCI
 """
 Falsification Matcher — 消化論文の主張と epistemic_status.yaml の反証条件を照合
 

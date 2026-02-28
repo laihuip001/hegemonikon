@@ -10,6 +10,7 @@ Run with:
 import asyncio
 import pytest
 from unittest.mock import AsyncMock, MagicMock, patch
+from aioresponses import aioresponses
 
 import sys
 from pathlib import Path
@@ -103,11 +104,33 @@ class TestCreateSession:
 
     # PURPOSE: Test successful session creation
     @pytest.mark.asyncio
-    @pytest.mark.skip(reason="Requires aioresponses for proper async mocking")
     async def test_create_session_success(self):
         """Test successful session creation."""
-        # TODO: Use aioresponses for proper async HTTP mocking
-        pass
+        client = JulesClient(api_key="test-key-123")
+
+        with aioresponses() as mock_api:
+            mock_url = f"{client.BASE_URL}/sessions"
+            mock_api.post(
+                mock_url,
+                payload={
+                    "id": "test-123",
+                    "name": "sessions/test-123",
+                    "state": "PLANNING",
+                },
+                status=200,
+            )
+
+            session = await client.create_session(
+                prompt="Fix bug",
+                source="sources/github/owner/repo",
+            )
+
+            assert session.id == "test-123"
+            assert session.name == "sessions/test-123"
+            assert session.state == SessionState.PLANNING
+            assert session.prompt == "Fix bug"
+            assert session.source == "sources/github/owner/repo"
+            assert session.pull_request_url is None
 
 
 # PURPOSE: Test batch_execute method

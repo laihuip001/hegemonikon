@@ -44,21 +44,13 @@ jobs:
       - name: "L1: PROOF Header Check"
         run: |
           export PYTHONPATH=${{ github.workspace }}
-          if [ "${{ github.event_name }}" = "pull_request" ]; then
-            python -m mekhane.dendron.cli guard .
-          else
-            python -m mekhane.dendron.cli check mekhane/ --ci --format ci
-          fi
+          python -m mekhane.dendron.cli check mekhane/ --ci --format ci
 
       # L2: Purpose Quality Check — mekhane/dendron/ (strict: WEAK = FAIL)
       - name: "L2: Purpose Check (dendron/ — strict)"
         run: |
           export PYTHONPATH=${{ github.workspace }}
-          if [ "${{ github.event_name }}" = "pull_request" ]; then
-            python -m mekhane.dendron.cli guard .
-          else
-            python -m mekhane.dendron.cli purpose mekhane/dendron/ --ci --strict
-          fi
+          python -m mekhane.dendron.cli purpose mekhane/dendron/ --ci --strict
 
       # L2: Purpose Quality Check — mekhane/ 全体 (warn only)
       - name: "L2: Purpose Check (mekhane/ — warn)"

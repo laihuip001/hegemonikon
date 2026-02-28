@@ -2838,8 +2838,8 @@ def update_derivative_selector(
     """
     Record feedback for derivative selection learning.
 
-    Future enhancement: integrate with Dirichlet learning in FEP agent
-    to improve derivative selection based on outcomes.
+    Integrates with Dirichlet learning in FEP agent to improve
+    derivative selection based on outcomes.
 
     Args:
         theorem: O-series theorem
@@ -2847,9 +2847,54 @@ def update_derivative_selector(
         problem_context: Problem description
         success: Whether the derivative was effective
     """
-    # TODO: Integrate with HegemonikónFEPAgent.update_A_dirichlet()
-    # This will require:
-    # 1. Derivative-specific state space in FEP
+    try:
+        from .fep_agent import HegemonikónFEPAgent
+        from .state_spaces import encode_observation
+    except ImportError:
+        logger.warning("FEP agent not available. Skipping derivative selector update.")
+        return
+
+    # Instantiate the agent
+    agent = HegemonikónFEPAgent()
+
+    # 1. Derivative-specific state space in FEP (via custom persistence path)
+    # This separates learning per derivative so the agent learns expected observations
+    # for each specific derivative independently.
+    home_dir = Path.home()
+    derivative_a_path = home_dir / f"oikos/mneme/.hegemonikon/learned_A_deriv_{theorem}_{derivative}.npy"
+    derivative_a_path.parent.mkdir(parents=True, exist_ok=True)
+
+    # Load previously learned A matrix for this specific derivative if it exists
+    agent.load_learned_A(str(derivative_a_path))
+
     # 2. Observation encoding for derivative context
+    # Ensure theorem is valid for encode_for_derivative_selection
+    enc_theorem = theorem if theorem in ["O1", "O2", "O3", "O4"] else "O1"
+
+    # Returns values between 0 and 2
+    abs_level, ctx_dep, ref_need = encode_for_derivative_selection(
+        problem_context,
+        enc_theorem  # type: ignore
+    )
+
+    # Map to FEP agent's observation space (0.0 - 1.0)
+    # Context clarity correlates with context dependency
+    context_clarity = ctx_dep / 2.0
+    # Urgency correlates with abstraction level
+    urgency = abs_level / 2.0
+    # Confidence correlates with success outcome
+    confidence = 1.0 if success else 0.0
+
+    # Get flat observation index (0-7)
+    obs_idx = encode_observation(context_clarity, urgency, confidence)
+
     # 3. Persistence of learned derivative preferences
-    pass
+    # First infer states to align beliefs with the current context observation
+    agent.infer_states(obs_idx)
+
+    # Only reinforce the matrix on successful outcomes
+    if success:
+        agent.update_A_dirichlet(obs_idx)
+
+    # Persist the updated preferences to the derivative-specific path
+    agent.save_learned_A(str(derivative_a_path))

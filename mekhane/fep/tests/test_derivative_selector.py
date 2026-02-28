@@ -1160,3 +1160,73 @@ class TestASeriesHelperFunctions:
         """Verify unknown a theorem raises behavior."""
         with pytest.raises(ValueError):
             select_derivative("A5", "test")
+
+# =============================================================================
+# Update Derivative Selector Tests
+# =============================================================================
+
+from unittest.mock import patch, MagicMock
+
+# PURPOSE: Test update_derivative_selector
+class TestUpdateDerivativeSelector:
+    """Test update_derivative_selector."""
+
+    @patch("mekhane.fep.fep_agent.HegemonikónFEPAgent")
+    def test_update_derivative_selector_success(self, MockAgent):
+        """Verify update_derivative_selector correctly processes success outcomes."""
+        from mekhane.fep.derivative_selector import update_derivative_selector
+
+        mock_agent_instance = MagicMock()
+        MockAgent.return_value = mock_agent_instance
+
+        update_derivative_selector(
+            theorem="O1",
+            derivative="nous",
+            problem_context="本質や原理について",
+            success=True,
+        )
+
+        # Confirm instantiation and loading
+        from pathlib import Path
+        expected_path = str(Path.home() / "oikos/mneme/.hegemonikon/learned_A_deriv_O1_nous.npy")
+        MockAgent.assert_called_once()
+        mock_agent_instance.load_learned_A.assert_called_once_with(expected_path)
+
+        # Confirm state inference
+        mock_agent_instance.infer_states.assert_called_once()
+
+        # Confirm Dirichlet update is applied for successful derivative selection
+        mock_agent_instance.update_A_dirichlet.assert_called_once()
+
+        # Confirm persistence
+        mock_agent_instance.save_learned_A.assert_called_once_with(expected_path)
+
+    @patch("mekhane.fep.fep_agent.HegemonikónFEPAgent")
+    def test_update_derivative_selector_failure(self, MockAgent):
+        """Verify update_derivative_selector handles failures (no reinforcement)."""
+        from mekhane.fep.derivative_selector import update_derivative_selector
+
+        mock_agent_instance = MagicMock()
+        MockAgent.return_value = mock_agent_instance
+
+        update_derivative_selector(
+            theorem="O2",
+            derivative="desir",
+            problem_context="生の欲動",
+            success=False,
+        )
+
+        # Confirm instantiation and loading
+        from pathlib import Path
+        expected_path = str(Path.home() / "oikos/mneme/.hegemonikon/learned_A_deriv_O2_desir.npy")
+        MockAgent.assert_called_once()
+        mock_agent_instance.load_learned_A.assert_called_once_with(expected_path)
+
+        # Confirm state inference
+        mock_agent_instance.infer_states.assert_called_once()
+
+        # Confirm Dirichlet update is NOT applied when success is False
+        mock_agent_instance.update_A_dirichlet.assert_not_called()
+
+        # Confirm persistence
+        mock_agent_instance.save_learned_A.assert_called_once_with(expected_path)

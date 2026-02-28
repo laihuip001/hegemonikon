@@ -1,4 +1,15 @@
-"""CCL Linter — CCL 式の静的検証。
+# PROOF: [L2/インフラ] <- mekhane/ccl/ccl_linter
+"""
+PROOF: [L2/インフラ]
+
+P3 → 知識収集が必要
+   → CCL式の検証が必要
+   → ccl_linter が担う
+
+Q.E.D.
+
+---
+CCL Linter — CCL 式の静的検証。
 
 operators.md (SSOT) に基づいて CCL 式を検証し、
 未定義演算子、矛盾する演算子の組合せ、ネスト深度超過を検出する。
@@ -40,6 +51,7 @@ _KNOWN_NON_OPERATORS = set("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ
 _STRUCTURAL_CHARS = set("(){}[]@:,.=|")
 
 
+# PURPOSE: lint実行
 def lint(ccl_expr: str) -> List[LintWarning]:
     """CCL 式を静的検証し、警告リストを返す。"""
     warnings: List[LintWarning] = []

@@ -205,6 +205,7 @@ def build_uss_oauth_topic(token_info: OAuthTokenInfo) -> bytes:
     return topic
 
 
+# PURPOSE: IDEからトークン読み込み
 def read_token_from_ide() -> OAuthTokenInfo | None:
     """IDE の state.vscdb から OAuth トークンを読み取る."""
     db_path = Path.home() / ".config" / "Antigravity" / "User" / "globalStorage" / "state.vscdb"
@@ -241,6 +242,7 @@ def read_token_from_ide() -> OAuthTokenInfo | None:
         return None
 
 
+# PURPOSE: protoフィールド読み込み
 def _read_proto_field(data: bytes, offset: int) -> tuple[int, bytes, int]:
     """Read a single proto field (wire type 2 only)."""
     tag, offset = _varint_decode(data, offset)
@@ -257,6 +259,7 @@ def _read_proto_field(data: bytes, offset: int) -> tuple[int, bytes, int]:
 
 # ====== ConnectRPC Handler ======
 
+# PURPOSE: 拡張サーバーハンドラ
 class FakeExtensionServerHandler(http.server.BaseHTTPRequestHandler):
     """ConnectRPC compatible HTTP handler."""
 
@@ -266,6 +269,7 @@ class FakeExtensionServerHandler(http.server.BaseHTTPRequestHandler):
     _lock = threading.Lock()
     _token_update_events: list[threading.Event] = []
 
+    # PURPOSE: トークン情報設定
     @classmethod
     def set_token_info(cls, info: OAuthTokenInfo) -> None:
         cls._token_info = info
@@ -275,9 +279,11 @@ class FakeExtensionServerHandler(http.server.BaseHTTPRequestHandler):
             for ev in cls._token_update_events:
                 ev.set()
 
+    # PURPOSE: ログメッセージ
     def log_message(self, format, *args):
         logger.debug("HTTP: %s", format % args)
 
+    # PURPOSE: POSTハンドラ
     def do_POST(self):
         path = self.path
         content_length = int(self.headers.get("Content-Length", 0))
@@ -292,6 +298,7 @@ class FakeExtensionServerHandler(http.server.BaseHTTPRequestHandler):
         else:
             self.send_error(404, f"Unknown path: {path}")
 
+    # PURPOSE: RPCハンドラ
     def _handle_rpc(self, method: str, body: bytes):
         if method == "SubscribeToUnifiedStateSyncTopic":
             self._handle_subscribe(body)
@@ -308,6 +315,7 @@ class FakeExtensionServerHandler(http.server.BaseHTTPRequestHandler):
             logger.debug("Unimplemented method: %s (returning empty)", method) 
             self._send_unary_response(b"")
 
+    # PURPOSE: サブスクライブハンドラ
     def _handle_subscribe(self, body: bytes):
         """Handle ServerStreaming: SubscribeToUnifiedStateSyncTopic."""
         topic = decode_subscribe_request(body)
@@ -347,6 +355,7 @@ class FakeExtensionServerHandler(http.server.BaseHTTPRequestHandler):
             with self._lock:
                 self._token_update_events.remove(ev)
 
+    # PURPOSE: 単項レスポンス送信
     def _send_unary_response(self, payload: bytes):
         """Send ConnectRPC unary response."""
         self.send_response(200)
@@ -355,6 +364,7 @@ class FakeExtensionServerHandler(http.server.BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(payload)
 
+    # PURPOSE: トピックバイト取得
     def _get_topic_bytes(self, topic: str) -> bytes:
         """Get Topic proto bytes for a given topic name."""
         if topic == "uss-oauth" and "uss-oauth" in self._topic_cache:
@@ -363,6 +373,7 @@ class FakeExtensionServerHandler(http.server.BaseHTTPRequestHandler):
         return b""
 
 
+# PURPOSE: サーバー起動
 def serve(port: int, token_info: OAuthTokenInfo) -> http.server.HTTPServer:
     """HTTP サーバー起動."""
     FakeExtensionServerHandler.set_token_info(token_info)
@@ -371,6 +382,7 @@ def serve(port: int, token_info: OAuthTokenInfo) -> http.server.HTTPServer:
     return server
 
 
+# PURPOSE: メイン処理
 def main() -> None:
     parser = argparse.ArgumentParser(description="Fake Extension Server (ConnectRPC)")
     parser.add_argument("--port", type=int, default=50051)

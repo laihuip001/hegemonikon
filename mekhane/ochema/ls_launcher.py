@@ -1,5 +1,16 @@
 #!/usr/bin/env python3
-"""LS Standalone Launcher — IDE なしで Language Server を直接起動する。
+# PROOF: [L2/インフラ] <- mekhane/ochema/ls_launcher
+"""
+PROOF: [L2/インフラ]
+
+P3 → 知識収集が必要
+   → LSの起動が必要
+   → ls_launcher が担う
+
+Q.E.D.
+
+---
+LS Standalone Launcher — IDE なしで Language Server を直接起動する。
 
 ManagementMetadata protobuf を stdin に送り込んで LS を起動。
 Proto definition (from extension.js + Go binary analysis):
@@ -33,6 +44,7 @@ LS_BINARY = (
 CLOUD_CODE_ENDPOINT = "https://daily-cloudcode-pa.googleapis.com"
 
 
+# PURPOSE: プロトコルバッファ文字列エンコード
 def encode_protobuf_string(field_number: int, value: str) -> bytes:
     """Encode a protobuf string field (wire type 2)."""
     if not value:
@@ -42,6 +54,7 @@ def encode_protobuf_string(field_number: int, value: str) -> bytes:
     return _encode_varint(tag) + _encode_varint(len(data)) + data
 
 
+# PURPOSE: プロトコルバッファブール値エンコード
 def encode_protobuf_bool(field_number: int, value: bool) -> bytes:
     """Encode a protobuf bool field (wire type 0)."""
     if not value:
@@ -50,6 +63,7 @@ def encode_protobuf_bool(field_number: int, value: bool) -> bytes:
     return _encode_varint(tag) + _encode_varint(1 if value else 0)
 
 
+# PURPOSE: varintエンコード
 def _encode_varint(value: int) -> bytes:
     """Encode an integer as a protobuf varint."""
     result = []
@@ -60,6 +74,7 @@ def _encode_varint(value: int) -> bytes:
     return bytes(result)
 
 
+# PURPOSE: 管理メタデータ構築
 def build_management_metadata(
     auth_token: str,
     auth_uid: str = "",
@@ -75,6 +90,7 @@ def build_management_metadata(
     return msg
 
 
+# PURPOSE: OAuthトークン取得
 def get_current_oauth_token() -> str | None:
     """現在起動中の LS プロセスのメモリから OAuth token を取得する。
     
@@ -134,6 +150,7 @@ def get_current_oauth_token() -> str | None:
     return None
 
 
+# PURPOSE: LS起動
 def launch_ls(
     port: int,
     auth_token: str,
@@ -198,6 +215,7 @@ def launch_ls(
     return proc
 
 
+# PURPOSE: メイン処理
 def main():
     parser = argparse.ArgumentParser(description="LS Standalone Launcher")
     parser.add_argument("--port", type=int, default=29501, help="Server port")

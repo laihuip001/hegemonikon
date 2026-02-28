@@ -1,4 +1,15 @@
+# PROOF: [L2/インフラ] <- mekhane/mcp/mcp_guard
 """
+PROOF: [L2/インフラ]
+
+P3 → 知識収集が必要
+   → MCP サーバーの死活管理が必要
+   → mcp_guard が担う
+
+Q.E.D.
+
+---
+
 MCP Guard — ゾンビプロセス防止の自己防衛モジュール
 
 各 MCP サーバーが起動時に呼ぶ。同名サーバーの重複起動を構造的に不可能にする。
@@ -30,6 +41,7 @@ PID_DIR = Path.home() / ".cache" / "hgk" / "mcp"
 _KILL_WAIT = 2.0
 
 
+# PURPOSE: MCPサーバー起動ガード
 def guard(server_name: str) -> None:
     """MCP サーバー起動ガード。
 
@@ -52,16 +64,19 @@ def guard(server_name: str) -> None:
         pass
 
 
+# PURPOSE: PIDディレクトリを作成
 def _ensure_dir() -> None:
     """PID ディレクトリを作成。"""
     PID_DIR.mkdir(parents=True, exist_ok=True)
 
 
+# PURPOSE: PIDファイルパス取得
 def _pid_file(server_name: str) -> Path:
     """PID ファイルのパスを返す。"""
     return PID_DIR / f"{server_name}.pid"
 
 
+# PURPOSE: 古い同名プロセスをkill
 def _kill_old_process(server_name: str) -> None:
     """古い同名プロセスを安全に kill する。
 
@@ -119,6 +134,7 @@ def _kill_old_process(server_name: str) -> None:
     pid_path.unlink(missing_ok=True)
 
 
+# PURPOSE: PIDがMCPサーバーか検証
 def _is_mcp_process(pid: int, server_name: str) -> bool:
     """PID が実際に MCP サーバーのプロセスかどうかを検証。
 
@@ -149,6 +165,7 @@ def _is_mcp_process(pid: int, server_name: str) -> bool:
         return False
 
 
+# PURPOSE: プロセス生存確認
 def _process_alive(pid: int) -> bool:
     """プロセスが生存しているか確認。"""
     try:
@@ -158,11 +175,13 @@ def _process_alive(pid: int) -> bool:
         return False
 
 
+# PURPOSE: 自分のPIDを保存
 def _write_pid(server_name: str) -> None:
     """自分の PID をファイルに書き込む。"""
     _pid_file(server_name).write_text(str(os.getpid()))
 
 
+# PURPOSE: クリーンアップ登録
 def _register_cleanup(server_name: str) -> None:
     """終了時に PID ファイルを削除する atexit ハンドラを登録。"""
     def _cleanup():
@@ -179,6 +198,7 @@ def _register_cleanup(server_name: str) -> None:
     atexit.register(_cleanup)
 
 
+# PURPOSE: ステータス取得
 def status() -> dict:
     """全 MCP サーバーの PID 状況を返す。診断用。"""
     result = {}

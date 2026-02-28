@@ -120,14 +120,51 @@ class LMQLTranslator:
             return self._translate_synteleia_macro(name, args)
         
         # 一般マクロ: ビルトインまたはユーザー定義
-        return f'''
-# CCL マクロ: @{name}
-# TODO: マクロ展開 → 他の CCL 式に変換
+        from hermeneus.src.macros import get_macro_registry
+        from hermeneus.src.expander import Expander
+        from hermeneus.src.parser import CCLParser
+
+        registry = get_macro_registry()
+        expander = Expander(macro_registry=registry)
+
+        ccl_str = f"@{name}"
+        if args:
+            ccl_str += "{" + ",".join(args) + "}"
+
+        result = expander.expand(ccl_str)
+
+        # 展開されなかった場合 (未定義など) はフォールバック
+        if result.expanded == ccl_str:
+            return f'''
+# CCL マクロ: @{name} (展開失敗/未定義)
 @lmql.query
 def macro_{name}(context: str):
     """マクロ @{name} の実行"""
     argmax
         "マクロ @{name} を実行: コンテキスト: {{context}}"
+        "[RESULT]"
+    from
+        "{self.model}"
+'''
+
+        # 展開された式をパースして変換
+        parser = CCLParser()
+        try:
+            expanded_ast = parser.parse(result.expanded)
+            translated = self.translate(expanded_ast)
+
+            # 元のマクロ情報をコメントとして付与
+            header = f"# CCL マクロ展開: {ccl_str} → {result.expanded}\n"
+            return header + translated.lstrip()
+        except Exception as e:
+            # パースエラー時のフォールバック
+            return f'''
+# CCL マクロ: @{name} (展開後のパース失敗: {e})
+@lmql.query
+def macro_{name}_error(context: str):
+    """マクロ @{name} の実行 (エラー)"""
+    argmax
+        "マクロ @{name} の展開 ({result.expanded}) のパースに失敗しました: {e}"
         "[RESULT]"
     from
         "{self.model}"

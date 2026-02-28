@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ]
 """
 Periskopē — HGK Deep Research Engine
 

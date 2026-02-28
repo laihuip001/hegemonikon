@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ]
 """
 Periskopē searchers — pluggable search source adapters.
 

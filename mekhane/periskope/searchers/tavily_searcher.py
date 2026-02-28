@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ]
 """
 Tavily Search API client for Periskopē.
 

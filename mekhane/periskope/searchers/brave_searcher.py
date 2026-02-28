@@ -1,3 +1,4 @@
+# PROOF: [L1/定理] <- mekhane/periskope/searchers/brave_searcher.py requires PROOF header for validation
 """
 Brave Search API client for Periskopē.
 

@@ -1,3 +1,4 @@
+# PROOF: [L1/定理] <- mekhane/periskope/citation_agent.py requires PROOF header for validation
 """
 Citation verification agent for Periskopē.
 

@@ -1,3 +1,4 @@
+# PROOF: [L1/定理] <- mekhane/mcp/mcp_guard.py requires PROOF header for validation
 """
 MCP Guard — ゾンビプロセス防止の自己防衛モジュール
 

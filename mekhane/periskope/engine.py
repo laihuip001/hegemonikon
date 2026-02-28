@@ -1,3 +1,4 @@
+# PROOF: [L1/定理] <- mekhane/periskope/engine.py requires PROOF header for validation
 """
 Periskopē Deep Research Engine — Orchestrator.
 

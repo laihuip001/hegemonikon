@@ -1,3 +1,4 @@
+# PROOF: [L1/定理] <- mekhane/periskope/synthesizer.py requires PROOF header for validation
 """
 Multi-model synthesizer for Periskopē.
 

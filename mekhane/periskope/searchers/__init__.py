@@ -1,3 +1,4 @@
+# PROOF: [L1/定理] <- mekhane/periskope/searchers/__init__.py requires PROOF header for validation
 """
 Periskopē searchers — pluggable search source adapters.
 

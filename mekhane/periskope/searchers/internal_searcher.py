@@ -1,3 +1,4 @@
+# PROOF: [L1/定理] <- mekhane/periskope/searchers/internal_searcher.py requires PROOF header for validation
 """
 Internal knowledge searcher for Periskopē.
 

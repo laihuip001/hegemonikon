@@ -1,3 +1,4 @@
+# PROOF: [L1/定理] <- mekhane/periskope/searchers/semantic_scholar_searcher.py requires PROOF header for validation
 """
 Semantic Scholar API client for Periskopē.
 

@@ -1,3 +1,4 @@
+# PROOF: [L1/定理] <- mekhane/basanos/l2/history.py requires PROOF header for validation
 #!/usr/bin/env python3
 # PURPOSE: Basanos L2 deficit 履歴の永続化 — JSONL 形式で時系列追跡
 # REASON: deficit の推移を記録し、体系の健全性トレンドを可視化するため

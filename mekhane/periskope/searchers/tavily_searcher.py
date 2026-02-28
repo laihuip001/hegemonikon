@@ -1,3 +1,4 @@
+# PROOF: [L1/定理] <- mekhane/periskope/searchers/tavily_searcher.py requires PROOF header for validation
 """
 Tavily Search API client for Periskopē.
 

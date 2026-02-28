@@ -1,3 +1,4 @@
+# PROOF: [L1/定理] <- mekhane/api/routes/cortex.py requires PROOF header for validation
 from typing import Any, AsyncGenerator
 
 import asyncio

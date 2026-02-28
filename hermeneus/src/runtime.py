@@ -40,6 +40,11 @@ def _load_env():
 _load_env()
 
 
+# Cached clients for Secret Manager to avoid performance overhead
+_gcp_secret_client = None
+_aws_secret_client = None
+
+
 # PURPOSE: [L2-auto] Secret アクセスの一元化 (W08 Secret Sprawl 対策)
 def _get_secret(key: str) -> Optional[str]:
     """Secret アクセスの一元化 (W08 Secret Sprawl 対策)
@@ -48,7 +53,41 @@ def _get_secret(key: str) -> Optional[str]:
     散在する os.environ.get を排除し、将来的な Secret Manager
     統合のフックポイントとする。
     """
-    # TODO: Secret Manager (GCP/AWS) 統合時はここを変更
+    global _gcp_secret_client, _aws_secret_client
+
+    # 1. GCP Secret Manager
+    project_id = os.environ.get("GOOGLE_CLOUD_PROJECT")
+    if project_id:
+        try:
+            from google.cloud import secretmanager
+            if _gcp_secret_client is None:
+                _gcp_secret_client = secretmanager.SecretManagerServiceClient()
+
+            name = f"projects/{project_id}/secrets/{key}/versions/latest"
+            response = _gcp_secret_client.access_secret_version(request={"name": name})
+            return response.payload.data.decode("UTF-8")
+        except ImportError:
+            pass
+        except Exception as e:
+            print(f"Warning: Failed to fetch secret '{key}' from GCP Secret Manager: {e}")
+
+    # 2. AWS Secrets Manager
+    aws_region = os.environ.get("AWS_REGION") or os.environ.get("AWS_DEFAULT_REGION")
+    if aws_region:
+        try:
+            import boto3
+            if _aws_secret_client is None:
+                _aws_secret_client = boto3.client("secretsmanager", region_name=aws_region)
+
+            response = _aws_secret_client.get_secret_value(SecretId=key)
+            if "SecretString" in response:
+                return response["SecretString"]
+        except ImportError:
+            pass
+        except Exception as e:
+            print(f"Warning: Failed to fetch secret '{key}' from AWS Secrets Manager: {e}")
+
+    # 3. Fallback to environment variables
     return os.environ.get(key)
 
 

@@ -1,4 +1,3 @@
-# PROOF: [L2/インフラ] <- mekhane/ A0->Auto->AddedByCI
 """
 Periskopē — HGK Deep Research Engine
 

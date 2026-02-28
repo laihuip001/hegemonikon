@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# PROOF: [L2/インフラ] <- mekhane/ A0->Auto->AddedByCI
 """Intent-WAL (Write-Ahead Log) Manager.
 
 Manages session intent WAL files for crash recovery and context continuity.

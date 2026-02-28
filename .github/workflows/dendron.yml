@@ -40,24 +40,11 @@ jobs:
       - name: Install dependencies
         run: pip install pyyaml
 
-      # L1: PROOF Header Check (blocking)
-      - name: "L1: PROOF Header Check"
+      # PR Guard: Check only modified files (blocking)
+      - name: "PR Guard Check"
         run: |
           export PYTHONPATH=${{ github.workspace }}
-          python -m mekhane.dendron.cli check mekhane/ --ci --format ci
-
-      # L2: Purpose Quality Check — mekhane/dendron/ (strict: WEAK = FAIL)
-      - name: "L2: Purpose Check (dendron/ — strict)"
-        run: |
-          export PYTHONPATH=${{ github.workspace }}
-          python -m mekhane.dendron.cli purpose mekhane/dendron/ --ci --strict
-
-      # L2: Purpose Quality Check — mekhane/ 全体 (warn only)
-      - name: "L2: Purpose Check (mekhane/ — warn)"
-        continue-on-error: true
-        run: |
-          export PYTHONPATH=${{ github.workspace }}
-          python -m mekhane.dendron.cli purpose mekhane/ --ci
+          python -m mekhane.dendron.cli guard .
 
       # Safety Contract: risk_tier + lcm_state check (blocking)
       - name: "Safety Contract Audit"

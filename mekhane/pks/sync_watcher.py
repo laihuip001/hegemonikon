@@ -169,8 +169,15 @@ class SyncWatcher:
 
         for change in changes:
             if change.change_type == "deleted":
-                # TODO: LanceDB からの削除は将来実装
-                print(f"  [deleted] {change.path.name} (index removal pending)")
+                print(f"  [deleted] {change.path.name}", end="")
+                if index is not None:
+                    try:
+                        index.delete_by_source(str(change.path))
+                        print(" → index removed ✅")
+                    except Exception as e:
+                        print(f" → error: {e}")
+                else:
+                    print(" (no index)")
                 continue
 
             if change.path.suffix not in self.extensions:

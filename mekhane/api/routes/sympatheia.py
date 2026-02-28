@@ -181,6 +181,40 @@ def _load_config() -> dict:
     return _read_json(MNEME / "sympatheia_config.json", default)
 
 
+# PURPOSE: [L2-auto] ファイルの末尾 N 行を効率的に読み込む。
+def _tail_lines(filepath: Path, n: int = 200) -> list[str]:
+    """ファイルの末尾 N 行を効率的に読み込む。"""
+    if not filepath.exists() or not filepath.is_file() or filepath.stat().st_size == 0:
+        return []
+    lines: list[str] = []
+    try:
+        with open(filepath, 'rb') as f:
+            f.seek(0, os.SEEK_END)
+            file_size = f.tell()
+            chunk_size = 8192
+            position = file_size
+            buffer = b""
+            while position > 0 and len(lines) <= n:
+                read_size = min(chunk_size, position)
+                position -= read_size
+                f.seek(position)
+                chunk = f.read(read_size)
+                buffer = chunk + buffer
+                parts = buffer.split(b'\n')
+                buffer = parts[0]
+                for part in reversed(parts[1:]):
+                    if part.strip():
+                        lines.append(part.decode('utf-8', errors='replace'))
+                    if len(lines) >= n:
+                        break
+            if buffer and len(lines) < n and buffer.strip():
+                lines.append(buffer.decode('utf-8', errors='replace'))
+        lines.reverse()
+        return lines
+    except Exception:
+        return []
+
+
 # PURPOSE: [L2-auto] ローカル通知を JSONL に保存する。Slack 代替。
 def _send_notification(source: str, level: str, title: str, body: str, data: Optional[dict] = None) -> str:
     """ローカル通知を JSONL に保存する。Slack 代替。"""
@@ -325,7 +359,7 @@ async def weekly_digest(req: DigestRequest) -> DigestResponse:
     health_file = MNEME / "health_metrics.jsonl"
     health_scores: list[float] = []
     try:
-        for line in health_file.read_text("utf-8").strip().split("\n")[-200:]:
+        for line in _tail_lines(health_file, 200):
             try:
                 m = json.loads(line)
                 if m.get("timestamp", "") > one_week_ago:
@@ -467,7 +501,7 @@ async def feedback_loop(req: FeedbackRequest) -> FeedbackResponse:
     # --- Health Metrics 分析 ---
     scores: list[float] = []
     try:
-        for line in (MNEME / "health_metrics.jsonl").read_text("utf-8").strip().split("\n")[-200:]:
+        for line in _tail_lines(MNEME / "health_metrics.jsonl", 200):
             try:
                 m = json.loads(line)
                 if m.get("timestamp", "") > three_days_ago:

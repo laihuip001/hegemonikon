@@ -101,7 +101,8 @@ class TestMeaningfulTraceContextRegression:
                 intensity=2,
                 context="must persist to disk",
             )
-            save_traces(path)
+            with patch("mekhane.fep.meaningful_traces.ensure_traces_dir"):
+                save_traces(path)
 
             # Load and verify
             loaded = load_traces(path)

@@ -94,9 +94,9 @@ class ArxivCollector(BaseCollector):
             sort_order=arxiv.SortOrder.Descending,
         )
 
+        self._rate_limit_wait()
         papers = []
         for result in self.client.results(search):
-            self._rate_limit_wait()
             papers.append(self._to_paper(result))
 
         return papers
@@ -136,11 +136,11 @@ class ArxivCollector(BaseCollector):
             sort_order=arxiv.SortOrder.Descending,
         )
 
+        self._rate_limit_wait()
         papers = []
         cutoff = datetime.now().timestamp() - (days * 86400)
 
         for result in self.client.results(search):
-            self._rate_limit_wait()
             if result.published and result.published.timestamp() < cutoff:
                 break
             papers.append(self._to_paper(result))

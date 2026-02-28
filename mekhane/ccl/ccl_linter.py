@@ -1,3 +1,4 @@
+# PROOF: [L1/定理] <- mekhane/ccl/ccl_linter.py requires PROOF header for validation
 """CCL Linter — CCL 式の静的検証。
 
 operators.md (SSOT) に基づいて CCL 式を検証し、

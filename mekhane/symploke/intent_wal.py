@@ -1,3 +1,4 @@
+# PROOF: [L1/定理] <- mekhane/symploke/intent_wal.py requires PROOF header for validation
 #!/usr/bin/env python3
 """Intent-WAL (Write-Ahead Log) Manager.
 

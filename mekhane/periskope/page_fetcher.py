@@ -1,3 +1,4 @@
+# PROOF: [L1/定理] <- mekhane/periskope/page_fetcher.py requires PROOF header for validation
 """
 Page Fetcher — 選択的全文クロール for Periskopē.
 

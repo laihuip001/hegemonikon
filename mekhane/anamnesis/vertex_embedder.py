@@ -1,3 +1,4 @@
+# PROOF: [L1/定理] <- mekhane/anamnesis/vertex_embedder.py requires PROOF header for validation
 import os
 import logging
 from google import genai

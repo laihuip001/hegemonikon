@@ -1,3 +1,4 @@
+# PROOF: [L1/定理] <- mekhane/periskope/__init__.py requires PROOF header for validation
 """
 Periskopē — HGK Deep Research Engine
 

@@ -1,3 +1,4 @@
+# PROOF: [L1/定理] <- mekhane/ochema/ls_launcher.py requires PROOF header for validation
 #!/usr/bin/env python3
 """LS Standalone Launcher — IDE なしで Language Server を直接起動する。
 

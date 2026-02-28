@@ -1,3 +1,4 @@
+# PROOF: [L1/定理] <- mekhane/periskope/query_expander.py requires PROOF header for validation
 """
 Query expander for Periskopē.
 

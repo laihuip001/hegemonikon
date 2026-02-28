@@ -1,3 +1,4 @@
+# PROOF: [L1/定理] <- mekhane/dendron/falsification_checker.py requires PROOF header for validation
 """
 S7: Falsification Condition Checker
 

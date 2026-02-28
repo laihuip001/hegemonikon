@@ -1,3 +1,4 @@
+# PROOF: [L1/定理] <- mekhane/periskope/searchers/playwright_searcher.py requires PROOF header for validation
 """
 Playwright-based searcher for Periskopē.
 

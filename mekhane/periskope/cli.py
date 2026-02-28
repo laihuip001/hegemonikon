@@ -1,3 +1,4 @@
+# PROOF: [L1/定理] <- mekhane/periskope/cli.py requires PROOF header for validation
 #!/usr/bin/env python3
 """
 Periskopē CLI — Deep Research from the command line.

@@ -1,3 +1,4 @@
+# PROOF: [L1/定理] <- mekhane/tape.py requires PROOF header for validation
 """
 Tape Writer — WF 実行トレースを JSONL として記録する。
 

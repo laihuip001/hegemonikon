@@ -1,3 +1,4 @@
+# PROOF: [L1/定理] <- mekhane/mcp/mcp_base.py requires PROOF header for validation
 #!/usr/bin/env python3
 """
 MCP Base Module — Hegemonikón MCP Server Common Infrastructure

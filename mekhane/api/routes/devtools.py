@@ -1,3 +1,4 @@
+# PROOF: [L1/定理] <- mekhane/api/routes/devtools.py requires PROOF header for validation
 """
 DevTools API routes — ファイル操作・ターミナル・Ochema (AI) をフロントエンド DevTools ビューに提供。
 

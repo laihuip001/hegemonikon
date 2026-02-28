@@ -1,3 +1,4 @@
+# PROOF: [L1/定理] <- mekhane/periskope/searchers/searxng.py requires PROOF header for validation
 """
 SearXNG search client for Periskopē.
 

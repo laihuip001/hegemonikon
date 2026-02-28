@@ -1,3 +1,4 @@
+# PROOF: [L1/定理] <- mekhane/periskope/models.py requires PROOF header for validation
 """
 Periskopē data models.
 

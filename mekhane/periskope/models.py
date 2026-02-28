@@ -1,3 +1,5 @@
+# PROOF: [L2/Periskope] <- mekhane/periskope/models.py
+# PURPOSE: Auto-added header
 """
 Periskopē data models.
 

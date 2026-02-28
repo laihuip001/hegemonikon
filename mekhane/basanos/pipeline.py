@@ -619,7 +619,12 @@ class DailyReviewPipeline:
 
             try:
                 loop = asyncio.get_running_loop()
-                loop.create_task(run_notify())
+                # Keep a reference to the task to prevent it from being garbage collected
+                task = loop.create_task(run_notify())
+                if not hasattr(self, "_bg_tasks"):
+                    self._bg_tasks = set()
+                self._bg_tasks.add(task)
+                task.add_done_callback(self._bg_tasks.discard)
             except RuntimeError:
                 asyncio.run(run_notify())
 

@@ -1,3 +1,5 @@
+# PROOF: [L2/Periskope] <- mekhane/periskope/cli.py
+# PURPOSE: Auto-added header
 #!/usr/bin/env python3
 """
 Periskopē CLI — Deep Research from the command line.

@@ -1,3 +1,5 @@
+# PROOF: [L2/Periskope] <- mekhane/periskope/citation_agent.py
+# PURPOSE: Auto-added header
 """
 Citation verification agent for Periskopē.
 

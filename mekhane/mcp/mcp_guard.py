@@ -1,3 +1,5 @@
+# PROOF: [L2/Mcp] <- mekhane/mcp/mcp_guard.py
+# PURPOSE: Auto-added header
 """
 MCP Guard — ゾンビプロセス防止の自己防衛モジュール
 

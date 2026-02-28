@@ -1,3 +1,5 @@
+# PROOF: [L2/Periskope] <- mekhane/periskope/searchers/__init__.py
+# PURPOSE: Auto-added header
 """
 Periskopē searchers — pluggable search source adapters.
 

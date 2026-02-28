@@ -1,3 +1,5 @@
+# PROOF: [L2/Periskope] <- mekhane/periskope/__init__.py
+# PURPOSE: Auto-added header
 """
 Periskopē — HGK Deep Research Engine
 

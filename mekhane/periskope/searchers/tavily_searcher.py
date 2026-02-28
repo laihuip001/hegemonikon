@@ -1,3 +1,5 @@
+# PROOF: [L2/Periskope] <- mekhane/periskope/searchers/tavily_searcher.py
+# PURPOSE: Auto-added header
 """
 Tavily Search API client for Periskopē.
 

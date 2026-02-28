@@ -1,3 +1,5 @@
+# PROOF: [L2/Periskope] <- mekhane/periskope/engine.py
+# PURPOSE: Auto-added header
 """
 Periskopē Deep Research Engine — Orchestrator.
 

@@ -1,3 +1,5 @@
+# PROOF: [L2/Periskope] <- mekhane/periskope/searchers/semantic_scholar_searcher.py
+# PURPOSE: Auto-added header
 """
 Semantic Scholar API client for Periskopē.
 

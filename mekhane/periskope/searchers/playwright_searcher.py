@@ -1,3 +1,5 @@
+# PROOF: [L2/Periskope] <- mekhane/periskope/searchers/playwright_searcher.py
+# PURPOSE: Auto-added header
 """
 Playwright-based searcher for Periskopē.
 

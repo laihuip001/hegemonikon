@@ -4,11 +4,21 @@
 """Synteleia API Tests"""
 
 import pytest
-from fastapi.testclient import TestClient
-from mekhane.api.server import create_app
+try:
+    from fastapi.testclient import TestClient
+    HAS_FASTAPI = True
+except ImportError:
+    HAS_FASTAPI = False
+    TestClient = type("TestClient", (), {})
+try:
+    from mekhane.api.server import create_app
+except ImportError:
+    pass
 
 
 # PURPOSE: Verify client behaves correctly
+pytestmark = pytest.mark.skipif(not HAS_FASTAPI, reason="fastapi not installed")
+
 @pytest.fixture(scope="module")
 def client():
     """テスト用 FastAPI クライアント。"""
@@ -20,6 +30,8 @@ def client():
 
 
 # PURPOSE: Test suite validating synteleia audit correctness
+pytestmark = pytest.mark.skipif(not HAS_FASTAPI, reason="fastapi not installed")
+
 class TestSynteleiaAudit:
     """/api/synteleia/audit エンドポイント。"""
 
@@ -112,6 +124,8 @@ class TestSynteleiaAudit:
 
 
 # PURPOSE: Test suite validating synteleia audit quick correctness
+pytestmark = pytest.mark.skipif(not HAS_FASTAPI, reason="fastapi not installed")
+
 class TestSynteleiaAuditQuick:
     """/api/synteleia/audit-quick エンドポイント。"""
 
@@ -146,6 +160,8 @@ class TestSynteleiaAuditQuick:
 
 
 # PURPOSE: Test suite validating synteleia agents correctness
+pytestmark = pytest.mark.skipif(not HAS_FASTAPI, reason="fastapi not installed")
+
 class TestSynteleiaAgents:
     """/api/synteleia/agents エンドポイント。"""
 

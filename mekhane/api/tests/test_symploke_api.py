@@ -10,12 +10,22 @@ Symploke API Tests — 知識統合層 REST API のエンドポイント検証
 """
 
 import pytest
-from fastapi.testclient import TestClient
+try:
+    from fastapi.testclient import TestClient
+    HAS_FASTAPI = True
+except ImportError:
+    HAS_FASTAPI = False
+    TestClient = type("TestClient", (), {})
 
-from mekhane.api.server import create_app
+try:
+    from mekhane.api.server import create_app
+except ImportError:
+    pass
 
 
 # PURPOSE: Verify client behaves correctly
+pytestmark = pytest.mark.skipif(not HAS_FASTAPI, reason="fastapi not installed")
+
 @pytest.fixture(scope="module")
 def client():
     """TestClient を生成。"""
@@ -30,6 +40,8 @@ def client():
 
 
 # PURPOSE: Test suite validating symploke search correctness
+pytestmark = pytest.mark.skipif(not HAS_FASTAPI, reason="fastapi not installed")
+
 class TestSymplokeSearch:
     """/api/symploke/search エンドポイント。"""
 
@@ -80,6 +92,8 @@ class TestSymplokeSearch:
 
 
 # PURPOSE: Test suite validating symploke persona correctness
+pytestmark = pytest.mark.skipif(not HAS_FASTAPI, reason="fastapi not installed")
+
 class TestSymplokePersona:
     """/api/symploke/persona エンドポイント。"""
 
@@ -101,6 +115,8 @@ class TestSymplokePersona:
 
 
 # PURPOSE: Test suite validating symploke boot context correctness
+pytestmark = pytest.mark.skipif(not HAS_FASTAPI, reason="fastapi not installed")
+
 class TestSymplokeBootContext:
     """/api/symploke/boot-context エンドポイント。"""
 
@@ -130,6 +146,8 @@ class TestSymplokeBootContext:
 
 
 # PURPOSE: Test suite validating symploke stats correctness
+pytestmark = pytest.mark.skipif(not HAS_FASTAPI, reason="fastapi not installed")
+
 class TestSymplokeStats:
     """/api/symploke/stats エンドポイント。"""
 

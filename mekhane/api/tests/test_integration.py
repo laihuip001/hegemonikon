@@ -9,6 +9,13 @@ from unittest.mock import patch
 
 
 # PURPOSE: Test suite validating timeline router correctness
+try:
+    import fastapi
+    HAS_FASTAPI = True
+except ImportError:
+    HAS_FASTAPI = False
+
+@pytest.mark.skipif(not HAS_FASTAPI, reason="fastapi not installed")
 class TestTimelineRouter:
     """Timeline API テスト"""
 
@@ -82,6 +89,7 @@ class TestTimelineRouter:
 
 
 # PURPOSE: Test suite validating kalon router correctness
+@pytest.mark.skipif(not HAS_FASTAPI, reason="fastapi not installed")
 class TestKalonRouter:
     """Kalon API テスト"""
 

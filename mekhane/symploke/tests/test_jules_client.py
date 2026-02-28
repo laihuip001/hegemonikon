@@ -13,6 +13,7 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import sys
 from pathlib import Path
+from aioresponses import aioresponses
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent.parent))
 
@@ -103,11 +104,31 @@ class TestCreateSession:
 
     # PURPOSE: Test successful session creation
     @pytest.mark.asyncio
-    @pytest.mark.skip(reason="Requires aioresponses for proper async mocking")
     async def test_create_session_success(self):
         """Test successful session creation."""
-        # TODO: Use aioresponses for proper async HTTP mocking
-        pass
+        client = JulesClient(api_key="test-key")
+
+        with aioresponses() as m:
+            m.post(
+                f"{client.base_url}/sessions",
+                payload={
+                    "id": "session-123",
+                    "name": "sessions/session-123",
+                    "state": "PLANNING"
+                },
+                status=200
+            )
+
+            session = await client.create_session(
+                prompt="Fix bug",
+                source="sources/github/owner/repo"
+            )
+
+            assert session.id == "session-123"
+            assert session.name == "sessions/session-123"
+            assert session.state == SessionState.PLANNING
+            assert session.prompt == "Fix bug"
+            assert session.source == "sources/github/owner/repo"
 
 
 # PURPOSE: Test batch_execute method

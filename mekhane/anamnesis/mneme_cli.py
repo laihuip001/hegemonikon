@@ -98,10 +98,45 @@ def cmd_ingest(args):
         except Exception as e:
             print(f"[Kairos] Error: {e}")
 
-    # Chronos (Conversation History) - Not yet implemented
+    # Chronos (Conversation History)
     if args.all or args.chronos:
-        # TODO: Implement when conversation history indexing is ready
         results["chronos"] = 0
+        try:
+            from mekhane.symploke.kairos_ingest import (
+                get_conversation_files,
+                parse_conversation_chunks,
+                DEFAULT_INDEX_PATH as KAIROS_PATH,
+            )
+            from mekhane.symploke.indices.chronos import ChronosIndex
+            from mekhane.symploke.adapters.embedding_adapter import EmbeddingAdapter
+
+            CHRONOS_PATH = KAIROS_PATH.parent / "chronos.pkl"
+
+            files = get_conversation_files()
+            if files:
+                all_docs = []
+                for f in files:
+                    chunks = parse_conversation_chunks(f)
+                    all_docs.extend(chunks)
+
+                CHRONOS_PATH.parent.mkdir(parents=True, exist_ok=True)
+
+                adapter = EmbeddingAdapter()
+                sample_vec = adapter.encode(["test"])
+                dim = sample_vec.shape[1] if sample_vec.ndim == 2 else len(sample_vec[0])
+
+                index = ChronosIndex(adapter, "chronos", dimension=dim)
+                index.initialize()
+                count = index.ingest(all_docs)
+
+                adapter.save(str(CHRONOS_PATH))
+                results["chronos"] = count
+            else:
+                print("[Chronos] No conversation files found")
+        except ImportError as e:
+            print(f"[Chronos] Import error: {e}")
+        except Exception as e:
+            print(f"[Chronos] Error: {e}")
 
     # Output in /boot expected format
     total = sum(results.values())
@@ -139,8 +174,19 @@ def cmd_stats(args):
     )
     print(f"Kairos: {handoff_count} handoff files")
 
-    # Chronos stats (placeholder)
-    print("Chronos: Not implemented")
+    # Chronos stats
+    try:
+        from mekhane.symploke.kairos_ingest import DEFAULT_INDEX_PATH as KAIROS_PATH
+        from mekhane.symploke.adapters.embedding_adapter import EmbeddingAdapter
+        chronos_path = KAIROS_PATH.parent / "chronos.pkl"
+        if chronos_path.exists():
+            adapter = EmbeddingAdapter()
+            adapter.load(str(chronos_path))
+            print(f"Chronos: {adapter.count()} vectors")
+        else:
+            print("Chronos: Not indexed")
+    except Exception as e:
+        print(f"Chronos: Error - {e}")
 
     print("=" * 40)
     return 0

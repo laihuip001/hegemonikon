@@ -107,7 +107,7 @@ def process_conversations(data: Union[List, Dict, Iterable], output_dir: str):
         try:
             # Title extraction
             title = item.get("title", "Untitled")
-            create_time = item.get("create_time", item.get("created_at", ""))
+            create_time = item.get("create_time", item.get("created_at", item.get("createTime", "")))
 
             # Format date
             date_str = "Unknown_Date"
@@ -118,8 +118,10 @@ def process_conversations(data: Union[List, Dict, Iterable], output_dir: str):
                     else:
                         dt = datetime.fromisoformat(create_time.replace("Z", "+00:00"))
                     date_str = dt.strftime("%Y-%m-%d")
-                except Exception:
-                    pass  # TODO: Add proper error handling
+                except (ValueError, TypeError) as e:
+                    print(f"Warning: Failed to parse date '{create_time}' for item '{title}': {e}")
+                except Exception as e:
+                    print(f"Warning: Unexpected error parsing date for item '{title}': {e}")
 
             # Safe Filename (Robustness)
             base_name = safe_filename(f"{date_str}_{title}")

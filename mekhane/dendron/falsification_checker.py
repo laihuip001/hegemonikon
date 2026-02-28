@@ -20,6 +20,7 @@ PROJECT_ROOT = Path(__file__).parent.parent.parent
 REGISTRY_PATH = PROJECT_ROOT / "kernel" / "epistemic_status.yaml"
 
 
+# PURPOSE: レジストリを読み込む
 def load_registry() -> dict:
     """Load the epistemic status registry"""
     if not REGISTRY_PATH.exists():
@@ -30,6 +31,7 @@ def load_registry() -> dict:
         return yaml.safe_load(f)
 
 
+# PURPOSE: 必須フィールドの完全性をチェック
 def check_completeness(registry: dict) -> list[str]:
     """Check that all patches have required fields"""
     issues = []
@@ -55,6 +57,7 @@ def check_completeness(registry: dict) -> list[str]:
     return issues
 
 
+# PURPOSE: ファイル参照が正しいか検証
 def check_file_references(registry: dict) -> list[str]:
     """Verify that claims exist in referenced files at specified lines"""
     issues = []
@@ -97,6 +100,7 @@ def check_file_references(registry: dict) -> list[str]:
     return issues
 
 
+# PURPOSE: サマリー統計を生成
 def summary_stats(registry: dict) -> dict:
     """Generate summary statistics"""
     patches = registry.get("patches", {})
@@ -110,6 +114,7 @@ def summary_stats(registry: dict) -> dict:
     }
 
 
+# PURPOSE: エントリーポイント
 def main():
     registry = load_registry()
     

@@ -1,0 +1,29 @@
+{
+  "ccl": "/sop+",
+  "plan": {
+    "type": "single",
+    "elements": [
+      "/sop+"
+    ]
+  },
+  "results": [
+    {
+      "status": "success",
+      "ccl": "/sop+",
+      "thread": "perplexity",
+      "answer": "**Install DSPy using `pip install dspy-ai` (latest stable) or `pip install git+https://github.com/stanfordnlp/dspy.git` for the main branch.** [1][3][6]\n\n### Core DSPy Workflow\nDSPy is a Python framework for programming language models via **signatures** (input/output specs), **modules** (like Predict, ChainOfThought), and **optimizers** that automatically improve prompts, few-shot examples, or weights.[3][4]\n1. Define a **signature** (e.g., `class QA(dspy.Signature): question -> answer`).[4]\n2. Build a **module** (e.g., `dspy.Predict(signature)` or `dspy.ChainOfThought(signature)`).[2][4]\n3. Configure an **LM** (e.g., `dspy.settings.configure(lm=dspy.OpenAI(model='gpt-4o'))` or local Ollama).[1][2][6]\n4. **Optimize** with examples and a metric using an optimizer like BootstrapFewShot.\n\n### Teleprompter and BootstrapFewShot\nUse **Teleprompter** as the high-level optimizer interface; **BootstrapFewShot** generates few-shot examples automatically from unlabeled or semi-labeled data:\n```\nimport dspy\nfrom dspy.teleprompt import BootstrapFewShot\n\n# Example setup\nsignature = dspy.Signature(...)  # Your task signature\nmodule = dspy.ChainOfThought(signature)\nteleprompter = BootstrapFewShot(metric=your_metric)  # See metrics below\ncompiled = teleprompter.compile(module, trainset=train_examples)\n```\nBootstrapFewShot bootstraps demonstrations by running the module on inputs, validating with your metric, and selecting high-quality few-shots (typically 4-16 examples).[3]\n\n### Prompt Optimization\n- DSPy **compiles** pipelines iteratively: define task + metric + examples, then optimize signatures, few-shots, or weights.[3]\n- Modules like **ReAct** add tools/reasoning: `dspy.ReAct(signature, tools=[func1])`.[2]\n- Best practice: Start simple (Predict), add reasoning (ChainOfThought), then optimize.[2][7]\n\n### Metrics Best Practices\nMetrics evaluate predictions (e.g., exact match, semantic similarity); define before optimization:\n- **dspy.evaluate.answer_exact_match**: For exact string matches.[3]\n- **Custom metric**: `def metric(example, pred, trace=None): return float(pred.answer.lower() == example.answer.lower())`.\n- SOP: Prepare 10-100 unlabeled inputs; use metric on held-out validation set; aim for >80% on dev set before production.[3]\n- For classification/QA: Use signature-exact-match or F1; for generation: LLM-as-judge or semantic similarity.[3]\n\n### Standard Operating Procedure (SOP) Deep Dive\n1. **Setup**: Virtual env + `pip install dspy-ai openai` (add `phoenix-arize` for observability).[2][5]\n2. **LM Config**: Test multiple (e.g., GPT-4o-mini for speed).[2]\n3. **Data**: `dspy.Example(question=\"...\", answer=\"...\").with_inputs('question')` (few-shot trainset).[1]\n4. **Module**: `class MyModule(dspy.Module): def forward(self, x): ...`.[2]\n5. **Optimize**: `BootstrapFewShot(metric=metric, max_bootstrapped_demos=4).compile(module, trainset)`.[3]\n6. **Evaluate**: `from dspy.evaluate import Evaluate; ev = Evaluate(...); ev(module, devset)`.[3]\n7. **Iterate**: If metric < threshold, add more examples/bootstraps or refine signature.\n\nFor Text-to-SQL example: Use Ollama + few-shot SQLGenerator module.[1] Official docs and notebooks provide full labs.[3][6]",
+      "citations": [
+        "https://www.codecademy.com/article/what-is-dspy",
+        "https://atalupadhyay.wordpress.com/2026/01/26/dspy-from-beginner-to-advanced/",
+        "https://pypi.org/project/dspy/",
+        "https://www.jellyfishtechnologies.com/dspy-building-self-improving-llm-pipelines-in-python/",
+        "https://dev.to/ashokan/a-beginner-friendly-tutorial-using-dspy-to-enhance-prompt-engineering-with-openai-apis-1nbn",
+        "https://dspy.ai",
+        "https://zenvanriel.nl/ai-engineer-blog/dspy-implementation-guide/",
+        "https://pypi.org/project/dspy/2.5.10/"
+      ],
+      "cost": 0.004265
+    }
+  ],
+  "timestamp": "2026-02-01T14:24:50.459119"
+}

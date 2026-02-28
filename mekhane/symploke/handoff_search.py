@@ -257,8 +257,8 @@ def get_boot_handoffs(mode: str = "standard", context: str = None) -> dict:
                                 True  # Proactive Recall でヒット
                             )
                             proactive_memories.append(doc)
-            except Exception as e:
-                logging.exception(f"Proactive recall search error: {e}")
+            except Exception:
+                logging.exception("Proactive recall search error")
 
     return {
         "latest": latest,

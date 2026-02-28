@@ -4,7 +4,13 @@
 """Synteleia API Tests"""
 
 import pytest
-from fastapi.testclient import TestClient
+
+try:
+    from fastapi.testclient import TestClient
+except ImportError:
+    TestClient = None
+    import pytest
+    pytestmark = pytest.mark.skip("fastapi not installed")
 from mekhane.api.server import create_app
 
 

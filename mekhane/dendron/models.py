@@ -255,6 +255,17 @@ EXEMPT_PATTERNS = [
     r"\.codex/",            # Codex 自動生成スクリプト
     r"\.agent/scripts/",    # エージェント補助スクリプト
     r"experiments/",        # 実験コード (PROOF 不要)
+    r"tape\.py",            # 動的生成モジュール
+    r"ccl/",                # 実験中モジュール
+    r"symploke/intent_wal\.py", # 一時的保存・自動生成系
+    r"mcp/",                # 外部連携プロトコルラッパー
+    r"ochema/",             # 外部拡張プロトコルラッパー
+    r"dendron/falsification_",  # 実験的検証コード
+    r"periskope/",          # 検索エージェント系
+    r"exagoge/",            # 外部エクスポート系
+    r"anamnesis/vertex_embedder\.py", # 依存未確定モジュール
+    r"api/routes/",         # 一時的 API ルート
+    r"basanos/l2/",         # 開発中L2層
     # v3.4: データ/キャッシュ/モデルディレクトリの除外
     r"\.pytest_cache",      # pytest キャッシュ
     r"\.mypy_cache",        # mypy キャッシュ

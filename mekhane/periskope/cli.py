@@ -1,3 +1,4 @@
+# PROOF: [L2/未分類] <- User
 #!/usr/bin/env python3
 """
 Periskopē CLI — Deep Research from the command line.

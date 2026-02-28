@@ -1,3 +1,4 @@
+# PROOF: [L2/未分類] <- User
 """
 Page Fetcher — 選択的全文クロール for Periskopē.
 

@@ -1,3 +1,4 @@
+# PROOF: [L2/未分類] <- User
 """
 Internal knowledge searcher for Periskopē.
 

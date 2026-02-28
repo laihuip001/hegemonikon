@@ -1,4 +1,3 @@
-# PROOF: [L2/Auto] <- mekhane/ A0->Auto->AddedByCI
 """
 Periskopē searchers — pluggable search source adapters.
 

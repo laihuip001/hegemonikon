@@ -1,4 +1,3 @@
-# PROOF: [L2/Auto] <- mekhane/ A0->Auto->AddedByCI
 """
 Tavily Search API client for Periskopē.
 

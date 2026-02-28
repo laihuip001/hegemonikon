@@ -291,14 +291,8 @@ async def run_slot_batch(
     total_failed = 0
     all_results = []
 
-    # distribute global max_concurrent across concurrent files to prevent multiplier effect
-    concurrent_files = max(1, min(len(files), max_concurrent))
-    batch_concurrent = max(1, max_concurrent // concurrent_files)
-    file_semaphore = asyncio.Semaphore(concurrent_files)
-
-    # PURPOSE: ファイルごとに専門家を実行
-    async def process_file(file_idx: int, target_file: str) -> Optional[dict]:
-        async with file_semaphore:
+    try:
+        for file_idx, target_file in enumerate(files, 1):
             # 専門家プール選択
             if basanos_bridge is not None and hybrid_ratio > 0 and hybrid_ratio < 1.0:
                 # Hybrid mode: basanos + specialist を比率で混合
@@ -375,17 +369,20 @@ async def run_slot_batch(
 
             if dry_run:
                 print(f"  [{file_idx}/{len(files)}] {target_file} × {len(specs)} specialists (DRY-RUN)")
-                return {
+                all_results.append({
                     "file": target_file,
                     "specialists": len(specs),
                     "dry_run": True,
-                }
+                })
+                continue
 
             print(f"  [{file_idx}/{len(files)}] {target_file} × {len(specs)} specialists")
-            results = await run_batch(specs, target_file, batch_concurrent)
+            results = await run_batch(specs, target_file, max_concurrent)
 
             started = sum(1 for r in results if "session_id" in r)
             failed = sum(1 for r in results if "error" in r)
+            total_started += started
+            total_failed += failed
 
             # F9: session_id + perspective_id をログ保存 (jules_result_parser 連携)
             sessions_info = []
@@ -400,37 +397,13 @@ async def run_slot_batch(
                     info["perspective_id"] = getattr(specs[i], "id", "")
                 sessions_info.append(info)
 
-            print(f"    → {started}/{len(specs)} started, {failed} failed")
-
-            return {
+            all_results.append({
                 "file": target_file,
                 "specialists": len(specs),
                 "started": started,
                 "failed": failed,
                 "sessions": sessions_info,
-            }
-
-    try:
-        tasks = [
-            asyncio.create_task(process_file(file_idx, target_file))
-            for file_idx, target_file in enumerate(files, 1)
-        ]
-
-        for coro in asyncio.as_completed(tasks):
-            try:
-                res = await coro
-            except Exception as e:
-                print(f"  ⚠️  Unhandled error in process_file: {e}")
-                continue
-
-            if not res:
-                continue
-            all_results.append(res)
-            if res.get("dry_run"):
-                continue
-
-            total_started += res.get("started", 0)
-            total_failed += res.get("failed", 0)
+            })
 
             # 安全弁: エラー率チェック
             total_attempted = total_started + total_failed
@@ -438,11 +411,9 @@ async def run_slot_batch(
                 error_rate = total_failed / total_attempted
                 if error_rate > MAX_ERROR_RATE:
                     print(f"  ⚠️  Error rate {error_rate:.1%} > {MAX_ERROR_RATE:.0%}, stopping slot")
-                    # Cancel remaining tasks to halt execution
-                    for t in tasks:
-                        if not t.done():
-                            t.cancel()
                     break
+
+            print(f"    → {started}/{len(specs)} started, {failed} failed")
 
     finally:
         # API キー復元

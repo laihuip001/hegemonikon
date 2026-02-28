@@ -10,8 +10,7 @@ import os
 import sys
 import pytest
 
-# Add parent to path
-sys.path.insert(0, "/home/makaron8426/oikos/hegemonikon")
+aiohttp = pytest.importorskip("aiohttp")
 
 from mekhane.symploke.jules_client import JulesClient
 

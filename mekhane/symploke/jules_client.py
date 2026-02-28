@@ -17,7 +17,6 @@ Usage:
 """
 
 import asyncio
-import aiohttp
 import functools
 import logging
 import os
@@ -29,6 +28,12 @@ from enum import Enum
 from typing import Optional
 
 # Optional OpenTelemetry support for distributed tracing
+try:
+    import aiohttp
+    AIOHTTP_AVAILABLE = True
+except ImportError:
+    AIOHTTP_AVAILABLE = False
+
 try:
     from opentelemetry import trace
     from opentelemetry.propagate import inject
@@ -173,7 +178,7 @@ def with_retry(
     backoff_factor: float = 2.0,
     initial_delay: float = 1.0,
     max_delay: float = 60.0,
-    retryable_exceptions: tuple = (RateLimitError, aiohttp.ClientError),
+    retryable_exceptions: tuple = None,
 ):
     """
     Decorator for async functions with exponential backoff retry.
@@ -185,6 +190,12 @@ def with_retry(
         max_delay: Maximum delay cap
         retryable_exceptions: Tuple of exceptions to retry on
     """
+
+    if retryable_exceptions is None:
+        if AIOHTTP_AVAILABLE:
+            retryable_exceptions = (RateLimitError, aiohttp.ClientError)
+        else:
+            retryable_exceptions = (RateLimitError,)
 
     # PURPOSE: decorator の処理
     def decorator(func):
@@ -255,7 +266,7 @@ class JulesClient:
     def __init__(
         self,
         api_key: Optional[str] = None,
-        session: Optional[aiohttp.ClientSession] = None,
+        session: Optional["aiohttp.ClientSession"] = None,
         max_concurrent: Optional[int] = None,
         base_url: Optional[str] = None,
     ):
@@ -280,7 +291,7 @@ class JulesClient:
             "Content-Type": "application/json",
         }
         self._shared_session = session
-        self._owned_session: Optional[aiohttp.ClientSession] = None
+        self._owned_session: Optional["aiohttp.ClientSession"] = None
 
         # Global semaphore for cross-batch rate limiting (th-003 fix)
         self._global_semaphore = asyncio.Semaphore(
@@ -306,7 +317,7 @@ class JulesClient:
             self._owned_session = None
 
     @property
-    def _session(self) -> aiohttp.ClientSession:
+    def _session(self) -> "aiohttp.ClientSession":
         """Get the active session (shared or owned)."""
         return self._shared_session or self._owned_session or aiohttp.ClientSession()
 

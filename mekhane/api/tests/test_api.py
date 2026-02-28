@@ -10,12 +10,22 @@ API Integration Tests — FastAPI TestClient によるエンドポイント検�
 """
 
 import pytest
-from fastapi.testclient import TestClient
+try:
+    from fastapi.testclient import TestClient
+    HAS_FASTAPI = True
+except ImportError:
+    HAS_FASTAPI = False
+    TestClient = type("TestClient", (), {})
 
-from mekhane.api.server import create_app
+try:
+    from mekhane.api.server import create_app
+except ImportError:
+    pass
 
 
 # PURPOSE: テスト用アプリケーション
+pytestmark = pytest.mark.skipif(not HAS_FASTAPI, reason="fastapi not installed")
+
 @pytest.fixture(scope="module")
 def client():
     """TestClient を生成。"""
@@ -30,6 +40,8 @@ def client():
 
 
 # PURPOSE: Test suite validating status correctness
+pytestmark = pytest.mark.skipif(not HAS_FASTAPI, reason="fastapi not installed")
+
 class TestStatus:
     """/api/status/* エンドポイント。"""
 
@@ -63,6 +75,8 @@ class TestStatus:
 
 
 # PURPOSE: Test suite validating f e p correctness
+pytestmark = pytest.mark.skipif(not HAS_FASTAPI, reason="fastapi not installed")
+
 class TestFEP:
     """/api/fep/* エンドポイント。"""
 
@@ -109,6 +123,8 @@ class TestFEP:
 
 
 # PURPOSE: Test suite validating gnosis correctness
+pytestmark = pytest.mark.skipif(not HAS_FASTAPI, reason="fastapi not installed")
+
 class TestGnosis:
     """/api/gnosis/* エンドポイント。"""
 
@@ -138,6 +154,8 @@ class TestGnosis:
 
 
 # PURPOSE: Test suite validating postcheck correctness
+pytestmark = pytest.mark.skipif(not HAS_FASTAPI, reason="fastapi not installed")
+
 class TestPostcheck:
     """/api/postcheck/* エンドポイント。"""
 
@@ -171,6 +189,8 @@ class TestPostcheck:
 
 
 # PURPOSE: Test suite validating dendron correctness
+pytestmark = pytest.mark.skipif(not HAS_FASTAPI, reason="fastapi not installed")
+
 class TestDendron:
     """/api/dendron/* エンドポイント。"""
 
@@ -202,6 +222,8 @@ class TestDendron:
 
 
 # PURPOSE: Test suite validating open a p i correctness
+pytestmark = pytest.mark.skipif(not HAS_FASTAPI, reason="fastapi not installed")
+
 class TestOpenAPI:
     """OpenAPI スキーマの公開確認。"""
 
@@ -227,6 +249,8 @@ class TestOpenAPI:
 
 
 # PURPOSE: Test suite validating link graph correctness
+pytestmark = pytest.mark.skipif(not HAS_FASTAPI, reason="fastapi not installed")
+
 class TestLinkGraph:
     """/api/link-graph/* エンドポイント。"""
 
@@ -303,6 +327,8 @@ class TestLinkGraph:
 
 
 # PURPOSE: Test suite validating sophia k i correctness
+pytestmark = pytest.mark.skipif(not HAS_FASTAPI, reason="fastapi not installed")
+
 class TestSophiaKI:
     """CRUD ラウンドトリップ + セキュリティ検証。"""
 
@@ -411,6 +437,8 @@ class TestSophiaKI:
 
 
 # PURPOSE: Test suite validating graph correctness
+pytestmark = pytest.mark.skipif(not HAS_FASTAPI, reason="fastapi not installed")
+
 class TestGraph:
     """/api/graph/* エンドポイント。"""
 
@@ -469,6 +497,8 @@ class TestGraph:
 
 
 # PURPOSE: Test suite validating c c l correctness
+pytestmark = pytest.mark.skipif(not HAS_FASTAPI, reason="fastapi not installed")
+
 class TestCCL:
     """/api/ccl/* エンドポイント。"""
 
@@ -518,6 +548,8 @@ class TestCCL:
 
 
 # PURPOSE: Test suite validating w f registry correctness
+pytestmark = pytest.mark.skipif(not HAS_FASTAPI, reason="fastapi not installed")
+
 class TestWFRegistry:
     """/api/wf/* エンドポイント。"""
 
@@ -558,6 +590,8 @@ class TestWFRegistry:
 
 
 # PURPOSE: Test suite validating sympatheia correctness
+pytestmark = pytest.mark.skipif(not HAS_FASTAPI, reason="fastapi not installed")
+
 class TestSympatheia:
     """/api/sympatheia/* エンドポイント (遅延ロード)."""
 
@@ -591,6 +625,8 @@ class TestSympatheia:
 
 
 # PURPOSE: Test suite validating gnosis narrator correctness
+pytestmark = pytest.mark.skipif(not HAS_FASTAPI, reason="fastapi not installed")
+
 class TestGnosisNarrator:
     """/api/gnosis/papers + /api/gnosis/narrate."""
 
@@ -617,6 +653,8 @@ class TestGnosisNarrator:
 
 
 # PURPOSE: Test suite validating synteleia correctness
+pytestmark = pytest.mark.skipif(not HAS_FASTAPI, reason="fastapi not installed")
+
 class TestSynteleia:
     """/api/synteleia/* エンドポイント。"""
 
@@ -646,6 +684,8 @@ class TestSynteleia:
 
 
 # PURPOSE: Test suite validating gateway correctness
+pytestmark = pytest.mark.skipif(not HAS_FASTAPI, reason="fastapi not installed")
+
 class TestGateway:
     """/api/gateway/* エンドポイント。"""
 

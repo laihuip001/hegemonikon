@@ -9,6 +9,13 @@ import asyncio
 import os
 import sys
 import pytest
+try:
+    import aiohttp
+    HAS_AIOHTTP = True
+except ImportError:
+    HAS_AIOHTTP = False
+
+pytestmark = pytest.mark.skipif(not HAS_AIOHTTP, reason="aiohttp not installed")
 
 # Add parent to path
 sys.path.insert(0, "/home/makaron8426/oikos/hegemonikon")

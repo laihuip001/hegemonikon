@@ -1,3 +1,4 @@
+# PROOF: [未分類] <- mekhane
 """
 Multi-model synthesizer for Periskopē.
 

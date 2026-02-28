@@ -60,6 +60,13 @@ def _old_format_log(slot: str = "morning", mode: str = "specialist",
 
 # === テストクラス ===
 
+try:
+    import fastapi
+    HAS_FASTAPI = True
+except ImportError:
+    HAS_FASTAPI = False
+
+@pytest.mark.skipif(not HAS_FASTAPI, reason="fastapi not installed")
 class TestSchedulerAPI:
     """Scheduler Status API のテスト。"""
 

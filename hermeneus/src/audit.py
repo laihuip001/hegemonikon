@@ -269,18 +269,6 @@ class AuditStore:
             )
             conn.commit()
     
-    # PURPOSE: ストアを閉じる
-    def close(self):
-        """ストアを閉じる"""
-        if getattr(self, '_conn', None) is not None:
-            self._conn.close()
-            self._conn = None
-
-    # PURPOSE: デストラクタ
-    def __del__(self):
-        """デストラクタ"""
-        self.close()
-
     # PURPOSE: 行をレコードに変換
     def _row_to_record(self, row) -> AuditRecord:
         """行をレコードに変換"""

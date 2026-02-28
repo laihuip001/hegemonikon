@@ -1,4 +1,3 @@
-# PROOF: [L2/Mekhane] <- mekhane/ A0->Existence
 """
 Citation verification agent for Periskopē.
 

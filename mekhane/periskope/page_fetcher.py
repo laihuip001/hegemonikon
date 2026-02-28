@@ -1,4 +1,3 @@
-# PROOF: [L2/定理] <- mekhane/Auto/ AddedByCI
 """
 Page Fetcher — 選択的全文クロール for Periskopē.
 

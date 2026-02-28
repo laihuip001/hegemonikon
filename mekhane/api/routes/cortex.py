@@ -1,4 +1,3 @@
-# PROOF: [L2/定理] <- mekhane/Auto/ AddedByCI
 from typing import Any, AsyncGenerator
 
 import asyncio

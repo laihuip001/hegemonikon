@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# PROOF: [L2/定理] <- mekhane/Auto/ AddedByCI
 """
 Periskopē CLI — Deep Research from the command line.
 

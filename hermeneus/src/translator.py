@@ -120,18 +120,37 @@ class LMQLTranslator:
             return self._translate_synteleia_macro(name, args)
         
         # 一般マクロ: ビルトインまたはユーザー定義
-        return f'''
-# CCL マクロ: @{name}
-# TODO: マクロ展開 → 他の CCL 式に変換
+        from mekhane.ccl.macro_registry import MacroRegistry
+        from mekhane.ccl.macro_expander import MacroExpander
+        from hermeneus.src.parser import CCLParser
+
+        registry = MacroRegistry()
+        expander = MacroExpander(registry)
+
+        # 引数がある場合は文字列に変換して付加
+        args_str = f"{{{','.join(str(a) for a in args)}}}" if args else ""
+
+        # マクロ展開
+        expanded_ccl, expanded = expander.expand(f"@{name}{args_str}")
+
+        if not expanded:
+            # マクロが未定義の場合のフォールバック
+            return f'''
+# CCL マクロ: @{name} (未定義)
 @lmql.query
-def macro_{name}(context: str):
-    """マクロ @{name} の実行"""
+def macro_{name}_not_found(context: str):
+    """未定義マクロ @{name} のフォールバック実行"""
     argmax
-        "マクロ @{name} を実行: コンテキスト: {{context}}"
+        "マクロ @{name} は未定義です。コンテキストに基づいて最適に行動してください: {{context}}"
         "[RESULT]"
     from
         "{self.model}"
 '''
+
+        # 展開された CCL をパースして再帰的に翻訳
+        parser = CCLParser()
+        ast = parser.parse(expanded_ccl)
+        return self.translate(ast)
     
     # PURPOSE: Synteleia マクロを LMQL + Python に変換
     def _translate_synteleia_macro(self, name: str, args: list) -> str:

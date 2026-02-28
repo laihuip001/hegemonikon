@@ -1,3 +1,4 @@
+# PROOF: [L2/Auto] <- mekhane/basanos/l2/ A0->Auto->AddedByCI
 #!/usr/bin/env python3
 # PURPOSE: Basanos L3 自動解決ループ — deficit→問い→解決策の自動生成
 # REASON: deficit を検出するだけでなく、解決への道筋を自動提案するため

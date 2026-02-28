@@ -98,7 +98,7 @@ class AuditStore:
     @contextmanager
     def _connect(self):
         """データベース接続を取得"""
-        conn = sqlite3.connect(str(self.db_path))
+        conn = sqlite3.connect(str(self.db_path), check_same_thread=False)
         conn.row_factory = sqlite3.Row
         try:
             yield conn

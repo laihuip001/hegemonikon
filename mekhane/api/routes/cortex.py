@@ -1,3 +1,4 @@
+# PROOF: [L2/機能] <- mekhane/api/ cortex
 from typing import Any, AsyncGenerator
 
 import asyncio

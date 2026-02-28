@@ -31,6 +31,8 @@ import sys
 from pathlib import Path
 from datetime import datetime
 
+import os
+
 # Add Hegemonikon root to path for imports
 _THIS_DIR = Path(__file__).parent
 _HEGEMONIKON_ROOT = (
@@ -98,10 +100,41 @@ def cmd_ingest(args):
         except Exception as e:
             print(f"[Kairos] Error: {e}")
 
-    # Chronos (Conversation History) - Not yet implemented
+    # Chronos (Conversation History)
     if args.all or args.chronos:
-        # TODO: Implement when conversation history indexing is ready
-        results["chronos"] = 0
+        try:
+            from mekhane.symploke.kairos_ingest import (
+                get_conversation_files,
+                parse_conversation_chunks,
+            )
+            from mekhane.symploke.chronos_ingest import (
+                ingest_to_chronos,
+                CHRONOS_INDEX_PATH,
+            )
+
+            files = get_conversation_files()
+            if files:
+                all_docs = []
+                for f in files:
+                    all_docs.extend(parse_conversation_chunks(f))
+
+                if all_docs:
+                    count = ingest_to_chronos(
+                        all_docs, save_path=str(CHRONOS_INDEX_PATH)
+                    )
+                    results["chronos"] = count
+                else:
+                    print("[Chronos] No documents generated from conversation files")
+                    results["chronos"] = 0
+            else:
+                print("[Chronos] No conversation files found")
+                results["chronos"] = 0
+        except ImportError as e:
+            print(f"[Chronos] Import error: {e}")
+            results["chronos"] = 0
+        except Exception as e:
+            print(f"[Chronos] Error: {e}")
+            results["chronos"] = 0
 
     # Output in /boot expected format
     total = sum(results.values())
@@ -139,8 +172,20 @@ def cmd_stats(args):
     )
     print(f"Kairos: {handoff_count} handoff files")
 
-    # Chronos stats (placeholder)
-    print("Chronos: Not implemented")
+    # Chronos stats
+    try:
+        from mekhane.symploke.chronos_ingest import (
+            CHRONOS_INDEX_PATH,
+            load_chronos_index,
+        )
+
+        if CHRONOS_INDEX_PATH.exists():
+            adapter = load_chronos_index(str(CHRONOS_INDEX_PATH))
+            print(f"Chronos: {adapter.count()} vectors")
+        else:
+            print("Chronos: Not indexed")
+    except Exception as e:
+        print(f"Chronos: Error - {e}")
 
     print("=" * 40)
     return 0

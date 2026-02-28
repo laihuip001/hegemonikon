@@ -1,0 +1,22 @@
+--- mekhane/symploke/tests/test_api_connection.py
++++ mekhane/symploke/tests/test_api_connection.py
+@@ -13,7 +13,12 @@
+ # Add parent to path
+ sys.path.insert(0, "/home/makaron8426/oikos/hegemonikon")
+
+-from mekhane.symploke.jules_client import JulesClient
++try:
++    import aiohttp
++    from mekhane.symploke.jules_client import JulesClient
++    HAS_AIOHTTP = True
++except ImportError:
++    HAS_AIOHTTP = False
+
+
+ # PURPOSE: Test API connection by listing sources
+@@ -21,6 +26,7 @@
+ @pytest.mark.skipif(not os.environ.get("JULES_API_KEY"), reason="JULES_API_KEY not set")
++@pytest.mark.skipif(not HAS_AIOHTTP, reason="aiohttp required for this test")
+ async def test_list_sources():
+     """
+     Test listing available sources from the API.

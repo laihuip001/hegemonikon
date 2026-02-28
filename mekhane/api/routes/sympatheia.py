@@ -150,6 +150,32 @@ class NotificationResponse(BaseModel):
 # Helpers
 # ===========================================================================
 
+# PURPOSE: ファイルの末尾から指定行数を高速に読み込む。
+def _tail_lines(path: Path, n: int) -> list[str]:
+    """ファイルの末尾から n 行を高速に読み込む（ファイル全体をメモリに展開しない）。"""
+    try:
+        if not path.exists():
+            return []
+        with open(path, 'rb') as f:
+            f.seek(0, os.SEEK_END)
+            buffer = b""
+            pointer_location = f.tell()
+            while pointer_location > 0:
+                step = min(4096, pointer_location)
+                f.seek(pointer_location - step)
+                buffer = f.read(step) + buffer
+                pointer_location -= step
+                lines = buffer.split(b'\n')
+                valid_lines = [line.decode('utf-8', errors='ignore').strip() for line in lines if line.strip()]
+                if len(valid_lines) >= n + 1:
+                    return valid_lines[-n:]
+            valid_lines = [line.decode('utf-8', errors='ignore').strip() for line in buffer.split(b'\n') if line.strip()]
+            return valid_lines[-n:]
+    except Exception as e:
+        logger.warning("Failed to tail %s: %s", path, e)
+        return []
+
+
 # PURPOSE: [L2-auto] JSON ファイルを安全に読む。
 def _read_json(path: Path, default: Any = None) -> Any:
     """JSON ファイルを安全に読む。"""
@@ -325,7 +351,7 @@ async def weekly_digest(req: DigestRequest) -> DigestResponse:
     health_file = MNEME / "health_metrics.jsonl"
     health_scores: list[float] = []
     try:
-        for line in health_file.read_text("utf-8").strip().split("\n")[-200:]:
+        for line in _tail_lines(health_file, 200):
             try:
                 m = json.loads(line)
                 if m.get("timestamp", "") > one_week_ago:
@@ -467,7 +493,7 @@ async def feedback_loop(req: FeedbackRequest) -> FeedbackResponse:
     # --- Health Metrics 分析 ---
     scores: list[float] = []
     try:
-        for line in (MNEME / "health_metrics.jsonl").read_text("utf-8").strip().split("\n")[-200:]:
+        for line in _tail_lines(MNEME / "health_metrics.jsonl", 200):
             try:
                 m = json.loads(line)
                 if m.get("timestamp", "") > three_days_ago:

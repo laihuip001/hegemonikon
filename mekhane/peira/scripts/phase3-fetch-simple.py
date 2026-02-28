@@ -17,6 +17,8 @@ import sys
 import json
 import re
 import time
+import asyncio
+import aiohttp
 import requests
 from bs4 import BeautifulSoup
 from html2text import HTML2Text
@@ -121,62 +123,66 @@ def extract_markdown(soup):
 
 
 # PURPOSE: Fetch and parse a single article.
-def fetch_article(url):
-    """Fetch and parse a single article."""
-    try:
-        response = requests.get(url, headers=HEADERS, timeout=10)
+async def fetch_article(session: aiohttp.ClientSession, url: str, sem: asyncio.Semaphore, batch_id: str, index: int, total: int) -> tuple[dict | None, str | None]:
+    """Fetch and parse a single article concurrently."""
+    async with sem:
+        print(f"[Batch {batch_id}] [{index}/{total}] Fetching: {url}")
+        try:
+            async with session.get(url, headers=HEADERS, timeout=10) as response:
+                if response.status == 404:
+                    print(f"  -> SKIPPED: 404 Not Found")
+                    return None, "404 Not Found"
 
-        if response.status_code == 404:
-            return None, "404 Not Found"
+                response.raise_for_status()
+                text = await response.text(encoding="utf-8", errors="replace")
 
-        response.raise_for_status()
-        response.encoding = "utf-8"
+                soup = BeautifulSoup(text, "html.parser")
 
-        soup = BeautifulSoup(response.text, "html.parser")
+                metadata = extract_metadata(soup, url)
+                markdown = extract_markdown(soup)
 
-        metadata = extract_metadata(soup, url)
-        markdown = extract_markdown(soup)
+                print(f"  -> OK: {metadata['title'][:50]}...")
 
-        return {
-            "url": metadata["url"],
-            "title": metadata["title"],
-            "date": metadata["date"],
-            "metadata": metadata["metadata"],
-            "markdown": markdown,
-        }, None
+                return {
+                    "url": metadata["url"],
+                    "title": metadata["title"],
+                    "date": metadata["date"],
+                    "metadata": metadata["metadata"],
+                    "markdown": markdown,
+                }, None
 
-    except requests.exceptions.RequestException as e:
-        return None, str(e)
+        except (aiohttp.ClientError, asyncio.TimeoutError) as e:
+            print(f"  -> SKIPPED: {str(e)}")
+            return None, str(e)
 
 
-# PURPOSE: CLI エントリポイント — データパイプラインの直接実行
-def main():
+# PURPOSE: Async Main 実行関数
+async def amain():
     batch_id, start_line, end_line = get_args()
     output_file = f"temp_batch_data_{batch_id}.json"
     skip_log_file = os.path.join("Raw", "aidb", "_index", f"skipped_{batch_id}.txt")
 
     print(f"[Batch {batch_id}] Loading URLs from lines {start_line}-{end_line}...")
     urls = load_urls(start_line, end_line)
-    print(f"[Batch {batch_id}] Found {len(urls)} URLs to process.")
+    total_urls = len(urls)
+    print(f"[Batch {batch_id}] Found {total_urls} URLs to process.")
 
     articles = []
     skipped = []
 
-    for i, url in enumerate(urls, 1):
-        print(f"[Batch {batch_id}] [{i}/{len(urls)}] Fetching: {url}")
+    sem = asyncio.Semaphore(10)
 
-        article, error = fetch_article(url)
+    async with aiohttp.ClientSession() as session:
+        tasks = [fetch_article(session, url, sem, batch_id, i, total_urls) for i, url in enumerate(urls, 1)]
 
-        if error:
-            print(f"  -> SKIPPED: {error}")
-            skipped.append(f"{url}\t{error}")
-        else:
-            print(f"  -> OK: {article['title'][:50]}...")
-            articles.append(article)
+        # execution
+        results = await asyncio.gather(*tasks)
 
-        # Rate limiting
-        if i < len(urls):
-            time.sleep(REQUEST_DELAY)
+        for url, (article, error) in zip(urls, results):
+            if error:
+                skipped.append(f"{url}	{error}")
+            elif article:
+                articles.append(article)
 
     # Save results
     print(f"\n[Batch {batch_id}] Saving {len(articles)} articles to {output_file}...")
@@ -195,6 +201,10 @@ def main():
         f"\n[Batch {batch_id}] COMPLETE: {len(articles)} success, {len(skipped)} skipped."
     )
     print(f"Next step: python scripts/phase3-save-batch-parallel.py {batch_id}")
+
+# PURPOSE: CLI エントリポイント — データパイプラインの直接実行
+def main():
+    asyncio.run(amain())
 
 
 if __name__ == "__main__":

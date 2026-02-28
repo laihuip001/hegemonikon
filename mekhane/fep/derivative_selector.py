@@ -2886,28 +2886,29 @@ def update_derivative_selector(
         )
         flat_obs = abs_level * 9 + ctx_dep * 3 + ref_need
 
-        # Check if saved A matrix exists
+        # Check if saved pA (Dirichlet concentration) matrix exists
         persist_dir = Path.home() / "oikos/mneme/.hegemonikon/fep/derivatives"
         persist_dir.mkdir(parents=True, exist_ok=True)
-        persist_path = persist_dir / f"{theorem}_A.npy"
+        persist_path = persist_dir / f"{theorem}_pA.npy"
 
         A = utils.obj_array_zeros([[num_obs, num_states]])
+
+        loaded_pA = None
         if persist_path.exists():
             try:
-                loaded_A = np.load(str(persist_path))
-                # Validate shape
-                if loaded_A.shape == (num_obs, num_states):
-                    # Validate normalization
-                    col_sums = loaded_A.sum(axis=0)
-                    if not np.allclose(col_sums, 1.0):
-                        loaded_A = loaded_A / col_sums
-                    A[0] = loaded_A
+                pA = np.load(str(persist_path))
+                if pA.shape == (num_obs, num_states):
+                    loaded_pA = pA
                 else:
-                    A[0] = np.ones((num_obs, num_states)) / num_obs
+                    logger.warning(f"Shape mismatch for {theorem} pA matrix")
             except Exception as e:
-                logger.warning(f"Failed to load A matrix for {theorem}: {e}")
-                A[0] = np.ones((num_obs, num_states)) / num_obs
+                logger.warning(f"Failed to load pA matrix for {theorem}: {e}")
+
+        if loaded_pA is not None:
+            # Reconstruct A from pA by normalizing columns
+            A[0] = loaded_pA / loaded_pA.sum(axis=0, keepdims=True)
         else:
+            # Default uninformative prior (count=1 for all)
             A[0] = np.ones((num_obs, num_states)) / num_obs
 
         # Initialize B, C, D to defaults
@@ -2927,6 +2928,11 @@ def update_derivative_selector(
             use_defaults=False
         )
 
+        # Set the agent's pA explicitly to match the loaded or default count
+        if loaded_pA is not None:
+            agent.agent.pA = utils.obj_array_zeros([[num_obs, num_states]])
+            agent.agent.pA[0] = loaded_pA.copy()
+
         # Set beliefs to the selected derivative (one-hot)
         deriv_idx = derivatives.index(derivative)
         belief = np.zeros(num_states)
@@ -2941,11 +2947,26 @@ def update_derivative_selector(
             agent.beliefs = belief
 
         # Update A matrix using Dirichlet concentration update
-        agent.update_A_dirichlet(observation=flat_obs, learning_rate=5.0)
+        agent.update_A_dirichlet(observation=flat_obs, learning_rate=1.0)
 
         # 3. Persistence of learned derivative preferences
-        updated_A = agent.agent.A[0] if isinstance(agent.agent.A, np.ndarray) and agent.agent.A.dtype == object else (agent.agent.A[0] if isinstance(agent.agent.A, list) else agent.agent.A)
-        np.save(str(persist_path), updated_A)
+        # We must save the Dirichlet counts (pA), not the probabilities (A)
+        # However, HegemonikónFEPAgent.update_A_dirichlet manually updates agent.A
+        # but does NOT update agent.pA! So we need to reconstruct the updated pA here.
+        # Since update_A_dirichlet does: pA += lr * outer(obs, belief)
+        # We can just apply it to our loaded_pA directly.
+
+        if loaded_pA is None:
+            # If no pA existed, start with a uniform pseudo-count matrix
+            loaded_pA = np.ones((num_obs, num_states))
+
+        obs_vector = np.zeros(num_obs)
+        obs_vector[flat_obs] = 1.0
+
+        # Dirichlet learning rule (align with the FEP agent's rule)
+        loaded_pA += 1.0 * np.outer(obs_vector, belief)
+
+        np.save(str(persist_path), loaded_pA)
 
     except Exception as e:
         logger.error(f"Error in update_derivative_selector: {e}")

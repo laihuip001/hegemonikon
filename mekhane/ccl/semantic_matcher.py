@@ -19,9 +19,7 @@ try:
 except ImportError:
     HAS_EMBEDDINGS = False
 
-
 logger = logging.getLogger(__name__)
-
 
 # PURPOSE: の統一的インターフェースを実現する
 @dataclass

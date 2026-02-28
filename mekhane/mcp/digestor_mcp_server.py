@@ -11,6 +11,15 @@ import sys
 from pathlib import Path
 from mekhane.mcp.mcp_base import MCPBase, StdoutSuppressor
 
+import os
+
+# F: MCP Import Path Hardening - project root + mekhane dir
+_project_root = str(Path(__file__).parent.parent.parent.absolute())
+_mekhane_dir = str(Path(__file__).parent.parent.absolute())
+for _p in [_project_root, _mekhane_dir]:
+    if _p not in sys.path:
+        sys.path.insert(0, _p)
+
 # Initialize via shared infrastructure
 _base = MCPBase(
     name="digestor",

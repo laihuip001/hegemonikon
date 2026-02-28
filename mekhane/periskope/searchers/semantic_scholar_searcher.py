@@ -1,3 +1,4 @@
+# PROOF: [未分類] <- mekhane
 """
 Semantic Scholar API client for Periskopē.
 

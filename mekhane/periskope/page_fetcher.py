@@ -1,3 +1,4 @@
+# PROOF: [未分類] <- mekhane
 """
 Page Fetcher — 選択的全文クロール for Periskopē.
 

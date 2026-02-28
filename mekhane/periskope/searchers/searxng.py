@@ -1,3 +1,4 @@
+# PROOF: [未分類] <- mekhane
 """
 SearXNG search client for Periskopē.
 

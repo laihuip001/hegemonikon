@@ -1,3 +1,4 @@
+# PROOF: [未分類] <- mekhane
 import os
 import logging
 from google import genai

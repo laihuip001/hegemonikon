@@ -1,3 +1,4 @@
+# PROOF: [未分類] <- mekhane
 """
 Brave Search API client for Periskopē.
 

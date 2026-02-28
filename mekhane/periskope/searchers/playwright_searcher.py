@@ -1,3 +1,4 @@
+# PROOF: [未分類] <- mekhane
 """
 Playwright-based searcher for Periskopē.
 

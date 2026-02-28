@@ -1,3 +1,4 @@
+# PROOF: [未分類] <- mekhane
 from typing import Any, AsyncGenerator
 
 import asyncio

@@ -40,16 +40,42 @@ def _load_env():
 _load_env()
 
 
+_secret_manager_client = None
+
 # PURPOSE: [L2-auto] Secret アクセスの一元化 (W08 Secret Sprawl 対策)
 def _get_secret(key: str) -> Optional[str]:
     """Secret アクセスの一元化 (W08 Secret Sprawl 対策)
     
     全ての API キー・認証情報はこの関数経由で取得する。
-    散在する os.environ.get を排除し、将来的な Secret Manager
+    散在する os.environ.get を排除し、Secret Manager
     統合のフックポイントとする。
     """
-    # TODO: Secret Manager (GCP/AWS) 統合時はここを変更
-    return os.environ.get(key)
+    global _secret_manager_client
+
+    # 1. 優先して環境変数から取得 (ローカル開発/上書き用)
+    val = os.environ.get(key)
+    if val:
+        return val
+
+    # 2. GCP Secret Manager から取得を試みる
+    try:
+        from google.cloud import secretmanager
+        project_id = os.environ.get("GOOGLE_CLOUD_PROJECT")
+        if not project_id:
+            return None
+
+        if _secret_manager_client is None:
+            _secret_manager_client = secretmanager.SecretManagerServiceClient()
+
+        name = f"projects/{project_id}/secrets/{key}/versions/latest"
+        response = _secret_manager_client.access_secret_version(request={"name": name})
+        return response.payload.data.decode("UTF-8")
+    except ImportError:
+        # Secret Manager ライブラリが未インストールの場合は None
+        return None
+    except Exception as e:
+        # 認証エラーやシークレットが見つからない場合など
+        return None
 
 
 # PURPOSE: [L2-auto] メモリ内 Circuit Breaker (W06 Cascade Failure 対策)

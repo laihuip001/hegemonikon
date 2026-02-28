@@ -89,7 +89,7 @@ def _list_report_files() -> list[str]:
 # ─── Endpoints ────────────────────────────────────────────
 # PURPOSE: [L2-auto] digest_report 一覧を取得（新しい順）
 @router.get("/reports", response_model=DigestReportListResponse)
-async def list_reports(
+def list_reports(
     limit: int = Query(default=10, ge=1, le=50),
     offset: int = Query(default=0, ge=0),
 ) -> DigestReportListResponse:
@@ -109,7 +109,7 @@ async def list_reports(
 
 # PURPOSE: [L2-auto] 最新のレポートを取得
 @router.get("/latest", response_model=Optional[DigestReport])
-async def latest_report() -> Optional[DigestReport]:
+def latest_report() -> Optional[DigestReport]:
     """最新のレポートを取得"""
     files = _list_report_files()
     if not files:
@@ -140,7 +140,7 @@ class RunResponse(BaseModel):
 
 # PURPOSE: [L2-auto] Digestor パイプラインを実行（n8n Schedule Trigger 用）
 @router.post("/run", response_model=RunResponse)
-async def run_pipeline(req: RunRequest = RunRequest()) -> RunResponse:
+def run_pipeline(req: RunRequest = RunRequest()) -> RunResponse:
     """Digestor パイプラインを実行（n8n Schedule Trigger 用）"""
     try:
         from mekhane.ergasterion.digestor.pipeline import DigestorPipeline

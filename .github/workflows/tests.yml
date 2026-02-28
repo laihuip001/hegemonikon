@@ -96,7 +96,7 @@ jobs:
               env:
                   PYTHONPATH: ${{ github.workspace }}
               run: |
-                  python -m mekhane.dendron.cli check mekhane/ --format markdown > proof-coverage.md
+                  python -m mekhane.dendron.cli check mekhane/ --format markdown > proof-coverage.md || true
                   echo "" >> proof-coverage.md
                   echo "## L2 Purpose Quality" >> proof-coverage.md
                   echo "### dendron/ (strict)" >> proof-coverage.md

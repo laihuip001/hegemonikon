@@ -105,6 +105,7 @@ class DocStalenessChecker:
         self._results: List[StalenessResult] = []
         self._warnings: List[str] = []
 
+    # PURPOSE: 検出された陳腐化ファイルの一覧を生成する
     @property
     def warnings(self) -> List[str]:
         """scan 時の警告 (doc_id 重複等)."""

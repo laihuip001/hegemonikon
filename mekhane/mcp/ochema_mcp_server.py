@@ -1,5 +1,5 @@
-# PROOF: [L2/インフラ] <- mekhane/mcp/ Ochēma MCP Server
 #!/usr/bin/env python3
+# PROOF: [L2/インフラ] <- mekhane/mcp/ Ochēma MCP Server
 """
 Ochēma MCP Server — Antigravity Language Server Bridge
 

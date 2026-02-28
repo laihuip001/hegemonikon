@@ -1,5 +1,5 @@
-# PROOF: [L2/インフラ] <- mekhane/mcp/ A0→MCP経由のアクセスが必要→mneme_server が担う
 #!/usr/bin/env python3
+# PROOF: [L2/インフラ] <- mekhane/mcp/ A0→MCP経由のアクセスが必要→mneme_server が担う
 """
 Mneme MCP Server v1.1 - Hegemonikón Symplokē Integration
 

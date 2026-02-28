@@ -1,5 +1,5 @@
-# PROOF: [L2/インフラ] <- mekhane/mcp/ Periskopē Deep Research を MCP ツールとして公開
 #!/usr/bin/env python3
+# PROOF: [L2/インフラ] <- mekhane/mcp/ Periskopē Deep Research を MCP ツールとして公開
 """
 Periskopē MCP Server v1.0 — Deep Research Engine via MCP
 

@@ -1,5 +1,5 @@
-# PROOF: [L2/インフラ] <- mekhane/ergasterion/basanos/ A2→評議会システムが必要→prompt_generator が担う
 #!/usr/bin/env python3
+# PROOF: [L2/インフラ] <- mekhane/ergasterion/basanos/ A2→評議会システムが必要→prompt_generator が担う
 """
 Jules Basanos v2: Prompt Generator
 

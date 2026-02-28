@@ -1,5 +1,5 @@
-# PROOF: [L3/ユーティリティ] <- mekhane/scripts/ O4→運用スクリプトが必要→cleanup_sessions が担う
 #!/usr/bin/env python3
+# PROOF: [L3/ユーティリティ] <- mekhane/scripts/ O4→運用スクリプトが必要→cleanup_sessions が担う
 """
 cleanup_sessions.py
 現在のセッション以外の全ての .pb ファイルを backup ディレクトリに退避し、

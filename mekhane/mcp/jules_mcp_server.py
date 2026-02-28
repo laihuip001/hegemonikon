@@ -1,5 +1,5 @@
-# PROOF: [L2/インフラ] <- mekhane/mcp/ A0→MCP経由のアクセスが必要→jules_mcp_server が担う
 #!/usr/bin/env python3
+# PROOF: [L2/インフラ] <- mekhane/mcp/ A0→MCP経由のアクセスが必要→jules_mcp_server が担う
 """
 ⚠️ DEPRECATED (2026-02-18): ochema_mcp_server.py に統合済み。このファイルは直接使用しない。
 Jules MCP Server - Hegemonikón H3 Symplokē Layer

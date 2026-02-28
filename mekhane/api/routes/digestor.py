@@ -7,8 +7,6 @@ Desktop App から Digestor 候補レポートを閲覧する。
 scheduler が生成した digest_report_*.json を読み取ってフロントに返す。
 """
 
-import aiofiles
-import asyncio
 import glob
 import json
 import logging
@@ -60,12 +58,11 @@ class DigestReportListResponse(BaseModel):
 
 # ─── Helpers ──────────────────────────────────────────────
 # PURPOSE: [L2-auto] JSON ファイルから DigestReport を生成。失敗時は None。
-async def _load_report(fpath: str) -> Optional[DigestReport]:
+def _load_report(fpath: str) -> Optional[DigestReport]:
     """JSON ファイルから DigestReport を生成。失敗時は None。"""
     try:
-        async with aiofiles.open(fpath) as f:
-            content = await f.read()
-            data = json.loads(content)
+        with open(fpath) as f:
+            data = json.load(f)
         return DigestReport(
             timestamp=data.get("timestamp", ""),
             source=data.get("source", "gnosis"),
@@ -83,11 +80,10 @@ async def _load_report(fpath: str) -> Optional[DigestReport]:
 
 
 # PURPOSE: [L2-auto] digest_report_*.json を新しい順に返す。
-async def _list_report_files() -> list[str]:
+def _list_report_files() -> list[str]:
     """digest_report_*.json を新しい順に返す。"""
     pattern = str(DIGESTOR_DIR / "digest_report_*.json")
-    files = await asyncio.to_thread(glob.glob, pattern)
-    return sorted(files, reverse=True)
+    return sorted(glob.glob(pattern), reverse=True)
 
 
 # ─── Endpoints ────────────────────────────────────────────
@@ -98,17 +94,13 @@ async def list_reports(
     offset: int = Query(default=0, ge=0),
 ) -> DigestReportListResponse:
     """digest_report 一覧を取得（新しい順）"""
-    files = await _list_report_files()
+    files = _list_report_files()
     total = len(files)
     page = files[offset:offset + limit]
 
     reports: list[DigestReport] = []
-
-    # Load reports concurrently
-    tasks = [_load_report(fpath) for fpath in page]
-    results = await asyncio.gather(*tasks)
-
-    for report in results:
+    for fpath in page:
+        report = _load_report(fpath)
         if report is not None:
             reports.append(report)
 
@@ -119,10 +111,10 @@ async def list_reports(
 @router.get("/latest", response_model=Optional[DigestReport])
 async def latest_report() -> Optional[DigestReport]:
     """最新のレポートを取得"""
-    files = await _list_report_files()
+    files = _list_report_files()
     if not files:
         return None
-    return await _load_report(files[0])
+    return _load_report(files[0])
 
 
 # ─── Run Pipeline ─────────────────────────────────────────

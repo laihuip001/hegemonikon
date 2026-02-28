@@ -7,6 +7,7 @@ Desktop App から Digestor 候補レポートを閲覧する。
 scheduler が生成した digest_report_*.json を読み取ってフロントに返す。
 """
 
+import asyncio
 import glob
 import json
 import logging
@@ -94,16 +95,19 @@ async def list_reports(
     offset: int = Query(default=0, ge=0),
 ) -> DigestReportListResponse:
     """digest_report 一覧を取得（新しい順）"""
-    files = _list_report_files()
-    total = len(files)
-    page = files[offset:offset + limit]
+    def _do_work() -> tuple[list[DigestReport], int]:
+        files = _list_report_files()
+        total = len(files)
+        page = files[offset:offset + limit]
 
-    reports: list[DigestReport] = []
-    for fpath in page:
-        report = _load_report(fpath)
-        if report is not None:
-            reports.append(report)
+        reports: list[DigestReport] = []
+        for fpath in page:
+            report = _load_report(fpath)
+            if report is not None:
+                reports.append(report)
+        return reports, total
 
+    reports, total = await asyncio.to_thread(_do_work)
     return DigestReportListResponse(reports=reports, total=total)
 
 
@@ -111,10 +115,13 @@ async def list_reports(
 @router.get("/latest", response_model=Optional[DigestReport])
 async def latest_report() -> Optional[DigestReport]:
     """最新のレポートを取得"""
-    files = _list_report_files()
-    if not files:
-        return None
-    return _load_report(files[0])
+    def _do_work() -> Optional[DigestReport]:
+        files = _list_report_files()
+        if not files:
+            return None
+        return _load_report(files[0])
+
+    return await asyncio.to_thread(_do_work)
 
 
 # ─── Run Pipeline ─────────────────────────────────────────

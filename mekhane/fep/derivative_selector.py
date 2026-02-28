@@ -2911,5 +2911,5 @@ def update_derivative_selector(
         logger.debug(
             f"Successfully recorded FEP feedback for {theorem}:{derivative}"
         )
-    except Exception as e:
+    except (ImportError, NameError, AttributeError, PermissionError, OSError) as e:
         logger.error(f"Failed to record FEP feedback for derivative selector: {e}")

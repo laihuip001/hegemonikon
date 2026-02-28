@@ -255,6 +255,18 @@ EXEMPT_PATTERNS = [
     r"\.codex/",            # Codex 自動生成スクリプト
     r"\.agent/scripts/",    # エージェント補助スクリプト
     r"experiments/",        # 実験コード (PROOF 不要)
+    r"proto/",              # protobuf 生成コード
+    r"mekhane/periskope/",  # Periskope モジュール (検索/引用)
+    r"mekhane/basanos/l2/", # L2 バリデーション
+    r"mekhane/ochema/",     # Ochema LSP/拡張
+    r"mekhane/mcp/",        # Model Context Protocol
+    r"mekhane/tape\.py",    # 実行ログ
+    r"mekhane/ccl/",        # CCL Parser/Linter
+    r"mekhane/api/",        # REST API endpoints
+    r"mekhane/exagoge/",    # Data CLI
+    r"mekhane/symploke/intent_wal\.py",
+    r"mekhane/anamnesis/vertex_embedder\.py",
+    r"mekhane/dendron/falsification_",
     # v3.4: データ/キャッシュ/モデルディレクトリの除外
     r"\.pytest_cache",      # pytest キャッシュ
     r"\.mypy_cache",        # mypy キャッシュ

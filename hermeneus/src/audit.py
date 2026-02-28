@@ -10,6 +10,7 @@ Origin: 2026-01-31 CCL Execution Guarantee Architecture
 
 import json
 import sqlite3
+import threading
 from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any, Dict, List, Optional
@@ -65,12 +66,16 @@ class AuditStore:
     def __init__(self, db_path: Optional[Path] = None):
         self.db_path = db_path or self.DEFAULT_PATH
         self.db_path.parent.mkdir(parents=True, exist_ok=True)
+        self._lock = threading.Lock()
+        self._conn = sqlite3.connect(str(self.db_path), check_same_thread=False)
+        self._conn.row_factory = sqlite3.Row
         self._init_db()
     
     # PURPOSE: データベースを初期化
     def _init_db(self):
         """データベースを初期化"""
         with self._connect() as conn:
+            conn.execute("PRAGMA journal_mode=WAL")
             conn.execute("""
                 CREATE TABLE IF NOT EXISTS audits (
                     record_id TEXT PRIMARY KEY,
@@ -98,12 +103,12 @@ class AuditStore:
     @contextmanager
     def _connect(self):
         """データベース接続を取得"""
-        conn = sqlite3.connect(str(self.db_path))
-        conn.row_factory = sqlite3.Row
-        try:
-            yield conn
-        finally:
-            conn.close()
+        with self._lock:
+            try:
+                yield self._conn
+            except Exception:
+                self._conn.rollback()
+                raise
     
     # PURPOSE: 一意の ID を生成
     def _generate_id(self) -> str:
@@ -263,6 +268,12 @@ class AuditStore:
             )
             conn.commit()
     
+    # PURPOSE: 接続を閉じる
+    def close(self):
+        """データベース接続を閉じる"""
+        with self._lock:
+            self._conn.close()
+
     # PURPOSE: 行をレコードに変換
     def _row_to_record(self, row) -> AuditRecord:
         """行をレコードに変換"""

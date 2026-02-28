@@ -1,3 +1,4 @@
+# PROOF: [L2/機能] <- mekhane/ Auto-generated
 #!/usr/bin/env python3
 """LS Standalone Launcher — IDE なしで Language Server を直接起動する。
 

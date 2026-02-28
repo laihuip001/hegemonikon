@@ -28,16 +28,14 @@ if TYPE_CHECKING:
     from .fep_agent import HegemonikónFEPAgent
 
 # Default persistence paths
-LEARNED_A_PATH = Path("/home/makaron8426/oikos/mneme/.hegemonikon/learned_A.npy")
-LEARNED_A_METADATA_PATH = Path(
-    "/home/makaron8426/oikos/mneme/.hegemonikon/learned_A_meta.json"
-)
+LEARNED_A_PATH = Path.home() / "oikos/mneme/.hegemonikon/learned_A.npy"
+LEARNED_A_METADATA_PATH = Path.home() / "oikos/mneme/.hegemonikon/learned_A_meta.json"
 
 
 # PURPOSE: Ensure the persistence directory exists.
-def ensure_persistence_dir() -> None:
+def ensure_persistence_dir(path: Optional[Path] = None) -> None:
     """Ensure the persistence directory exists."""
-    LEARNED_A_PATH.parent.mkdir(parents=True, exist_ok=True)
+    (path or LEARNED_A_PATH).parent.mkdir(parents=True, exist_ok=True)
 
 
 # PURPOSE: Save learned A matrix to file.
@@ -59,7 +57,7 @@ def save_A(agent: "HegemonikónFEPAgent", path: Optional[Path] = None) -> Path:
         >>> saved_path = save_A(agent)
     """
     target_path = path or LEARNED_A_PATH
-    ensure_persistence_dir()
+    ensure_persistence_dir(target_path)
 
     # Get A matrix from pymdp agent
     A = agent.agent.A

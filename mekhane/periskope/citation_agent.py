@@ -1,3 +1,4 @@
+# PROOF: [L2/機能] <- mekhane/ Auto-generated
 """
 Citation verification agent for Periskopē.
 

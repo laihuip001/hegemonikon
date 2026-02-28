@@ -1,0 +1,7 @@
+--- mekhane/fep/derivative_selector.py
++++ mekhane/fep/derivative_selector.py
+@@ -1,5 +1,5 @@
+-# PROOF: [L1/定理] <- mekhane/fep/
++# PROOF: [L2/Mekhane] <- mekhane/fep/ A0->Existence
+ """
+ PROOF: [L1/定理] このファイルは存在しなければならない

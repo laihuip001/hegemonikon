@@ -19,6 +19,10 @@ from typing import Any, Dict, List, Optional, Union
 from enum import Enum
 from pathlib import Path
 
+import logging
+
+logger = logging.getLogger(__name__)
+
 # .env ファイルから環境変数を読み込む
 # PURPOSE: hermeneus/.env から API キーを読み込む
 def _load_env():
@@ -39,6 +43,8 @@ def _load_env():
 
 _load_env()
 
+_gcp_secret_client = None
+_aws_secret_client = None
 
 # PURPOSE: [L2-auto] Secret アクセスの一元化 (W08 Secret Sprawl 対策)
 def _get_secret(key: str) -> Optional[str]:
@@ -48,7 +54,44 @@ def _get_secret(key: str) -> Optional[str]:
     散在する os.environ.get を排除し、将来的な Secret Manager
     統合のフックポイントとする。
     """
-    # TODO: Secret Manager (GCP/AWS) 統合時はここを変更
+    global _gcp_secret_client, _aws_secret_client
+
+    # 1. GCP Secret Manager
+    if os.environ.get("USE_GCP_SECRET_MANAGER", "").lower() == "true":
+        try:
+            from google.cloud import secretmanager
+            project_id = os.environ.get("GOOGLE_CLOUD_PROJECT")
+            if project_id:
+                if _gcp_secret_client is None:
+                    _gcp_secret_client = secretmanager.SecretManagerServiceClient()
+
+                name = f"projects/{project_id}/secrets/{key}/versions/latest"
+                response = _gcp_secret_client.access_secret_version(request={"name": name})
+                return response.payload.data.decode("UTF-8")
+            else:
+                logger.warning("USE_GCP_SECRET_MANAGER is true but GOOGLE_CLOUD_PROJECT is not set.")
+        except ImportError:
+            logger.warning("google-cloud-secret-manager is not installed. Falling back to env vars.")
+        except Exception as e:
+            logger.warning(f"Failed to fetch {key} from GCP Secret Manager: {e}. Falling back.")
+
+    # 2. AWS Secrets Manager
+    if os.environ.get("USE_AWS_SECRET_MANAGER", "").lower() == "true":
+        try:
+            import boto3
+            region = os.environ.get("AWS_REGION", "us-east-1")
+            if _aws_secret_client is None:
+                _aws_secret_client = boto3.client("secretsmanager", region_name=region)
+
+            response = _aws_secret_client.get_secret_value(SecretId=key)
+            if "SecretString" in response:
+                return response["SecretString"]
+        except ImportError:
+            logger.warning("boto3 is not installed. Falling back to env vars.")
+        except Exception as e:
+            logger.warning(f"Failed to fetch {key} from AWS Secrets Manager: {e}. Falling back.")
+
+    # 3. Local Environment Variables Fallback
     return os.environ.get(key)
 
 

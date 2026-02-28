@@ -1,5 +1,3 @@
-# PROOF: [L2/実装] <- mekhane/dendron/ A0->Auto->AddedByCI
-# PURPOSE: falsification_checker checks and validations
 """
 S7: Falsification Condition Checker
 
@@ -21,7 +19,6 @@ PROJECT_ROOT = Path(__file__).parent.parent.parent
 REGISTRY_PATH = PROJECT_ROOT / "kernel" / "epistemic_status.yaml"
 
 
-# PURPOSE: Ensure load_registry works correctly
 def load_registry() -> dict:
     """Load the epistemic status registry"""
     if not REGISTRY_PATH.exists():
@@ -32,7 +29,6 @@ def load_registry() -> dict:
         return yaml.safe_load(f)
 
 
-# PURPOSE: Ensure check_completeness works correctly
 def check_completeness(registry: dict) -> list[str]:
     """Check that all patches have required fields"""
     issues = []
@@ -58,7 +54,6 @@ def check_completeness(registry: dict) -> list[str]:
     return issues
 
 
-# PURPOSE: Ensure check_file_references works correctly
 def check_file_references(registry: dict) -> list[str]:
     """Verify that claims exist in referenced files at specified lines"""
     issues = []
@@ -101,7 +96,6 @@ def check_file_references(registry: dict) -> list[str]:
     return issues
 
 
-# PURPOSE: Ensure summary_stats works correctly
 def summary_stats(registry: dict) -> dict:
     """Generate summary statistics"""
     patches = registry.get("patches", {})
@@ -115,7 +109,6 @@ def summary_stats(registry: dict) -> dict:
     }
 
 
-# PURPOSE: Ensure main works correctly
 def main():
     registry = load_registry()
     

@@ -1,4 +1,3 @@
-# PROOF: [L2/実装] <- mekhane/periskope/ A0->Auto->AddedByCI
 """
 Citation verification agent for Periskopē.
 

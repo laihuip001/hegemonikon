@@ -45,7 +45,8 @@ jobs:
                   pip install pytest pytest-asyncio pytest-timeout pyyaml pydantic lancedb numpy scipy \
                               networkx pandas tabulate requests httpx schedule fastapi==0.115.6 uvicorn aiohttp python-dotenv filelock starlette==0.40.0
                   # Install PyTorch (CPU-only) and dependents
-                  pip install sentence-transformers torch --index-url https://download.pytorch.org/whl/cpu
+                  pip install torch --index-url https://download.pytorch.org/whl/cpu
+                  pip install sentence-transformers
                   # Install project in development mode if setup exists
                   pip install -e ".[test]" 2>/dev/null || true
 

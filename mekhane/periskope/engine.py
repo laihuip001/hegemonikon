@@ -1,3 +1,4 @@
+# PROOF: [L2/Search] <- mekhane/periskope/
 """
 Periskopē Deep Research Engine — Orchestrator.
 

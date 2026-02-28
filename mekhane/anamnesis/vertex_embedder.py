@@ -1,3 +1,4 @@
+# PROOF: [L2/Embedding] <- mekhane/anamnesis/
 import os
 import logging
 from google import genai

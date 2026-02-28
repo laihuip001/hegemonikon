@@ -28,16 +28,15 @@ if TYPE_CHECKING:
     from .fep_agent import HegemonikónFEPAgent
 
 # Default persistence paths
-LEARNED_A_PATH = Path("/home/makaron8426/oikos/mneme/.hegemonikon/learned_A.npy")
-LEARNED_A_METADATA_PATH = Path(
-    "/home/makaron8426/oikos/mneme/.hegemonikon/learned_A_meta.json"
-)
+LEARNED_A_PATH = Path.home() / "oikos/mneme/.hegemonikon/learned_A.npy"
+LEARNED_A_METADATA_PATH = Path.home() / "oikos/mneme/.hegemonikon/learned_A_meta.json"
 
 
 # PURPOSE: Ensure the persistence directory exists.
-def ensure_persistence_dir() -> None:
+def ensure_persistence_dir(path: Optional[Path] = None) -> None:
     """Ensure the persistence directory exists."""
-    LEARNED_A_PATH.parent.mkdir(parents=True, exist_ok=True)
+    target_path = path or LEARNED_A_PATH
+    target_path.parent.mkdir(parents=True, exist_ok=True)
 
 
 # PURPOSE: Save learned A matrix to file.

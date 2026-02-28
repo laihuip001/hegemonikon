@@ -19,9 +19,10 @@ import os
 import re
 import sys
 from dataclasses import dataclass, field
+import concurrent.futures
 from datetime import datetime
 from pathlib import Path
-from typing import Optional
+from typing import Optional, Callable
 
 from mekhane.pks.llm_client import PKSLLMClient
 
@@ -57,19 +58,19 @@ class KnowledgeNugget:
         """Markdown 形式で出力"""
         lines = [
             f"### 📡 {self.title}",
-            f"",
+            "",
             f"**関連度**: {self.relevance_score:.2f} | **ソース**: {self.source}",
         ]
         if self.push_reason:
             lines.append(f"**プッシュ理由**: {self.push_reason}")
-        lines.append(f"")
+        lines.append("")
         if self.abstract:
             lines.append(f"> {self.abstract[:300]}...")
         if self.authors:
-            lines.append(f"")
+            lines.append("")
             lines.append(f"*Authors: {self.authors[:100]}*")
         if self.url:
-            lines.append(f"")
+            lines.append("")
             lines.append(f"[論文リンク]({self.url})")
         return "\n".join(lines)
 
@@ -510,8 +511,14 @@ class SuggestedQuestionGenerator:
     # PURPOSE: 複数ナゲットに一括で質問を付与
     def enrich_batch(self, nuggets: list[KnowledgeNugget]) -> list[KnowledgeNugget]:
         """複数ナゲットに一括で質問を付与"""
-        for nugget in nuggets:
-            nugget.suggested_questions = self.generate(nugget)
+        if not nuggets:
+            return nuggets
+
+        with concurrent.futures.ThreadPoolExecutor(max_workers=min(10, len(nuggets))) as executor:
+            results = list(executor.map(self.generate, nuggets))
+            for nugget, questions in zip(nuggets, results):
+                nugget.suggested_questions = questions
+
         return nuggets
 
 
@@ -967,7 +974,7 @@ class PKSEngine:
 
             # v2: セレンディピティスコアを表示
             if nugget.serendipity_score > 0:
-                lines.append(f"")
+                lines.append("")
                 lines.append(f"_🎲 意外性: {nugget.serendipity_score:.2f}_")
 
             lines.append("")

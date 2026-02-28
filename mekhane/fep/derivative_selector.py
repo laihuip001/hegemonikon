@@ -140,8 +140,8 @@ try:
     if api_key:
         GEMINI_CLIENT = genai.Client(api_key=api_key)
         GEMINI_AVAILABLE = True
-except ImportError:
-    pass  # TODO: Add proper error handling
+except ImportError as e:
+    logger.warning("google-genai package is not installed. LLM fallback for derivative selection will be disabled. Error: %s", e)
 
 
 # =============================================================================

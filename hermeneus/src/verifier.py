@@ -905,20 +905,17 @@ class AuditStore:
     
     # PURPOSE: [L2-auto] 初期化: init__
     def __init__(self):
-        self._records: List[AuditRecord] = []
+        self._records: Dict[str, AuditRecord] = {}
     
     # PURPOSE: [L2-auto] 記録を追加
     def record(self, audit: AuditRecord):  # PURPOSE: 監査記録をストアに追加する
         """記録を追加"""
-        self._records.append(audit)
+        self._records[audit.id] = audit
     
     # PURPOSE: [L2-auto] ID で取得
     def get(self, audit_id: str) -> Optional[AuditRecord]:  # PURPOSE: ID で監査記録を取得する
         """ID で取得"""
-        for r in self._records:
-            if r.id == audit_id:
-                return r
-        return None
+        return self._records.get(audit_id)
     
     # PURPOSE: CCL 式・日時条件で監査記録をクエリする
     def query(
@@ -928,7 +925,7 @@ class AuditStore:
         limit: int = 10
     ) -> List[AuditRecord]:
         """PURPOSE: CCL 式・日時条件で監査記録をクエリする"""
-        results = self._records
+        results = list(self._records.values())
         if ccl:
             results = [r for r in results if r.ccl == ccl]
         if since:
@@ -941,7 +938,7 @@ class AuditStore:
         if not self._records:
             return {"total": 0, "accept_rate": 0.0}
         
-        accepted = sum(1 for r in self._records if r.consensus.accepted)
+        accepted = sum(1 for r in self._records.values() if r.consensus.accepted)
         return {
             "total": len(self._records),
             "accept_rate": accepted / len(self._records),

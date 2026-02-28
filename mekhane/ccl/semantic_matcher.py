@@ -6,6 +6,7 @@ Uses vector embeddings to match Japanese natural language to CCL macros.
 Integrates with Symplokē for semantic search.
 """
 
+import logging
 from typing import List, Tuple, Optional
 from dataclasses import dataclass
 from .macro_registry import MacroRegistry, Macro, BUILTIN_MACROS
@@ -17,6 +18,9 @@ try:
     HAS_EMBEDDINGS = True
 except ImportError:
     HAS_EMBEDDINGS = False
+
+
+logger = logging.getLogger(__name__)
 
 
 # PURPOSE: の統一的インターフェースを実現する
@@ -126,8 +130,8 @@ class SemanticMacroMatcher:
             try:
                 self.model = SentenceTransformer(self.MODEL_NAME)
                 self._build_index()
-            except Exception:
-                pass  # TODO: Add proper error handling
+            except Exception as e:
+                logger.warning(f"Failed to initialize SentenceTransformer: {e}")
 
     # PURPOSE: Build embedding index for all macro descriptions.
     def _build_index(self):

@@ -1,3 +1,5 @@
+# PROOF: [L2/Auto] <- mekhane/ A0->Auto->AddedByCI
+# PURPOSE: Auto-generated purpose for CI compliance
 """
 Tape Writer — WF 実行トレースを JSONL として記録する。
 

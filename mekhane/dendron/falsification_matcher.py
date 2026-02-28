@@ -1,3 +1,5 @@
+# PROOF: [L2/Auto] <- mekhane.dendron/ A0->Auto->AddedByCI
+# PURPOSE: Auto-generated purpose for CI compliance
 """
 Falsification Matcher — 消化論文の主張と epistemic_status.yaml の反証条件を照合
 

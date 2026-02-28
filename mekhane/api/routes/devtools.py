@@ -1,3 +1,5 @@
+# PROOF: [L2/Auto] <- mekhane.api.routes/ A0->Auto->AddedByCI
+# PURPOSE: Auto-generated purpose for CI compliance
 """
 DevTools API routes — ファイル操作・ターミナル・Ochema (AI) をフロントエンド DevTools ビューに提供。
 

@@ -8,6 +8,7 @@ Dashboard カードおよび健全性チェックに使用。
 """
 
 from __future__ import annotations
+import asyncio
 from pathlib import Path
 from fastapi import APIRouter
 
@@ -19,6 +20,12 @@ PROJECT_ROOT = Path.home() / "oikos" / "hegemonikon"
 REGISTRY_PATH = PROJECT_ROOT / "kernel" / "epistemic_status.yaml"
 
 
+def _load_registry(path: Path) -> dict:
+    """YAMLファイルをブロッキングI/Oで読み込むヘルパー"""
+    with open(path, encoding="utf-8") as f:
+        return yaml.safe_load(f) or {}
+
+
 @router.get("/status")
 async def epistemic_status():
     """認識論的地位の全パッチ情報を返す"""
@@ -26,9 +33,7 @@ async def epistemic_status():
         return {"status": "no_data", "patches": [], "summary": {}}
 
     try:
-        with open(REGISTRY_PATH, encoding="utf-8") as f:
-            data = yaml.safe_load(f) or {}
-
+        data = await asyncio.to_thread(_load_registry, REGISTRY_PATH)
         patches = data.get("patches", {})
 
         # Summary statistics
@@ -67,9 +72,7 @@ async def epistemic_health():
         return {"score": 0, "details": "Registry not found"}
 
     try:
-        with open(REGISTRY_PATH, encoding="utf-8") as f:
-            data = yaml.safe_load(f) or {}
-
+        data = await asyncio.to_thread(_load_registry, REGISTRY_PATH)
         patches = data.get("patches", {})
         if not patches:
             return {"score": 100, "details": "No patches to evaluate"}

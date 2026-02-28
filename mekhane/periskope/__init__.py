@@ -1,3 +1,4 @@
+# PROOF: [L1/定理] <- mekhane/periskope/ : Periskope module initialization
 """
 Periskopē — HGK Deep Research Engine
 

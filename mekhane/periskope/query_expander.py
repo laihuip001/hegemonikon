@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] <- mekhane/periskope/ : Query expansion and semantic formulation
 """
 Query expander for Periskopē.
 

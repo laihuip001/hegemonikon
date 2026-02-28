@@ -1,3 +1,4 @@
+# PROOF: [L1/定理] <- mekhane/periskope/ : Core search and citation orchestration engine
 """
 Periskopē Deep Research Engine — Orchestrator.
 

@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L1/状態管理] <- mekhane/symploke/ エージェントの意図と実行履歴を記録する先行書き込みログ
 """Intent-WAL (Write-Ahead Log) Manager.
 
 Manages session intent WAL files for crash recovery and context continuity.

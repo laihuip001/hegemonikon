@@ -1,3 +1,4 @@
+# PROOF: [L2/静的解析] <- mekhane/ccl/ CCL構文の静的検証と記述規則の評価
 """CCL Linter — CCL 式の静的検証。
 
 operators.md (SSOT) に基づいて CCL 式を検証し、

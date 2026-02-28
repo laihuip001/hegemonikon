@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] <- mekhane/periskope/searchers/ ローカルDendronノートや内部ナレッジの検索
 """
 Internal knowledge searcher for Periskopē.
 

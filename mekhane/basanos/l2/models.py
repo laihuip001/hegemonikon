@@ -1,3 +1,4 @@
+# PROOF: [L1/データ構造] <- mekhane/basanos/l2/ Basanosテストフレームワーク固有の型定義
 # PURPOSE: L2 問い生成のコアデータモデル — deficit と question の型定義
 # REASON: F⊣G 随伴構造の概念を Python の型として具象化するため
 """Core data models for Basanos L2 structural deficit detection."""

@@ -1,3 +1,4 @@
+# PROOF: [L1/制御] <- mekhane/ccl/ CCLカスタム演算子の動的ロードと登録管理
 """operators.md の SSOT パーサー。
 
 operators.md の Markdown テーブルから演算子定義を抽出し、

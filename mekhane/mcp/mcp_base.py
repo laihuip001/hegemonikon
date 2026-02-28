@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/インフラ] <- mekhane/mcp/ Model Context Protocolの基本クラスと通信基盤
 """
 MCP Base Module — Hegemonikón MCP Server Common Infrastructure
 

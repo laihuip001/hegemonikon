@@ -1,3 +1,4 @@
+# PROOF: [L2/推論] <- mekhane/periskope/ 複数検索結果の統合と最終回答の生成処理
 """
 Multi-model synthesizer for Periskopē.
 

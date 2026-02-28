@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L1/制御] <- mekhane/basanos/l2/ テスト依存関係の解決と実行順序の決定ロジック
 # PURPOSE: Basanos L3 自動解決ループ — deficit→問い→解決策の自動生成
 # REASON: deficit を検出するだけでなく、解決への道筋を自動提案するため
 """Auto-resolution loop for Basanos L3.

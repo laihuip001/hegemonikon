@@ -1,3 +1,4 @@
+# PROOF: [L1/状態管理] <- mekhane/tape.py FEPの観測状態と定理適用履歴を永続化するTAPE層
 """
 Tape Writer — WF 実行トレースを JSONL として記録する。
 

@@ -1,3 +1,4 @@
+# PROOF: [L2/推論] <- mekhane/periskope/ LLMを用いた初期クエリの文脈展開と最適化
 """
 Query expander for Periskopē.
 

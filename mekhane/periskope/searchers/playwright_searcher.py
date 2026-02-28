@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] <- mekhane/periskope/searchers/ Playwrightを用いた動的Webページのスクレイピング
 """
 Playwright-based searcher for Periskopē.
 

@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] <- mekhane/anamnesis/ Vertex AIを用いた高次元ベクトル埋め込みの生成
 import os
 import logging
 from google import genai

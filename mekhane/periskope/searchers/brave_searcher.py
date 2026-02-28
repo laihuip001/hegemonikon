@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] <- mekhane/periskope/searchers/ Brave Search APIとの非同期通信統合
 """
 Brave Search API client for Periskopē.
 

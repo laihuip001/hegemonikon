@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/UI] <- mekhane/periskope/ PKSモジュールのコマンドライン実行インターフェース
 """
 Periskopē CLI — Deep Research from the command line.
 

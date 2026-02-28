@@ -1,3 +1,4 @@
+# PROOF: [L2/推論] <- mekhane/periskope/ PKS検索結果からの引用生成とハルシネーション抑制
 """
 Citation verification agent for Periskopē.
 

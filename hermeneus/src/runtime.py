@@ -40,16 +40,67 @@ def _load_env():
 _load_env()
 
 
+_SECRET_CACHE: Dict[str, str] = {}
+
 # PURPOSE: [L2-auto] Secret アクセスの一元化 (W08 Secret Sprawl 対策)
 def _get_secret(key: str) -> Optional[str]:
     """Secret アクセスの一元化 (W08 Secret Sprawl 対策)
     
     全ての API キー・認証情報はこの関数経由で取得する。
-    散在する os.environ.get を排除し、将来的な Secret Manager
-    統合のフックポイントとする。
+    散在する os.environ.get を排除し、GCP/AWS Secret Manager を統合。
     """
-    # TODO: Secret Manager (GCP/AWS) 統合時はここを変更
-    return os.environ.get(key)
+    if key in _SECRET_CACHE:
+        return _SECRET_CACHE[key]
+
+    # 1. 環境変数を優先 (ローカル開発・テスト用)
+    val = os.environ.get(key)
+    if val is not None:
+        _SECRET_CACHE[key] = val
+        return val
+
+    # 2. GCP Secret Manager
+    project_id = os.environ.get("GOOGLE_CLOUD_PROJECT")
+    if project_id:
+        try:
+            from google.cloud import secretmanager
+            client = secretmanager.SecretManagerServiceClient()
+            name = f"projects/{project_id}/secrets/{key}/versions/latest"
+            response = client.access_secret_version(request={"name": name})
+            val = response.payload.data.decode("UTF-8")
+            _SECRET_CACHE[key] = val
+            return val
+        except ImportError:
+            pass  # ライブラリ未インストール
+        except Exception:
+            pass  # シークレットが存在しない、または権限エラー
+
+    # 3. AWS Secrets Manager
+    aws_region = os.environ.get("AWS_REGION")
+    if aws_region:
+        try:
+            import boto3
+            import json
+            client = boto3.client('secretsmanager', region_name=aws_region)
+            response = client.get_secret_value(SecretId=key)
+            if 'SecretString' in response:
+                val = response['SecretString']
+
+                # JSON形式の場合は、同じキー名のフィールドを試みる
+                try:
+                    json_val = json.loads(val)
+                    if isinstance(json_val, dict) and key in json_val:
+                        val = json_val[key]
+                except Exception:
+                    pass
+
+                _SECRET_CACHE[key] = val
+                return val
+        except ImportError:
+            pass
+        except Exception:
+            pass
+
+    return None
 
 
 # PURPOSE: [L2-auto] メモリ内 Circuit Breaker (W06 Cascade Failure 対策)

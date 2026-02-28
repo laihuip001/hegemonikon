@@ -141,7 +141,6 @@ async def run_push(k: int = Query(20, ge=1, le=100)) -> PushResponse:
     # NOTE: PKSEngine のメソッドは同期的。FastAPI の async 内でブロックする可能性がある。
     # 以前はブロックしていたが、現在は asyncio.to_thread() でラップしている。
 
-
     # Handoff からトピック抽出
     topics = await asyncio.to_thread(engine.auto_context_from_handoff)
     if not topics:

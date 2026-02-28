@@ -1,3 +1,4 @@
+# PROOF: [L2/記憶] <- anamnesis 構成要素として必要
 import os
 import logging
 from google import genai

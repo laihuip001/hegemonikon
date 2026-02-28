@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/外部連携] <- mcp 構成要素として必要
 """
 MCP Base Module — Hegemonikón MCP Server Common Infrastructure
 

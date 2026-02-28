@@ -1,3 +1,4 @@
+# PROOF: [L2/探索] <- periskope 構成要素として必要
 """
 Playwright-based searcher for Periskopē.
 

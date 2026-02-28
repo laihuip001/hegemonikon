@@ -1,3 +1,4 @@
+# PROOF: [L2/言語] <- ccl 構成要素として必要
 """CCL Linter — CCL 式の静的検証。
 
 operators.md (SSOT) に基づいて CCL 式を検証し、

@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] <- dendron 構成要素として必要
 """
 S7: Falsification Condition Checker
 

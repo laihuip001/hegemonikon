@@ -1,3 +1,4 @@
+# PROOF: [L2/実装] <- tape.py 構成要素として必要
 """
 Tape Writer — WF 実行トレースを JSONL として記録する。
 

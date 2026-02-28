@@ -1,3 +1,4 @@
+# PROOF: [L2/外部連携] <- api 構成要素として必要
 from typing import Any, AsyncGenerator
 
 import asyncio

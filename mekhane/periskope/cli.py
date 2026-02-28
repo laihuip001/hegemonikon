@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/探索] <- periskope 構成要素として必要
 """
 Periskopē CLI — Deep Research from the command line.
 

@@ -1,3 +1,4 @@
+# PROOF: [Level/Category] <- mekhane/periskope/ A0->Auto->AddedByCI
 """
 Semantic Scholar API client for Periskopē.
 

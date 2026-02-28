@@ -1,427 +1,304 @@
 [
   {
-    "id": "20260215_112517_133943",
+    "id": "20260228_113320_319238",
     "ccl_expr": "/dia!",
     "operators": [
       "!"
     ],
-    "generated_at": "2026-02-15T11:25:17.133962",
+    "generated_at": "2026-02-28T11:33:20.319266",
     "answered": null,
     "correct": null,
     "had_failure": null,
     "notes": ""
   },
   {
-    "id": "20260215_112517_144792",
+    "id": "20260228_113320_339977",
     "ccl_expr": "/dia!",
     "operators": [
       "!"
     ],
-    "generated_at": "2026-02-15T11:25:17.144809",
+    "generated_at": "2026-02-28T11:33:20.340009",
     "answered": null,
     "correct": null,
     "had_failure": null,
     "notes": ""
   },
   {
-    "id": "20260215_112517_156559",
+    "id": "20260228_113320_368474",
     "ccl_expr": "/noe!*^/dia",
     "operators": [
       "!",
       "*^"
     ],
-    "generated_at": "2026-02-15T11:25:17.156574",
+    "generated_at": "2026-02-28T11:33:20.368505",
     "answered": null,
     "correct": null,
     "had_failure": null,
     "notes": ""
   },
   {
-    "id": "20260215_112517_166900",
+    "id": "20260228_113320_394498",
     "ccl_expr": "/noe\\dia",
     "operators": [
       "\\"
     ],
-    "generated_at": "2026-02-15T11:25:17.166918",
+    "generated_at": "2026-02-28T11:33:20.394527",
     "answered": null,
     "correct": null,
     "had_failure": null,
     "notes": ""
   },
   {
-    "id": "20260215_112517_171193",
+    "id": "20260228_113320_404830",
     "ccl_expr": "/noe\\dia",
     "operators": [
       "\\"
     ],
-    "generated_at": "2026-02-15T11:25:17.171209",
+    "generated_at": "2026-02-28T11:33:20.404855",
     "answered": null,
     "correct": null,
     "had_failure": null,
     "notes": ""
   },
   {
-    "id": "20260215_113745_123510",
-    "ccl_expr": "/pro_/s-_R:{F:[×2]{/u+*^/u^}}_~(/noe*/dia)_/pis_/dox-",
-    "operators": [
-      "*^"
-    ],
-    "generated_at": "2026-02-15T11:37:45.123531",
-    "answered": null,
-    "correct": null,
-    "had_failure": null,
-    "notes": ""
-  },
-  {
-    "id": "20260215_121749_207456",
-    "ccl_expr": "/pro_/s-_R:{F:[×2]{/u+*^/u^}}_~(/noe*/dia)_/pis_/dox-",
-    "operators": [
-      "*^"
-    ],
-    "generated_at": "2026-02-15T12:17:49.207479",
-    "answered": null,
-    "correct": null,
-    "had_failure": null,
-    "notes": ""
-  },
-  {
-    "id": "20260215_151139_170959",
-    "ccl_expr": "/noe+~!/dia-",
-    "operators": [
-      "!"
-    ],
-    "generated_at": "2026-02-15T15:11:39.170980",
-    "answered": null,
-    "correct": null,
-    "had_failure": null,
-    "notes": ""
-  },
-  {
-    "id": "20260215_151139_192543",
-    "ccl_expr": "/noe~!/dia",
-    "operators": [
-      "!"
-    ],
-    "generated_at": "2026-02-15T15:11:39.192554",
-    "answered": null,
-    "correct": null,
-    "had_failure": null,
-    "notes": ""
-  },
-  {
-    "id": "20260215_171806_710646",
+    "id": "20260228_113808_144803",
     "ccl_expr": "/dia!",
     "operators": [
       "!"
     ],
-    "generated_at": "2026-02-15T17:18:06.710670",
+    "generated_at": "2026-02-28T11:38:08.144836",
     "answered": null,
     "correct": null,
     "had_failure": null,
     "notes": ""
   },
   {
-    "id": "20260215_171806_721963",
+    "id": "20260228_113808_166167",
     "ccl_expr": "/dia!",
     "operators": [
       "!"
     ],
-    "generated_at": "2026-02-15T17:18:06.721989",
+    "generated_at": "2026-02-28T11:38:08.166198",
     "answered": null,
     "correct": null,
     "had_failure": null,
     "notes": ""
   },
   {
-    "id": "20260215_171806_734326",
+    "id": "20260228_113808_195850",
     "ccl_expr": "/noe!*^/dia",
     "operators": [
       "!",
       "*^"
     ],
-    "generated_at": "2026-02-15T17:18:06.734359",
+    "generated_at": "2026-02-28T11:38:08.195881",
     "answered": null,
     "correct": null,
     "had_failure": null,
     "notes": ""
   },
   {
-    "id": "20260215_171806_747002",
+    "id": "20260228_113808_222208",
     "ccl_expr": "/noe\\dia",
     "operators": [
       "\\"
     ],
-    "generated_at": "2026-02-15T17:18:06.747026",
+    "generated_at": "2026-02-28T11:38:08.222236",
     "answered": null,
     "correct": null,
     "had_failure": null,
     "notes": ""
   },
   {
-    "id": "20260215_171806_751991",
+    "id": "20260228_113808_232454",
     "ccl_expr": "/noe\\dia",
     "operators": [
       "\\"
     ],
-    "generated_at": "2026-02-15T17:18:06.752025",
+    "generated_at": "2026-02-28T11:38:08.232481",
     "answered": null,
     "correct": null,
     "had_failure": null,
     "notes": ""
   },
   {
-    "id": "20260218_020758_421491",
+    "id": "20260228_123459_772802",
     "ccl_expr": "/dia!",
     "operators": [
       "!"
     ],
-    "generated_at": "2026-02-18T02:07:58.421518",
+    "generated_at": "2026-02-28T12:34:59.772835",
     "answered": null,
     "correct": null,
     "had_failure": null,
     "notes": ""
   },
   {
-    "id": "20260218_020758_432311",
+    "id": "20260228_123459_817781",
     "ccl_expr": "/dia!",
     "operators": [
       "!"
     ],
-    "generated_at": "2026-02-18T02:07:58.432335",
+    "generated_at": "2026-02-28T12:34:59.817816",
     "answered": null,
     "correct": null,
     "had_failure": null,
     "notes": ""
   },
   {
-    "id": "20260218_020758_446501",
+    "id": "20260228_123459_877753",
     "ccl_expr": "/noe!*^/dia",
     "operators": [
       "!",
       "*^"
     ],
-    "generated_at": "2026-02-18T02:07:58.446521",
+    "generated_at": "2026-02-28T12:34:59.877786",
     "answered": null,
     "correct": null,
     "had_failure": null,
     "notes": ""
   },
   {
-    "id": "20260218_020758_457743",
+    "id": "20260228_123459_905035",
     "ccl_expr": "/noe\\dia",
     "operators": [
       "\\"
     ],
-    "generated_at": "2026-02-18T02:07:58.457764",
+    "generated_at": "2026-02-28T12:34:59.905067",
     "answered": null,
     "correct": null,
     "had_failure": null,
     "notes": ""
   },
   {
-    "id": "20260218_020758_462766",
+    "id": "20260228_123459_915608",
     "ccl_expr": "/noe\\dia",
     "operators": [
       "\\"
     ],
-    "generated_at": "2026-02-18T02:07:58.462783",
+    "generated_at": "2026-02-28T12:34:59.915638",
     "answered": null,
     "correct": null,
     "had_failure": null,
     "notes": ""
   },
   {
-    "id": "20260218_032659_554899",
-    "ccl_expr": "\\noe+",
+    "id": "20260228_133303_071658",
+    "ccl_expr": "/dia!",
     "operators": [
-      "\\"
+      "!"
     ],
-    "generated_at": "2026-02-18T03:26:59.554923",
+    "generated_at": "2026-02-28T13:33:03.071693",
     "answered": null,
     "correct": null,
     "had_failure": null,
     "notes": ""
   },
   {
-    "id": "20260218_033835_014679",
-    "ccl_expr": "(/noe+)*%(/noe+^)_(\\noe+)*%(\\noe+^)",
+    "id": "20260228_133303_095627",
+    "ccl_expr": "/dia!",
     "operators": [
-      "\\"
+      "!"
     ],
-    "generated_at": "2026-02-18T03:38:35.014703",
+    "generated_at": "2026-02-28T13:33:03.095664",
     "answered": null,
     "correct": null,
     "had_failure": null,
     "notes": ""
   },
   {
-    "id": "20260218_035340_052497",
-    "ccl_expr": "C:{/noe+~*/noe+^}_\\noe!",
+    "id": "20260228_133303_126290",
+    "ccl_expr": "/noe!*^/dia",
     "operators": [
       "!",
-      "\\"
-    ],
-    "generated_at": "2026-02-18T03:53:40.052524",
-    "answered": null,
-    "correct": null,
-    "had_failure": null,
-    "notes": ""
-  },
-  {
-    "id": "20260218_035340_497118",
-    "ccl_expr": "(/noe+)*%(/noe-)_(\\noe+)*%(\\noe-)",
-    "operators": [
-      "\\"
-    ],
-    "generated_at": "2026-02-18T03:53:40.497143",
-    "answered": null,
-    "correct": null,
-    "had_failure": null,
-    "notes": ""
-  },
-  {
-    "id": "20260218_035931_147977",
-    "ccl_expr": "/pro_/s-_R:{F:[×2]{/u+*^/u^}}_~(/noe*/dia)_/pis_/dox-",
-    "operators": [
       "*^"
     ],
-    "generated_at": "2026-02-18T03:59:31.148004",
+    "generated_at": "2026-02-28T13:33:03.126322",
     "answered": null,
     "correct": null,
     "had_failure": null,
     "notes": ""
   },
   {
-    "id": "20260218_040420_764046",
-    "ccl_expr": "C:{(/noe+)*%(/noe+^)_(\\noe+)*%(\\noe+^)}",
+    "id": "20260228_133303_153766",
+    "ccl_expr": "/noe\\dia",
     "operators": [
       "\\"
     ],
-    "generated_at": "2026-02-18T04:04:20.764071",
+    "generated_at": "2026-02-28T13:33:03.153799",
     "answered": null,
     "correct": null,
     "had_failure": null,
     "notes": ""
   },
   {
-    "id": "20260218_040420_776588",
-    "ccl_expr": "C:{/noe+*%/noe-_\\noe+^*%\\noe√}",
+    "id": "20260228_133303_165075",
+    "ccl_expr": "/noe\\dia",
     "operators": [
       "\\"
     ],
-    "generated_at": "2026-02-18T04:04:20.776608",
+    "generated_at": "2026-02-28T13:33:03.165108",
     "answered": null,
     "correct": null,
     "had_failure": null,
     "notes": ""
   },
   {
-    "id": "20260218_041433_648729",
-    "ccl_expr": "F:[×2]{(/noe+)*%(/noe+^)_(\\noe+)*%(\\noe+^)}",
+    "id": "20260228_133917_035206",
+    "ccl_expr": "/dia!",
     "operators": [
-      "\\"
+      "!"
     ],
-    "generated_at": "2026-02-18T04:14:33.648754",
+    "generated_at": "2026-02-28T13:39:17.035240",
     "answered": null,
     "correct": null,
     "had_failure": null,
     "notes": ""
   },
   {
-    "id": "20260218_051608_895180",
-    "ccl_expr": "(/dia+)*%(/dia*)_(\\dia+)*%(\\dia*)",
+    "id": "20260228_133917_057060",
+    "ccl_expr": "/dia!",
     "operators": [
-      "\\"
+      "!"
     ],
-    "generated_at": "2026-02-18T05:16:08.895206",
+    "generated_at": "2026-02-28T13:39:17.057094",
     "answered": null,
     "correct": null,
     "had_failure": null,
     "notes": ""
   },
   {
-    "id": "20260218_051608_908062",
-    "ccl_expr": "(/dia+)*%(/dia+!)_(\\dia+)*%(\\dia+!)",
+    "id": "20260228_133917_086494",
+    "ccl_expr": "/noe!*^/dia",
     "operators": [
       "!",
-      "\\"
-    ],
-    "generated_at": "2026-02-18T05:16:08.908091",
-    "answered": null,
-    "correct": null,
-    "had_failure": null,
-    "notes": ""
-  },
-  {
-    "id": "20260218_053545_046958",
-    "ccl_expr": "F:[×3]{(/dia+)*%(/dia+!)_(\\dia+)*%(\\dia+!)}",
-    "operators": [
-      "!",
-      "\\"
-    ],
-    "generated_at": "2026-02-18T05:35:45.046989",
-    "answered": null,
-    "correct": null,
-    "had_failure": null,
-    "notes": ""
-  },
-  {
-    "id": "20260218_053655_676657",
-    "ccl_expr": "F:[×3]{(/dia+)*%(/dia+!)_(\\dia+)*%(\\dia+!)}",
-    "operators": [
-      "!",
-      "\\"
-    ],
-    "generated_at": "2026-02-18T05:36:55.676681",
-    "answered": null,
-    "correct": null,
-    "had_failure": null,
-    "notes": ""
-  },
-  {
-    "id": "20260218_055841_876998",
-    "ccl_expr": "(/noe+)*%(/noe+^)_(\\noe+)*%(\\noe+^)",
-    "operators": [
-      "\\"
-    ],
-    "generated_at": "2026-02-18T05:58:41.877022",
-    "answered": null,
-    "correct": null,
-    "had_failure": null,
-    "notes": ""
-  },
-  {
-    "id": "20260218_064839_668930",
-    "ccl_expr": "/pro_/s-_R:{F:[×2]{/u+*^/u^}}_~(/noe*/dia)_/pis_/dox-",
-    "operators": [
       "*^"
     ],
-    "generated_at": "2026-02-18T06:48:39.668958",
+    "generated_at": "2026-02-28T13:39:17.086524",
     "answered": null,
     "correct": null,
     "had_failure": null,
     "notes": ""
   },
   {
-    "id": "20260218_120012_925508",
-    "ccl_expr": "F:[×3]{(/noe+)*%(/noe+^)_(\\noe+)*%(\\noe+^)}",
+    "id": "20260228_133917_114174",
+    "ccl_expr": "/noe\\dia",
     "operators": [
       "\\"
     ],
-    "generated_at": "2026-02-18T12:00:12.925534",
+    "generated_at": "2026-02-28T13:39:17.114205",
     "answered": null,
     "correct": null,
     "had_failure": null,
     "notes": ""
   },
   {
-    "id": "20260219_014122_612128",
-    "ccl_expr": "F:[×3]{(/dia+)*%(/dia+!)_(\\dia+)*%(\\dia+!)}",
+    "id": "20260228_133917_124793",
+    "ccl_expr": "/noe\\dia",
     "operators": [
-      "!",
       "\\"
     ],
-    "generated_at": "2026-02-19T01:41:22.612154",
+    "generated_at": "2026-02-28T13:39:17.124821",
     "answered": null,
     "correct": null,
     "had_failure": null,

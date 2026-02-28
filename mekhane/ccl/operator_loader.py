@@ -1,3 +1,4 @@
+# PROOF: [L2/言語基盤] <- mekhane/ccl/ S1→CCL言語処理の要求→operator_loader.py が担う
 """operators.md の SSOT パーサー。
 
 operators.md の Markdown テーブルから演算子定義を抽出し、

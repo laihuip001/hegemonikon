@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/言語基盤] <- mekhane/ochema/ S1→LSP連携の要求→ls_launcher.py が担う
 """LS Standalone Launcher — IDE なしで Language Server を直接起動する。
 
 ManagementMetadata protobuf を stdin に送り込んで LS を起動。

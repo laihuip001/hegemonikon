@@ -1,3 +1,4 @@
+# PROOF: [L2/言語基盤] <- mekhane/ochema/proto/ S1→LSP連携の要求→__init__.py が担う
 # PURPOSE: Antigravity LS の ConnectRPC proto 定義を一元管理する
 # REASON: scripts/ (実験) と ochema/ (正式) が同じ v8 proto 知識を共有し、
 #         Creator が proto を更新するとき 1 箇所だけ変えれば済むようにする

@@ -1,3 +1,4 @@
+# PROOF: [L2/記憶] <- mekhane/anamnesis/ K3→長期記憶の要求→vertex_embedder.py が担う
 import os
 import logging
 from google import genai

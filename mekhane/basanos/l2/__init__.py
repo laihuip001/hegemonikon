@@ -1,3 +1,4 @@
+# PROOF: [L2/審査] <- mekhane/basanos/l2/ A2→厳密な審査の要求→__init__.py が担う
 # PURPOSE: L2 問い生成機構 — 構造的差分検出によるズレの発見
 # REASON: F⊣G 随伴構造の ε/η deficit を具象化し、自動的に問いを生成するため
 """

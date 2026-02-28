@@ -1,3 +1,4 @@
+# PROOF: [L2/探索] <- mekhane/periskope/searchers/ O3→外部知識探索の要求→searxng.py が担う
 """
 SearXNG search client for Periskopē.
 

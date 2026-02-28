@@ -34,6 +34,9 @@ from enum import Enum
 # A1 Pathos (メタ感情)
 # =============================================================================
 
+SOMATIC_KEYWORDS = ("体", "身体", "緊張", "心拍", "body", "tension")
+COGNITIVE_KEYWORDS = ("考え", "思考", "分析", "think", "analyze")
+NEGATIVE_KEYWORDS = ("不安", "怒り", "悲しみ", "恐れ", "anxiety", "anger", "fear")
 
 # PURPOSE: A1 Pathos の派生モード
 class PathosDerivative(Enum):
@@ -93,9 +96,9 @@ def evaluate_pathos(
     exp_lower = experience.lower()
 
     # キーワードベースの派生推論
-    if any(w in exp_lower for w in ["体", "身体", "緊張", "心拍", "body", "tension"]):
+    if any(w in exp_lower for w in SOMATIC_KEYWORDS):
         derivative = PathosDerivative.SOMATIC
-    elif any(w in exp_lower for w in ["考え", "思考", "分析", "think", "analyze"]):
+    elif any(w in exp_lower for w in COGNITIVE_KEYWORDS):
         derivative = PathosDerivative.COGNITIVE
     else:
         derivative = PathosDerivative.EMOTIONAL
@@ -105,8 +108,7 @@ def evaluate_pathos(
     meta = meta_emotion or f"{primary}に対する自覚"
 
     # 強度と調整必要度
-    negative_keywords = ["不安", "怒り", "悲しみ", "恐れ", "anxiety", "anger", "fear"]
-    if any(w in exp_lower for w in negative_keywords):
+    if any(w in exp_lower for w in NEGATIVE_KEYWORDS):
         intensity = 0.7
         regulation_need = 0.6
     else:
@@ -126,6 +128,9 @@ def evaluate_pathos(
 # =============================================================================
 # A3 Gnōmē (格言・原則)
 # =============================================================================
+
+UNIVERSAL_KEYWORDS = ("常に", "普遍", "never", "always", "必ず")
+DOMAIN_KEYWORDS = ("この場合", "特定の", "specifically", "in this case")
 
 # PURPOSE: A3 Gnōmē の派生モード
 
@@ -185,12 +190,10 @@ def extract_gnome(
     combined = src_lower + " " + ctx_lower
 
     # 派生推論
-    if any(w in combined for w in ["常に", "普遍", "never", "always", "必ず"]):
+    if any(w in combined for w in UNIVERSAL_KEYWORDS):
         derivative = GnomeDerivative.UNIVERSAL
         generalizability = 0.9
-    elif any(
-        w in combined for w in ["この場合", "特定の", "specifically", "in this case"]
-    ):
+    elif any(w in combined for w in DOMAIN_KEYWORDS):
         derivative = GnomeDerivative.DOMAIN
         generalizability = 0.5
     else:

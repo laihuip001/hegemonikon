@@ -1,3 +1,4 @@
+# PROOF: [Ousia/Logic] <- mekhane/periskope/searchers/
 """
 Internal knowledge searcher for Periskopē.
 

@@ -1,3 +1,4 @@
+# PROOF: [Ousia/Logic] <- mekhane/periskope/
 """
 Citation verification agent for Periskopē.
 

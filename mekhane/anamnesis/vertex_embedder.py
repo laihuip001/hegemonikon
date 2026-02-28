@@ -1,3 +1,4 @@
+# PROOF: [Ousia/Logic] <- mekhane/anamnesis/
 import os
 import logging
 from google import genai

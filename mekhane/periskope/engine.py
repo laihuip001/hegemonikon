@@ -1,3 +1,4 @@
+# PROOF: [Ousia/Logic] <- mekhane/periskope/
 """
 Periskopē Deep Research Engine — Orchestrator.
 

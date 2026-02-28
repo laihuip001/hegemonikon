@@ -1,3 +1,4 @@
+# PROOF: [Ousia/Logic] <- mekhane/periskope/
 """
 Periskopē — HGK Deep Research Engine
 

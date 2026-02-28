@@ -1,3 +1,4 @@
+# PROOF: [Ousia/Logic] <- mekhane/periskope/searchers/
 """
 Periskopē searchers — pluggable search source adapters.
 

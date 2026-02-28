@@ -1,3 +1,4 @@
+# PROOF: [Ousia/Logic] <- mekhane/periskope/searchers/
 """
 Playwright-based searcher for Periskopē.
 

@@ -1,3 +1,4 @@
+# PROOF: [Ousia/Logic] <- mekhane/periskope/searchers/
 """
 Brave Search API client for Periskopē.
 

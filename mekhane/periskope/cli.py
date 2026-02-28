@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [Ousia/Logic] <- mekhane/periskope/
 """
 Periskopē CLI — Deep Research from the command line.
 

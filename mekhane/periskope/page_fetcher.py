@@ -1,3 +1,4 @@
+# PROOF: [Ousia/Logic] <- mekhane/periskope/
 """
 Page Fetcher — 選択的全文クロール for Periskopē.
 

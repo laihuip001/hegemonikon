@@ -1,3 +1,4 @@
+# PROOF: [Ousia/Logic] <- mekhane/mcp/
 """
 MCP Guard — ゾンビプロセス防止の自己防衛モジュール
 

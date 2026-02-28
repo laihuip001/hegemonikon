@@ -22,6 +22,7 @@ from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
 from typing import Optional
+import concurrent.futures
 
 from mekhane.pks.llm_client import PKSLLMClient
 
@@ -510,8 +511,21 @@ class SuggestedQuestionGenerator:
     # PURPOSE: 複数ナゲットに一括で質問を付与
     def enrich_batch(self, nuggets: list[KnowledgeNugget]) -> list[KnowledgeNugget]:
         """複数ナゲットに一括で質問を付与"""
-        for nugget in nuggets:
-            nugget.suggested_questions = self.generate(nugget)
+        if not nuggets:
+            return nuggets
+
+        with concurrent.futures.ThreadPoolExecutor(max_workers=min(10, len(nuggets))) as executor:
+            # generate() は該当ナゲットの質問リストを返す
+            futures = {executor.submit(self.generate, nugget): nugget for nugget in nuggets}
+            for future in concurrent.futures.as_completed(futures):
+                nugget = futures[future]
+                try:
+                    questions = future.result()
+                    nugget.suggested_questions = questions
+                except Exception as e:
+                    print(f"[PKS] SuggestedQuestion batch generation error: {e}")
+                    nugget.suggested_questions = self._generate_fallback(nugget, 3)
+
         return nuggets
 
 

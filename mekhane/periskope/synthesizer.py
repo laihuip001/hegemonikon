@@ -1,4 +1,3 @@
-# PROOF: [L2/インフラ]
 """
 Multi-model synthesizer for Periskopē.
 

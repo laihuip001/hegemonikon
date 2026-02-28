@@ -1,4 +1,3 @@
-# PROOF: [L2/インフラ]
 #!/usr/bin/env python3
 """Intent-WAL (Write-Ahead Log) Manager.
 

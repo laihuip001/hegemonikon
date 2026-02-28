@@ -1,4 +1,3 @@
-# PROOF: [L2/インフラ]
 """
 Page Fetcher — 選択的全文クロール for Periskopē.
 

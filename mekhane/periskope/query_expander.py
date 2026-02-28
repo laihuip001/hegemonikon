@@ -1,4 +1,3 @@
-# PROOF: [L2/インフラ]
 """
 Query expander for Periskopē.
 

@@ -1,4 +1,3 @@
-# PROOF: [L2/インフラ]
 """
 Brave Search API client for Periskopē.
 

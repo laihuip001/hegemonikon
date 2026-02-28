@@ -1,4 +1,3 @@
-# PROOF: [L2/インフラ]
 """
 Periskopē Deep Research Engine — Orchestrator.
 

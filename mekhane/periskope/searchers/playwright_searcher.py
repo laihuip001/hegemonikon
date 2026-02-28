@@ -1,4 +1,3 @@
-# PROOF: [L2/インフラ]
 """
 Playwright-based searcher for Periskopē.
 

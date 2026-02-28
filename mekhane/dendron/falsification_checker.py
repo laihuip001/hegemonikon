@@ -1,4 +1,3 @@
-# PROOF: [L2/インフラ]
 """
 S7: Falsification Condition Checker
 

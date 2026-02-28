@@ -1,4 +1,3 @@
-# PROOF: [L2/インフラ]
 """
 SearXNG search client for Periskopē.
 

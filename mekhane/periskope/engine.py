@@ -1,3 +1,4 @@
+# PROOF: [L2/Component] <- mekhane/periskope/engine.py
 """
 Periskopē Deep Research Engine — Orchestrator.
 

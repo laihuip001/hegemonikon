@@ -16,7 +16,6 @@ import logging
 import sys
 
 
-# PURPOSE: parser を生成する
 def create_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="periskope",
@@ -82,7 +81,6 @@ def create_parser() -> argparse.ArgumentParser:
     return parser
 
 
-# PURPOSE: Run Periskopē research
 async def main(args: argparse.Namespace) -> int:
     """Run Periskopē research."""
     from mekhane.periskope.engine import PeriskopeEngine
@@ -124,7 +122,6 @@ async def main(args: argparse.Namespace) -> int:
     return 0
 
 
-# PURPOSE: run を実行する
 def run() -> None:
     parser = create_parser()
     args = parser.parse_args()

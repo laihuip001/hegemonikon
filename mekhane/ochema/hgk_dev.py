@@ -56,7 +56,6 @@ DEFAULT_MODEL = "gemini-3-pro-preview"
 
 # --- Colors ---
 
-# PURPOSE: ANSI color codes
 class C:
     """ANSI color codes."""
     RESET = "\033[0m"
@@ -242,7 +241,6 @@ def _print_help() -> None:
 """)
 
 
-# PURPOSE: Main REPL entry point
 def main() -> None:
     """Main REPL entry point."""
     parser = argparse.ArgumentParser(

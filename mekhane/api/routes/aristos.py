@@ -41,7 +41,6 @@ class StatusResponse(BaseModel):
     theorems: list[dict[str, Any]] = []
 
 
-# PURPOSE: 全定理の進化済み重みを取得。
 @router.get("/weights", response_model=WeightsResponse)
 async def get_weights() -> WeightsResponse:
     """全定理の進化済み重みを取得。"""
@@ -64,7 +63,6 @@ async def get_weights() -> WeightsResponse:
     )
 
 
-# PURPOSE: Aristos 進化ステータスを取得。
 @router.get("/status", response_model=StatusResponse)
 async def get_status() -> StatusResponse:
     """Aristos 進化ステータスを取得。"""

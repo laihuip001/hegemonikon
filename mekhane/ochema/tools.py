@@ -83,7 +83,6 @@ def _log_tool_use(name: str, args: dict, result: dict, elapsed: float) -> None:
         _TOOL_LOG.pop(0)
 
 
-# PURPOSE: Get the tool execution audit log (F5)
 def get_tool_log() -> list[dict[str, Any]]:
     """Get the tool execution audit log (F5)."""
     return list(_TOOL_LOG)
@@ -280,7 +279,6 @@ TOOL_DEFINITIONS: list[dict[str, Any]] = [
 # --- Tool Execution ---
 
 
-# PURPOSE: Dispatch and execute a tool call
 def execute_tool(name: str, args: dict[str, Any]) -> dict[str, Any]:
     """Dispatch and execute a tool call.
 
@@ -621,7 +619,6 @@ IMPORTANT:
 """
 
 
-# PURPOSE: Build human-readable tool descriptions for Claude's system prompt
 def build_tool_descriptions() -> str:
     """Build human-readable tool descriptions for Claude's system prompt."""
     lines = []
@@ -645,7 +642,6 @@ def build_tool_descriptions() -> str:
     return "\n".join(lines)
 
 
-# PURPOSE: Build the complete system prompt for Claude text-based tool use
 def get_claude_system_prompt(extra_instructions: str = "") -> str:
     """Build the complete system prompt for Claude text-based tool use."""
     tool_desc = build_tool_descriptions()
@@ -655,7 +651,6 @@ def get_claude_system_prompt(extra_instructions: str = "") -> str:
     return prompt
 
 
-# PURPOSE: Parse tool calls from Claude's text response
 def parse_tool_calls_from_text(text: str) -> list[dict[str, Any]]:
     """Parse tool calls from Claude's text response.
 
@@ -682,13 +677,11 @@ def parse_tool_calls_from_text(text: str) -> list[dict[str, Any]]:
     return tool_calls
 
 
-# PURPOSE: Check if text contains any tool_call blocks
 def has_tool_calls(text: str) -> bool:
     """Check if text contains any tool_call blocks."""
     return "```tool_call" in text
 
 
-# PURPOSE: Remove tool_call blocks from text, returning only the narrative
 def strip_tool_calls(text: str) -> str:
     """Remove tool_call blocks from text, returning only the narrative."""
     return re.sub(r"```tool_call\s*\n.*?\n```", "", text, flags=re.DOTALL).strip()
@@ -732,7 +725,6 @@ HGK_SYSTEM_TEMPLATES: dict[str, str] = {
 }
 
 
-# PURPOSE: Get a pre-defined system instruction template
 def get_system_template(template_name: str) -> str:
     """Get a pre-defined system instruction template."""
     return HGK_SYSTEM_TEMPLATES.get(template_name, HGK_SYSTEM_TEMPLATES["default"])

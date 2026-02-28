@@ -27,7 +27,6 @@ PENDING_FILE = FEEDBACK_DIR / "pending_sessions.json"
 HISTORY_FILE = FEEDBACK_DIR / "feedback_history.json"
 
 
-# PURPOSE: 1つの Jules セッションからのフィードバック。
 @dataclass
 class FeedbackEntry:
     """1つの Jules セッションからのフィードバック。"""
@@ -41,7 +40,6 @@ class FeedbackEntry:
     checker_adjustments: Dict[str, float] = field(default_factory=dict)
     # {checker_code: adjustment} e.g. {"AI-001": -0.1} = reduce weight
 
-    # PURPOSE: to_dict の処理
     def to_dict(self) -> dict:
         return {
             "session_id": self.session_id,
@@ -53,7 +51,6 @@ class FeedbackEntry:
             "checker_adjustments": self.checker_adjustments,
         }
 
-    # PURPOSE: from_dict の処理
     @classmethod
     def from_dict(cls, d: dict) -> "FeedbackEntry":
         return cls(
@@ -67,7 +64,6 @@ class FeedbackEntry:
         )
 
 
-# PURPOSE: Jules L2 結果を L0 Basanos にフィードバックする。
 class JulesFeedback:
     """Jules L2 結果を L0 Basanos にフィードバックする。
 
@@ -114,7 +110,6 @@ class JulesFeedback:
             json.dumps(entries, ensure_ascii=False, indent=2), "utf-8"
         )
 
-    # PURPOSE: Jules セッションを pending に登録。
     def register_session(
         self,
         session_id: str,
@@ -142,7 +137,6 @@ class JulesFeedback:
         self._save_pending(pending)
         logger.info(f"Registered Jules session: {session_id} ({len(issues)} issues)")
 
-    # PURPOSE: 完了した Jules セッションの結果を回収して分類。
     def collect_completed(self) -> List[FeedbackEntry]:
         """完了した Jules セッションの結果を回収して分類。
 
@@ -275,7 +269,6 @@ class JulesFeedback:
 
         return adjustments
 
-    # PURPOSE: 過去N日の feedback_history から累積チェッカー調整値を算出。
     def compute_cumulative_adjustments(self, days: int = 30) -> Dict[str, float]:
         """過去N日の feedback_history から累積チェッカー調整値を算出。"""
         history = self._load_history()
@@ -298,7 +291,6 @@ class JulesFeedback:
 
         return cumulative
 
-    # PURPOSE: 累積調整値を RotationState に適用。
     def apply_to_rotation(self, state: "RotationState") -> Dict[str, Any]:
         """累積調整値を RotationState に適用。
 
@@ -336,7 +328,6 @@ class JulesFeedback:
 
         return changes
 
-    # PURPOSE: フィードバック履歴の要約。
     def summary(self) -> str:
         """フィードバック履歴の要約。"""
         history = self._load_history()

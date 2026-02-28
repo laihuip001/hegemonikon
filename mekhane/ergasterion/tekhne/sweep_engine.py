@@ -41,7 +41,6 @@ if str(_PROJECT_ROOT) not in sys.path:
 # === Data Structures ===
 
 
-# PURPOSE: A single issue found by a perspective scan
 @dataclass
 class SweepIssue:
     """A single issue found by a perspective scan."""
@@ -54,7 +53,6 @@ class SweepIssue:
     recommendation: str = ""
     location: str = ""  # optional file:line reference
 
-    # PURPOSE: Numeric weight for sorting
     @property
     def severity_weight(self) -> int:
         """Numeric weight for sorting."""
@@ -63,7 +61,6 @@ class SweepIssue:
         )
 
 
-# PURPOSE: Result of a 480-dimension sweep scan
 @dataclass
 class SweepReport:
     """Result of a 480-dimension sweep scan."""
@@ -75,12 +72,10 @@ class SweepReport:
     total_perspectives: int = 0
     elapsed_seconds: float = 0.0
 
-    # PURPOSE: issue_count の処理
     @property
     def issue_count(self) -> int:
         return len(self.issues)
 
-    # PURPOSE: Fraction of perspectives that completed successfully
     @property
     def coverage(self) -> float:
         """Fraction of perspectives that completed successfully."""
@@ -88,12 +83,10 @@ class SweepReport:
             return 0.0
         return (self.total_perspectives - self.errors) / self.total_perspectives
 
-    # PURPOSE: Return top N issues sorted by severity (highest first)
     def top_issues(self, n: int = 20) -> list[SweepIssue]:
         """Return top N issues sorted by severity (highest first)."""
         return sorted(self.issues, key=lambda i: i.severity_weight, reverse=True)[:n]
 
-    # PURPOSE: Group issues by domain
     def by_domain(self) -> dict[str, list[SweepIssue]]:
         """Group issues by domain."""
         grouped: dict[str, list[SweepIssue]] = {}
@@ -101,7 +94,6 @@ class SweepReport:
             grouped.setdefault(issue.domain, []).append(issue)
         return grouped
 
-    # PURPOSE: Count issues by severity
     def by_severity(self) -> dict[str, int]:
         """Count issues by severity."""
         counts: dict[str, int] = {
@@ -114,7 +106,6 @@ class SweepReport:
             counts[issue.severity] = counts.get(issue.severity, 0) + 1
         return counts
 
-    # PURPOSE: Human-readable summary
     def summary(self) -> str:
         """Human-readable summary."""
         sev = self.by_severity()
@@ -149,7 +140,6 @@ class SweepReport:
         lines.append(f"{'=' * 60}")
         return "\n".join(lines)
 
-    # PURPOSE: Serialize to dict
     def to_dict(self) -> dict:
         """Serialize to dict."""
         return {
@@ -292,7 +282,6 @@ def _parse_sweep_response(
 # === Sweep Engine ===
 
 
-# PURPOSE: Flash × 480-dimension prompt quality sweep scanner
 class SweepEngine:
     """Flash × 480-dimension prompt quality sweep scanner.
 
@@ -348,7 +337,6 @@ class SweepEngine:
             self._client = CortexClient(model=self.model, temperature=0.3, max_tokens=1024)
         return self._client
 
-    # PURPOSE: Run a full sweep scan on a prompt file
     def sweep(
         self,
         filepath: str,
@@ -503,7 +491,6 @@ class SweepEngine:
         report.elapsed_seconds = time.time() - start_time
         return report
 
-    # PURPOSE: Async sweep — processes perspectives concurrently
     async def sweep_async(
         self,
         filepath: str,
@@ -611,7 +598,6 @@ class SweepEngine:
 # === CLI ===
 
 
-# PURPOSE: main の処理
 def main():
     import argparse
 

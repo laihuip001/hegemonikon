@@ -60,7 +60,6 @@ def _old_format_log(slot: str = "morning", mode: str = "specialist",
 
 # === テストクラス ===
 
-# PURPOSE: Scheduler Status API のテスト。
 class TestSchedulerAPI:
     """Scheduler Status API のテスト。"""
 
@@ -72,7 +71,6 @@ class TestSchedulerAPI:
             (log_dir / filename).write_text(json.dumps(data))
         return log_dir
 
-    # PURPOSE: ログディレクトリが存在しない場合 → no_data。
     def test_no_log_dir(self):
         """ログディレクトリが存在しない場合 → no_data。"""
         import importlib
@@ -83,7 +81,6 @@ class TestSchedulerAPI:
             assert result["status"] == "no_data"
             assert result["runs"] == []
 
-    # PURPOSE: ログディレクトリが空の場合 → no_data。
     def test_empty_log_dir(self, tmp_path: Path):
         """ログディレクトリが空の場合 → no_data。"""
         import mekhane.api.routes.scheduler as mod
@@ -94,7 +91,6 @@ class TestSchedulerAPI:
             result = asyncio.run(mod.scheduler_status(limit=5))
             assert result["status"] == "no_data"
 
-    # PURPOSE: 新フォーマットのログ → 正しくパース。
     def test_new_format_log(self, tmp_path: Path):
         """新フォーマットのログ → 正しくパース。"""
         import mekhane.api.routes.scheduler as mod
@@ -111,7 +107,6 @@ class TestSchedulerAPI:
             assert run["total_failed"] == 1
             assert run["files_reviewed"] == 5
 
-    # PURPOSE: 旧フォーマット (result 内ネスト) → フォールバックでパース。
     def test_old_format_log_fallback(self, tmp_path: Path):
         """旧フォーマット (result 内ネスト) → フォールバックでパース。"""
         import mekhane.api.routes.scheduler as mod
@@ -128,7 +123,6 @@ class TestSchedulerAPI:
             assert run["total_failed"] == 2
             assert run["files_reviewed"] == 3  # len(result.files)
 
-    # PURPOSE: 成功率の計算が正しいか検証。
     def test_success_rate_calculation(self, tmp_path: Path):
         """成功率の計算が正しいか検証。"""
         import mekhane.api.routes.scheduler as mod
@@ -143,7 +137,6 @@ class TestSchedulerAPI:
             assert summary["success_rate"] == 88.9
             assert summary["status"] == "warn"  # 70 <= 88.9 < 90
 
-    # PURPOSE: 成功率 90%+ → status=ok。
     def test_status_ok(self, tmp_path: Path):
         """成功率 90%+ → status=ok。"""
         import mekhane.api.routes.scheduler as mod
@@ -155,7 +148,6 @@ class TestSchedulerAPI:
             result = asyncio.run(mod.scheduler_status(limit=5))
             assert result["summary"]["status"] == "ok"
 
-    # PURPOSE: 成功率 < 70% → status=error。
     def test_status_error(self, tmp_path: Path):
         """成功率 < 70% → status=error。"""
         import mekhane.api.routes.scheduler as mod
@@ -167,7 +159,6 @@ class TestSchedulerAPI:
             result = asyncio.run(mod.scheduler_status(limit=5))
             assert result["summary"]["status"] == "error"
 
-    # PURPOSE: limit パラメータが正しく機能するか。
     def test_limit_parameter(self, tmp_path: Path):
         """limit パラメータが正しく機能するか。"""
         import mekhane.api.routes.scheduler as mod
@@ -181,7 +172,6 @@ class TestSchedulerAPI:
             result = asyncio.run(mod.scheduler_status(limit=2))
             assert len(result["runs"]) == 2
 
-    # PURPOSE: モード集計が正しいか。
     def test_mode_aggregation(self, tmp_path: Path):
         """モード集計が正しいか。"""
         import mekhane.api.routes.scheduler as mod
@@ -197,7 +187,6 @@ class TestSchedulerAPI:
             assert modes["basanos"] == 2
             assert modes["hybrid"] == 1
 
-    # PURPOSE: 壊れたログファイルはスキップされる。
     def test_corrupt_log_skipped(self, tmp_path: Path):
         """壊れたログファイルはスキップされる。"""
         import mekhane.api.routes.scheduler as mod

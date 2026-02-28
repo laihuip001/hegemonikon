@@ -72,7 +72,6 @@ class AuditTarget:
     exclude_patterns: List[str] = field(default_factory=list)  # 除外 glob パターン
     _stripped_cache: Optional[str] = field(default=None, repr=False, compare=False)
 
-    # PURPOSE: 文字列リテラル・コメント除去済みコンテンツ。
     @property
     def stripped_content(self) -> str:
         """文字列リテラル・コメント除去済みコンテンツ。
@@ -89,7 +88,6 @@ class AuditTarget:
             self._stripped_cache = self.content
         return self._stripped_cache
 
-    # PURPOSE: source 拡張子から言語を自動推定。
     @property
     def language(self) -> "SourceLanguage":
         """source 拡張子から言語を自動推定。"""

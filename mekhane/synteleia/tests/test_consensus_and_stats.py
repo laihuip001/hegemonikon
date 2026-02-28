@@ -14,11 +14,9 @@ from mekhane.synteleia.dokimasia.consensus_agent import ConsensusAgent
 from mekhane.synteleia.base import AuditTarget, AuditTargetType
 
 
-# PURPOSE: ConsensusAgent のユニットテスト。
 class TestConsensusAgent:
     """ConsensusAgent のユニットテスト。"""
 
-    # PURPOSE: バックエンドなしの場合、passed=True, confidence=0.0。
     def test_no_backends(self):
         """バックエンドなしの場合、passed=True, confidence=0.0。"""
         agent = ConsensusAgent(backends=[])
@@ -31,7 +29,6 @@ class TestConsensusAgent:
         assert result.confidence == 0.0
         assert result.metadata["reason"] == "No backends available"
 
-    # PURPOSE: バックエンドが接続不可の場合。
     def test_no_available_backends(self):
         """バックエンドが接続不可の場合。"""
         backend = MagicMock()
@@ -43,7 +40,6 @@ class TestConsensusAgent:
         assert result.confidence == 0.0
         assert result.metadata["reason"] == "No backends reachable"
 
-    # PURPOSE: 全モデルが同じ issue を検出 → 高確信度。
     def test_consensus_all_agree(self):
         """全モデルが同じ issue を検出 → 高確信度。"""
         issue_json = json.dumps({
@@ -67,7 +63,6 @@ class TestConsensusAgent:
         assert len(result.issues) == 1
         assert result.issues[0].code == "SEC-001"
 
-    # PURPOSE: 全モデルが問題なしと判断。
     def test_consensus_no_issues(self):
         """全モデルが問題なしと判断。"""
         no_issue_json = json.dumps({
@@ -90,7 +85,6 @@ class TestConsensusAgent:
         assert result.confidence == 1.0
         assert len(result.issues) == 0
 
-    # PURPOSE: 2/3 のモデルが検出 → 過半数で採用。
     def test_consensus_partial_agreement(self):
         """2/3 のモデルが検出 → 過半数で採用。"""
         issue_json = json.dumps({
@@ -124,7 +118,6 @@ class TestConsensusAgent:
         assert len(result.issues) == 1
         assert result.issues[0].code == "LOG-001"
 
-    # PURPOSE: 1つのバックエンドがエラーの場合も残りで処理。
     def test_backend_failure_graceful(self):
         """1つのバックエンドがエラーの場合も残りで処理。"""
         issue_json = json.dumps({
@@ -149,11 +142,9 @@ class TestConsensusAgent:
         assert result.metadata["n_backends"] == 1
 
 
-# PURPOSE: Orchestrator.with_l3 のテスト。
 class TestOrchestratorWithL3:
     """Orchestrator.with_l3 のテスト。"""
 
-    # PURPOSE: with_l3 が ConsensusAgent を含むオーケストレータを生成。
     def test_with_l3_creates_orchestrator(self):
         """with_l3 が ConsensusAgent を含むオーケストレータを生成。"""
         from mekhane.synteleia.orchestrator import SynteleiaOrchestrator
@@ -162,11 +153,9 @@ class TestOrchestratorWithL3:
         assert "ConsensusAgent" in agent_names
 
 
-# PURPOSE: F5: パターン統計テスト。
 class TestPatternStats:
     """F5: パターン統計テスト。"""
 
-    # PURPOSE: record_hit でヒット数が増加し、get_stats で取得可能。
     def test_record_and_get(self):
         """record_hit でヒット数が増加し、get_stats で取得可能。"""
         from mekhane.synteleia.pattern_loader import (
@@ -188,11 +177,9 @@ class TestPatternStats:
         assert get_stats() == {}
 
 
-# PURPOSE: F4: 3層マージのテスト。
 class TestMergedPatterns:
     """F4: 3層マージのテスト。"""
 
-    # PURPOSE: カスタムディレクトリが存在しない場合、プロジェクト YAML のみ使用。
     def test_no_custom_dir(self, tmp_path):
         """カスタムディレクトリが存在しない場合、プロジェクト YAML のみ使用。"""
         from mekhane.synteleia.pattern_loader import load_merged_patterns, _cache
@@ -212,7 +199,6 @@ class TestMergedPatterns:
         assert "vague_patterns" in result
         _cache.clear()
 
-    # PURPOSE: カスタムパターンがプロジェクトパターンを上書き。
     def test_custom_overrides(self, tmp_path):
         """カスタムパターンがプロジェクトパターンを上書き。"""
         from mekhane.synteleia.pattern_loader import load_merged_patterns, _cache

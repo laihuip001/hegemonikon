@@ -25,7 +25,6 @@ if _version_not_supported:
     )
 
 
-# PURPOSE: Minimal service definition - only what LS needs
 class ExtensionServerServiceStub(object):
     """Minimal service definition - only what LS needs
     """
@@ -58,12 +57,10 @@ class ExtensionServerServiceStub(object):
                 _registered_method=True)
 
 
-# PURPOSE: Minimal service definition - only what LS needs
 class ExtensionServerServiceServicer(object):
     """Minimal service definition - only what LS needs
     """
 
-    # PURPOSE: Critical: LS calls this to subscribe to state updates (OAuth token)
     def SubscribeToUnifiedStateSyncTopic(self, request, context):
         """Critical: LS calls this to subscribe to state updates (OAuth token)
         """
@@ -71,7 +68,6 @@ class ExtensionServerServiceServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
-    # PURPOSE: LS calls this to push state updates
     def PushUnifiedStateSyncUpdate(self, request, context):
         """LS calls this to push state updates
         """
@@ -79,7 +75,6 @@ class ExtensionServerServiceServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
-    # PURPOSE: LS calls this on startup
     def LanguageServerStarted(self, request, context):
         """LS calls this on startup
         """
@@ -87,7 +82,6 @@ class ExtensionServerServiceServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
-    # PURPOSE: LS calls this to report errors
     def RecordError(self, request, context):
         """LS calls this to report errors
         """
@@ -96,7 +90,6 @@ class ExtensionServerServiceServicer(object):
         raise NotImplementedError('Method not implemented!')
 
 
-# PURPOSE: ExtensionServerServiceServicer_to_server を追加する
 def add_ExtensionServerServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
             'SubscribeToUnifiedStateSyncTopic': grpc.unary_stream_rpc_method_handler(
@@ -127,12 +120,10 @@ def add_ExtensionServerServiceServicer_to_server(servicer, server):
 
 
  # This class is part of an EXPERIMENTAL API.
-# PURPOSE: Minimal service definition - only what LS needs
 class ExtensionServerService(object):
     """Minimal service definition - only what LS needs
     """
 
-    # PURPOSE: SubscribeToUnifiedStateSyncTopic の処理
     @staticmethod
     def SubscribeToUnifiedStateSyncTopic(request,
             target,
@@ -160,7 +151,6 @@ class ExtensionServerService(object):
             metadata,
             _registered_method=True)
 
-    # PURPOSE: PushUnifiedStateSyncUpdate の処理
     @staticmethod
     def PushUnifiedStateSyncUpdate(request,
             target,
@@ -188,7 +178,6 @@ class ExtensionServerService(object):
             metadata,
             _registered_method=True)
 
-    # PURPOSE: LanguageServerStarted の処理
     @staticmethod
     def LanguageServerStarted(request,
             target,
@@ -216,7 +205,6 @@ class ExtensionServerService(object):
             metadata,
             _registered_method=True)
 
-    # PURPOSE: RecordError の処理
     @staticmethod
     def RecordError(request,
             target,

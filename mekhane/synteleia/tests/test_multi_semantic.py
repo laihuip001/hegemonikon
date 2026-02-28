@@ -68,11 +68,9 @@ def _issue(code: str = "SEM-001", severity: str = "medium", msg: str = "issue") 
 # =============================================================================
 
 
-# PURPOSE: EnsembleMember のテスト。
 class TestEnsembleMember:
     """EnsembleMember のテスト。"""
 
-    # PURPOSE: persona_prompt に persona 固有のテキストが含まれること。
     def test_persona_prompt_contains_persona(self):
         """persona_prompt に persona 固有のテキストが含まれること。"""
         member = EnsembleMember(
@@ -82,7 +80,6 @@ class TestEnsembleMember:
         assert "批判者" in prompt
         assert "Critic" in prompt
 
-    # PURPOSE: persona_prompt にベース監査プロンプトが含まれること。
     def test_persona_prompt_contains_base_prompt(self):
         """persona_prompt にベース監査プロンプトが含まれること。"""
         member = EnsembleMember(
@@ -97,24 +94,20 @@ class TestEnsembleMember:
 # =============================================================================
 
 
-# PURPOSE: MultiSemanticAgent のテスト。
 class TestMultiSemanticAgent:
     """MultiSemanticAgent のテスト。"""
 
-    # PURPOSE: with_stubs() で 3 メンバーが生成されること。
     def test_with_stubs_creates_3_members(self):
         """with_stubs() で 3 メンバーが生成されること。"""
         agent = MultiSemanticAgent.with_stubs()
         assert len(agent.members) == 3
 
-    # PURPOSE: 全 persona がカバーされること。
     def test_with_stubs_covers_all_personas(self):
         """全 persona がカバーされること。"""
         agent = MultiSemanticAgent.with_stubs()
         personas = {m.persona for m in agent.members}
         assert personas == {"critic", "optimist", "pragmatist"}
 
-    # PURPOSE: 全メンバーが問題なしの場合、passed=True。
     def test_audit_no_issues(self):
         """全メンバーが問題なしの場合、passed=True。"""
         agent = MultiSemanticAgent.with_stubs()
@@ -123,7 +116,6 @@ class TestMultiSemanticAgent:
         assert result.issues == []
         assert result.metadata["multi_llm"] is True
 
-    # PURPOSE: 全メンバーが同じ issue を見つけた場合、採用される。
     def test_audit_unanimous_issue(self):
         """全メンバーが同じ issue を見つけた場合、採用される。"""
         issue = _issue(code="SEM-001", severity="high", msg="design flaw found")
@@ -136,7 +128,6 @@ class TestMultiSemanticAgent:
         assert len(result.issues) >= 1
         assert "3/3 votes" in result.issues[0].message
 
-    # PURPOSE: 2/3 メンバーが同じ issue を見つけた場合、採用される。
     def test_audit_majority_issue(self):
         """2/3 メンバーが同じ issue を見つけた場合、採用される。"""
         issue = _issue(code="SEM-002", severity="medium", msg="minor concern here")
@@ -154,7 +145,6 @@ class TestMultiSemanticAgent:
         assert len(result.issues) >= 1
         assert "2/3 votes" in result.issues[0].message
 
-    # PURPOSE: 1/3 メンバーのみの non-CRITICAL issue は除外される。
     def test_audit_single_non_critical_rejected(self):
         """1/3 メンバーのみの non-CRITICAL issue は除外される。"""
         issue = _issue(code="SEM-003", severity="low", msg="cosmetic issue only")
@@ -172,7 +162,6 @@ class TestMultiSemanticAgent:
         assert result.passed is True
         assert len(result.issues) == 0
 
-    # PURPOSE: 1/3 メンバーでも CRITICAL は採用される。
     def test_audit_single_critical_accepted(self):
         """1/3 メンバーでも CRITICAL は採用される。"""
         issue = _issue(code="SEM-004", severity="critical", msg="security vulnerability")
@@ -190,7 +179,6 @@ class TestMultiSemanticAgent:
         assert result.passed is False  # CRITICAL → not passed
         assert len(result.issues) >= 1
 
-    # PURPOSE: メタデータにメンバー情報が含まれること。
     def test_audit_metadata_contains_member_info(self):
         """メタデータにメンバー情報が含まれること。"""
         agent = MultiSemanticAgent.with_stubs()
@@ -200,14 +188,12 @@ class TestMultiSemanticAgent:
         assert len(result.metadata["members"]) == 3
         assert result.metadata["voting"] == "confidence-weighted majority"
 
-    # PURPOSE: テキスト系ターゲットをサポートすること。
     def test_supports_text_types(self):
         """テキスト系ターゲットをサポートすること。"""
         agent = MultiSemanticAgent.with_stubs()
         assert agent.supports(AuditTargetType.GENERIC) is True
         assert agent.supports(AuditTargetType.CCL_OUTPUT) is True
 
-    # PURPOSE: severity 順序が正しいこと。
     def test_severity_rank(self):
         """severity 順序が正しいこと。"""
         assert _severity_rank(AuditSeverity.CRITICAL) > _severity_rank(AuditSeverity.HIGH)
@@ -221,11 +207,9 @@ class TestMultiSemanticAgent:
 # =============================================================================
 
 
-# PURPOSE: orchestrator.with_multi_l2() の統合テスト。
 class TestOrchestratorMultiL2:
     """orchestrator.with_multi_l2() の統合テスト。"""
 
-    # PURPOSE: with_multi_l2() がオーケストレータを生成すること。
     def test_with_multi_l2_creates_orchestrator(self):
         """with_multi_l2() がオーケストレータを生成すること。"""
         # OchemaBackend は LS 不在で失敗するので StubBackend にフォールバック
@@ -235,7 +219,6 @@ class TestOrchestratorMultiL2:
         ).SynteleiaOrchestrator.with_multi_l2()
         assert o is not None
 
-    # PURPOSE: with_multi_l2() に MultiSemanticAgent が含まれること。
     def test_with_multi_l2_has_multi_agent(self):
         """with_multi_l2() に MultiSemanticAgent が含まれること。"""
         from mekhane.synteleia.orchestrator import SynteleiaOrchestrator

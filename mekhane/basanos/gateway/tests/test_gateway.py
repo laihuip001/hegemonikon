@@ -353,7 +353,6 @@ class TestForward:
         vs.register_tool("gnosis", "search")
         return vs
 
-    # PURPOSE: 無効な名前空間はルーティングエラーを返す
     def test_forward_invalid_namespace(self, gateway: VirtualServer) -> None:
         """無効な名前空間はルーティングエラーを返す"""
         result = gateway.forward("invalid_no_dot")
@@ -362,7 +361,6 @@ class TestForward:
         assert result.error.code == "INVALID_NAMESPACE"
         assert result.latency_ms > 0
 
-    # PURPOSE: 未知サーバーはルーティングエラーを返す
     def test_forward_unknown_server(self, gateway: VirtualServer) -> None:
         """未知サーバーはルーティングエラーを返す"""
         result = gateway.forward("evil.steal")
@@ -370,7 +368,6 @@ class TestForward:
         assert result.error is not None
         assert result.error.code == "SERVER_NOT_FOUND"
 
-    # PURPOSE: 破壊的操作は forward でもブロックされる
     def test_forward_destructive_blocked(self, gateway: VirtualServer) -> None:
         """破壊的操作は forward でもブロックされる"""
         result = gateway.forward("gnosis.delete_paper")
@@ -379,7 +376,6 @@ class TestForward:
         # Either POLICY_DENIED or APPROVAL_REQUIRED
         assert result.error.code in ("POLICY_DENIED", "APPROVAL_REQUIRED")
 
-    # PURPOSE: 存在しないコマンドのサーバーはエラーを返す
     def test_forward_stdio_command_not_found(self, gateway: VirtualServer) -> None:
         """存在しないコマンドのサーバーはエラーを返す"""
         # gnosis は stdio + command="npx -y @anthropic/gnosis-mcp" (or similar)
@@ -390,7 +386,6 @@ class TestForward:
         # Expected: COMMAND_NOT_FOUND or PROCESS_ERROR (depends on env)
         assert result.error.code in ("COMMAND_NOT_FOUND", "PROCESS_ERROR", "NO_COMMAND")
 
-    # PURPOSE: forward() はレイテンシを記録する
     def test_forward_latency_tracked(self, gateway: VirtualServer) -> None:
         """forward() はレイテンシを記録する"""
         result = gateway.forward("gnosis.search", {"query": "test"})

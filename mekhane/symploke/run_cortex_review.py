@@ -35,7 +35,6 @@ Focus on: correctness, naming quality, design adherence, and potential improveme
 Output: top 5 findings as structured items with severity (Critical/High/Medium/Low)."""
 
 
-# PURPOSE: context/ ディレクトリから全コンテキストを結合して返す。
 def load_context() -> str:
     """context/ ディレクトリから全コンテキストを結合して返す。"""
     context_parts: list[str] = []
@@ -46,7 +45,6 @@ def load_context() -> str:
     return "\n\n---\n\n".join(context_parts)
 
 
-# PURPOSE: レビュープロンプトを構築する。
 def build_review_prompt(code: str, filepath: str, context: str) -> str:
     """レビュープロンプトを構築する。"""
     return f"""Review the following code from `{filepath}`.
@@ -62,7 +60,6 @@ def build_review_prompt(code: str, filepath: str, context: str) -> str:
 Provide your top 5 findings with severity (Critical/High/Medium/Low) and actionable recommendations."""
 
 
-# PURPOSE: Ochema Cortex API を呼び出す (MCP 経由)。
 def call_cortex(prompt: str, model: str = DEFAULT_MODEL, max_tokens: int = 2048) -> str:
     """Ochema Cortex API を呼び出す (MCP 経由)。
 
@@ -93,7 +90,6 @@ def call_cortex(prompt: str, model: str = DEFAULT_MODEL, max_tokens: int = 2048)
         return f"[Error] Cortex API call failed: {e}"
 
 
-# PURPOSE: main の処理
 def main() -> None:
     parser = argparse.ArgumentParser(description="Cortex Code Review (Gemini 3)")
     parser.add_argument("target", help="レビュー対象ファイル")

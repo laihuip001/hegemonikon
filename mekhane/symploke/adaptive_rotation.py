@@ -88,7 +88,6 @@ def _weighted_avg(rates: list[float]) -> float:
     return sum(r * w for r, w in zip(rates, weights)) / total_weight
 
 
-# PURPOSE: 曜日に対する推奨モードを返す (F23: MAB ベース選択)。
 def recommend_mode(
     day_of_week: int,
     log_dir: Optional[Path] = None,
@@ -154,7 +153,6 @@ def recommend_mode(
             return max(mode_scores, key=lambda m: mode_scores[m])
 
 
-# PURPOSE: 全曜日の推奨ローテーションレポートを返す。
 def get_rotation_report(
     log_dir: Optional[Path] = None,
     window_days: int = 14,

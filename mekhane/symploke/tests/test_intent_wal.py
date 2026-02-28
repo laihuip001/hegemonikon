@@ -18,11 +18,9 @@ from mekhane.symploke.intent_wal import (
 )
 
 
-# PURPOSE: Test IntentWAL dataclass serialization
 class TestIntentWALDataStructure:
     """Test IntentWAL dataclass serialization."""
 
-    # PURPOSE: Minimal WAL with only required fields
     def test_create_minimal_wal(self):
         """Minimal WAL with only required fields."""
         wal = IntentWAL(session_id="test-123", session_goal="Fix bug")
@@ -32,7 +30,6 @@ class TestIntentWALDataStructure:
         assert wal.context_health_level == "green"
         assert wal.created_at != ""
 
-    # PURPOSE: to_dict -> from_dict should preserve all fields
     def test_roundtrip_serialization(self):
         """to_dict -> from_dict should preserve all fields."""
         wal = IntentWAL(
@@ -61,7 +58,6 @@ class TestIntentWALDataStructure:
         assert restored.progress[0].step == 1
         assert restored.progress[0].status == "done"
 
-    # PURPOSE: Serialized dict should include version 1.0
     def test_version_field(self):
         """Serialized dict should include version 1.0."""
         wal = IntentWAL(session_id="v", session_goal="test")
@@ -69,11 +65,9 @@ class TestIntentWALDataStructure:
         assert data["version"] == "1.0"
 
 
-# PURPOSE: Test WAL Manager operations
 class TestIntentWALManager:
     """Test WAL Manager operations."""
 
-    # PURPOSE: Create a new WAL file
     def test_create_wal(self):
         """Create a new WAL file."""
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -93,7 +87,6 @@ class TestIntentWALManager:
                 data = yaml.safe_load(f)
             assert data["intent"]["session_goal"] == "Test goal"
 
-    # PURPOSE: Progress updates are append-only
     def test_update_progress_appends(self):
         """Progress updates are append-only."""
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -111,7 +104,6 @@ class TestIntentWALManager:
             reloaded = mgr.load(mgr.current_path)
             assert len(reloaded.progress) == 2
 
-    # PURPOSE: Context health updates (BC-18 integration)
     def test_update_context_health(self):
         """Context health updates (BC-18 integration)."""
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -122,7 +114,6 @@ class TestIntentWALManager:
             assert mgr.current.context_health_level == "yellow"
             assert mgr.current.savepoint == "/tmp/save.md"
 
-    # PURPOSE: Invalid health level should raise ValueError
     def test_invalid_health_level_raises(self):
         """Invalid health level should raise ValueError."""
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -135,7 +126,6 @@ class TestIntentWALManager:
             except ValueError:
                 pass
 
-    # PURPOSE: load_latest returns most recent WAL
     def test_load_latest(self):
         """load_latest returns most recent WAL."""
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -156,14 +146,12 @@ class TestIntentWALManager:
             assert latest is not None
             assert latest.session_goal == "Second"
 
-    # PURPOSE: load_latest returns None when no WALs exist
     def test_load_latest_empty_dir(self):
         """load_latest returns None when no WALs exist."""
         with tempfile.TemporaryDirectory() as tmpdir:
             mgr = IntentWALManager(wal_dir=Path(tmpdir))
             assert mgr.load_latest() is None
 
-    # PURPOSE: Update recovery information
     def test_update_recovery(self):
         """Update recovery information."""
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -180,7 +168,6 @@ class TestIntentWALManager:
             assert mgr.current.uncommitted_changes is True
             assert mgr.current.blockers == ["API down"]
 
-    # PURPOSE: Operations without active WAL should raise RuntimeError
     def test_no_active_wal_raises(self):
         """Operations without active WAL should raise RuntimeError."""
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -192,11 +179,9 @@ class TestIntentWALManager:
                 pass
 
 
-# PURPOSE: Test WAL to Handoff/Boot section conversion
 class TestHandoffConversion:
     """Test WAL to Handoff/Boot section conversion."""
 
-    # PURPOSE: Convert WAL to Handoff-compatible markdown section
     def test_to_handoff_section(self):
         """Convert WAL to Handoff-compatible markdown section."""
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -216,7 +201,6 @@ class TestHandoffConversion:
             assert "| 1 | Create API | done |" in section
             assert "green" in section
 
-    # PURPOSE: Convert WAL to Boot Report section
     def test_to_boot_section(self):
         """Convert WAL to Boot Report section."""
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -230,7 +214,6 @@ class TestHandoffConversion:
             assert "Fix safety" in section
             assert "1/1 steps completed" in section
 
-    # PURPOSE: Conversion with no active WAL returns empty string
     def test_empty_wal_conversion(self):
         """Conversion with no active WAL returns empty string."""
         with tempfile.TemporaryDirectory() as tmpdir:

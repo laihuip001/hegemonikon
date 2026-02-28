@@ -11,7 +11,6 @@ from unittest.mock import patch, MagicMock, AsyncMock
 
 # ═══ テスト用モック ═══════════════════════════════
 
-# PURPOSE: テスト用の Paper モック
 @dataclass
 class MockPaper:
     """テスト用の Paper モック"""
@@ -26,13 +25,11 @@ class MockPaper:
     doi: Optional[str] = None
     arxiv_id: Optional[str] = None
 
-    # PURPOSE: primary_key の処理
     @property
     def primary_key(self):
         return f"{self.source}:{self.source_id or self.id}"
 
 
-# PURPOSE: Exa SearchResult のモック
 @dataclass
 class MockSearchResult:
     """Exa SearchResult のモック"""
@@ -47,11 +44,9 @@ class MockSearchResult:
 # ═══ Phase C: Exa 統合 ═══════════════════════════
 
 
-# PURPOSE: _exa_to_paper の単体テスト
 class TestExaToPaper:
     """_exa_to_paper の単体テスト"""
 
-    # PURPOSE: pipeline の処理
     @pytest.fixture
     def pipeline(self, tmp_path):
         topics_file = tmp_path / "topics.yaml"
@@ -71,7 +66,6 @@ topics:
         selector = DigestorSelector(topics_file=topics_file)
         return DigestorPipeline(output_dir=tmp_path, selector=selector)
 
-    # PURPOSE: SearchResult → Paper 変換が成功する
     def test_converts_search_result(self, pipeline):
         """SearchResult → Paper 変換が成功する"""
         result = MockSearchResult(
@@ -86,21 +80,18 @@ topics:
         assert paper.url == "https://arxiv.org/abs/2601.12345"
         assert "active inference" in paper.abstract.lower()
 
-    # PURPOSE: タイトルなし → None
     def test_empty_title_returns_none(self, pipeline):
         """タイトルなし → None"""
         result = MockSearchResult(title="", url="https://example.com")
         paper = pipeline._exa_to_paper(result, "fep")
         assert paper is None
 
-    # PURPOSE: 空白のみタイトル → None
     def test_whitespace_title_returns_none(self, pipeline):
         """空白のみタイトル → None"""
         result = MockSearchResult(title="   ", url="https://example.com")
         paper = pipeline._exa_to_paper(result, "fep")
         assert paper is None
 
-    # PURPOSE: content が 500 文字に切り詰められる
     def test_content_truncated_to_500(self, pipeline):
         """content が 500 文字に切り詰められる"""
         long_content = "x" * 1000
@@ -109,7 +100,6 @@ topics:
         assert paper is not None
         assert len(paper.abstract) <= 500
 
-    # PURPOSE: content が空の場合 snippet にフォールバック
     def test_fallback_to_snippet(self, pipeline):
         """content が空の場合 snippet にフォールバック"""
         result = MockSearchResult(title="Test", content="", snippet="Short snippet.")
@@ -118,11 +108,9 @@ topics:
         assert paper.abstract == "Short snippet."
 
 
-# PURPOSE: _fetch_from_exa の統合テスト
 class TestFetchFromExa:
     """_fetch_from_exa の統合テスト"""
 
-    # PURPOSE: pipeline の処理
     @pytest.fixture
     def pipeline(self, tmp_path):
         topics_file = tmp_path / "topics.yaml"
@@ -142,7 +130,6 @@ topics:
         selector = DigestorSelector(topics_file=topics_file)
         return DigestorPipeline(output_dir=tmp_path, selector=selector)
 
-    # PURPOSE: EXA_API_KEY なし → 空リスト
     def test_skips_without_api_key(self, pipeline):
         """EXA_API_KEY なし → 空リスト"""
         with patch.dict("os.environ", {}, clear=True):
@@ -152,7 +139,6 @@ topics:
             result = pipeline._fetch_from_exa(topics=["fep"])
             assert result == []
 
-    # PURPOSE: EXA_API_KEY あり + mock → Paper リスト
     @patch("mekhane.periskope.searchers.exa_searcher.ExaSearcher")
     def test_returns_papers_with_api_key(self, mock_exa_cls, pipeline):
         """EXA_API_KEY あり + mock → Paper リスト"""
@@ -171,7 +157,6 @@ topics:
         assert len(papers) == 2
         assert all(p.source == "exa" for p in papers)
 
-    # PURPOSE: ExaSearcher が import できない → 空リスト
     def test_graceful_on_import_error(self, pipeline):
         """ExaSearcher が import できない → 空リスト"""
         with patch.dict("os.environ", {"EXA_API_KEY": "test-key"}):

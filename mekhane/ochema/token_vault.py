@@ -49,13 +49,11 @@ _TOKEN_TTL = 3300  # 55 minutes
 # --- Exceptions ---
 
 
-# PURPOSE: TokenVault error
 class VaultError(Exception):
     """TokenVault error."""
     pass
 
 
-# PURPOSE: Authentication error for a specific account
 class VaultAuthError(VaultError):
     """Authentication error for a specific account."""
     pass
@@ -64,7 +62,6 @@ class VaultAuthError(VaultError):
 # --- TokenVault ---
 
 
-# PURPOSE: Multi-account OAuth token manager
 class TokenVault:
     """Multi-account OAuth token manager.
 
@@ -83,7 +80,6 @@ class TokenVault:
 
     # --- Public API ---
 
-    # PURPOSE: Get a valid access token for the given account
     def get_token(self, account: str = "default") -> str:
         """Get a valid access token for the given account.
 
@@ -136,7 +132,6 @@ class TokenVault:
         self._cache[account] = (token, time.time() + _TOKEN_TTL)
         return token
 
-    # PURPOSE: Add a new account to the vault
     def add_account(
         self,
         name: str,
@@ -198,7 +193,6 @@ class TokenVault:
         logger.info("Account added: %s (email=%s)", name, email or "?")
         return acct_info
 
-    # PURPOSE: Remove an account from the vault
     def remove_account(self, name: str) -> None:
         """Remove an account from the vault.
 
@@ -230,7 +224,6 @@ class TokenVault:
         self._cache.pop(name, None)
         logger.info("Account removed: %s", name)
 
-    # PURPOSE: List all registered accounts
     def list_accounts(self) -> list[dict[str, Any]]:
         """List all registered accounts.
 
@@ -250,7 +243,6 @@ class TokenVault:
             })
         return result
 
-    # PURPOSE: Set the default account
     def set_default(self, name: str) -> None:
         """Set the default account.
 
@@ -265,13 +257,11 @@ class TokenVault:
         self._save_vault(vault)
         logger.info("Default account set: %s", name)
 
-    # PURPOSE: Get the name of the default account
     def get_default_account(self) -> str:
         """Get the name of the default account."""
         vault = self._load_vault()
         return vault.get("default_account", "default")
 
-    # PURPOSE: Get token with automatic failover to other accounts
     def get_token_with_failover(
         self,
         primary: str = "default",
@@ -315,14 +305,12 @@ class TokenVault:
             f"Primary: '{primary}', Total accounts: {len(vault.get('accounts', {}))}"
         )
 
-    # PURPOSE: Get the project ID for an account (if cached)
     def get_project(self, account: str = "default") -> Optional[str]:
         """Get the project ID for an account (if cached)."""
         vault = self._load_vault()
         acct = vault.get("accounts", {}).get(account, {})
         return acct.get("project")
 
-    # PURPOSE: Cache the project ID for an account
     def set_project(self, account: str, project: str) -> None:
         """Cache the project ID for an account."""
         vault = self._load_vault()
@@ -421,7 +409,6 @@ class TokenVault:
         self._oauth_config = (data["client_id"], data["client_secret"])
         return self._oauth_config
 
-    # PURPOSE: Get token health status for all accounts
     def status(self) -> dict[str, Any]:
         """Get token health status for all accounts.
 

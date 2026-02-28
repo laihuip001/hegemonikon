@@ -45,7 +45,6 @@ _SEVERITY_MAP = {
 }
 
 
-# PURPOSE: Basanos Issue → Synteleia AuditIssue に変換。
 def basanos_issue_to_synteleia(issue: Issue, file_path: str = "") -> AuditIssue:
     """Basanos Issue → Synteleia AuditIssue に変換。"""
     return AuditIssue(
@@ -58,7 +57,6 @@ def basanos_issue_to_synteleia(issue: Issue, file_path: str = "") -> AuditIssue:
     )
 
 
-# PURPOSE: Basanos AuditResult → Synteleia AuditTarget に変換。
 def basanos_to_synteleia_target(basanos_result: BasanosResult) -> AuditTarget:
     """Basanos AuditResult → Synteleia AuditTarget に変換。"""
     content = basanos_result.file_path.read_text(encoding="utf-8")
@@ -78,7 +76,6 @@ def basanos_to_synteleia_target(basanos_result: BasanosResult) -> AuditTarget:
 # Domain Weights — π(ε) の蓄積
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-# PURPOSE: ドメインの重み — 過去の問題頻度に基づく精度加重。
 @dataclass
 class DomainWeight:
     """ドメインの重み — 過去の問題頻度に基づく精度加重。"""
@@ -89,7 +86,6 @@ class DomainWeight:
     last_reviewed: Optional[str] = None
 
 
-# PURPOSE: basanos_rotation_state.json の拡張版。
 @dataclass
 class RotationState:
     """basanos_rotation_state.json の拡張版。"""
@@ -97,7 +93,6 @@ class RotationState:
     cycle: int = 0
     last_date: str = ""
 
-    # PURPOSE: JSON から読込。旧形式にも対応。
     @classmethod
     def load(cls, path: Path = ROTATION_STATE_PATH) -> "RotationState":
         """JSON から読込。旧形式にも対応。"""
@@ -127,7 +122,6 @@ class RotationState:
 
         return state
 
-    # PURPOSE: JSON に保存。
     def save(self, path: Path = ROTATION_STATE_PATH) -> None:
         """JSON に保存。"""
         data = {
@@ -148,7 +142,6 @@ class RotationState:
         with open(path, "w") as f:
             json.dump(data, f, indent=2, ensure_ascii=False)
 
-    # PURPOSE: 重み付きでドメインを選択。重みが高い = ε が大きい = 優先。
     def select_domains(self, n: int = 3) -> List[str]:
         """重み付きでドメインを選択。重みが高い = ε が大きい = 優先。"""
         if not self.domains:
@@ -160,7 +153,6 @@ class RotationState:
         )
         return [d.name for d in sorted_domains[:n]]
 
-    # PURPOSE: π(ε) 更新: 問題が多い → 重み上昇、少ない → 減衰。
     def update_weights(self, domain: str, issue_count: int, decay: float = 0.9) -> None:
         """π(ε) 更新: 問題が多い → 重み上昇、少ない → 減衰。"""
         if domain not in self.domains:
@@ -183,7 +175,6 @@ class RotationState:
 # Pipeline Result
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-# PURPOSE: パイプライン全体の結果。
 @dataclass
 class PipelineResult:
     """パイプライン全体の結果。"""
@@ -194,7 +185,6 @@ class PipelineResult:
     l2_session_id: Optional[str] = None  # Jules session ID if triggered
     domains_reviewed: List[str] = field(default_factory=list)
 
-    # PURPOSE: L2 発動条件: CRITICAL or HIGH が存在 = ε が閾値超過。
     @property
     def needs_l2(self) -> bool:
         """L2 発動条件: CRITICAL or HIGH が存在 = ε が閾値超過。"""
@@ -203,7 +193,6 @@ class PipelineResult:
             for i in self.l0_issues
         )
 
-    # PURPOSE: Jules に渡す深掘りレビュー用プロンプトを生成。
     def to_jules_prompt(self, max_issues: int = 10, context_lines: int = 5) -> str:
         """Jules に渡す深掘りレビュー用プロンプトを生成。
 
@@ -279,7 +268,6 @@ class PipelineResult:
 # DailyReviewPipeline — Main Orchestrator
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-# PURPOSE: Daily Review Pipeline — VISION.md A→B→C の具体化。
 class DailyReviewPipeline:
     """
     Daily Review Pipeline — VISION.md A→B→C の具体化。
@@ -303,7 +291,6 @@ class DailyReviewPipeline:
         self.auditor = AIAuditor(strict=False)  # CRITICAL/HIGH only
         self._synteleia = None
 
-    # PURPOSE: Lazy-load Synteleia orchestrator
     @property
     def synteleia(self):
         """Lazy-load Synteleia orchestrator."""
@@ -312,7 +299,6 @@ class DailyReviewPipeline:
             self._synteleia = SynteleiaOrchestrator()
         return self._synteleia
 
-    # PURPOSE: パイプラインを実行。
     def run(
         self,
         files: Optional[List[Path]] = None,
@@ -672,7 +658,6 @@ class DailyReviewPipeline:
             return None
 
 
-    # PURPOSE: パイプライン結果のサマリーを生成。
     def summary(self, result: PipelineResult) -> str:
         """パイプライン結果のサマリーを生成。"""
         lines = [

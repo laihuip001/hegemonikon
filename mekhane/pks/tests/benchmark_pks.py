@@ -164,7 +164,6 @@ BENCHMARK_QUERIES = [
 ]
 
 
-# PURPOSE: A single search result
 @dataclass
 class SearchResult:
     """A single search result."""
@@ -174,7 +173,6 @@ class SearchResult:
     snippet: str
 
 
-# PURPOSE: Results for a single benchmark query
 @dataclass
 class QueryResult:
     """Results for a single benchmark query."""
@@ -191,7 +189,6 @@ class QueryResult:
     total_keywords: int = 0
 
 
-# PURPOSE: Execute PKS search and return results with latency
 def run_search(query: str, k: int = 10) -> tuple[list[SearchResult], float]:
     """Execute PKS search and return results with latency.
 
@@ -273,7 +270,6 @@ def run_search(query: str, k: int = 10) -> tuple[list[SearchResult], float]:
     return all_results, elapsed
 
 
-# PURPOSE: Check if a result is relevant based on keyword matching OR source match
 def evaluate_relevance(
     result: SearchResult,
     keywords: list[str],
@@ -303,7 +299,6 @@ def evaluate_relevance(
     return kw_relevant or src_relevant
 
 
-# PURPOSE: Compute Precision@K, MRR, and Source Coverage
 def compute_metrics(
     results: list[SearchResult],
     expected_sources: list[str],
@@ -343,7 +338,6 @@ def compute_metrics(
     return precision, mrr, coverage, keyword_hits, len(keywords)
 
 
-# PURPOSE: Run the full benchmark suite
 def run_benchmark() -> list[QueryResult]:
     """Run the full benchmark suite."""
     print("=" * 60)
@@ -383,7 +377,6 @@ def run_benchmark() -> list[QueryResult]:
     return query_results
 
 
-# PURPOSE: Generate markdown benchmark report
 def generate_report(results: list[QueryResult]) -> str:
     """Generate markdown benchmark report."""
     lines = []
@@ -523,7 +516,6 @@ def generate_report(results: list[QueryResult]) -> str:
     return "\n".join(lines)
 
 
-# PURPOSE: main の処理
 def main():
     results = run_benchmark()
 

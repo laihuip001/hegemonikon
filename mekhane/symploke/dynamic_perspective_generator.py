@@ -90,14 +90,12 @@ COMPLEXITY_THRESHOLDS = {
 }
 
 
-# PURPOSE: ファイル特性に応じた Perspective 動的生成器。
 class DynamicPerspectiveGenerator:
     """ファイル特性に応じた Perspective 動的生成器。"""
 
     def __init__(self, max_perspectives: int = 24):
         self._max = max_perspectives
 
-    # PURPOSE: ファイルを静的解析し、プロファイルを生成。
     def profile_file(self, file_path: str) -> FileProfile:
         """ファイルを静的解析し、プロファイルを生成。"""
         path = Path(file_path)
@@ -150,7 +148,6 @@ class DynamicPerspectiveGenerator:
 
         return profile
 
-    # PURPOSE: ファイルに最適化された Perspective セットを生成。
     def generate_for_file(
         self,
         file_path: str,

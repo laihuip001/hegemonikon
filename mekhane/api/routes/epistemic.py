@@ -19,7 +19,6 @@ PROJECT_ROOT = Path.home() / "oikos" / "hegemonikon"
 REGISTRY_PATH = PROJECT_ROOT / "kernel" / "epistemic_status.yaml"
 
 
-# PURPOSE: 認識論的地位の全パッチ情報を返す
 @router.get("/status")
 async def epistemic_status():
     """認識論的地位の全パッチ情報を返す"""
@@ -61,7 +60,6 @@ async def epistemic_status():
         return {"status": "error", "message": str(e)}
 
 
-# PURPOSE: 認識論的健全性スコアを計算
 @router.get("/health")
 async def epistemic_health():
     """認識論的健全性スコアを計算"""

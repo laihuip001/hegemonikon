@@ -38,7 +38,6 @@ from mekhane.fep.kalon_checker import (
 # =============================================================================
 # KalonResult tests
 # =============================================================================
-# PURPOSE: Test KalonResult data class
 class TestKalonResult:
     """Test KalonResult data class."""
 
@@ -57,7 +56,6 @@ class TestKalonResult:
 # =============================================================================
 # KalonReport tests
 # =============================================================================
-# PURPOSE: Test KalonReport aggregation
 class TestKalonReport:
     """Test KalonReport aggregation."""
 
@@ -114,11 +112,9 @@ class TestKalonReport:
 # =============================================================================
 # KalonChecker with real data (category.py)
 # =============================================================================
-# PURPOSE: Test KalonChecker against actual SERIES_ENRICHMENTS and ADJOINT_PAIRS_D
 class TestKalonCheckerRealData:
     """Test KalonChecker against actual SERIES_ENRICHMENTS and ADJOINT_PAIRS_D."""
 
-    # PURPOSE: method をセットアップする
     def setup_method(self):
         self.checker = KalonChecker()
 
@@ -162,7 +158,6 @@ class TestKalonCheckerRealData:
 # =============================================================================
 # KalonChecker with synthetic data (edge cases)
 # =============================================================================
-# PURPOSE: Test KalonChecker with synthetic data for edge cases
 class TestKalonCheckerEdgeCases:
     """Test KalonChecker with synthetic data for edge cases."""
 

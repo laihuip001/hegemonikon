@@ -142,7 +142,6 @@ THEOREM_KEYWORDS: list[dict] = [
 _USAGE_FILE = Path.home() / "oikos" / "mneme" / ".hegemonikon" / "theorem_usage.jsonl"
 
 
-# PURPOSE: A single usage record
 @dataclass
 class TheoremUsage:
     """A single usage record."""
@@ -168,7 +167,6 @@ def _load_usage_counts() -> dict[str, int]:
     return counts
 
 
-# PURPOSE: Record a theorem usage event
 def record_usage(theorem_id: str, context: str = "") -> None:
     """Record a theorem usage event."""
     _USAGE_FILE.parent.mkdir(parents=True, exist_ok=True)
@@ -185,7 +183,6 @@ def record_usage(theorem_id: str, context: str = "") -> None:
 # Keyword Matcher
 # ---------------------------------------------------------------------------
 
-# PURPOSE: A suggested theorem with score and reason
 @dataclass
 class TheoremSuggestion:
     """A suggested theorem with score and reason."""
@@ -198,7 +195,6 @@ class TheoremSuggestion:
     matched_keywords: list[str] = field(default_factory=list)
 
 
-# PURPOSE: Keyword-match user input against all 24 theorem keyword tables
 def suggest_theorems(
     user_input: str,
     max_results: int = 3,
@@ -241,7 +237,6 @@ def suggest_theorems(
 # Today's Theorem — for /boot integration
 # ---------------------------------------------------------------------------
 
-# PURPOSE: Select n underused theorems for today's session
 def todays_theorem(n: int = 2) -> list[dict]:
     """Select n underused theorems for today's session.
 
@@ -313,7 +308,6 @@ def _generate_connection_prompt(theorem: dict) -> str:
 # Usage Summary
 # ---------------------------------------------------------------------------
 
-# PURPOSE: Generate a usage summary for dashboard display
 def usage_summary() -> dict:
     """Generate a usage summary for dashboard display.
 
@@ -346,7 +340,6 @@ def usage_summary() -> dict:
 # CLI
 # ---------------------------------------------------------------------------
 
-# PURPOSE: CLI: python -m mekhane.fep.theorem_recommender [suggest|today|summary] [input]
 def main() -> None:
     """CLI: python -m mekhane.fep.theorem_recommender [suggest|today|summary] [input]"""
     import sys

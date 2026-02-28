@@ -86,7 +86,6 @@ class OchemaService:
         self._cortex_clients: dict[str, Any] = {}  # account -> CortexClient
         self._ls_init_attempted = False
 
-    # PURPOSE: Get the singleton service instance
     @classmethod
     def get(cls) -> "OchemaService":
         """Get the singleton service instance."""
@@ -96,7 +95,6 @@ class OchemaService:
         assert cls._instance is not None  # satisfy type checker
         return cls._instance
 
-    # PURPOSE: Reset the singleton (for testing)
     @classmethod
     def reset(cls) -> None:
         """Reset the singleton (for testing)."""
@@ -163,7 +161,6 @@ class OchemaService:
 
     # --- Core API ---
 
-    # PURPOSE: Send a prompt and get a response
     def ask(
         self,
         message: str,
@@ -220,7 +217,6 @@ class OchemaService:
                 account=account,
             )
 
-    # PURPOSE: Async version of ask(). Runs sync code in thread pool
     async def ask_async(
         self,
         message: str,
@@ -231,7 +227,6 @@ class OchemaService:
         import asyncio
         return await asyncio.to_thread(self.ask, message, model, **kwargs)
 
-    # PURPOSE: Stream a response token by token
     def stream(
         self,
         message: str,
@@ -275,7 +270,6 @@ class OchemaService:
 
     # --- Info API ---
 
-    # PURPOSE: Return all available models with provider status
     def models(self, account: str = "default") -> dict[str, Any]:
         """Return all available models with provider status.
 
@@ -314,7 +308,6 @@ class OchemaService:
             "dynamic_models": dynamic,
         }
 
-    # PURPOSE: Return connection status for all providers
     def status(self) -> dict[str, Any]:
         """Return connection status for all providers."""
         result: dict[str, Any] = {
@@ -350,7 +343,6 @@ class OchemaService:
 
         return result
 
-    # PURPOSE: Return unified quota info from LS and Cortex
     def quota(self, account: str = "default") -> dict[str, Any]:
         """Return unified quota info from LS and Cortex.
 
@@ -381,7 +373,6 @@ class OchemaService:
 
         return result
 
-    # PURPOSE: Return LS model list with quota info. Empty list if unavailable
     def ls_models(self) -> list[dict[str, Any]]:
         """Return LS model list with quota info. Empty list if unavailable."""
         ls = self._get_ls_client()
@@ -394,7 +385,6 @@ class OchemaService:
 
     # --- Session API (LS only) ---
 
-    # PURPOSE: Get session info from LS. Raises if LS unavailable
     def session_info(self, cascade_id: Optional[str] = None) -> dict[str, Any]:
         """Get session info from LS. Raises if LS unavailable."""
         ls = self._get_ls_client()
@@ -402,7 +392,6 @@ class OchemaService:
             raise RuntimeError("Language Server is not available")
         return ls.session_info(cascade_id)
 
-    # PURPOSE: Get context health from LS. Raises if LS unavailable
     def context_health(self, cascade_id: Optional[str] = None) -> dict[str, Any]:
         """Get context health from LS. Raises if LS unavailable."""
         ls = self._get_ls_client()
@@ -412,13 +401,11 @@ class OchemaService:
 
     # --- Properties ---
 
-    # PURPOSE: Check if Language Server is reachable
     @property
     def ls_available(self) -> bool:
         """Check if Language Server is reachable."""
         return self._get_ls_client() is not None
 
-    # PURPOSE: Check if Cortex API is authenticated
     @property
     def cortex_available(self) -> bool:
         """Check if Cortex API is authenticated."""
@@ -478,7 +465,6 @@ class OchemaService:
 
     # --- Chat API (generateChat) ---
 
-    # PURPOSE: generateChat API でチャット応答を取得。
     def chat(
         self,
         message: str,
@@ -520,7 +506,6 @@ class OchemaService:
             thinking_budget=thinking_budget,
         )
 
-    # PURPOSE: マルチターン generateChat 会話を開始する。
     def start_chat(
         self,
         model: str = "",
@@ -547,7 +532,6 @@ class OchemaService:
         lower = model.lower().replace("-", "_")
         return any(lower.startswith(prefix) for prefix in self._CLAUDE_MODELS)
 
-    # PURPOSE: Send a prompt with tool use support
     def ask_with_tools(
         self,
         message: str,

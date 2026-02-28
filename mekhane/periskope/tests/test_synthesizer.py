@@ -19,7 +19,6 @@ from mekhane.periskope.synthesizer import MultiModelSynthesizer
 
 # ── Unit Tests (no API calls) ──
 
-# PURPOSE: Results should be formatted with source tags and content
 def test_format_results():
     """Results should be formatted with source tags and content."""
     synth = MultiModelSynthesizer()
@@ -44,7 +43,6 @@ def test_format_results():
     assert "Test Paper 1" in formatted
 
 
-# PURPOSE: Citations should be extracted from [Source N] references
 def test_extract_citations():
     """Citations should be extracted from [Source N] references."""
     synth = MultiModelSynthesizer()
@@ -57,7 +55,6 @@ def test_extract_citations():
     assert citations[0].taint_level == TaintLevel.UNCHECKED
 
 
-# PURPOSE: Confidence should be extracted from text
 def test_extract_confidence():
     """Confidence should be extracted from text."""
     synth = MultiModelSynthesizer()
@@ -66,7 +63,6 @@ def test_extract_confidence():
     assert synth._extract_confidence("No confidence here") == 0.5
 
 
-# PURPOSE: Single model should return agreement=1.0
 def test_divergence_single_model():
     """Single model should return agreement=1.0."""
     synth = MultiModelSynthesizer()
@@ -82,7 +78,6 @@ def test_divergence_single_model():
     assert len(report.divergent_claims) == 0
 
 
-# PURPOSE: Two models with different confidence should detect divergence
 def test_divergence_two_models():
     """Two models with different confidence should detect divergence."""
     synth = MultiModelSynthesizer()
@@ -97,7 +92,6 @@ def test_divergence_two_models():
 
 # ── Integration Test (requires Cortex API) ──
 
-# PURPOSE: Gemini synthesis should produce a result via Cortex API
 @pytest.mark.asyncio
 async def test_gemini_synthesis():
     """Gemini synthesis should produce a result via Cortex API."""

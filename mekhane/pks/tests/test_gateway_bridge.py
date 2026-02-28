@@ -15,7 +15,6 @@ from mekhane.pks.pks_engine import KnowledgeNugget, SessionContext
 
 # --- Fixtures ---
 
-# PURPOSE: テスト用ディレクトリ構造を作成。
 @pytest.fixture
 def tmp_dirs(tmp_path):
     """テスト用ディレクトリ構造を作成。"""
@@ -28,7 +27,6 @@ def tmp_dirs(tmp_path):
     return ideas, doxa, sessions, ki
 
 
-# PURPOSE: テスト用 GatewayBridge を作成。
 @pytest.fixture
 def bridge(tmp_dirs):
     """テスト用 GatewayBridge を作成。"""
@@ -73,16 +71,13 @@ def _write_doxa(doxa_dir: Path, name: str, title: str) -> Path:
 # 1. GatewayBridge 単体テスト
 # ======================================================
 
-# PURPOSE: 初期化テスト
 class TestGatewayBridgeInit:
     """初期化テスト"""
 
-    # PURPOSE: creates_with_defaults をテストする
     def test_creates_with_defaults(self):
         bridge = GatewayBridge()
         assert len(bridge._sources) == 4
 
-    # PURPOSE: creates_with_custom_dirs をテストする
     def test_creates_with_custom_dirs(self, tmp_dirs):
         ideas, doxa, sessions, ki = tmp_dirs
         bridge = GatewayBridge(
@@ -92,11 +87,9 @@ class TestGatewayBridgeInit:
         assert bridge._sources[0].directory == ideas
 
 
-# PURPOSE: Ideas パーサーテスト
 class TestParseIdea:
     """Ideas パーサーテスト"""
 
-    # PURPOSE: parses_idea をテストする
     def test_parses_idea(self, bridge, tmp_dirs):
         ideas_dir = tmp_dirs[0]
         _write_idea(ideas_dir, "idea_20260214.md", "テストアイデア", "FEP, CCL")
@@ -106,7 +99,6 @@ class TestParseIdea:
         assert "gateway:ideas:" in nugget.source
         assert nugget.relevance_score == 0.6
 
-    # PURPOSE: extracts_tags_metadata をテストする
     def test_extracts_tags_metadata(self, bridge, tmp_dirs):
         ideas_dir = tmp_dirs[0]
         _write_idea(ideas_dir, "idea_20260214.md", "タグテスト", "FEP, CCL, 圏論")
@@ -115,11 +107,9 @@ class TestParseIdea:
         assert "FEP" in nugget.metadata["tags"]
 
 
-# PURPOSE: Handoff パーサーテスト
 class TestParseHandoff:
     """Handoff パーサーテスト"""
 
-    # PURPOSE: parses_handoff をテストする
     def test_parses_handoff(self, bridge, tmp_dirs):
         sessions_dir = tmp_dirs[2]
         _write_handoff(sessions_dir, "handoff_20260214_2100.md", "テスト引き継ぎ", "FEP分析")
@@ -128,7 +118,6 @@ class TestParseHandoff:
         assert "FEP分析" in nugget.title
         assert "gateway:handoff:" in nugget.source
 
-    # PURPOSE: rejects_old_handoff をテストする
     def test_rejects_old_handoff(self, bridge, tmp_dirs):
         sessions_dir = tmp_dirs[2]
         p = _write_handoff(sessions_dir, "handoff_20250101_0000.md", "古い引き継ぎ")
@@ -140,11 +129,9 @@ class TestParseHandoff:
         assert nugget is None  # 30日超で除外
 
 
-# PURPOSE: KI パーサーテスト
 class TestParseKI:
     """KI パーサーテスト"""
 
-    # PURPOSE: parses_ki をテストする
     def test_parses_ki(self, bridge, tmp_dirs):
         ki_dir = tmp_dirs[3]
         _write_ki(ki_dir, "test_ki.md", "FEPと謙虚さ", "原則 (Principle)")
@@ -153,7 +140,6 @@ class TestParseKI:
         assert "FEPと謙虚さ" in nugget.title
         assert nugget.metadata["tags"] == ["原則 (Principle)"]
 
-    # PURPOSE: skips_readme をテストする
     def test_skips_readme(self, bridge, tmp_dirs):
         ki_dir = tmp_dirs[3]
         (ki_dir / "README.md").write_text("# README")
@@ -161,11 +147,9 @@ class TestParseKI:
         assert nugget is None
 
 
-# PURPOSE: Doxa パーサーテスト
 class TestParseDoxa:
     """Doxa パーサーテスト"""
 
-    # PURPOSE: parses_doxa をテストする
     def test_parses_doxa(self, bridge, tmp_dirs):
         doxa_dir = tmp_dirs[1]
         _write_doxa(doxa_dir, "dox_test.md", "テスト信念")
@@ -179,7 +163,6 @@ class TestParseDoxa:
 # 2. コンテキストフィルタリングテスト
 # ======================================================
 
-# PURPOSE: 多段階マッチングテスト
 class TestFilterByContext:
     """多段階マッチングテスト"""
 
@@ -193,7 +176,6 @@ class TestFilterByContext:
             n.metadata = {"tags": tags}
         return n
 
-    # PURPOSE: direct_match をテストする
     def test_direct_match(self, bridge):
         ctx = SessionContext()
         ctx.topics = ["FEP"]
@@ -202,7 +184,6 @@ class TestFilterByContext:
         assert len(result) == 1
         assert result[0].relevance_score > 0.5
 
-    # PURPOSE: alias_expansion をテストする
     def test_alias_expansion(self, bridge):
         ctx = SessionContext()
         ctx.topics = ["FEP"]
@@ -212,7 +193,6 @@ class TestFilterByContext:
         assert len(result) == 1
         assert "関連" in result[0].push_reason
 
-    # PURPOSE: tag_match をテストする
     def test_tag_match(self, bridge):
         ctx = SessionContext()
         ctx.topics = ["FEP"]
@@ -221,7 +201,6 @@ class TestFilterByContext:
         assert len(result) == 1
         assert "タグ" in result[0].push_reason
 
-    # PURPOSE: no_match_low_score_excluded をテストする
     def test_no_match_low_score_excluded(self, bridge):
         ctx = SessionContext()
         ctx.topics = ["FEP"]
@@ -229,7 +208,6 @@ class TestFilterByContext:
         result = bridge._filter_by_context(nuggets, ctx)
         assert len(result) == 0
 
-    # PURPOSE: high_base_score_passes_through をテストする
     def test_high_base_score_passes_through(self, bridge):
         ctx = SessionContext()
         ctx.topics = ["FEP"]
@@ -243,16 +221,13 @@ class TestFilterByContext:
 # 3. scan() E2E テスト
 # ======================================================
 
-# PURPOSE: scan() の統合テスト
 class TestScanE2E:
     """scan() の統合テスト"""
 
-    # PURPOSE: scan_empty_dirs をテストする
     def test_scan_empty_dirs(self, bridge):
         nuggets = bridge.scan()
         assert nuggets == []
 
-    # PURPOSE: scan_with_data をテストする
     def test_scan_with_data(self, bridge, tmp_dirs):
         ideas_dir, doxa_dir, sessions_dir, ki_dir = tmp_dirs
         _write_idea(ideas_dir, "idea_20260214.md", "テストアイデア", "FEP")
@@ -260,7 +235,6 @@ class TestScanE2E:
         nuggets = bridge.scan(max_results=10)
         assert len(nuggets) == 2
 
-    # PURPOSE: scan_with_source_filter をテストする
     def test_scan_with_source_filter(self, bridge, tmp_dirs):
         ideas_dir, _, _, ki_dir = tmp_dirs
         _write_idea(ideas_dir, "idea_20260214.md", "アイデア")
@@ -269,7 +243,6 @@ class TestScanE2E:
         assert len(nuggets) == 1
         assert "ideas" in nuggets[0].source
 
-    # PURPOSE: scan_with_context をテストする
     def test_scan_with_context(self, bridge, tmp_dirs):
         ideas_dir, _, sessions_dir, ki_dir = tmp_dirs
         _write_idea(ideas_dir, "idea_20260214.md", "FEP分析", "FEP")
@@ -285,16 +258,13 @@ class TestScanE2E:
 # 4. stats() テスト
 # ======================================================
 
-# PURPOSE: Test stats の実装
 class TestStats:
-    # PURPOSE: stats_empty をテストする
     def test_stats_empty(self, bridge):
         stats = bridge.stats()
         assert "ideas" in stats
         assert stats["ideas"]["exists"]
         assert stats["ideas"]["count"] == 0
 
-    # PURPOSE: stats_with_data をテストする
     def test_stats_with_data(self, bridge, tmp_dirs):
         _write_idea(tmp_dirs[0], "idea_20260214.md", "テスト")
         stats = bridge.stats()
@@ -305,16 +275,13 @@ class TestStats:
 # 5. エイリアス辞書テスト
 # ======================================================
 
-# PURPOSE: Test topic aliases の実装
 class TestTopicAliases:
-    # PURPOSE: fep_aliases をテストする
     def test_fep_aliases(self):
         assert "fep" in _TOPIC_ALIASES
         aliases = _TOPIC_ALIASES["fep"]
         assert "自由エネルギー" in aliases
         assert "prediction error" in aliases
 
-    # PURPOSE: bidirectional_hgk をテストする
     def test_bidirectional_hgk(self):
         assert "hgk" in _TOPIC_ALIASES
         assert "hegemonikón" in _TOPIC_ALIASES

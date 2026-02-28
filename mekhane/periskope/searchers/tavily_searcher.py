@@ -23,7 +23,6 @@ logger = logging.getLogger(__name__)
 _TAVILY_API_URL = "https://api.tavily.com/search"
 
 
-# PURPOSE: Client for Tavily Search API
 class TavilySearcher:
     """Client for Tavily Search API.
 
@@ -39,13 +38,11 @@ class TavilySearcher:
         self._api_key = os.getenv("TAVILY_API_KEY", "")
         self._timeout = timeout
 
-    # PURPOSE: Check if API key is configured
     @property
     def available(self) -> bool:
         """Check if API key is configured."""
         return bool(self._api_key)
 
-    # PURPOSE: Search via Tavily API
     async def search(
         self,
         query: str,

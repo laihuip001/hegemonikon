@@ -27,14 +27,12 @@ THRESHOLD_CONSECUTIVE_FAIL = 3  # 連続失敗回数
 THRESHOLD_MIN_TASKS_PER_WEEK = 3  # 週あたり最小タスク数
 
 
-# PURPOSE: 異常検知レポート。
 class AnomalyReport:
     """異常検知レポート。"""
     def __init__(self) -> None:
         self.anomalies: list[dict] = []
         self.stats: dict = {}
 
-    # PURPOSE: add を追加する
     def add(self, kind: str, severity: str, message: str, data: Optional[dict] = None) -> None:
         self.anomalies.append({
             "kind": kind,
@@ -44,17 +42,14 @@ class AnomalyReport:
             "detected_at": datetime.now().isoformat(),
         })
 
-    # PURPOSE: has_critical の処理
     @property
     def has_critical(self) -> bool:
         return any(a["severity"] == "CRITICAL" for a in self.anomalies)
 
-    # PURPOSE: has_warnings の処理
     @property
     def has_warnings(self) -> bool:
         return len(self.anomalies) > 0
 
-    # PURPOSE: to_dict の処理
     def to_dict(self) -> dict:
         return {
             "total_anomalies": len(self.anomalies),
@@ -91,7 +86,6 @@ def _load_recent_logs(days: int = 7) -> list[dict]:
     return logs
 
 
-# PURPOSE: スケジューラログを分析し異常を検知する。
 def detect_anomalies(days: int = 7) -> AnomalyReport:
     """スケジューラログを分析し異常を検知する。"""
     report = AnomalyReport()
@@ -162,7 +156,6 @@ def detect_anomalies(days: int = 7) -> AnomalyReport:
     return report
 
 
-# PURPOSE: Sympatheia API に異常通知を送信する。
 def notify_sympatheia(report: AnomalyReport) -> dict:
     """Sympatheia API に異常通知を送信する。"""
     import urllib.request

@@ -10,13 +10,11 @@ from mekhane.periskope.models import SearchSource
 from mekhane.periskope.searchers.searxng import SearXNGSearcher
 
 
-# PURPOSE: searcher の処理
 @pytest.fixture
 def searcher():
     return SearXNGSearcher(base_url="http://localhost:8888")
 
 
-# PURPOSE: SearXNG Docker instance should be reachable
 @pytest.mark.asyncio
 async def test_health_check(searcher: SearXNGSearcher):
     """SearXNG Docker instance should be reachable."""
@@ -25,7 +23,6 @@ async def test_health_check(searcher: SearXNGSearcher):
     await searcher.close()
 
 
-# PURPOSE: Basic search should return results
 @pytest.mark.asyncio
 async def test_basic_search(searcher: SearXNGSearcher):
     """Basic search should return results."""
@@ -42,7 +39,6 @@ async def test_basic_search(searcher: SearXNGSearcher):
     await searcher.close()
 
 
-# PURPOSE: Academic search should use scholarly engines
 @pytest.mark.asyncio
 async def test_academic_search(searcher: SearXNGSearcher):
     """Academic search should use scholarly engines."""
@@ -55,7 +51,6 @@ async def test_academic_search(searcher: SearXNGSearcher):
     await searcher.close()
 
 
-# PURPOSE: Search results should contain engine metadata
 @pytest.mark.asyncio
 async def test_search_result_metadata(searcher: SearXNGSearcher):
     """Search results should contain engine metadata."""
@@ -69,7 +64,6 @@ async def test_search_result_metadata(searcher: SearXNGSearcher):
     await searcher.close()
 
 
-# PURPOSE: Empty query should not crash
 @pytest.mark.asyncio
 async def test_empty_query(searcher: SearXNGSearcher):
     """Empty query should not crash."""

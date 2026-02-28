@@ -30,7 +30,6 @@ from mekhane.basanos.l2.resolver import Resolver, print_resolutions
 
 
 # ANSI colors
-# PURPOSE: ANSI color codes
 class C:
     """ANSI color codes."""
 
@@ -100,7 +99,6 @@ def _fetch_gnosis_keywords() -> list[tuple[str, list[str]]]:
     return []
 
 
-# PURPOSE: Find project root by looking for kernel/ directory
 def detect_project_root() -> Path:
     """Find project root by looking for kernel/ directory."""
     current = Path(__file__).resolve().parent
@@ -112,7 +110,6 @@ def detect_project_root() -> Path:
     return Path("/home/makaron8426/oikos/hegemonikon")
 
 
-# PURPOSE: Run deficit factories and return all detected deficits
 def scan_deficits(
     project_root: Path,
     deficit_type: Optional[str] = None,
@@ -180,7 +177,6 @@ def scan_deficits(
     return deficits
 
 
-# PURPOSE: Display deficits in a formatted table
 def print_deficits(deficits: list[Deficit]) -> None:
     """Display deficits in a formatted table."""
     if not deficits:
@@ -212,7 +208,6 @@ def print_deficits(deficits: list[Deficit]) -> None:
     print(f"  Δε/Δt: {sum(1 for d in deficits if d.type == DeficitType.DELTA)}")
 
 
-# PURPOSE: Generate and display questions from deficits
 def print_questions(deficits: list[Deficit], limit: int = 10) -> None:
     """Generate and display questions from deficits."""
     questions = [d.to_question() for d in deficits]
@@ -231,7 +226,6 @@ def print_questions(deficits: list[Deficit], limit: int = 10) -> None:
         print()
 
 
-# PURPOSE: CLI entry point
 def main(argv: Optional[list[str]] = None) -> int:
     """CLI entry point."""
     parser = argparse.ArgumentParser(

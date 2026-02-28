@@ -38,7 +38,6 @@ class LLMBackendProtocol:
     def query(self, prompt: str, context: str) -> str:
         raise NotImplementedError
 
-    # PURPOSE: is_available の処理
     def is_available(self) -> bool:
         raise NotImplementedError
 
@@ -72,7 +71,6 @@ class ConsensusAgent(AuditAgent):
     def __init__(self, backends: Optional[List[Any]] = None):
         self._backends = backends or []
 
-    # PURPOSE: 複数バックエンドに監査を依頼し、コンセンサスを計算。
     def audit(self, target: AuditTarget) -> AgentResult:
         """複数バックエンドに監査を依頼し、コンセンサスを計算。"""
         if not self._backends:

@@ -37,7 +37,6 @@ def _make_context(**kwargs) -> SessionContext:
     return SessionContext(**defaults)
 
 
-# PURPOSE: Advocacy データクラスのテスト
 class TestAdvocacy:
     """Advocacy データクラスのテスト"""
 
@@ -68,7 +67,6 @@ class TestAdvocacy:
         assert "関連度" not in md
 
 
-# PURPOSE: SelfAdvocate テンプレート生成テスト (LLM なし)
 class TestSelfAdvocateTemplate:
     """SelfAdvocate テンプレート生成テスト (LLM なし)"""
 
@@ -142,7 +140,6 @@ class TestSelfAdvocateTemplate:
         assert "語りかける論文はありません" in report
 
 
-# PURPOSE: LLM レスポンスパースのテスト
 class TestSelfAdvocateLLMParse:
     """LLM レスポンスパースのテスト"""
 

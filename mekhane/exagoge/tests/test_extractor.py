@@ -16,7 +16,6 @@ import pytest
 
 # ------ fixtures ------
 
-# PURPOSE: エクスポート出力先の一時ディレクトリ。
 @pytest.fixture
 def tmp_output(tmp_path: Path) -> Path:
     """エクスポート出力先の一時ディレクトリ。"""
@@ -25,7 +24,6 @@ def tmp_output(tmp_path: Path) -> Path:
     return out
 
 
-# PURPOSE: テスト用 Handoff ファイルを含む一時ディレクトリ。
 @pytest.fixture
 def tmp_sessions(tmp_path: Path) -> Path:
     """テスト用 Handoff ファイルを含む一時ディレクトリ。"""
@@ -56,7 +54,6 @@ class TestExportResult:
         assert result.errors == []
         assert result.exported_at  # non-empty timestamp
 
-    # PURPOSE: failure_result をテストする
     def test_failure_result(self) -> None:
         from mekhane.exagoge.extractor import ExportResult
 
@@ -81,7 +78,6 @@ class TestHandoffExporter:
         assert all("size_bytes" in r for r in records)
         assert all("line_count" in r for r in records)
 
-    # PURPOSE: extract_with_limit をテストする
     def test_extract_with_limit(
         self, tmp_sessions: Path, tmp_output: Path
     ) -> None:
@@ -91,7 +87,6 @@ class TestHandoffExporter:
         records = exporter.extract(count=2)
         assert len(records) == 2
 
-    # PURPOSE: extract_empty_dir をテストする
     def test_extract_empty_dir(self, tmp_path: Path, tmp_output: Path) -> None:
         from mekhane.exagoge.extractor import HandoffExporter
 
@@ -101,7 +96,6 @@ class TestHandoffExporter:
         records = exporter.extract()
         assert records == []
 
-    # PURPOSE: extract_nonexistent_dir をテストする
     def test_extract_nonexistent_dir(
         self, tmp_path: Path, tmp_output: Path
     ) -> None:
@@ -112,7 +106,6 @@ class TestHandoffExporter:
         records = exporter.extract()
         assert records == []
 
-    # PURPOSE: transform_structure をテストする
     def test_transform_structure(
         self, tmp_sessions: Path, tmp_output: Path
     ) -> None:
@@ -125,7 +118,6 @@ class TestHandoffExporter:
         assert transformed["count"] == 3
         assert len(transformed["records"]) == 3
 
-    # PURPOSE: export_creates_json_file をテストする
     def test_export_creates_json_file(
         self, tmp_sessions: Path, tmp_output: Path
     ) -> None:

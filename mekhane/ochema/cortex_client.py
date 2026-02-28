@@ -157,7 +157,6 @@ class CortexClient:
         for var in ("HTTPS_PROXY", "HTTP_PROXY", "https_proxy", "http_proxy"):
             os.environ.pop(var, None)
 
-    # PURPOSE: Get or create TokenVault instance
     @property
     def vault(self) -> "TokenVault":
         """Get or create TokenVault instance."""
@@ -1442,7 +1441,6 @@ class ChatConversation:
         self._history: list[dict[str, Any]] = []
         self._turn_count = 0
 
-    # PURPOSE: メッセージを送信し、応答を取得する。
     def send(
         self,
         message: str,
@@ -1474,19 +1472,16 @@ class ChatConversation:
 
         return response
 
-    # PURPOSE: 現在のターン数。
     @property
     def turn_count(self) -> int:
         """現在のターン数。"""
         return self._turn_count
 
-    # PURPOSE: 現在の会話履歴 (read-only copy)。
     @property
     def history(self) -> list[dict[str, Any]]:
         """現在の会話履歴 (read-only copy)。"""
         return list(self._history)
 
-    # PURPOSE: 会話を閉じる (リソース解放)。
     def close(self) -> None:
         """会話を閉じる (リソース解放)。"""
         self._history.clear()
@@ -1527,7 +1522,6 @@ class ChatConversation:
         self._history: list[dict[str, Any]] = []
         self._turn_count = 0
 
-    # PURPOSE: メッセージを送信し、応答を取得する。
     def send(
         self,
         message: str,
@@ -1559,19 +1553,16 @@ class ChatConversation:
 
         return response
 
-    # PURPOSE: 現在のターン数。
     @property
     def turn_count(self) -> int:
         """現在のターン数。"""
         return self._turn_count
 
-    # PURPOSE: 現在の会話履歴 (read-only copy)。
     @property
     def history(self) -> list[dict[str, Any]]:
         """現在の会話履歴 (read-only copy)。"""
         return list(self._history)
 
-    # PURPOSE: 会話を閉じる (リソース解放)。
     def close(self) -> None:
         """会話を閉じる (リソース解放)。"""
         self._history.clear()

@@ -15,18 +15,15 @@ import pytest
 from mekhane.synteleia.dokimasia.cortex_backend import CortexBackend
 
 
-# PURPOSE: is_available() のテスト。
 class TestCortexBackendAvailability:
     """is_available() のテスト。"""
 
-    # PURPOSE: unavailable_without_key をテストする
     def test_unavailable_without_key(self):
         with patch.dict(os.environ, {}, clear=True):
             backend = CortexBackend()
             backend._available = None  # Reset cache
             assert backend.is_available() is False
 
-    # PURPOSE: available_with_key をテストする
     def test_available_with_key(self):
         with patch.dict(os.environ, {"GEMINI_API_KEY": "test-key"}):
             backend = CortexBackend()
@@ -34,11 +31,9 @@ class TestCortexBackendAvailability:
             assert backend.is_available() is True
 
 
-# PURPOSE: query() のテスト。
 class TestCortexBackendQuery:
     """query() のテスト。"""
 
-    # PURPOSE: API キーなしで JSON フォールバック応答を返す。
     def test_fallback_without_key(self):
         """API キーなしで JSON フォールバック応答を返す。"""
         with patch.dict(os.environ, {}, clear=True):
@@ -51,7 +46,6 @@ class TestCortexBackendQuery:
             assert parsed["confidence"] == 0.0
             assert "not set" in parsed["summary"]
 
-    # PURPOSE: モック API 応答のテスト — query 自体をパッチ。
     def test_query_with_mock_api(self):
         """モック API 応答のテスト — query 自体をパッチ。"""
         expected = json.dumps({
@@ -66,7 +60,6 @@ class TestCortexBackendQuery:
             assert parsed["confidence"] == 0.8
             assert len(parsed["issues"]) == 1
 
-    # PURPOSE: query の内部構造テスト — API なしで呼び出し構造を確認。
     def test_query_integration_structure(self):
         """query の内部構造テスト — API なしで呼び出し構造を確認。"""
         with patch.dict(os.environ, {}, clear=True):
@@ -79,16 +72,13 @@ class TestCortexBackendQuery:
             assert "confidence" in parsed
 
 
-# PURPOSE: Test cortex backend repr の実装
 class TestCortexBackendRepr:
-    # PURPOSE: repr をテストする
     def test_repr(self):
         backend = CortexBackend(model="gemini-2.5-pro", label="Pro")
         r = repr(backend)
         assert "gemini-2.5-pro" in r
         assert "Pro" in r
 
-    # PURPOSE: default_label をテストする
     def test_default_label(self):
         backend = CortexBackend()
         assert backend.label == "gemini-2.5-flash"

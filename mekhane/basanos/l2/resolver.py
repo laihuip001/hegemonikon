@@ -21,7 +21,6 @@ from mekhane.basanos.l2.models import Deficit, Question
 logger = logging.getLogger(__name__)
 
 
-# PURPOSE: Proposed resolution for a deficit
 @dataclass
 class Resolution:
     """Proposed resolution for a deficit."""
@@ -33,7 +32,6 @@ class Resolution:
     references: list[str] = field(default_factory=list)  # relevant files/docs
     status: str = "proposed"  # proposed, accepted, rejected, applied
 
-    # PURPOSE: Serialize to JSON-safe dict
     def to_dict(self) -> dict[str, Any]:
         """Serialize to JSON-safe dict."""
         return {
@@ -47,7 +45,6 @@ class Resolution:
         }
 
 
-# PURPOSE: L3 auto-resolution engine
 class Resolver:
     """L3 auto-resolution engine.
 
@@ -115,7 +112,6 @@ class Resolver:
             },
         }
 
-    # PURPOSE: Generate resolution using rule-based heuristics (no LLM)
     def resolve_heuristic(self, deficit: Deficit) -> Resolution:
         """Generate resolution using rule-based heuristics (no LLM)."""
         question = deficit.to_question()
@@ -157,7 +153,6 @@ class Resolver:
 
         return refs[:5]  # Limit references
 
-    # PURPOSE: Resolve multiple deficits, prioritized by severity
     def resolve_batch(
         self,
         deficits: list[Deficit],
@@ -187,7 +182,6 @@ class Resolver:
         resolutions.sort(key=lambda r: r.confidence, reverse=True)
         return resolutions
 
-    # PURPOSE: Resolve deficit using LLM via Cortex API (async)
     async def resolve_with_llm(
         self,
         deficit: Deficit,
@@ -253,7 +247,6 @@ class Resolver:
         return actions[:5]
 
 
-# PURPOSE: Display resolutions in formatted output
 def print_resolutions(resolutions: list[Resolution]) -> None:
     """Display resolutions in formatted output."""
     if not resolutions:

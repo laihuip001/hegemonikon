@@ -19,7 +19,6 @@ from mekhane.periskope.models import (
 
 # ── ResearchReport Tests ──
 
-# PURPOSE: Empty report should produce valid markdown
 def test_report_markdown_empty():
     """Empty report should produce valid markdown."""
     report = ResearchReport(query="test", elapsed_seconds=1.5)
@@ -29,7 +28,6 @@ def test_report_markdown_empty():
     assert "1.5s" in md
 
 
-# PURPOSE: Report with all phases should produce complete markdown
 def test_report_markdown_with_results():
     """Report with all phases should produce complete markdown."""
     report = ResearchReport(
@@ -72,7 +70,6 @@ def test_report_markdown_with_results():
 
 # ── Engine Unit Tests ──
 
-# PURPOSE: Engine should initialize with default configuration
 def test_engine_init():
     """Engine should initialize with default configuration."""
     engine = PeriskopeEngine()
@@ -82,7 +79,6 @@ def test_engine_init():
 
 # ── Engine Integration Test (uses real APIs) ──
 
-# PURPOSE: Research with internal sources only should work without Docker
 @pytest.mark.asyncio
 async def test_engine_research_internal_only():
     """Research with internal sources only should work without Docker."""
@@ -98,7 +94,6 @@ async def test_engine_research_internal_only():
     assert isinstance(report.search_results, list)
 
 
-# PURPOSE: Full research pipeline (all sources + synthesis + verification)
 @pytest.mark.asyncio
 async def test_engine_research_full():
     """Full research pipeline (all sources + synthesis + verification)."""

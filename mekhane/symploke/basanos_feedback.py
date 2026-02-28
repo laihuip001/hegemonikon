@@ -44,7 +44,6 @@ class PerspectiveFeedback:
     useful_count: int = 0     # 有用な指摘を出した回数
     last_used: str = ""       # 最後に使われた日時
 
-    # PURPOSE: 有用な指摘率 (0.0 - 1.0)。
     @property
     def usefulness_rate(self) -> float:
         """有用な指摘率 (0.0 - 1.0)。"""
@@ -95,7 +94,6 @@ class FeedbackStore:
             }
         self._state_file.write_text(json.dumps(raw, indent=2, ensure_ascii=False))
 
-    # PURPOSE: Perspective の使用を記録。
     def record_usage(self, perspective_id: str, domain: str, axis: str, was_useful: bool):
         """Perspective の使用を記録。"""
         if perspective_id not in self._data:
@@ -110,7 +108,6 @@ class FeedbackStore:
             fb.useful_count += 1
         fb.last_used = datetime.now().strftime("%Y-%m-%d %H:%M")
 
-    # PURPOSE: 有用率が閾値以下の Perspective ID リスト (10回以上使用されたもののみ)。
     def get_low_quality_perspectives(self, threshold: float = 0.1) -> list[str]:
         """有用率が閾値以下の Perspective ID リスト (10回以上使用されたもののみ)。"""
         return [
@@ -118,17 +115,14 @@ class FeedbackStore:
             if fb.total_reviews >= 10 and fb.usefulness_rate < threshold
         ]
 
-    # PURPOSE: 全フィードバックデータを返す。
     def get_all_feedback(self) -> dict[str, PerspectiveFeedback]:
         """全フィードバックデータを返す。"""
         return dict(self._data)
 
-    # PURPOSE: 外部保存用。
     def save(self):
         """外部保存用。"""
         self._save()
 
-    # PURPOSE: 淘汰レポートを返す (F14)。
     def get_exclusion_report(self, threshold: float = 0.1) -> dict:
         """淘汰レポートを返す (F14)。"""
         excluded = self.get_low_quality_perspectives(threshold)
@@ -141,7 +135,6 @@ class FeedbackStore:
             "exclusion_rate": round(len(excluded) / total, 3) if total else 0.0,
         }
 
-    # PURPOSE: 指定日数以上使用されていない Perspective ID リストを返す (F24)。
     def get_stale_perspectives(self, inactive_days: int = 30) -> list[str]:
         """指定日数以上使用されていない Perspective ID リストを返す (F24)。
 
@@ -163,7 +156,6 @@ class FeedbackStore:
                 stale.append(pid)
         return stale
 
-    # PURPOSE: Perspective をアーカイブ状態にする (F24)。
     def archive_perspective(self, perspective_id: str) -> bool:
         """Perspective をアーカイブ状態にする (F24)。
 

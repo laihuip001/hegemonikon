@@ -168,7 +168,6 @@ def _breed_combination(parents: list[dict], existing_ids: set[str]) -> list[dict
     return children
 
 
-# PURPOSE: 高品質 Perspective から子孫を生成する。
 def breed_perspectives(
     store,
     max_children: int = 10,

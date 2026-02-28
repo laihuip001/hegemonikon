@@ -11,18 +11,15 @@ import pytest
 from mekhane.synteleia.pattern_loader import strip_strings_and_comments
 
 
-# PURPOSE: JS/TS コメント strip
 class TestJSComments:
     """JS/TS コメント strip"""
 
-    # PURPOSE: line_comment をテストする
     def test_line_comment(self):
         code = "const x = 1; // this is a comment"
         result = strip_strings_and_comments(code)
         assert "//" not in result
         assert "const x = 1;" in result
 
-    # PURPOSE: block_comment をテストする
     def test_block_comment(self):
         code = "const x = /* inline */ 1;"
         result = strip_strings_and_comments(code)
@@ -30,7 +27,6 @@ class TestJSComments:
         assert "const x =" in result
         assert "1;" in result
 
-    # PURPOSE: multiline_block_comment をテストする
     def test_multiline_block_comment(self):
         code = """/**
  * JSDoc comment
@@ -42,7 +38,6 @@ function foo() {}"""
         assert "@param" not in result
         assert "function foo()" in result
 
-    # PURPOSE: ブロックコメント内の括弧が strip される
     def test_block_comment_with_brackets(self):
         """ブロックコメント内の括弧が strip される"""
         code = "/* { ( [ ] ) } */ const x = 1;"
@@ -51,25 +46,21 @@ function foo() {}"""
         assert "const x = 1;" in result
 
 
-# PURPOSE: JS/TS テンプレートリテラル strip
 class TestTemplateLiterals:
     """JS/TS テンプレートリテラル strip"""
 
-    # PURPOSE: simple_template をテストする
     def test_simple_template(self):
         code = "const msg = `hello world`;"
         result = strip_strings_and_comments(code)
         assert "hello world" not in result
         assert "const msg =" in result
 
-    # PURPOSE: テンプレートリテラル内の括弧が strip される — COMP-030 偽陽性の根本原因
     def test_template_with_brackets(self):
         """テンプレートリテラル内の括弧が strip される — COMP-030 偽陽性の根本原因"""
         code = "const msg = `value is ${x} items`;"
         result = strip_strings_and_comments(code)
         assert "${x}" not in result
 
-    # PURPOSE: テンプレートリテラル内の不対応括弧が括弧カウントに影響しない
     def test_template_with_unbalanced_braces(self):
         """テンプレートリテラル内の不対応括弧が括弧カウントに影響しない"""
         code = "const re = `{{{`;"
@@ -81,23 +72,19 @@ class TestTemplateLiterals:
         )
 
 
-# PURPOSE: JS/TS 正規表現リテラル strip
 class TestRegexLiterals:
     """JS/TS 正規表現リテラル strip"""
 
-    # PURPOSE: regex_after_equals をテストする
     def test_regex_after_equals(self):
         code = "const re = /[{}]+/g;"
         result = strip_strings_and_comments(code)
         assert "[{}]" not in result
 
-    # PURPOSE: regex_after_paren をテストする
     def test_regex_after_paren(self):
         code = 'str.match(/^(\\w+)\\s*=/)';
         result = strip_strings_and_comments(code)
         assert "\\w+" not in result
 
-    # PURPOSE: 除算の / は strip しない
     def test_regex_not_division(self):
         """除算の / は strip しない"""
         code = "const ratio = a / b;"
@@ -105,82 +92,68 @@ class TestRegexLiterals:
         assert "a" in result
         assert "b" in result
 
-    # PURPOSE: regex_with_escaped_slash をテストする
     def test_regex_with_escaped_slash(self):
         code = r"const re = /path\/to\/file/;"
         result = strip_strings_and_comments(code)
         assert "path" not in result
 
 
-# PURPOSE: Python 構文の後方互換性
 class TestPythonCompat:
     """Python 構文の後方互換性"""
 
-    # PURPOSE: python_hash_comment をテストする
     def test_python_hash_comment(self):
         code = "x = 1  # comment"
         result = strip_strings_and_comments(code)
         assert "comment" not in result
         assert "x = 1" in result
 
-    # PURPOSE: python_docstring をテストする
     def test_python_docstring(self):
         code = '"""This is a docstring"""\nx = 1'
         result = strip_strings_and_comments(code)
         assert "docstring" not in result
         assert "x = 1" in result
 
-    # PURPOSE: python_single_docstring をテストする
     def test_python_single_docstring(self):
         code = "'''Another docstring'''\nx = 1"
         result = strip_strings_and_comments(code)
         assert "Another" not in result
 
-    # PURPOSE: python_string_with_brackets をテストする
     def test_python_string_with_brackets(self):
         code = 'msg = "hello {name}"'
         result = strip_strings_and_comments(code)
         assert "{name}" not in result
 
 
-# PURPOSE: Rust 構文の互換性
 class TestRustCompat:
     """Rust 構文の互換性"""
 
-    # PURPOSE: rust_line_comment をテストする
     def test_rust_line_comment(self):
         code = "let x = 1; // comment"
         result = strip_strings_and_comments(code)
         assert "comment" not in result
 
-    # PURPOSE: rust_block_comment をテストする
     def test_rust_block_comment(self):
         code = "let x = /* value */ 1;"
         result = strip_strings_and_comments(code)
         assert "value" not in result
 
-    # PURPOSE: rust_string をテストする
     def test_rust_string(self):
         code = 'let msg = "hello {}";'
         result = strip_strings_and_comments(code)
         assert "hello" not in result
 
 
-# PURPOSE: エッジケース
 class TestEdgeCases:
     """エッジケース"""
 
-    # PURPOSE: empty_string をテストする
     def test_empty_string(self):
         assert strip_strings_and_comments("") == ""
 
-    # PURPOSE: no_comments_or_strings をテストする
     def test_no_comments_or_strings(self):
         code = "const x = 1 + 2;"
         result = strip_strings_and_comments(code)
         assert result.strip() == code.strip()
 
-    # PURPOSE: Python の # と JS の // が共存しても安全
     def test_mixed_languages_safe(self):
         """Python の # と JS の // が共存しても安全"""
         code = "x = 1  # py comment\ny = 2  // js comment"
@@ -190,7 +163,6 @@ class TestEdgeCases:
         assert "x = 1" in result
         assert "y = 2" in result
 
-    # PURPOSE: strip 後に括弧がバランスするか (実際の TypeScript コード)
     def test_bracket_balance_after_strip(self):
         """strip 後に括弧がバランスするか (実際の TypeScript コード)"""
         code = """

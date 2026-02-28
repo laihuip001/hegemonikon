@@ -35,11 +35,9 @@ from mekhane.ergasterion.tekhne.deep_engine import (
 # ============================================================
 
 
-# PURPOSE: Test SweepIssue data structure
 class TestSweepIssue:
     """Test SweepIssue data structure."""
 
-    # PURPOSE: severity_weight_critical をテストする
     def test_severity_weight_critical(self):
         issue = SweepIssue(
             perspective_id="Security-O1",
@@ -50,7 +48,6 @@ class TestSweepIssue:
         )
         assert issue.severity_weight == 4
 
-    # PURPOSE: severity_weight_info をテストする
     def test_severity_weight_info(self):
         issue = SweepIssue(
             perspective_id="Error-S2",
@@ -61,7 +58,6 @@ class TestSweepIssue:
         )
         assert issue.severity_weight == 1
 
-    # PURPOSE: severity_weight_unknown をテストする
     def test_severity_weight_unknown(self):
         issue = SweepIssue(
             perspective_id="X-Y",
@@ -78,11 +74,9 @@ class TestSweepIssue:
 # ============================================================
 
 
-# PURPOSE: Test SweepReport aggregation and sorting
 class TestSweepReport:
     """Test SweepReport aggregation and sorting."""
 
-    # PURPOSE: sample_report の処理
     @pytest.fixture
     def sample_report(self):
         issues = [
@@ -100,28 +94,23 @@ class TestSweepReport:
             elapsed_seconds=1.5,
         )
 
-    # PURPOSE: issue_count をテストする
     def test_issue_count(self, sample_report):
         assert sample_report.issue_count == 4
 
-    # PURPOSE: coverage をテストする
     def test_coverage(self, sample_report):
         assert sample_report.coverage == 0.9  # 9/10
 
-    # PURPOSE: top_issues_sorted をテストする
     def test_top_issues_sorted(self, sample_report):
         top = sample_report.top_issues(n=2)
         assert len(top) == 2
         assert top[0].severity == "critical"
         assert top[1].severity == "major"
 
-    # PURPOSE: by_domain をテストする
     def test_by_domain(self, sample_report):
         by_domain = sample_report.by_domain()
         assert "A" in by_domain
         assert len(by_domain["A"]) == 2
 
-    # PURPOSE: by_severity をテストする
     def test_by_severity(self, sample_report):
         counts = sample_report.by_severity()
         assert counts["critical"] == 1
@@ -129,14 +118,12 @@ class TestSweepReport:
         assert counts["minor"] == 1
         assert counts["info"] == 1
 
-    # PURPOSE: summary_contains_key_info をテストする
     def test_summary_contains_key_info(self, sample_report):
         summary = sample_report.summary()
         assert "test.md" in summary
         assert "10" in summary  # total perspectives
         assert "4" in summary  # issues
 
-    # PURPOSE: to_dict_serializable をテストする
     def test_to_dict_serializable(self, sample_report):
         d = sample_report.to_dict()
         json_str = json.dumps(d)
@@ -150,18 +137,15 @@ class TestSweepReport:
 # ============================================================
 
 
-# PURPOSE: Test _parse_sweep_response
 class TestSweepResponseParser:
     """Test _parse_sweep_response."""
 
-    # PURPOSE: silence_response をテストする
     def test_silence_response(self):
         issues = _parse_sweep_response(
             "SILENCE: No issues found", "A-O1", "A", "O1"
         )
         assert issues == []
 
-    # PURPOSE: json_response をテストする
     def test_json_response(self):
         json_resp = json.dumps([
             {
@@ -175,7 +159,6 @@ class TestSweepResponseParser:
         assert issues[0].severity == "major"
         assert "error handling" in issues[0].description
 
-    # PURPOSE: text_response_with_severity をテストする
     def test_text_response_with_severity(self):
         text = (
             "This is a critical issue: the prompt lacks safety constraints. "
@@ -186,7 +169,6 @@ class TestSweepResponseParser:
         assert len(issues) >= 1
         assert issues[0].severity == "critical"
 
-    # PURPOSE: empty_response をテストする
     def test_empty_response(self):
         issues = _parse_sweep_response("OK", "A-O1", "A", "O1")
         assert issues == []
@@ -197,11 +179,9 @@ class TestSweepResponseParser:
 # ============================================================
 
 
-# PURPOSE: Test DeepAnalysis data structure
 class TestDeepAnalysis:
     """Test DeepAnalysis data structure."""
 
-    # PURPOSE: has_actionable_fix をテストする
     def test_has_actionable_fix(self):
         analysis = DeepAnalysis(
             issue_id="A-O1",
@@ -219,7 +199,6 @@ class TestDeepAnalysis:
         )
         assert analysis.has_actionable_fix is True
 
-    # PURPOSE: no_actionable_fix をテストする
     def test_no_actionable_fix(self):
         analysis = DeepAnalysis(
             issue_id="B-S1",
@@ -235,11 +214,9 @@ class TestDeepAnalysis:
 # ============================================================
 
 
-# PURPOSE: Test DeepReport aggregation
 class TestDeepReport:
     """Test DeepReport aggregation."""
 
-    # PURPOSE: sample_deep_report の処理
     @pytest.fixture
     def sample_deep_report(self):
         analyses = [
@@ -266,18 +243,15 @@ class TestDeepReport:
             elapsed_seconds=5.0,
         )
 
-    # PURPOSE: prioritized_order をテストする
     def test_prioritized_order(self, sample_deep_report):
         p = sample_deep_report.prioritized()
         assert p[0].priority_score > p[1].priority_score
 
-    # PURPOSE: actionable_filter をテストする
     def test_actionable_filter(self, sample_deep_report):
         a = sample_deep_report.actionable()
         assert len(a) == 1
         assert a[0].issue_id == "A-O1"
 
-    # PURPOSE: to_dict_serializable をテストする
     def test_to_dict_serializable(self, sample_deep_report):
         d = sample_deep_report.to_dict()
         json_str = json.dumps(d)
@@ -290,11 +264,9 @@ class TestDeepReport:
 # ============================================================
 
 
-# PURPOSE: Test _parse_deep_response
 class TestDeepResponseParser:
     """Test _parse_deep_response."""
 
-    # PURPOSE: json_response をテストする
     def test_json_response(self):
         json_resp = json.dumps({
             "severity": "major",
@@ -316,14 +288,12 @@ class TestDeepResponseParser:
         assert len(analysis.fixes) == 1
         assert analysis.priority_score > 0
 
-    # PURPOSE: text_fallback をテストする
     def test_text_fallback(self):
         text = "This is a substantial analysis " * 10
         analysis = _parse_deep_response(text, "B-S1")
         assert analysis is not None
         assert analysis.issue_id == "B-S1"
 
-    # PURPOSE: short_response_returns_none をテストする
     def test_short_response_returns_none(self):
         analysis = _parse_deep_response("OK", "C-H1")
         assert analysis is None
@@ -334,11 +304,9 @@ class TestDeepResponseParser:
 # ============================================================
 
 
-# PURPOSE: Test SweepEngine with mocked CortexClient
 class TestSweepEngineIntegration:
     """Test SweepEngine with mocked CortexClient."""
 
-    # PURPOSE: Sweep engine should process mocked responses correctly
     def test_sweep_with_mock(self, tmp_path):
         """Sweep engine should process mocked responses correctly."""
         # Create test prompt
@@ -366,7 +334,6 @@ class TestSweepEngineIntegration:
         assert report.issue_count >= 1
         assert report.silences >= 1
 
-    # PURPOSE: Sweep should filter perspectives by domain
     def test_sweep_with_domain_filter(self, tmp_path):
         """Sweep should filter perspectives by domain."""
         prompt_file = tmp_path / "test.md"
@@ -390,11 +357,9 @@ class TestSweepEngineIntegration:
 # ============================================================
 
 
-# PURPOSE: Test that self_refine_pipeline accepts new modes
 class TestPipelineModes:
     """Test that self_refine_pipeline accepts new modes."""
 
-    # PURPOSE: Verify argparse accepts 'sweep' mode without error
     def test_cli_accepts_sweep_mode(self):
         """Verify argparse accepts 'sweep' mode without error."""
         import argparse
@@ -406,7 +371,6 @@ class TestPipelineModes:
         args = parser.parse_args(["--mode", "sweep"])
         assert args.mode == "sweep"
 
-    # PURPOSE: Verify argparse accepts 'auto' mode without error
     def test_cli_accepts_auto_mode(self):
         """Verify argparse accepts 'auto' mode without error."""
         import argparse

@@ -69,7 +69,6 @@ DEPTH_TO_CLAUDE: dict[str, dict[str, str]] = {
 }
 
 
-# PURPOSE: Resolve HGK depth level to model-specific thinking parameters
 def resolve_thinking_config(
     model: str,
     hgk_depth: str = "L2",
@@ -101,7 +100,6 @@ def resolve_thinking_config(
 # === Data Structures ===
 
 
-# PURPOSE: Configuration for a pipeline run
 @dataclass
 class PipelineConfig:
     """Configuration for a pipeline run."""
@@ -123,14 +121,12 @@ class PipelineConfig:
     output_dir: Optional[Path] = None
     report_format: str = "markdown"  # "markdown" or "json"
 
-    # PURPOSE: Resolve thinking parameters based on model and HGK depth
     @property
     def thinking_config(self) -> dict[str, str]:
         """Resolve thinking parameters based on model and HGK depth."""
         return resolve_thinking_config(self.model, self.hgk_depth)
 
 
-# PURPOSE: Aggregated results across multiple files
 @dataclass
 class AggregatedReport:
     """Aggregated results across multiple files."""
@@ -150,7 +146,6 @@ class AggregatedReport:
     cache_misses: int = 0
     timestamp: str = ""
 
-    # PURPOSE: Generate a Markdown report
     def report_markdown(self, top_n: int = 20) -> str:
         """Generate a Markdown report."""
         lines = [
@@ -239,7 +234,6 @@ class AggregatedReport:
 
         return "\n".join(lines)
 
-    # PURPOSE: Generate a JSON report
     def report_json(self) -> str:
         """Generate a JSON report."""
         return json.dumps(
@@ -267,7 +261,6 @@ class AggregatedReport:
 # === Pipeline ===
 
 
-# PURPOSE: End-to-end SweepEngine orchestrator
 class TekhnePipeline:
     """End-to-end SweepEngine orchestrator.
 
@@ -350,7 +343,6 @@ class TekhnePipeline:
             report.cache_hits = cache_stats.hits
             report.cache_misses = cache_stats.misses
 
-    # PURPOSE: Run the full pipeline synchronously
     def run(
         self,
         target: str,
@@ -404,7 +396,6 @@ class TekhnePipeline:
         report.elapsed_seconds = time.time() - start
         return report
 
-    # PURPOSE: Run the full pipeline asynchronously
     async def run_async(
         self,
         target: str,
@@ -452,7 +443,6 @@ class TekhnePipeline:
         report.elapsed_seconds = time.time() - start
         return report
 
-    # PURPOSE: Save report to file
     def save_report(
         self,
         report: AggregatedReport,
@@ -489,7 +479,6 @@ class TekhnePipeline:
 # === CLI ===
 
 
-# PURPOSE: CLI entry point
 def main():
     """CLI entry point."""
     import argparse

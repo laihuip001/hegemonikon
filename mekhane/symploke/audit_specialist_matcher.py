@@ -90,19 +90,16 @@ class CategoryAllocation:
     source_codes: list[str]  # この割り当ての元になった AI-xxx コード
 
 
-# PURPOSE: AIAuditor issue → Specialist カテゴリの adaptive マッチャー。
 class AuditSpecialistMatcher:
     """AIAuditor issue → Specialist カテゴリの adaptive マッチャー。"""
 
     def __init__(self, mapping: Optional[dict[str, list[str]]] = None):
         self._mapping = mapping or AUDIT_CODE_TO_SPECIALIST_CATEGORIES
 
-    # PURPOSE: AI-xxx コード → 関連カテゴリリスト。
     def get_categories_for_code(self, code: str) -> list[str]:
         """AI-xxx コード → 関連カテゴリリスト。"""
         return self._mapping.get(code, ["code_review"])  # fallback: code_review
 
-    # PURPOSE: Issue コードの集合からカテゴリ別スコアを算出。
     def score_categories(self, issue_codes: list[str]) -> dict[str, float]:
         """Issue コードの集合からカテゴリ別スコアを算出。
 
@@ -123,7 +120,6 @@ class AuditSpecialistMatcher:
 
         return cat_counts
 
-    # PURPOSE: Issue コードに基づいてスペシャリスト budget を配分。
     def allocate_budget(
         self,
         issue_codes: list[str],
@@ -182,7 +178,6 @@ class AuditSpecialistMatcher:
 
         return allocations
 
-    # PURPOSE: Issue コードから最適な specialist カテゴリを選択し、カテゴリ名リストを返す。
     def select_for_issues(
         self,
         issue_codes: list[str],
@@ -204,7 +199,6 @@ class AuditSpecialistMatcher:
         return result
 
 
-# PURPOSE: Convenience function: issue codes → category allocations
 def match_issues_to_specialists(issue_codes: list[str], budget: int = 20) -> list[CategoryAllocation]:
     """Convenience function: issue codes → category allocations."""
     matcher = AuditSpecialistMatcher()

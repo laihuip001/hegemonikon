@@ -27,11 +27,9 @@ from mekhane.synteleia.base import AuditSeverity, AuditTargetType
 # Adapter Tests
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-# PURPOSE: Basanos → Synteleia アダプターのテスト。
 class TestAdapter:
     """Basanos → Synteleia アダプターのテスト。"""
 
-    # PURPOSE: severity_mapping_critical をテストする
     def test_severity_mapping_critical(self):
         issue = Issue(
             code="AI-004", name="Logic Hallucination",
@@ -44,7 +42,6 @@ class TestAdapter:
         assert result.agent == "basanos/AI-004"
         assert result.location == "test.py:10"
 
-    # PURPOSE: severity_mapping_high をテストする
     def test_severity_mapping_high(self):
         issue = Issue(
             code="AI-001", name="Naming Hallucination",
@@ -55,7 +52,6 @@ class TestAdapter:
         assert result.severity == AuditSeverity.HIGH
         assert result.location == "L5"  # No file_path → "L{line}"
 
-    # PURPOSE: All severity levels map correctly
     def test_severity_mapping_all(self):
         """All severity levels map correctly."""
         for basanos_sev, synteleia_sev in [
@@ -67,7 +63,6 @@ class TestAdapter:
             issue = Issue(code="X", name="X", severity=basanos_sev, line=1, message="X")
             assert basanos_issue_to_synteleia(issue).severity == synteleia_sev
 
-    # PURPOSE: BasanosResult → AuditTarget conversion
     def test_basanos_to_synteleia_target(self, tmp_path):
         """BasanosResult → AuditTarget conversion."""
         test_file = tmp_path / "test.py"
@@ -90,11 +85,9 @@ class TestAdapter:
 # RotationState Tests
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-# PURPOSE: 重み付きドメインローテーションのテスト。
 class TestRotationState:
     """重み付きドメインローテーションのテスト。"""
 
-    # PURPOSE: 旧形式 (last_domains list) からの読込。
     def test_load_old_format(self, tmp_path):
         """旧形式 (last_domains list) からの読込。"""
         state_file = tmp_path / "state.json"
@@ -110,7 +103,6 @@ class TestRotationState:
         assert "Security" in state.domains
         assert state.domains["Security"].weight == 1.0  # Default weight
 
-    # PURPOSE: 新形式 (domains dict) からの読込。
     def test_load_new_format(self, tmp_path):
         """新形式 (domains dict) からの読込。"""
         state_file = tmp_path / "state.json"
@@ -128,7 +120,6 @@ class TestRotationState:
         assert state.domains["Security"].weight == 2.5
         assert state.domains["Testing"].weight == 0.5
 
-    # PURPOSE: Save → Load roundtrip。
     def test_save_roundtrip(self, tmp_path):
         """Save → Load roundtrip。"""
         state_file = tmp_path / "state.json"
@@ -141,7 +132,6 @@ class TestRotationState:
         assert loaded.domains["Security"].weight == 1.5
         assert loaded.domains["Security"].total_issues == 10
 
-    # PURPOSE: 重みの高いドメインが優先選択される。
     def test_select_domains_by_weight(self):
         """重みの高いドメインが優先選択される。"""
         state = RotationState()
@@ -152,7 +142,6 @@ class TestRotationState:
         selected = state.select_domains(n=2)
         assert selected == ["High", "Mid"]
 
-    # PURPOSE: Issue があると重みが上昇。
     def test_update_weights_increase(self):
         """Issue があると重みが上昇。"""
         state = RotationState()
@@ -163,7 +152,6 @@ class TestRotationState:
         assert state.domains["Security"].last_issues == 5
         assert state.domains["Security"].total_issues == 5
 
-    # PURPOSE: Issue がないと重みが減衰。
     def test_update_weights_decrease(self):
         """Issue がないと重みが減衰。"""
         state = RotationState()
@@ -173,7 +161,6 @@ class TestRotationState:
         assert state.domains["Security"].weight < 2.0
         assert state.domains["Security"].weight == pytest.approx(1.8)  # 2.0 * 0.9
 
-    # PURPOSE: 重みには上限(3.0)と下限(0.3)がある。
     def test_update_weights_bounds(self):
         """重みには上限(3.0)と下限(0.3)がある。"""
         state = RotationState()
@@ -185,7 +172,6 @@ class TestRotationState:
         state.update_weights("Y", issue_count=0)  # No issues
         assert state.domains["Y"].weight >= 0.3
 
-    # PURPOSE: 存在しないファイルから読込 → 空の状態。
     def test_load_nonexistent(self, tmp_path):
         """存在しないファイルから読込 → 空の状態。"""
         state = RotationState.load(tmp_path / "nonexistent.json")
@@ -197,30 +183,25 @@ class TestRotationState:
 # PipelineResult Tests
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-# PURPOSE: パイプライン結果のテスト。
 class TestPipelineResult:
     """パイプライン結果のテスト。"""
 
-    # PURPOSE: needs_l2_true をテストする
     def test_needs_l2_true(self):
         result = PipelineResult(
             l0_issues=[{"severity": "critical", "code": "AI-004", "message": "bad"}],
         )
         assert result.needs_l2 is True
 
-    # PURPOSE: needs_l2_false をテストする
     def test_needs_l2_false(self):
         result = PipelineResult(
             l0_issues=[{"severity": "medium", "code": "AI-002", "message": "ok"}],
         )
         assert result.needs_l2 is False
 
-    # PURPOSE: needs_l2_empty をテストする
     def test_needs_l2_empty(self):
         result = PipelineResult()
         assert result.needs_l2 is False
 
-    # PURPOSE: to_jules_prompt をテストする
     def test_to_jules_prompt(self):
         result = PipelineResult(
             l0_issues=[
@@ -238,11 +219,9 @@ class TestPipelineResult:
 # Pipeline Integration Test
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-# PURPOSE: パイプライン E2E テスト。
 class TestPipeline:
     """パイプライン E2E テスト。"""
 
-    # PURPOSE: 問題のないファイルでパイプライン実行。
     def test_run_with_clean_file(self, tmp_path):
         """問題のないファイルでパイプライン実行。"""
         test_file = tmp_path / "clean.py"
@@ -266,7 +245,6 @@ class TestPipeline:
         assert len(result.l0_issues) == 0
         assert result.needs_l2 is False
 
-    # PURPOSE: 問題のあるファイルで L0 検出を確認。
     def test_run_with_buggy_file(self, tmp_path):
         """問題のあるファイルで L0 検出を確認。"""
         test_file = tmp_path / "buggy.py"
@@ -296,7 +274,6 @@ class TestPipeline:
         assert len(result.l0_issues) > 0
         assert result.needs_l2 is True  # Should have CRITICAL/HIGH
 
-    # PURPOSE: フィードバックが rotation state を更新する。
     def test_feedback_updates_state(self, tmp_path):
         """フィードバックが rotation state を更新する。"""
         state_file = tmp_path / "state.json"
@@ -321,7 +298,6 @@ class TestPipeline:
         assert updated.cycle == 6  # Incremented
         assert updated.last_date != "2026-02-17"  # Updated
 
-    # PURPOSE: サマリー出力のフォーマット確認。
     def test_summary_output(self):
         """サマリー出力のフォーマット確認。"""
         pipeline = DailyReviewPipeline(enable_l2=False)
@@ -344,11 +320,9 @@ class TestPipeline:
 # F4: L1 Synteleia Mock Tests
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-# PURPOSE: L1 Synteleia 統合テスト (mock)。
 class TestL1Integration:
     """L1 Synteleia 統合テスト (mock)。"""
 
-    # PURPOSE: L0 issue がある場合、L1 結果が生成される。
     def test_l1_triggered_on_issues(self, tmp_path):
         """L0 issue がある場合、L1 結果が生成される。"""
         test_file = tmp_path / "bad.py"
@@ -373,7 +347,6 @@ class TestL1Integration:
         # L1 is skipped in dry_run but pipeline proceeds
         assert result.files_scanned == 1
 
-    # PURPOSE: L0 issue がない場合、L1 は不要。
     def test_l1_skipped_on_clean(self, tmp_path):
         """L0 issue がない場合、L1 は不要。"""
         test_file = tmp_path / "clean.py"
@@ -398,11 +371,9 @@ class TestL1Integration:
 # F5: Snippet Extraction Tests
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-# PURPOSE: _extract_snippet のテスト。
 class TestSnippet:
     """_extract_snippet のテスト。"""
 
-    # PURPOSE: 正常なファイル + 行番号でスニペット取得。
     def test_extract_snippet_valid(self, tmp_path):
         """正常なファイル + 行番号でスニペット取得。"""
         test_file = tmp_path / "example.py"
@@ -416,17 +387,14 @@ class TestSnippet:
         assert "line2" in snippet  # context before
         assert "line6" in snippet  # context after
 
-    # PURPOSE: コロンなし → 空文字。
     def test_extract_snippet_no_colon(self):
         """コロンなし → 空文字。"""
         assert PipelineResult._extract_snippet("no_colon") == ""
 
-    # PURPOSE: 存在しないファイル → 空文字。
     def test_extract_snippet_nonexistent(self):
         """存在しないファイル → 空文字。"""
         assert PipelineResult._extract_snippet("/nonexistent/file.py:1") == ""
 
-    # PURPOSE: to_jules_prompt にスニペットが含まれる。
     def test_extract_snippet_in_prompt(self, tmp_path):
         """to_jules_prompt にスニペットが含まれる。"""
         test_file = tmp_path / "code.py"
@@ -451,11 +419,9 @@ class TestSnippet:
 # Notification Tests
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-# PURPOSE: _notify_result のテスト。
 class TestNotification:
     """_notify_result のテスト。"""
 
-    # PURPOSE: run() が _notify_result を呼ぶ。
     def test_notify_called_on_run(self, tmp_path):
         """run() が _notify_result を呼ぶ。"""
         from unittest.mock import patch

@@ -16,7 +16,6 @@ from typing import Any
 from .extractor import BaseExporter
 
 
-# PURPOSE: Knowledge Item (KI) のエクスポーター。
 class KIExporter(BaseExporter):
     """Knowledge Item (KI) のエクスポーター。
 

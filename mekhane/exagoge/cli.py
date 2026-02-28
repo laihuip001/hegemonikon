@@ -29,7 +29,6 @@ DEFAULT_OUTPUT_DIR = Path.home() / "oikos/hegemonikon/exports"
 VALID_TYPES = {"handoff", "doxa", "ki", "ideas", "all"}
 
 
-# PURPOSE: CLI引数パーサーを構築する。
 def build_parser() -> argparse.ArgumentParser:
     """CLI引数パーサーを構築する。"""
     parser = argparse.ArgumentParser(
@@ -66,7 +65,6 @@ def build_parser() -> argparse.ArgumentParser:
     return parser
 
 
-# PURPOSE: タイプ文字列をセットに変換する。
 def resolve_types(type_str: str) -> set[str]:
     """タイプ文字列をセットに変換する。"""
     if type_str == "all":
@@ -79,7 +77,6 @@ def resolve_types(type_str: str) -> set[str]:
     return types
 
 
-# PURPOSE: CLI メインエントリーポイント。
 def main() -> None:
     """CLI メインエントリーポイント。"""
     parser = build_parser()

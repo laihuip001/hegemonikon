@@ -54,7 +54,6 @@ def _deserialize_deficit(data: dict[str, Any]) -> Deficit:
     )
 
 
-# PURPOSE: Append scan result to JSONL history file
 def record_scan(
     deficits: list[Deficit],
     history_dir: Optional[Path] = None,
@@ -94,7 +93,6 @@ def record_scan(
     return filepath
 
 
-# PURPOSE: Load scan history records (most recent first)
 def load_history(
     history_dir: Optional[Path] = None,
     limit: int = 50,
@@ -130,7 +128,6 @@ def load_history(
     return records[:limit]
 
 
-# PURPOSE: Calculate deficit trend from recent history
 def get_trend(
     history_dir: Optional[Path] = None,
     window: int = 10,

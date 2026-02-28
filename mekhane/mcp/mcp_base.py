@@ -40,7 +40,6 @@ if sys.platform == "win32":
 _original_stdout = sys.stdout
 
 
-# PURPOSE: Suppress stdout during imports to prevent MCP protocol pollution
 class StdoutSuppressor:
     """Suppress stdout during imports to prevent MCP protocol pollution.
 
@@ -69,7 +68,6 @@ class StdoutSuppressor:
             )
 
 
-# PURPOSE: Common infrastructure for all Hegemonikón MCP servers
 class MCPBase:
     """Common infrastructure for all Hegemonikón MCP servers.
 
@@ -124,7 +122,6 @@ class MCPBase:
         """Log to stderr with server name prefix."""
         print(f"[{self.name}] {msg}", file=sys.stderr, flush=True)
 
-    # PURPOSE: Provide log function for external use
     @property
     def log(self):
         """Provide log function for external use."""
@@ -147,7 +144,6 @@ class MCPBase:
             self._log(f"Server error: {e}")
             raise
 
-    # PURPOSE: Run the MCP server (blocking)
     def run(self):
         """Run the MCP server (blocking)."""
         self._log("Running main...")

@@ -131,7 +131,6 @@ def display_rank(store: FeedbackStore, top: int = 20) -> None:
               f"{r['domain']:<20}  {r['axis']:<12}  {r['perspective_id']}")
 
 
-# PURPOSE: Domain 別集計を表示。
 def display_domain(store: FeedbackStore) -> None:
     """Domain 別集計を表示。"""
     domains = aggregate_by_domain(store)
@@ -147,7 +146,6 @@ def display_domain(store: FeedbackStore) -> None:
               f"{d['perspectives']:>4}  {d['domain']}")
 
 
-# PURPOSE: Axis 別集計を表示。
 def display_axis(store: FeedbackStore) -> None:
     """Axis 別集計を表示。"""
     axes = aggregate_by_axis(store)

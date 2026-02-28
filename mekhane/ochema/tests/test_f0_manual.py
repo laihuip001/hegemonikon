@@ -14,7 +14,6 @@ sys.path.insert(0, ".")
 
 from mekhane.ochema.tools import TOOL_DEFINITIONS, execute_tool, _is_path_allowed
 
-# PURPOSE: tools をテストする
 def test_tools():
     print("=" * 50)
     print("F0 Tool Use — 検証")
@@ -23,7 +22,6 @@ def test_tools():
     passed = 0
     failed = 0
 
-    # PURPOSE: check を検証する
     def check(name, condition):
         nonlocal passed, failed
         if condition:
@@ -96,7 +94,6 @@ def test_tools():
     return failed == 0
 
 
-# PURPOSE: Test ask_with_tools with real API (requires Cortex auth)
 def test_api_integration():
     """Test ask_with_tools with real API (requires Cortex auth)."""
     print("\n" + "=" * 50)

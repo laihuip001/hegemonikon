@@ -16,7 +16,6 @@ from unittest.mock import MagicMock, patch
 import mekhane.ochema.antigravity_client as ac
 
 
-# PURPOSE: _select_model のキーワードマッチとフォールバック。
 class TestSelectModel(unittest.TestCase):
     """_select_model のキーワードマッチとフォールバック。"""
 
@@ -29,7 +28,6 @@ class TestSelectModel(unittest.TestCase):
             client._ssl_ctx = None
             return client
 
-    # PURPOSE: キーワードなし → デフォルト Claude Thinking。
     def test_default_model(self):
         """キーワードなし → デフォルト Claude Thinking。"""
         client = self._make_client()
@@ -40,7 +38,6 @@ class TestSelectModel(unittest.TestCase):
         result = client._select_model("hello world")
         self.assertEqual(result, ac.DEFAULT_MODEL)
 
-    # PURPOSE: security → Claude Thinking。
     def test_security_keyword(self):
         """security → Claude Thinking。"""
         client = self._make_client()
@@ -52,7 +49,6 @@ class TestSelectModel(unittest.TestCase):
         result = client._select_model("security audit of API endpoints")
         self.assertEqual(result, "MODEL_CLAUDE_4_5_SONNET_THINKING")
 
-    # PURPOSE: translate + quick → Gemini Flash。
     def test_simple_task_gemini_flash(self):
         """translate + quick → Gemini Flash。"""
         client = self._make_client()
@@ -64,7 +60,6 @@ class TestSelectModel(unittest.TestCase):
         result = client._select_model("translate this quickly please")
         self.assertEqual(result, "MODEL_PLACEHOLDER_M18")
 
-    # PURPOSE: Quota 10% → フォールバック。
     def test_fallback_on_low_quota(self):
         """Quota 10% → フォールバック。"""
         client = self._make_client()
@@ -78,7 +73,6 @@ class TestSelectModel(unittest.TestCase):
         # Thinking(5%) → M26(80%) へフォールバック
         self.assertEqual(result, "MODEL_PLACEHOLDER_M26")
 
-    # PURPOSE: quota_status 例外 → キーワードマッチ結果をそのまま返す。
     def test_quota_exception_fallback(self):
         """quota_status 例外 → キーワードマッチ結果をそのまま返す。"""
         client = self._make_client()
@@ -87,7 +81,6 @@ class TestSelectModel(unittest.TestCase):
         self.assertEqual(result, "MODEL_CLAUDE_4_5_SONNET_THINKING")
 
 
-# PURPOSE: context_health のレベル判定。
 class TestContextHealth(unittest.TestCase):
     """context_health のレベル判定。"""
 
@@ -99,7 +92,6 @@ class TestContextHealth(unittest.TestCase):
             client._ssl_ctx = None
             return client
 
-    # PURPOSE: healthy をテストする
     def test_healthy(self):
         client = self._make_client()
         client.session_info = MagicMock(return_value={
@@ -117,7 +109,6 @@ class TestContextHealth(unittest.TestCase):
         self.assertEqual(result["icon"], "🟢")
         self.assertIsNone(result["recommendation"])
 
-    # PURPOSE: warning をテストする
     def test_warning(self):
         client = self._make_client()
         client.session_info = MagicMock(return_value={
@@ -134,7 +125,6 @@ class TestContextHealth(unittest.TestCase):
         self.assertEqual(result["level"], "warning")
         self.assertIn("/bye", result["recommendation"])
 
-    # PURPOSE: danger をテストする
     def test_danger(self):
         client = self._make_client()
         client.session_info = MagicMock(return_value={
@@ -151,7 +141,6 @@ class TestContextHealth(unittest.TestCase):
         self.assertEqual(result["level"], "danger")
         self.assertIn("Context Rot", result["message"])
 
-    # PURPOSE: low_quota_included をテストする
     def test_low_quota_included(self):
         client = self._make_client()
         client.session_info = MagicMock(return_value={
@@ -173,7 +162,6 @@ class TestContextHealth(unittest.TestCase):
         self.assertEqual(result["low_quota_models"], ["Claude 4.5 Sonnet"])
 
 
-# PURPOSE: archive_sessions のファイル生成。
 class TestArchiveSessions(unittest.TestCase):
     """archive_sessions のファイル生成。"""
 
@@ -185,7 +173,6 @@ class TestArchiveSessions(unittest.TestCase):
             client._ssl_ctx = None
             return client
 
-    # PURPOSE: export_creates_file をテストする
     def test_export_creates_file(self):
         client = self._make_client()
         client.session_info = MagicMock(return_value={
@@ -218,7 +205,6 @@ class TestArchiveSessions(unittest.TestCase):
             self.assertIn("Hello", content)
             self.assertIn("Hi!", content)
 
-    # PURPOSE: skip_if_already_exported をテストする
     def test_skip_if_already_exported(self):
         client = self._make_client()
         client.session_info = MagicMock(return_value={

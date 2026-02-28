@@ -17,7 +17,10 @@ Usage:
 """
 
 import asyncio
-import aiohttp
+try:
+    import aiohttp
+except ImportError:
+    aiohttp = None
 import functools
 import logging
 import os

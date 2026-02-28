@@ -40,16 +40,60 @@ def _load_env():
 _load_env()
 
 
+_SECRET_CACHE: Dict[str, Optional[str]] = {}
+
 # PURPOSE: [L2-auto] Secret アクセスの一元化 (W08 Secret Sprawl 対策)
 def _get_secret(key: str) -> Optional[str]:
     """Secret アクセスの一元化 (W08 Secret Sprawl 対策)
     
     全ての API キー・認証情報はこの関数経由で取得する。
-    散在する os.environ.get を排除し、将来的な Secret Manager
-    統合のフックポイントとする。
+    ローカル環境の優先度を確保するため os.environ を先に確認し、
+    その後 GCP Secret Manager / AWS Secrets Manager から取得を試みる。
     """
-    # TODO: Secret Manager (GCP/AWS) 統合時はここを変更
-    return os.environ.get(key)
+    if key in _SECRET_CACHE:
+        return _SECRET_CACHE[key]
+
+    val = os.environ.get(key)
+
+    if val is None:
+        try:
+            from google.cloud import secretmanager
+            import google.auth
+
+            project_id = os.environ.get("GOOGLE_CLOUD_PROJECT")
+            if not project_id:
+                try:
+                    _, project_id = google.auth.default()
+                except Exception:
+                    pass
+
+            if project_id:
+                client = secretmanager.SecretManagerServiceClient()
+                name = f"projects/{project_id}/secrets/{key}/versions/latest"
+                response = client.access_secret_version(request={"name": name})
+                val = response.payload.data.decode("UTF-8")
+        except ImportError:
+            pass
+        except Exception:
+            pass
+
+    if val is None:
+        try:
+            import boto3
+            from botocore.exceptions import ClientError
+
+            client = boto3.client('secretsmanager')
+            response = client.get_secret_value(SecretId=key)
+            if 'SecretString' in response:
+                val = response['SecretString']
+        except ImportError:
+            pass
+        except Exception:
+            pass
+
+    _SECRET_CACHE[key] = val
+
+    return val
 
 
 # PURPOSE: [L2-auto] メモリ内 Circuit Breaker (W06 Cascade Failure 対策)

@@ -1,4 +1,3 @@
-# PROOF: [L2/Infra] <- mekhane/periskope/
 """
 Multi-model synthesizer for Periskopē.
 

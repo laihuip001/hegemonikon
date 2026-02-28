@@ -1,4 +1,3 @@
-# PROOF: [L2/Infra] <- mekhane/dendron/
 """
 S7: Falsification Condition Checker
 

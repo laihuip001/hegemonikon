@@ -98,10 +98,56 @@ def cmd_ingest(args):
         except Exception as e:
             print(f"[Kairos] Error: {e}")
 
-    # Chronos (Conversation History) - Not yet implemented
+    # Chronos (Conversation History)
     if args.all or args.chronos:
-        # TODO: Implement when conversation history indexing is ready
         results["chronos"] = 0
+        try:
+            from mekhane.symploke.kairos_ingest import (
+                get_conversation_files,
+                parse_conversation_chunks,
+            )
+            from mekhane.symploke.adapters.embedding_adapter import EmbeddingAdapter
+            from mekhane.symploke.indices.chronos import ChronosIndex
+            import os
+
+            # Configurable via env - defaults to mneme indices
+            CHRONOS_INDEX_PATH = Path(
+                os.environ.get(
+                    "HGK_CHRONOS_INDEX",
+                    str(Path.home() / "oikos" / "mneme" / ".hegemonikon" / "indices" / "chronos.pkl"),
+                )
+            )
+
+            files = get_conversation_files()
+            if files:
+                all_docs = []
+                for f in files:
+                    chunks = parse_conversation_chunks(f)
+                    all_docs.extend(chunks)
+
+                if all_docs:
+                    # Ensure directory exists
+                    CHRONOS_INDEX_PATH.parent.mkdir(parents=True, exist_ok=True)
+
+                    adapter = EmbeddingAdapter()
+                    # Auto-detect dimension from the model
+                    sample_vec = adapter.encode(["test"])
+                    dim = len(sample_vec[0])
+
+                    index = ChronosIndex(adapter, "chronos", dimension=dim)
+                    index.initialize()
+                    count = index.ingest(all_docs)
+
+                    adapter.save(str(CHRONOS_INDEX_PATH))
+                    results["chronos"] = count
+                else:
+                    print("[Chronos] No documents generated from conversations")
+            else:
+                print("[Chronos] No conversation files found")
+        except ImportError as e:
+            print(f"[Chronos] Import error: {e}")
+        except Exception as e:
+            print(f"[Chronos] Error: {e}")
 
     # Output in /boot expected format
     total = sum(results.values())
@@ -139,8 +185,24 @@ def cmd_stats(args):
     )
     print(f"Kairos: {handoff_count} handoff files")
 
-    # Chronos stats (placeholder)
-    print("Chronos: Not implemented")
+    # Chronos stats
+    import os
+    CHRONOS_INDEX_PATH = Path(
+        os.environ.get(
+            "HGK_CHRONOS_INDEX",
+            str(Path.home() / "oikos" / "mneme" / ".hegemonikon" / "indices" / "chronos.pkl"),
+        )
+    )
+    if CHRONOS_INDEX_PATH.exists():
+        try:
+            from mekhane.symploke.adapters.embedding_adapter import EmbeddingAdapter
+            adapter = EmbeddingAdapter()
+            adapter.load(str(CHRONOS_INDEX_PATH))
+            print(f"Chronos: {adapter.count()} vectors")
+        except Exception as e:
+            print(f"Chronos: Error - {e}")
+    else:
+        print("Chronos: Not indexed")
 
     print("=" * 40)
     return 0

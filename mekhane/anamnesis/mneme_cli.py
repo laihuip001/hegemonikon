@@ -31,6 +31,8 @@ import sys
 from pathlib import Path
 from datetime import datetime
 
+import os
+
 # Add Hegemonikon root to path for imports
 _THIS_DIR = Path(__file__).parent
 _HEGEMONIKON_ROOT = (
@@ -98,16 +100,17 @@ def cmd_ingest(args):
         except Exception as e:
             print(f"[Kairos] Error: {e}")
 
-    # Chronos (Conversation History) - Not yet implemented
+    # Chronos (Conversation History)
     if args.all or args.chronos:
         try:
             from mekhane.symploke.kairos_ingest import (
                 get_conversation_files,
                 parse_conversation_chunks,
             )
-            from mekhane.symploke.adapters.embedding_adapter import EmbeddingAdapter
-            from mekhane.symploke.indices.chronos import ChronosIndex
-            import os
+            from mekhane.symploke.chronos_ingest import (
+                ingest_to_chronos,
+                CHRONOS_INDEX_PATH,
+            )
 
             files = get_conversation_files()
             if files:
@@ -116,35 +119,9 @@ def cmd_ingest(args):
                     all_docs.extend(parse_conversation_chunks(f))
 
                 if all_docs:
-                    adapter = EmbeddingAdapter()
-                    # Auto-detect embedding dimension
-                    sample_vec = adapter.encode(["test"])
-                    dim = (
-                        sample_vec.shape[1]
-                        if sample_vec.ndim == 2
-                        else len(sample_vec[0])
+                    count = ingest_to_chronos(
+                        all_docs, save_path=str(CHRONOS_INDEX_PATH)
                     )
-
-                    index = ChronosIndex(adapter, "chronos", dimension=dim)
-                    index.initialize()
-                    count = index.ingest(all_docs)
-
-                    _PROJECT_ROOT = Path(__file__).parent.parent.parent
-                    CHRONOS_INDEX_PATH = Path(
-                        os.environ.get(
-                            "HGK_CHRONOS_INDEX",
-                            str(
-                                _PROJECT_ROOT.parent
-                                / "mneme"
-                                / ".hegemonikon"
-                                / "indices"
-                                / "chronos.pkl"
-                            ),
-                        )
-                    )
-                    CHRONOS_INDEX_PATH.parent.mkdir(parents=True, exist_ok=True)
-                    adapter.save(str(CHRONOS_INDEX_PATH))
-
                     results["chronos"] = count
                 else:
                     print("[Chronos] No documents generated from conversation files")
@@ -196,32 +173,19 @@ def cmd_stats(args):
     print(f"Kairos: {handoff_count} handoff files")
 
     # Chronos stats
-    import os
-
-    _PROJECT_ROOT = Path(__file__).parent.parent.parent
-    CHRONOS_INDEX_PATH = Path(
-        os.environ.get(
-            "HGK_CHRONOS_INDEX",
-            str(
-                _PROJECT_ROOT.parent
-                / "mneme"
-                / ".hegemonikon"
-                / "indices"
-                / "chronos.pkl"
-            ),
+    try:
+        from mekhane.symploke.chronos_ingest import (
+            CHRONOS_INDEX_PATH,
+            load_chronos_index,
         )
-    )
-    if CHRONOS_INDEX_PATH.exists():
-        try:
-            from mekhane.symploke.adapters.embedding_adapter import EmbeddingAdapter
 
-            adapter = EmbeddingAdapter()
-            adapter.load(str(CHRONOS_INDEX_PATH))
+        if CHRONOS_INDEX_PATH.exists():
+            adapter = load_chronos_index(str(CHRONOS_INDEX_PATH))
             print(f"Chronos: {adapter.count()} vectors")
-        except Exception as e:
-            print(f"Chronos: Error - {e}")
-    else:
-        print("Chronos: Not indexed")
+        else:
+            print("Chronos: Not indexed")
+    except Exception as e:
+        print(f"Chronos: Error - {e}")
 
     print("=" * 40)
     return 0

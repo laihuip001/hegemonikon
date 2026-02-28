@@ -120,14 +120,49 @@ class LMQLTranslator:
             return self._translate_synteleia_macro(name, args)
         
         # 一般マクロ: ビルトインまたはユーザー定義
+        from mekhane.ccl.macro_expander import MacroExpander
+        from hermeneus.src.parser import CCLParser
+
+        # マクロ参照を文字列に復元して展開器にかける
+        # (MacroRef は args を持つ場合があるため)
+        macro_str = f"@{name}"
+        if args:
+            args_str = ", ".join(str(a) for a in args)
+            macro_str += f"({args_str})"
+
+        expander = MacroExpander()
+        expansion, did_expand = expander.expand(macro_str)
+
+        if did_expand:
+            parser = CCLParser()
+            try:
+                # マクロ展開形をASTにパースし、再帰的に翻訳
+                expanded_ast = parser.parse(expansion)
+                return self.translate(expanded_ast)
+            except Exception as e:
+                # パース失敗時はフォールバックとしてエラーを埋め込むか、元の挙動にフォールバック
+                # ここではフォールバックしつつ、エラー理由もコメントに残す
+                return f'''
+# CCL マクロ: {macro_str}
+# エラー: マクロの展開後パースに失敗しました ({e})
+@lmql.query
+def macro_{name}(context: str):
+    """マクロ {macro_str} の実行 (展開エラー)"""
+    argmax
+        "マクロ {macro_str} を実行: コンテキスト: {{context}}"
+        "[RESULT]"
+    from
+        "{self.model}"
+'''
+
         return f'''
-# CCL マクロ: @{name}
+# CCL マクロ: {macro_str}
 # TODO: マクロ展開 → 他の CCL 式に変換
 @lmql.query
 def macro_{name}(context: str):
-    """マクロ @{name} の実行"""
+    """マクロ {macro_str} の実行"""
     argmax
-        "マクロ @{name} を実行: コンテキスト: {{context}}"
+        "マクロ {macro_str} を実行: コンテキスト: {{context}}"
         "[RESULT]"
     from
         "{self.model}"

@@ -291,6 +291,11 @@ async def run_slot_batch(
     total_failed = 0
     all_results = []
 
+    # バッチで一括実行するためのタスクリスト
+    all_tasks = []
+    # ファイルごとのスペシャリスト割り当て情報を保持
+    file_specs_map = {}
+
     try:
         for file_idx, target_file in enumerate(files, 1):
             # 専門家プール選択
@@ -367,6 +372,8 @@ async def run_slot_batch(
                 except Exception:
                     pass  # FeedbackStore 不在時はスキップ
 
+            file_specs_map[target_file] = specs
+
             if dry_run:
                 print(f"  [{file_idx}/{len(files)}] {target_file} × {len(specs)} specialists (DRY-RUN)")
                 all_results.append({
@@ -377,43 +384,80 @@ async def run_slot_batch(
                 continue
 
             print(f"  [{file_idx}/{len(files)}] {target_file} × {len(specs)} specialists")
-            results = await run_batch(specs, target_file, max_concurrent)
+            for spec in specs:
+                all_tasks.append((spec, target_file))
 
-            started = sum(1 for r in results if "session_id" in r)
-            failed = sum(1 for r in results if "error" in r)
-            total_started += started
-            total_failed += failed
+        if not dry_run and all_tasks:
+            # 安全弁を機能させるため、一定のチャンクサイズで実行し、エラー率を定期的にチェックする
+            CHUNK_SIZE = max(10, max_concurrent * 2)
+            print(f"\n  Starting concurrent batch execution for {len(all_tasks)} total tasks in chunks of {CHUNK_SIZE}...")
 
-            # F9: session_id + perspective_id をログ保存 (jules_result_parser 連携)
-            sessions_info = []
-            for i, r in enumerate(results):
-                info = {}
-                if "session_id" in r:
-                    info["session_id"] = r["session_id"]
-                if "error" in r:
-                    info["error"] = str(r["error"])[:100]
-                if i < len(specs):
-                    info["specialist"] = specs[i].name
-                    info["perspective_id"] = getattr(specs[i], "id", "")
-                sessions_info.append(info)
-
-            all_results.append({
-                "file": target_file,
-                "specialists": len(specs),
-                "started": started,
-                "failed": failed,
-                "sessions": sessions_info,
-            })
-
-            # 安全弁: エラー率チェック
-            total_attempted = total_started + total_failed
-            if total_attempted > 10:
-                error_rate = total_failed / total_attempted
-                if error_rate > MAX_ERROR_RATE:
-                    print(f"  ⚠️  Error rate {error_rate:.1%} > {MAX_ERROR_RATE:.0%}, stopping slot")
+            batch_results = []
+            stop_early = False
+            for chunk_start in range(0, len(all_tasks), CHUNK_SIZE):
+                if stop_early:
+                    print(f"  ⚠️  Skipping remaining {len(all_tasks) - chunk_start} tasks due to high error rate.")
                     break
 
-            print(f"    → {started}/{len(specs)} started, {failed} failed")
+                chunk = all_tasks[chunk_start:chunk_start + CHUNK_SIZE]
+                chunk_res = await run_batch(chunk, max_concurrent)
+                batch_results.extend(chunk_res)
+
+                # チャンク実行後の暫定エラー率チェック
+                current_attempted = len(batch_results)
+                current_failed = sum(1 for r in batch_results if "error" in r)
+
+                if current_attempted > 10:
+                    error_rate = current_failed / current_attempted
+                    if error_rate > MAX_ERROR_RATE:
+                        print(f"  ⚠️  Error rate {error_rate:.1%} > {MAX_ERROR_RATE:.0%}, stopping slot early")
+                        stop_early = True
+
+            # batch_results と実行した範囲のタスクは 1:1 対応なので zip で紐付け可能
+            executed_tasks = all_tasks[:len(batch_results)]
+            results_by_file = {}
+            for (spec, target_file), r in zip(executed_tasks, batch_results):
+                r["_original_spec"] = spec
+                results_by_file.setdefault(target_file, []).append(r)
+
+            for target_file in files:
+                if target_file not in file_specs_map:
+                    continue
+                specs = file_specs_map[target_file]
+                file_results = results_by_file.get(target_file, [])
+
+                started = sum(1 for r in file_results if "session_id" in r)
+                failed = sum(1 for r in file_results if "error" in r)
+                total_started += started
+                total_failed += failed
+
+                # F9: session_id + perspective_id をログ保存 (jules_result_parser 連携)
+                sessions_info = []
+                for r in file_results:
+                    info = {}
+                    if "session_id" in r:
+                        info["session_id"] = r["session_id"]
+                    if "error" in r:
+                        info["error"] = str(r["error"])[:100]
+                    spec = r.get("_original_spec")
+                    if spec:
+                        info["specialist"] = spec.name
+                        info["perspective_id"] = getattr(spec, "id", "")
+                    sessions_info.append(info)
+
+                all_results.append({
+                    "file": target_file,
+                    "specialists": len(specs),
+                    "started": started,
+                    "failed": failed,
+                    "sessions": sessions_info,
+                })
+
+                if file_results:
+                    print(f"  Result [{target_file}]: {started}/{len(file_results)} started, {failed} failed")
+                else:
+                    if stop_early:
+                        print(f"  Result [{target_file}]: skipped (early stop)")
 
     finally:
         # API キー復元

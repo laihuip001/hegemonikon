@@ -123,6 +123,9 @@ class TestAttractorContextBridgeIntegration:
     @pytest.fixture
     def bridge(self):
         """Verify bridge behavior."""
+        import os
+        if os.environ.get("HF_HUB_OFFLINE") == "1":
+            pytest.skip("Skipping test in offline CI environment")
         try:
             b = AttractorContextBridge(force_cpu=True)
             b._get_attractor()  # force init

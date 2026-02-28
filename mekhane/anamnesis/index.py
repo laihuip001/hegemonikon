@@ -484,6 +484,20 @@ class GnosisIndex:
 
         return results
 
+    # PURPOSE: ソースによる削除
+    def delete_by_source(self, source: str) -> None:
+        """指定したソースのドキュメントを削除"""
+        if not self._table_exists():
+            return
+
+        table = self.db.open_table(self.TABLE_NAME)
+        # Escape single quotes in source string
+        safe_source = source.replace("'", "''")
+        try:
+            table.delete(f"source = '{safe_source}'")
+        except Exception as e:
+            print(f"[GnosisIndex] Failed to delete source '{source}': {e}")
+
     # PURPOSE: インデックス統計
     def stats(self) -> dict:
         """インデックス統計"""

@@ -7,15 +7,11 @@ Chronos Ingest - 会話履歴（Chronos）インデックス生成機能
 取り込むための機能を提供する。
 """
 
-import sys
 import os
 import re
 from typing import List
 from pathlib import Path
 from datetime import datetime
-
-# Add project root to path
-sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 from mekhane.symploke.indices import Document
 from mekhane.symploke.indices.chronos import ChronosIndex

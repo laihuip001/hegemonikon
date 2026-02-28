@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] <- mekhane/ A0->Auto->AddedByCI
 """
 Semantic Scholar API client for Periskopē.
 

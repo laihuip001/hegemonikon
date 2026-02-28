@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] <- mekhane/ A0->Auto->AddedByCI
 """
 Citation verification agent for Periskopē.
 

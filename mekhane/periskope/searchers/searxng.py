@@ -1,4 +1,3 @@
-# PROOF: [L2/Auto] <- mekhane/searchers/
 """
 SearXNG search client for Periskopē.
 

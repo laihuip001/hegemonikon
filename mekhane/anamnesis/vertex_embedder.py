@@ -1,4 +1,3 @@
-# PROOF: [L2/Auto] <- mekhane/anamnesis/
 import os
 import logging
 from google import genai

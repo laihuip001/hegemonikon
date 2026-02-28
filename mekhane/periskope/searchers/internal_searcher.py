@@ -1,4 +1,3 @@
-# PROOF: [L2/Auto] <- mekhane/searchers/
 """
 Internal knowledge searcher for Periskopē.
 

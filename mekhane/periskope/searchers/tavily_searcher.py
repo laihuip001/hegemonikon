@@ -1,4 +1,3 @@
-# PROOF: [L2/Auto] <- mekhane/searchers/
 """
 Tavily Search API client for Periskopē.
 

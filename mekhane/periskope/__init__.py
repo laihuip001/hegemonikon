@@ -1,4 +1,3 @@
-# PROOF: [L2/Auto] <- mekhane/periskope/
 """
 Periskopē — HGK Deep Research Engine
 

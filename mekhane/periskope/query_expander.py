@@ -1,4 +1,3 @@
-# PROOF: [L2/Auto] <- mekhane/periskope/
 """
 Query expander for Periskopē.
 

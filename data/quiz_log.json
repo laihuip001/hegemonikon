@@ -426,5 +426,127 @@
     "correct": null,
     "had_failure": null,
     "notes": ""
+  },
+  {
+    "id": "20260228_101818_724599",
+    "ccl_expr": "/dia!",
+    "operators": [
+      "!"
+    ],
+    "generated_at": "2026-02-28T10:18:18.724653",
+    "answered": null,
+    "correct": null,
+    "had_failure": null,
+    "notes": ""
+  },
+  {
+    "id": "20260228_101818_763974",
+    "ccl_expr": "/dia!",
+    "operators": [
+      "!"
+    ],
+    "generated_at": "2026-02-28T10:18:18.764011",
+    "answered": null,
+    "correct": null,
+    "had_failure": null,
+    "notes": ""
+  },
+  {
+    "id": "20260228_101818_797030",
+    "ccl_expr": "/noe!*^/dia",
+    "operators": [
+      "!",
+      "*^"
+    ],
+    "generated_at": "2026-02-28T10:18:18.797065",
+    "answered": null,
+    "correct": null,
+    "had_failure": null,
+    "notes": ""
+  },
+  {
+    "id": "20260228_101818_826187",
+    "ccl_expr": "/noe\\dia",
+    "operators": [
+      "\\"
+    ],
+    "generated_at": "2026-02-28T10:18:18.826229",
+    "answered": null,
+    "correct": null,
+    "had_failure": null,
+    "notes": ""
+  },
+  {
+    "id": "20260228_101818_839172",
+    "ccl_expr": "/noe\\dia",
+    "operators": [
+      "\\"
+    ],
+    "generated_at": "2026-02-28T10:18:18.839208",
+    "answered": null,
+    "correct": null,
+    "had_failure": null,
+    "notes": ""
+  },
+  {
+    "id": "20260228_102320_560902",
+    "ccl_expr": "/dia!",
+    "operators": [
+      "!"
+    ],
+    "generated_at": "2026-02-28T10:23:20.560937",
+    "answered": null,
+    "correct": null,
+    "had_failure": null,
+    "notes": ""
+  },
+  {
+    "id": "20260228_102320_590876",
+    "ccl_expr": "/dia!",
+    "operators": [
+      "!"
+    ],
+    "generated_at": "2026-02-28T10:23:20.590910",
+    "answered": null,
+    "correct": null,
+    "had_failure": null,
+    "notes": ""
+  },
+  {
+    "id": "20260228_102320_623712",
+    "ccl_expr": "/noe!*^/dia",
+    "operators": [
+      "!",
+      "*^"
+    ],
+    "generated_at": "2026-02-28T10:23:20.623746",
+    "answered": null,
+    "correct": null,
+    "had_failure": null,
+    "notes": ""
+  },
+  {
+    "id": "20260228_102320_652075",
+    "ccl_expr": "/noe\\dia",
+    "operators": [
+      "\\"
+    ],
+    "generated_at": "2026-02-28T10:23:20.652108",
+    "answered": null,
+    "correct": null,
+    "had_failure": null,
+    "notes": ""
+  },
+  {
+    "id": "20260228_102320_664100",
+    "ccl_expr": "/noe\\dia",
+    "operators": [
+      "\\"
+    ],
+    "generated_at": "2026-02-28T10:23:20.664131",
+    "answered": null,
+    "correct": null,
+    "had_failure": null,
+    "notes": ""
   }
 ]

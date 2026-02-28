@@ -31,8 +31,8 @@ async def main():
                     try:
                         buttons = await pg.query_selector_all("button.select-none")
                         agent_pages.append((pg, len(buttons)))
-                    except Exception:
-                        pass  # TODO: Add proper error handling
+                    except Exception as e:
+                        print(f"[!] Error querying buttons on page {pg.url}: {e}")
 
         if not agent_pages:
             print("[!] Agent Manager not found")
@@ -160,8 +160,8 @@ async def main():
                         "el => el.parentElement?.outerHTML?.slice(0, 200)"
                     )
                     lines.append(f"  [{j}] parent: {parent}")
-                except Exception:
-                    pass  # TODO: Add proper error handling
+                except Exception as e:
+                    lines.append(f"  [{j}] Error evaluating parent: {e}")
 
         # 3. data-testid を持つ要素の調査
         lines.append("\n\n=== data-testid 調査 ===")
@@ -173,8 +173,8 @@ async def main():
                 testid = await el.get_attribute("data-testid")
                 if testid:
                     testid_counts[testid] = testid_counts.get(testid, 0) + 1
-            except Exception:
-                pass  # TODO: Add proper error handling
+            except Exception as e:
+                lines.append(f"  Error extracting data-testid: {e}")
 
         for testid, count in sorted(testid_counts.items(), key=lambda x: -x[1])[:20]:
             lines.append(f"  {testid}: {count}")

@@ -17,7 +17,6 @@ Usage:
 """
 
 import asyncio
-import aiohttp
 import functools
 import logging
 import os
@@ -27,6 +26,11 @@ import random  # AI-022: Thundering Herd 対策用
 from dataclasses import dataclass, field
 from enum import Enum
 from typing import Optional
+
+try:
+    import aiohttp
+except ImportError:
+    aiohttp = None
 
 # Optional OpenTelemetry support for distributed tracing
 try:

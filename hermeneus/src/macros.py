@@ -12,6 +12,7 @@ Usage:
     expanded = macros.get("think")  # /noe+ >> V[] < 0.3
 """
 
+import functools
 import re
 from pathlib import Path
 from typing import Dict, Optional
@@ -215,6 +216,7 @@ BUILTIN_MACROS = {
 
 
 # PURPOSE: 全マクロを取得 (統合)
+@functools.lru_cache(maxsize=1)
 def get_all_macros() -> Dict[str, str]:
     """
     全マクロを取得 (統合)

@@ -48,8 +48,43 @@ def _get_secret(key: str) -> Optional[str]:
     散在する os.environ.get を排除し、将来的な Secret Manager
     統合のフックポイントとする。
     """
-    # TODO: Secret Manager (GCP/AWS) 統合時はここを変更
-    return os.environ.get(key)
+    # 1. 優先: 環境変数 (オーバーライド用)
+    if key in os.environ:
+        return os.environ[key]
+
+    manager_type = os.environ.get("SECRET_MANAGER_TYPE", "").lower()
+
+    # 2. GCP Secret Manager
+    if manager_type == "gcp":
+        try:
+            from google.cloud import secretmanager
+            project_id = os.environ.get("GOOGLE_CLOUD_PROJECT")
+            if project_id:
+                client = secretmanager.SecretManagerServiceClient()
+                name = f"projects/{project_id}/secrets/{key}/versions/latest"
+                response = client.access_secret_version(request={"name": name})
+                return response.payload.data.decode("UTF-8")
+        except ImportError:
+            pass  # Fallback to os.environ if optional dependency is missing
+        except Exception:
+            pass  # Fallback on any API/auth error
+
+    # 3. AWS Secrets Manager
+    elif manager_type == "aws":
+        try:
+            import boto3
+            region_name = os.environ.get("AWS_REGION", "us-east-1")
+            client = boto3.client("secretsmanager", region_name=region_name)
+            response = client.get_secret_value(SecretId=key)
+            if "SecretString" in response:
+                return response["SecretString"]
+        except ImportError:
+            pass  # Fallback to os.environ if optional dependency is missing
+        except Exception:
+            pass  # Fallback on any API/auth error
+
+    # 4. Fallback (すでに環境変数になければ None)
+    return None
 
 
 # PURPOSE: [L2-auto] メモリ内 Circuit Breaker (W06 Cascade Failure 対策)

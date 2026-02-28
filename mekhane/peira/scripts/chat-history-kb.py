@@ -248,8 +248,11 @@ def build_index(incremental: bool = False, report_mode: bool = False):
                         )
                         if at <= last_sync:
                             continue
-                    except Exception:
-                        pass  # TODO: Add proper error handling
+                    except ValueError as e:
+                        if not report_mode:
+                            print(f"Warning: Failed to parse timestamp '{artifact_time}': {e}")
+                        # Fallback: assume it needs to be synced
+                        pass
 
             # Generate ID
             art_type = (

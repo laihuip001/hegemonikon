@@ -1,3 +1,4 @@
+# PROOF: [L2/Category] <- mekhane/tape.py/ A0->Auto->AddedByCI
 """
 Tape Writer — WF 実行トレースを JSONL として記録する。
 

@@ -714,20 +714,20 @@ async def list_notifications(
     notif_file = MNEME / "notifications.jsonl"
     results: list[dict] = []
     try:
-        lines = _read_last_n_lines(notif_file, 500)
-        for line in lines:
-            line = line.strip()
-            if not line:
-                continue
-            try:
-                record = json.loads(line)
-                if since and record.get("timestamp", "") < since:
+        with notif_file.open("r", encoding="utf-8") as f:
+            for line in f:
+                line = line.strip()
+                if not line:
                     continue
-                if level and record.get("level", "") != level.upper():
+                try:
+                    record = json.loads(line)
+                    if since and record.get("timestamp", "") < since:
+                        continue
+                    if level and record.get("level", "") != level.upper():
+                        continue
+                    results.append(record)
+                except Exception:
                     continue
-                results.append(record)
-            except Exception:
-                continue
     except FileNotFoundError:
         pass
     except Exception as e:

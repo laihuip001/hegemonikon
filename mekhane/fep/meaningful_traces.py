@@ -25,8 +25,22 @@ from pathlib import Path
 from typing import Optional, List
 import json
 
+import os
+
 # Default persistence path
-TRACES_PATH = Path("/home/makaron8426/oikos/mneme/.hegemonikon/meaningful_traces.json")
+# Fallback to home dir or temp dir if specific user path does not exist
+if Path("/home/makaron8426/oikos/mneme/.hegemonikon").exists() or "makaron8426" in str(Path.home()):
+    TRACES_PATH = Path("/home/makaron8426/oikos/mneme/.hegemonikon/meaningful_traces.json")
+else:
+    # Use a generic fallback for CI or other environments
+    import tempfile
+    _base_dir = Path(os.environ.get("XDG_DATA_HOME", Path.home() / ".local" / "share"))
+    try:
+        # Try to use standard user data directory
+        TRACES_PATH = _base_dir / "hegemonikon" / "meaningful_traces.json"
+    except Exception:
+        # Final fallback to temp dir
+        TRACES_PATH = Path(tempfile.gettempdir()) / "hegemonikon" / "meaningful_traces.json"
 
 
 # PURPOSE: の統一的インターフェースを実現する

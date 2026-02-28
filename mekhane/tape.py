@@ -1,3 +1,4 @@
+# PROOF: [L2/記録] <- O4→実行記録の保存→TapeWriterが担う
 """
 Tape Writer — WF 実行トレースを JSONL として記録する。
 

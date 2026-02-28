@@ -1,3 +1,4 @@
+# PROOF: [L1/CCL] <- S1→構文解析と検証→CCLツール群
 """CCL Linter — CCL 式の静的検証。
 
 operators.md (SSOT) に基づいて CCL 式を検証し、

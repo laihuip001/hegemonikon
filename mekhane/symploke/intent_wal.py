@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/統合] <- A0→継続的状態の統合→IntentWALが担う
 """Intent-WAL (Write-Ahead Log) Manager.
 
 Manages session intent WAL files for crash recovery and context continuity.

@@ -1,3 +1,4 @@
+# PROOF: [L2/探索] <- O3→未知領域の探索→Periskope統合検索
 """
 Citation verification agent for Periskopē.
 

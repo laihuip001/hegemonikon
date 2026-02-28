@@ -10,6 +10,7 @@ Origin: 2026-01-31 CCL Execution Guarantee Architecture
 
 import json
 import sqlite3
+import threading
 from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any, Dict, List, Optional
@@ -65,6 +66,7 @@ class AuditStore:
     def __init__(self, db_path: Optional[Path] = None):
         self.db_path = db_path or self.DEFAULT_PATH
         self.db_path.parent.mkdir(parents=True, exist_ok=True)
+        self._local = threading.local()
         self._init_db()
     
     # PURPOSE: データベースを初期化
@@ -98,12 +100,20 @@ class AuditStore:
     @contextmanager
     def _connect(self):
         """データベース接続を取得"""
-        conn = sqlite3.connect(str(self.db_path))
-        conn.row_factory = sqlite3.Row
+        if not hasattr(self._local, 'conn'):
+            self._local.conn = sqlite3.connect(str(self.db_path), timeout=30.0)
+            self._local.conn.row_factory = sqlite3.Row
+
         try:
-            yield conn
-        finally:
-            conn.close()
+            yield self._local.conn
+        except Exception:
+            if hasattr(self._local, 'conn'):
+                try:
+                    self._local.conn.close()
+                except Exception:
+                    pass
+                del self._local.conn
+            raise
     
     # PURPOSE: 一意の ID を生成
     def _generate_id(self) -> str:

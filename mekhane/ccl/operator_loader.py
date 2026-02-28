@@ -40,6 +40,8 @@ _TABLE_ROW_RE = re.compile(
     re.MULTILINE,
 )
 
+# Skip contextual duplicates like `+ | 数値文脈`
+
 # PURPOSE: セクション見出しの正規表現
 _SECTION_RE = re.compile(r'^###?\s+(\d+\.\d+\s+.+)$', re.MULTILINE)
 
@@ -99,6 +101,14 @@ def load_operators(
 
         # エスケープされたパイプを復元
         symbol = symbol.replace("\\|\\|", "||")
+
+        # Skip duplicate context definitions like "数値文脈" or "WF 直後" or "単体"
+        if symbol in operators and (
+            name in ["数値文脈", "WF 直後", "二項 (WF 間)", "前置", "単独", "複合", r"\|\| 後置", "単項", "AllOrNothing", "直前が"]
+            or "二項" in name or "前置" in name or "単独" in name or "複合" in name
+            or "直前が" in effect or "単体" in effect or "両側" in effect or "内部" in effect
+        ):
+            continue
 
         op = OperatorDef(
             symbol=symbol,

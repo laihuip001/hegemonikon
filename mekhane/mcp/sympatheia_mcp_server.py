@@ -396,7 +396,7 @@ async def call_tool(name: str, arguments: dict):
         elif name == "sympatheia_notifications":
             action = arguments.get("action", "list")
             if action == "send":
-                notif_id = sym._send_notification(
+                notif_id = await sym._send_notification(
                     source=arguments.get("source", "claude"),
                     level=arguments.get("notification_level", "INFO"),
                     title=arguments.get("title", ""),

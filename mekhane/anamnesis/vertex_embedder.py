@@ -1,3 +1,5 @@
+# PROOF: [L2/Anamnesis] <- mekhane/anamnesis/vertex_embedder.py
+# PURPOSE: Auto-added header
 import os
 import logging
 from google import genai

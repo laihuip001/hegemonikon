@@ -1,3 +1,5 @@
+# PROOF: [L2/Periskope] <- mekhane/periskope/searchers/searxng.py
+# PURPOSE: Auto-added header
 """
 SearXNG search client for Periskopē.
 

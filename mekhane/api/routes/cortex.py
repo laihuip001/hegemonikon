@@ -1,3 +1,5 @@
+# PROOF: [L2/Api] <- mekhane/api/routes/cortex.py
+# PURPOSE: Auto-added header
 from typing import Any, AsyncGenerator
 
 import asyncio

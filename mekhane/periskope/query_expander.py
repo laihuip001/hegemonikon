@@ -1,3 +1,5 @@
+# PROOF: [L2/Periskope] <- mekhane/periskope/query_expander.py
+# PURPOSE: Auto-added header
 """
 Query expander for Periskopē.
 

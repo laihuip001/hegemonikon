@@ -1,3 +1,5 @@
+# PROOF: [L2/Periskope] <- mekhane/periskope/synthesizer.py
+# PURPOSE: Auto-added header
 """
 Multi-model synthesizer for Periskopē.
 

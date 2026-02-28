@@ -598,21 +598,36 @@ class DailyReviewPipeline:
     def _notify_result(self, result: PipelineResult) -> None:
         """Sympatheia notifications.jsonl に結果を送信。"""
         try:
+            import asyncio
             from mekhane.api.routes.sympatheia import _send_notification
             level = "HIGH" if result.needs_l2 else "INFO"
             icon = "🚨" if result.needs_l2 else "📋"
-            _send_notification(
-                source="DailyReview",
-                level=level,
-                title=f"{icon} Daily Review: {result.files_scanned} files, {len(result.l0_issues)} issues",
-                body=self.summary(result),
-                data={
-                    "files_scanned": result.files_scanned,
-                    "l0_issues": len(result.l0_issues),
-                    "l2_triggered": result.l2_triggered,
-                    "domains": result.domains_reviewed,
-                },
-            )
+
+            async def run_notify():
+                await _send_notification(
+                    source="DailyReview",
+                    level=level,
+                    title=f"{icon} Daily Review: {result.files_scanned} files, {len(result.l0_issues)} issues",
+                    body=self.summary(result),
+                    data={
+                        "files_scanned": result.files_scanned,
+                        "l0_issues": len(result.l0_issues),
+                        "l2_triggered": result.l2_triggered,
+                        "domains": result.domains_reviewed,
+                    },
+                )
+
+            try:
+                loop = asyncio.get_running_loop()
+                # Keep a reference to the task to prevent it from being garbage collected
+                task = loop.create_task(run_notify())
+                if not hasattr(self, "_bg_tasks"):
+                    self._bg_tasks = set()
+                self._bg_tasks.add(task)
+                task.add_done_callback(self._bg_tasks.discard)
+            except RuntimeError:
+                asyncio.run(run_notify())
+
         except Exception as e:
             logger.warning(f"Sympatheia notification failed: {e}")
 

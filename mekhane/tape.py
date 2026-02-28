@@ -1,3 +1,5 @@
+# PROOF: [L2/Tape.py] <- mekhane/tape.py
+# PURPOSE: Auto-added header
 """
 Tape Writer — WF 実行トレースを JSONL として記録する。
 

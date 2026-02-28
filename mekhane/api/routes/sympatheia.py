@@ -24,6 +24,12 @@ import uuid
 from fastapi import APIRouter, Query
 from pydantic import BaseModel, Field
 
+try:
+    import aiofiles
+    HAS_AIOFILES = True
+except ImportError:
+    HAS_AIOFILES = False
+
 logger = logging.getLogger("hegemonikon.api.sympatheia")
 
 # PURPOSE: State ファイルのベースパス
@@ -182,7 +188,7 @@ def _load_config() -> dict:
 
 
 # PURPOSE: [L2-auto] ローカル通知を JSONL に保存する。Slack 代替。
-def _send_notification(source: str, level: str, title: str, body: str, data: Optional[dict] = None) -> str:
+async def _send_notification(source: str, level: str, title: str, body: str, data: Optional[dict] = None) -> str:
     """ローカル通知を JSONL に保存する。Slack 代替。"""
     notif_id = str(uuid.uuid4())[:8]
     now = datetime.now(timezone.utc)
@@ -198,8 +204,12 @@ def _send_notification(source: str, level: str, title: str, body: str, data: Opt
     notif_file = MNEME / "notifications.jsonl"
     try:
         notif_file.parent.mkdir(parents=True, exist_ok=True)
-        with open(notif_file, "a", encoding="utf-8") as f:
-            f.write(json.dumps(record, ensure_ascii=False) + "\n")
+        if HAS_AIOFILES:
+            async with aiofiles.open(notif_file, "a", encoding="utf-8") as f:
+                await f.write(json.dumps(record, ensure_ascii=False) + "\n")
+        else:
+            with open(notif_file, "a", encoding="utf-8") as f:
+                f.write(json.dumps(record, ensure_ascii=False) + "\n")
         logger.info("Notification [%s] %s: %s", notif_id, source, title)
     except Exception as e:
         logger.warning("Notification write failed: %s", e)
@@ -286,7 +296,7 @@ async def wbc_analyze(req: WBCRequest) -> WBCResponse:
     if should_escalate:
         emoji = "🚨" if level == "CRITICAL" else "⚠️"
         file_list = ", ".join(req.files[:5]) or "N/A"
-        _send_notification(
+        await _send_notification(
             source="WF-09",
             level=level,
             title=f"{emoji} WBC: {level} threat detected",
@@ -366,7 +376,7 @@ async def weekly_digest(req: DigestRequest) -> DigestResponse:
     _write_json(MNEME / "weekly_digest.json", result.model_dump())
 
     # 通知
-    _send_notification(
+    await _send_notification(
         source="WF-10",
         level="INFO",
         title=f"📊 Weekly Digest — {result.weekEnding}",
@@ -515,7 +525,7 @@ async def feedback_loop(req: FeedbackRequest) -> FeedbackResponse:
         config["adjustmentHistory"] = history
         _write_json(MNEME / "sympatheia_config.json", config)
 
-        _send_notification(
+        await _send_notification(
             source="WF-12",
             level="INFO",
             title="⚖️ Homeostasis: 閾値調整",
@@ -611,7 +621,7 @@ async def incoming_route(req: RouteRequest) -> RouteResponse:
 @router.post("/notifications", response_model=NotificationResponse, status_code=201)
 async def receive_notification(req: NotificationRequest) -> NotificationResponse:
     """通知受信: n8n WF や内部モジュールからの通知を JSONL に保存。"""
-    notif_id = _send_notification(
+    notif_id = await _send_notification(
         source=req.source,
         level=req.level,
         title=req.title,

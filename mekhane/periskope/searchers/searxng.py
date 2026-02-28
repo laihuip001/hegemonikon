@@ -1,3 +1,4 @@
+# PROOF: [L2/Infrastructure] <- mekhane/
 """
 SearXNG search client for Periskopē.
 

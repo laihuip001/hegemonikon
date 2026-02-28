@@ -276,7 +276,7 @@ class WorkflowExecutor:
             from hermeneus.src.macros import get_all_macros
 
             # Auto-load all registered macros (builtin + ccl/macros/)
-            macros = get_all_macros()
+            macros = await asyncio.to_thread(get_all_macros)
             lmql_code = compile_ccl(ccl, macros=macros, model=model)
             
             return PhaseResult(
@@ -314,7 +314,7 @@ class WorkflowExecutor:
             from hermeneus.src.runtime import LMQLExecutor, ExecutionConfig
             
             # Step 1: compile (LMQL コード生成)
-            macros = get_all_macros()
+            macros = await asyncio.to_thread(get_all_macros)
             lmql_code = compile_ccl(ccl, macros=macros, model=model)
             
             # Step 2: LLM で実行 (非同期)

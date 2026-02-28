@@ -1,3 +1,4 @@
+# PROOF: [L2/自動化] <- mekhane/ A0->Auto->AddedByCI
 from typing import Any, AsyncGenerator
 
 import asyncio

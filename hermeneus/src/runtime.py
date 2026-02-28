@@ -45,11 +45,46 @@ def _get_secret(key: str) -> Optional[str]:
     """Secret アクセスの一元化 (W08 Secret Sprawl 対策)
     
     全ての API キー・認証情報はこの関数経由で取得する。
-    散在する os.environ.get を排除し、将来的な Secret Manager
-    統合のフックポイントとする。
+    ローカル環境変数を優先し、設定されていれば
+    GCP または AWS の Secret Manager から取得する。
     """
-    # TODO: Secret Manager (GCP/AWS) 統合時はここを変更
-    return os.environ.get(key)
+    # 1. ローカルの環境変数を優先 (開発用・オーバーライド用)
+    val = os.environ.get(key)
+    if val is not None:
+        return val
+
+    # 2. GCP Secret Manager 統合
+    gcp_project = os.environ.get("GOOGLE_CLOUD_PROJECT")
+    if gcp_project:
+        try:
+            from google.cloud import secretmanager
+            client = secretmanager.SecretManagerServiceClient()
+            # 命名規則: projects/{project_id}/secrets/{secret_id}/versions/latest
+            name = f"projects/{gcp_project}/secrets/{key}/versions/latest"
+            response = client.access_secret_version(request={"name": name})
+            return response.payload.data.decode("UTF-8")
+        except ImportError:
+            pass  # ライブラリ未インストール時はスキップ
+        except Exception:
+            pass  # シークレット未存在・権限エラー等もスキップして次へ
+
+    # 3. AWS Secrets Manager 統合
+    aws_region = os.environ.get("AWS_REGION") or os.environ.get("AWS_DEFAULT_REGION")
+    if aws_region:
+        try:
+            import boto3
+            from botocore.exceptions import ClientError
+            client = boto3.client("secretsmanager", region_name=aws_region)
+            try:
+                response = client.get_secret_value(SecretId=key)
+                if "SecretString" in response:
+                    return response["SecretString"]
+            except ClientError:
+                pass  # シークレット未存在・権限エラー等
+        except ImportError:
+            pass  # ライブラリ未インストール時はスキップ
+
+    return None
 
 
 # PURPOSE: [L2-auto] メモリ内 Circuit Breaker (W06 Cascade Failure 対策)

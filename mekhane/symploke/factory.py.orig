@@ -110,7 +110,7 @@ def _register_adapters():
 
         VectorStoreFactory.register("hnswlib", HNSWlibAdapter)
     except ImportError:
-        logger.warning("hnswlib is not installed. HNSWlibAdapter will not be available. Please install 'hnswlib' to use it.")
+        pass  # TODO: Add proper error handling
 
     # 将来の拡張用
     # try:

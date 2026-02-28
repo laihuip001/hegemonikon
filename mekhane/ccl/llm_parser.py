@@ -8,9 +8,12 @@ Uses Gemini API (google.genai SDK) to convert natural language intent into CCL e
 Migration: google.generativeai -> google.genai (deprecated Nov 2025)
 """
 
+import logging
 import os
 from typing import Optional
 from pathlib import Path
+
+logger = logging.getLogger(__name__)
 
 # Try new SDK first, fall back to legacy
 try:
@@ -125,7 +128,7 @@ class LLMParser:
                     lines = ccl.split("\n")
                     ccl = "\n".join(lines[1:-1] if lines[-1] == "```" else lines[1:])
                 return ccl.strip()
-        except Exception:
-            pass  # TODO: Add proper error handling
+        except Exception as e:
+            logger.error("LLM parsing failed: %s", e)
 
         return None

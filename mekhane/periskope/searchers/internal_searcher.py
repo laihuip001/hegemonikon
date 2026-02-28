@@ -1,3 +1,4 @@
+# PROOF: [L2-auto]
 """
 Internal knowledge searcher for Periskopē.
 

@@ -1,3 +1,4 @@
+# PROOF: [L2-auto]
 """
 SearXNG search client for Periskopē.
 

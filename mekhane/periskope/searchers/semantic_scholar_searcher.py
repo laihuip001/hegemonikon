@@ -1,3 +1,4 @@
+# PROOF: [L2-auto]
 """
 Semantic Scholar API client for Periskopē.
 

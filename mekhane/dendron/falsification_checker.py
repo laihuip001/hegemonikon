@@ -1,3 +1,4 @@
+# PROOF: [L2-auto]
 """
 S7: Falsification Condition Checker
 

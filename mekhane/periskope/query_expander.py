@@ -1,3 +1,4 @@
+# PROOF: [L2-auto]
 """
 Query expander for Periskopē.
 

@@ -1,3 +1,4 @@
+# PROOF: [L2-auto]
 """
 Periskopē Deep Research Engine — Orchestrator.
 

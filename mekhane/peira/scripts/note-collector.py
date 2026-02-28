@@ -5,7 +5,8 @@ note.com 記事収集スクリプト v2
 シンプル版 - 即時実行
 """
 
-import requests
+import asyncio
+import aiohttp
 import json
 import os
 import time
@@ -17,48 +18,81 @@ USER_URLNAME = "tasty_dunlin998"
 OUTPUT_DIR = Path("/home/makaron8426/oikos/mneme/.hegemonikon/raw/note")
 API_BASE = "https://note.com/api/v2"
 
+async def fetch_page(session, url, params, headers):
+    try:
+        async with session.get(url, params=params, headers=headers, timeout=30) as resp:
+            resp.raise_for_status()
+            data = await resp.json()
+            return data, params["page"]
+    except Exception as e:
+        print(f"❌ Error on page {params['page']}: {e}")
+        return None, params["page"]
+
 # PURPOSE: CLI エントリポイント — データパイプラインの直接実行
-def main():
+async def async_main():
     print(f"🔍 Collecting articles from note.com/{USER_URLNAME}")
     
     # 出力ディレクトリを作成
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
     
-    all_articles = []
+    all_articles_by_page = {}
     page = 1
     
-    # 全ページを取得
-    while page <= 20:  # 最大20ページ
-        print(f"📄 Fetching page {page}...", flush=True)
+    async with aiohttp.ClientSession() as session:
+        pending = []
         
-        url = f"{API_BASE}/creators/{USER_URLNAME}/contents"
-        params = {"kind": "note", "page": page, "per_page": 20}
-        headers = {"User-Agent": "Mozilla/5.0", "Accept": "application/json"}
-        
-        try:
-            resp = requests.get(url, params=params, headers=headers, timeout=30)
-            resp.raise_for_status()
-            result = resp.json()
+        # 全ページを取得 (並行処理だがディレイを入れる)
+        while page <= 20:  # 最大20ページ
+            url = f"{API_BASE}/creators/{USER_URLNAME}/contents"
+            params = {"kind": "note", "page": page, "per_page": 20}
+            headers = {"User-Agent": "Mozilla/5.0", "Accept": "application/json"}
             
-            contents = result.get("data", {}).get("contents", [])
+            print(f"📄 Fetching page {page}...", flush=True)
+            task = asyncio.create_task(fetch_page(session, url, params, headers))
+            pending.append(task)
             
-            if not contents:
+            # APIのレートリミットを考慮した待機
+            await asyncio.sleep(0.5)
+            
+            # 完了しているタスクを見て、最後のページに到達したかチェック
+            last_page_reached = False
+            for t in pending:
+                if t.done() and not t.cancelled():
+                    res = t.result()
+                    if res:
+                        data, p = res
+                        if data:
+                            contents = data.get("data", {}).get("contents", [])
+                            is_last = data.get("data", {}).get("isLastPage", True)
+                            if not contents or is_last:
+                                last_page_reached = True
+            
+            if last_page_reached:
                 print(f"📭 No more articles")
                 break
             
-            all_articles.extend(contents)
-            print(f"   Found {len(contents)} articles (total: {len(all_articles)})", flush=True)
-            
-            if result.get("data", {}).get("isLastPage", True):
-                break
-            
             page += 1
-            time.sleep(0.5)
             
-        except Exception as e:
-            print(f"❌ Error: {e}")
-            break
-    
+        # 残りのタスクを待機
+        if pending:
+            await asyncio.gather(*pending, return_exceptions=True)
+
+        # 結果を収集
+        for t in pending:
+            if t.done() and not t.cancelled():
+                res = t.result()
+                if res and not isinstance(res, Exception):
+                    data, p = res
+                    if data:
+                        contents = data.get("data", {}).get("contents", [])
+                        all_articles_by_page[p] = contents
+                        print(f"   Found {len(contents)} articles on page {p}", flush=True)
+
+    all_articles = []
+    # ページ順に記事を結合
+    for p in sorted(all_articles_by_page.keys()):
+        all_articles.extend(all_articles_by_page[p])
+
     print(f"\n📊 Total: {len(all_articles)} articles")
     
     # 各記事を保存
@@ -103,6 +137,9 @@ def main():
     manifest_path.write_text(json.dumps(manifest, ensure_ascii=False, indent=2), encoding="utf-8")
     
     print(f"\n✅ Done! {len(all_articles)} articles saved to {OUTPUT_DIR}")
+
+def main():
+    asyncio.run(async_main())
 
 if __name__ == "__main__":
     main()

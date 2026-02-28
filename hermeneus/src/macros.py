@@ -15,6 +15,7 @@ Usage:
 import functools
 import re
 from pathlib import Path
+from types import MappingProxyType
 from typing import Dict, Optional
 from dataclasses import dataclass
 
@@ -91,26 +92,26 @@ def parse_macro_file(path: Path) -> Optional[MacroDefinition]:
     )
 
 
-@functools.lru_cache(maxsize=None)
 # PURPOSE: ccl/macros/ から全マクロを読み込む
+@functools.lru_cache(maxsize=None)
 def load_standard_macros() -> Dict[str, MacroDefinition]:
     """ccl/macros/ から全マクロを読み込む"""
     macros = {}
     
     if not CCL_MACROS_DIR.exists():
-        return macros
+        return MappingProxyType(macros)
     
     for path in CCL_MACROS_DIR.glob("*.md"):
         macro = parse_macro_file(path)
         if macro and macro.expansion:  # 空展開は除外 (YAML multiline 未対応)
             macros[macro.name] = macro
     
-    return macros
+    return MappingProxyType(macros)
 
 
-@functools.lru_cache(maxsize=None)
 # PURPOSE: .agent/workflows/ccl-*.md からマクロ展開形を読み込む
-def load_workflow_macros() -> Dict[str, str]:
+@functools.lru_cache(maxsize=None)
+def load_workflow_macros() -> MappingProxyType[str, str]:
     """
     .agent/workflows/ccl-*.md からマクロ展開形を読み込む
     
@@ -123,7 +124,7 @@ def load_workflow_macros() -> Dict[str, str]:
     macros = {}
     
     if not WF_MACROS_DIR.exists():
-        return macros
+        return MappingProxyType(macros)
     
     for path in WF_MACROS_DIR.glob("ccl-*.md"):
         # ファイル名からマクロ名を抽出: ccl-build.md → build
@@ -140,11 +141,11 @@ def load_workflow_macros() -> Dict[str, str]:
             expansion = match.group(1).strip()
             macros[name] = expansion
     
-    return macros
+    return MappingProxyType(macros)
 
 
-@functools.lru_cache(maxsize=None)
 # PURPOSE: マクロ名から展開形を取得 (全ソース検索)
+@functools.lru_cache(maxsize=None)
 def get_macro_expansion(name: str) -> Optional[str]:
     """マクロ名から展開形を取得 (全ソース検索)"""
     # 優先順位: ccl-*.md > ccl/macros/*.md > BUILTIN
@@ -162,9 +163,9 @@ def get_macro_expansion(name: str) -> Optional[str]:
     return None
 
 
-@functools.lru_cache(maxsize=None)
 # PURPOSE: Expander 互換形式でマクロレジストリを返す
-def get_macro_registry() -> Dict[str, str]:
+@functools.lru_cache(maxsize=None)
+def get_macro_registry() -> MappingProxyType[str, str]:
     """
     Expander 互換形式でマクロレジストリを返す
     
@@ -183,7 +184,7 @@ def get_macro_registry() -> Dict[str, str]:
                 # シンプルな展開のみ対応
                 registry[name] = parts[1].strip().split("\n")[0]
     
-    return registry
+    return MappingProxyType(registry)
 
 
 # 標準マクロ (ハードコード版 — ccl-*.md が見つからない場合のフォールバック)
@@ -219,9 +220,8 @@ BUILTIN_MACROS = {
 }
 
 
-@functools.lru_cache(maxsize=None)
 # PURPOSE: 全マクロを取得 (統合)
-def get_all_macros() -> Dict[str, str]:
+def get_all_macros() -> MappingProxyType[str, str]:
     """
     全マクロを取得 (統合)
     
@@ -233,7 +233,7 @@ def get_all_macros() -> Dict[str, str]:
     result = BUILTIN_MACROS.copy()
     result.update(get_macro_registry())  # ccl/macros/*.md
     result.update(load_workflow_macros())  # ccl-*.md (最優先)
-    return result
+    return MappingProxyType(result)
 
 
 # =============================================================================

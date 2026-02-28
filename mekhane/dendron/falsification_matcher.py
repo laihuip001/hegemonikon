@@ -1,3 +1,4 @@
+# PROOF: [L2/検証] <- mekhane/dendron/ K4(知識)の反証条件の検証と警告システムが必要
 """
 Falsification Matcher — 消化論文の主張と epistemic_status.yaml の反証条件を照合
 

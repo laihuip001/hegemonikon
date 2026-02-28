@@ -1,3 +1,4 @@
+# PROOF: [L2/探求] <- mekhane/periskope/ 深層調査エンジンによる並列検索と知識統合が必要
 """
 Query expander for Periskopē.
 

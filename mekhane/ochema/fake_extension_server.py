@@ -1,3 +1,4 @@
+# PROOF: [L3/ルーティング] <- mekhane/ochema/ LLMと言語サーバー間の通信と機能プロキシが必要
 """Fake Extension Server — ConnectRPC over HTTP.
 
 LS は ConnectRPC (extension_server_go_proto_connect) で Extension Server に接続する。

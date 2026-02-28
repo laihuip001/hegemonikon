@@ -1,3 +1,4 @@
+# PROOF: [L2/パーサー] <- mekhane/ccl/ CCL演算子の統一的解決が必要→loaderが担う
 """operators.md の SSOT パーサー。
 
 operators.md の Markdown テーブルから演算子定義を抽出し、

@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L3/統合] <- mekhane/mcp/ 外部ツール・リソースへのMCPプロトコルでの接続が必要
 """
 MCP Base Module — Hegemonikón MCP Server Common Infrastructure
 

@@ -1,3 +1,4 @@
+# PROOF: [L2/記憶] <- mekhane/anamnesis/ 知識グラフからのベクトルベースの記憶想起が必要
 import os
 import logging
 from google import genai

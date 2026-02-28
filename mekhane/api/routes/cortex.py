@@ -1,3 +1,4 @@
+# PROOF: [L3/API] <- mekhane/api/ フロントエンドとコアバックエンドのHTTP境界が必要
 from typing import Any, AsyncGenerator
 
 import asyncio

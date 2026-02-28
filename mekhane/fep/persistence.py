@@ -27,24 +27,17 @@ import numpy as np
 if TYPE_CHECKING:
     from .fep_agent import HegemonikónFEPAgent
 
-import os
-
 # Default persistence paths
-LEARNED_A_PATH = Path(os.environ.get("HOME", "/tmp")) / "oikos" / "mneme" / ".hegemonikon" / "learned_A.npy"
-LEARNED_A_METADATA_PATH = Path(os.environ.get("HOME", "/tmp")) / "oikos" / "mneme" / ".hegemonikon" / "learned_A_meta.json"
+LEARNED_A_PATH = Path("/home/makaron8426/oikos/mneme/.hegemonikon/learned_A.npy")
+LEARNED_A_METADATA_PATH = Path(
+    "/home/makaron8426/oikos/mneme/.hegemonikon/learned_A_meta.json"
+)
 
 
 # PURPOSE: Ensure the persistence directory exists.
 def ensure_persistence_dir() -> None:
     """Ensure the persistence directory exists."""
-    global LEARNED_A_PATH, LEARNED_A_METADATA_PATH, SNAPSHOT_DIR
-    try:
-        LEARNED_A_PATH.parent.mkdir(parents=True, exist_ok=True)
-    except PermissionError:
-        LEARNED_A_PATH = Path.home() / ".hegemonikon" / "learned_A.npy"
-        LEARNED_A_METADATA_PATH = Path.home() / ".hegemonikon" / "learned_A_meta.json"
-        SNAPSHOT_DIR = LEARNED_A_PATH.parent / "snapshots"
-        LEARNED_A_PATH.parent.mkdir(parents=True, exist_ok=True)
+    LEARNED_A_PATH.parent.mkdir(parents=True, exist_ok=True)
 
 
 # PURPOSE: Save learned A matrix to file.

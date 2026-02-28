@@ -105,6 +105,7 @@ class DocStalenessChecker:
         self._results: List[StalenessResult] = []
         self._warnings: List[str] = []
 
+    # PURPOSE: スキャン時に蓄積された警告 (doc_id 重複など) を取得し、レポート生成に渡す
     @property
     def warnings(self) -> List[str]:
         """scan 時の警告 (doc_id 重複等)."""

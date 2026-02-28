@@ -1,5 +1,5 @@
-# PROOF: [L3/テスト] <- mekhane/symploke/tests/ 対象モジュールが存在→検証が必要→test_jules_client が担う
 #!/usr/bin/env python3
+# PROOF: [L3/テスト] <- mekhane/symploke/tests/ 対象モジュールが存在→検証が必要→test_jules_client が担う
 """
 Tests for Jules Client
 
@@ -10,6 +10,7 @@ Run with:
 import asyncio
 import pytest
 from unittest.mock import AsyncMock, MagicMock, patch
+from aioresponses import aioresponses
 
 import sys
 from pathlib import Path
@@ -103,11 +104,35 @@ class TestCreateSession:
 
     # PURPOSE: Test successful session creation
     @pytest.mark.asyncio
-    @pytest.mark.skip(reason="Requires aioresponses for proper async mocking")
     async def test_create_session_success(self):
         """Test successful session creation."""
-        # TODO: Use aioresponses for proper async HTTP mocking
-        pass
+        client = JulesClient(api_key="test-key")
+
+        mock_response = {
+            "id": "test-123",
+            "name": "sessions/test-123",
+            "state": "PLANNING",
+            "prompt": "Fix bug",
+            "sourceContext": {"source": "sources/github/owner/repo"}
+        }
+
+        with aioresponses() as m:
+            m.post(
+                f"{client.base_url}/sessions",
+                payload=mock_response,
+                status=200
+            )
+
+            session = await client.create_session(
+                prompt="Fix bug",
+                source="sources/github/owner/repo"
+            )
+
+            assert session.id == "test-123"
+            assert session.name == "sessions/test-123"
+            assert session.state == SessionState.PLANNING
+            assert session.prompt == "Fix bug"
+            assert session.source == "sources/github/owner/repo"
 
 
 # PURPOSE: Test batch_execute method

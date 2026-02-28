@@ -1,5 +1,5 @@
-# PROOF: [L3/ユーティリティ] <- mekhane/peira/scripts/ O4→実験スクリプトが必要
 #!/usr/bin/env python3
+# PROOF: [L3/ユーティリティ] <- mekhane/peira/scripts/ O4→実験スクリプトが必要
 """
 phase3-save-batch-parallel.py
 Parallel-safe version of the batch save script.

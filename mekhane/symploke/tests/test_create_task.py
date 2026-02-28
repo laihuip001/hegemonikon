@@ -1,5 +1,5 @@
-# PROOF: [L3/テスト] <- mekhane/symploke/tests/ 対象モジュールが存在→検証が必要→test_create_task が担う
 #!/usr/bin/env python3
+# PROOF: [L3/テスト] <- mekhane/symploke/tests/ 対象モジュールが存在→検証が必要→test_create_task が担う
 """
 Jules API - Create a simple test task.
 Creates a minimal PR to test the full workflow.

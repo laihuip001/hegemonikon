@@ -1,5 +1,5 @@
-# PROOF: [L3/ユーティリティ] <- mekhane/peira/scripts/ O4→実験スクリプトが必要
 #!/usr/bin/env python3
+# PROOF: [L3/ユーティリティ] <- mekhane/peira/scripts/ O4→実験スクリプトが必要
 """
 merge-manifests.py
 Merges all batch-specific manifest files into a single manifest.jsonl

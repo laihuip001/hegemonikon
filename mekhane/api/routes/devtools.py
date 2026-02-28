@@ -1,3 +1,4 @@
+# PROOF: [Level/Category] <- mekhane/api/routes/ A0->Auto->AddedByCI
 """
 DevTools API routes — ファイル操作・ターミナル・Ochema (AI) をフロントエンド DevTools ビューに提供。
 

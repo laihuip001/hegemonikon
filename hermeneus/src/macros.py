@@ -13,6 +13,7 @@ Usage:
 """
 
 import re
+import functools
 from pathlib import Path
 from typing import Dict, Optional
 from dataclasses import dataclass
@@ -215,6 +216,7 @@ BUILTIN_MACROS = {
 
 
 # PURPOSE: 全マクロを取得 (統合)
+@functools.lru_cache(maxsize=1)
 def get_all_macros() -> Dict[str, str]:
     """
     全マクロを取得 (統合)

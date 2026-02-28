@@ -2838,7 +2838,7 @@ def update_derivative_selector(
     """
     Record feedback for derivative selection learning.
 
-    Future enhancement: integrate with Dirichlet learning in FEP agent
+    Integrates with Dirichlet learning in FEP agent
     to improve derivative selection based on outcomes.
 
     Args:
@@ -2847,9 +2847,50 @@ def update_derivative_selector(
         problem_context: Problem description
         success: Whether the derivative was effective
     """
-    # TODO: Integrate with HegemonikónFEPAgent.update_A_dirichlet()
-    # This will require:
+    if not success:
+        return
+
+    try:
+        from .fep_agent import HegemonikónFEPAgent
+        import numpy as np
+    except ImportError:
+        logger.warning("FEP Agent or numpy not available. Skipping derivative update.")
+        return
+
     # 1. Derivative-specific state space in FEP
+    # Map the selected derivative to a state index (0-2)
+    derivatives = THEOREM_DERIVATIVES.get(theorem, [])
+    if not derivatives or derivative not in derivatives:
+        return
+
+    state_idx = derivatives.index(derivative)
+
     # 2. Observation encoding for derivative context
+    # encode_for_derivative_selection returns (abstraction, context_dep, reflection)
+    o_series_theorem = theorem if theorem in ["O1", "O2", "O3", "O4"] else "O1" # type: ignore
+    obs_encoded = encode_for_derivative_selection(problem_context, o_series_theorem) # type: ignore
+
+    # Map to FEP Agent's observation space: (context_idx:0-1, urgency_idx:0-2, confidence_idx:0-2)
+    context_idx = 1 if obs_encoded[0] >= 1 else 0
+    urgency_idx = min(obs_encoded[1], 2)
+    confidence_idx = min(obs_encoded[2], 2)
+    obs_tuple = (context_idx, urgency_idx, confidence_idx)
+
     # 3. Persistence of learned derivative preferences
-    pass
+    try:
+        agent = HegemonikónFEPAgent()
+        # Load previously learned preferences if they exist
+        agent.load_learned_A()
+
+        # Set beliefs to 100% confidence in the selected derivative's mapped state
+        agent.beliefs = np.zeros(agent.state_dim)
+        agent.beliefs[state_idx] = 1.0
+
+        # Update Dirichlet prior (A matrix) with this observation
+        agent.update_A_dirichlet(obs_tuple)
+
+        # Save learned preferences
+        agent.save_learned_A()
+        logger.debug(f"Updated FEP derivative selection preferences for {theorem}:{derivative}")
+    except Exception as e:
+        logger.warning(f"Failed to update FEP derivative selector: {e}")

@@ -55,16 +55,12 @@ LLM_DERIVATIVE_MODEL = "gemini-2.0-flash-lite"  # Free tier model
 # Selection Logging Configuration (v3.2 新規 - 学習基盤)
 # -----------------------------------------------------------------------------
 SELECTION_LOG_ENABLED = True
-SELECTION_LOG_PATH = Path(
-    "/home/makaron8426/oikos/mneme/.hegemonikon/derivative_selections.yaml"
-)
+SELECTION_LOG_PATH = Path(__file__).parent.parent.parent / "mneme" / ".hegemonikon" / "derivative_selections.yaml"
 
 # -----------------------------------------------------------------------------
 # L2 Evolution Engine Integration (v3.3 新規)
 # -----------------------------------------------------------------------------
-EVOLVED_WEIGHTS_PATH = Path(
-    "/home/makaron8426/oikos/mneme/.hegemonikon/evolved_weights.json"
-)
+EVOLVED_WEIGHTS_PATH = Path(__file__).parent.parent.parent / "mneme" / ".hegemonikon" / "evolved_weights.json"
 EVOLVED_WEIGHTS_ENABLED = True  # Set to False to disable GA weight boosting
 
 logger = logging.getLogger(__name__)
@@ -100,7 +96,9 @@ def _load_evolved_weights() -> Optional[Dict[str, float]]:
         return None
 
 
-def _apply_evolved_boost(result: "DerivativeRecommendation") -> "DerivativeRecommendation":
+def _apply_evolved_boost(
+    result: "DerivativeRecommendation",
+) -> "DerivativeRecommendation":
     """GA 進化済み重みで推薦結果をブースト
 
     weights に該当する derivative のブースト係数があれば confidence を調整。
@@ -132,6 +130,7 @@ def reload_evolved_weights() -> None:
     _evolved_weights_loaded = False
     _evolved_weights_cache = None
     _load_evolved_weights()
+
 
 try:
     from google import genai
@@ -1470,8 +1469,30 @@ def correct_selection(
 # PURPOSE: Select the optimal derivative for the given theorem and problem context.
 def select_derivative(
     theorem: Literal[
-        "O1", "O2", "O3", "O4", "S1", "S2", "S3", "S4", "H1", "H2", "H3", "H4",
-        "P1", "P2", "P3", "P4", "K1", "K2", "K3", "K4", "A1", "A2", "A3", "A4",
+        "O1",
+        "O2",
+        "O3",
+        "O4",
+        "S1",
+        "S2",
+        "S3",
+        "S4",
+        "H1",
+        "H2",
+        "H3",
+        "H4",
+        "P1",
+        "P2",
+        "P3",
+        "P4",
+        "K1",
+        "K2",
+        "K3",
+        "K4",
+        "A1",
+        "A2",
+        "A3",
+        "A4",
     ],
     problem_context: str,
     use_fep: bool = False,
@@ -2847,9 +2868,88 @@ def update_derivative_selector(
         problem_context: Problem description
         success: Whether the derivative was effective
     """
-    # TODO: Integrate with HegemonikónFEPAgent.update_A_dirichlet()
-    # This will require:
-    # 1. Derivative-specific state space in FEP
-    # 2. Observation encoding for derivative context
-    # 3. Persistence of learned derivative preferences
-    pass
+    if not success:
+        return
+
+    # Import locally to avoid circular dependencies
+    from mekhane.fep.fep_agent import HegemonikónFEPAgent
+    from mekhane.fep.persistence import save_A, load_A, A_exists
+    import numpy as np
+
+    try:
+        agent = HegemonikónFEPAgent()
+
+        # Load existing learned A matrix if available
+        if A_exists():
+            learned_A = load_A()
+            if learned_A is not None:
+                if (
+                    isinstance(agent.agent.A, np.ndarray)
+                    and agent.agent.A.dtype == object
+                ):
+                    agent.agent.A[0] = (
+                        learned_A[0] if learned_A.dtype == object else learned_A
+                    )
+                elif isinstance(agent.agent.A, list):
+                    agent.agent.A[0] = (
+                        learned_A[0]
+                        if (
+                            isinstance(learned_A, np.ndarray)
+                            and learned_A.dtype == object
+                        )
+                        else learned_A
+                    )
+                else:
+                    agent.agent.A = learned_A
+
+        # 1. & 2. Map context to observation space (context, urgency, confidence)
+        if theorem in ["O1", "O2", "O3", "O4"]:
+            abs_lvl, ctx_dep, ref_need = encode_for_derivative_selection(
+                problem_context, theorem
+            )
+
+            # Map abstraction(0-2), context_dep(0-2), ref_need(0-2) to FEP observation space
+            # FEP agent observation space:
+            # - context: 0 (ambiguous), 1 (clear)
+            # - urgency: 0 (low), 1 (medium), 2 (high)
+            # - confidence: 0 (low), 1 (medium), 2 (high)
+
+            # Map ref_need to context clarity (high reflection need -> ambiguous context)
+            obs_context = 0 if ref_need >= 1 else 1
+            # Map context_dep to urgency
+            obs_urgency = ctx_dep
+            # Map abstraction to confidence
+            obs_confidence = abs_lvl
+
+            obs_tuple = (obs_context, obs_urgency, obs_confidence)
+        else:
+            # Default fallback for S, H series
+            obs_tuple = (0, 1, 1)
+
+        import hashlib
+        # 3. Create a pseudo-state for the derivative
+        # We hash the derivative name using MD5 to map it to one of the available states (0 to state_dim-1)
+        # This provides the "derivative-specific state space" effect within the existing architecture
+        # deterministically across sessions.
+        state_idx = int(hashlib.md5(derivative.encode()).hexdigest(), 16) % agent.state_dim
+
+        # Set belief to point exactly to this derivative's state
+        belief = np.zeros(agent.state_dim)
+        belief[state_idx] = 1.0
+
+        if isinstance(agent.beliefs, np.ndarray) and agent.beliefs.dtype == object:
+            agent.beliefs[0] = belief
+        elif isinstance(agent.beliefs, list):
+            agent.beliefs[0] = belief
+        else:
+            agent.beliefs = belief
+
+        # Update and persist
+        # Use a high learning rate to emphasize successful feedback
+        agent.update_A_dirichlet(observation=obs_tuple, learning_rate=50.0)
+        save_A(agent)
+
+        logger.info(f"Updated FEP derivative preferences for {theorem}:{derivative}")
+
+    except Exception as e:
+        logger.warning(f"Failed to update FEP derivative preference: {e}")

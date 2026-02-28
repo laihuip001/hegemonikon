@@ -1,3 +1,4 @@
+# PROOF: [L2/Logic] <- mekhane/periskope/
 """
 Citation verification agent for Periskopē.
 

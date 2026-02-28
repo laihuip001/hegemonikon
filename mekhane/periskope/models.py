@@ -1,3 +1,4 @@
+# PROOF: [L2/Logic] <- mekhane/periskope/
 """
 Periskopē data models.
 

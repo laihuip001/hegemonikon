@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# PROOF: [L2/インフラ] <- mekhane/symploke/ A0→索引管理が必要→chronos_ingest が担う
+# PROOF: [L2/Mekhane] <- mekhane/symploke/ A0->Existence
 """
 Chronos Ingest - 会話履歴 (Conversation Logs) を Chronos インデックスに自動投入
 
@@ -24,13 +24,13 @@ from mekhane.symploke.indices import Document, ChronosIndex
 HANDOFF_DIR = Path(
     os.environ.get(
         "HGK_SESSIONS_DIR",
-        "/home/makaron8426/oikos/mneme/.hegemonikon/sessions"
+        str(Path.home() / "oikos" / "mneme" / ".hegemonikon" / "sessions")
     )
 )
 DEFAULT_INDEX_PATH = Path(
     os.environ.get(
         "HGK_CHRONOS_INDEX",
-        "/home/makaron8426/oikos/mneme/.hegemonikon/indices/chronos.pkl"
+        str(Path.home() / "oikos" / "mneme" / ".hegemonikon" / "indices" / "chronos.pkl")
     )
 )
 
@@ -109,6 +109,11 @@ def parse_conversation_chunks(
 
     # Create chunks
     chunks = []
+
+    # Fallback if there are no markdown messages
+    if not messages:
+        return [parse_conversation(file_path)]
+
     current_chunk = f"# {title}\n\n"
     chunk_idx = 0
 

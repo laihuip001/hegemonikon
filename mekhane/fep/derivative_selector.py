@@ -2847,9 +2847,69 @@ def update_derivative_selector(
         problem_context: Problem description
         success: Whether the derivative was effective
     """
-    # TODO: Integrate with HegemonikónFEPAgent.update_A_dirichlet()
-    # This will require:
-    # 1. Derivative-specific state space in FEP
-    # 2. Observation encoding for derivative context
-    # 3. Persistence of learned derivative preferences
-    pass
+    # Only learn from successes (positive-only Dirichlet update)
+    if not success:
+        return
+
+    try:
+        from mekhane.fep.fep_agent import HegemonikónFEPAgent
+        from mekhane.fep.encoding import encode_input
+        import numpy as np
+
+        # 1. Derivative-specific state space in FEP
+        # We reuse the default HegemonikónFEPAgent structure but align its beliefs
+        # to the selected derivative for the specific theorem.
+        agent = HegemonikónFEPAgent(use_defaults=True)
+
+        # Locate the derivative index within the theorem's state space
+        deriv_list = getattr(DerivativeStateSpace, f"{theorem}_DERIVATIVES", [])
+        state_idx = 0
+        if derivative in deriv_list:
+            state_idx = deriv_list.index(derivative)
+
+        # Force the agent's belief state to 100% confidence in the selected derivative
+        # This ties the derivative selection directly to the Dirichlet A-matrix update.
+        if isinstance(agent.beliefs, list) and isinstance(agent.beliefs[0], np.ndarray):
+            # Handle pymdp obj array structure
+            agent.beliefs[0] = np.zeros_like(agent.beliefs[0])
+            if state_idx < len(agent.beliefs[0]):
+                agent.beliefs[0][state_idx] = 1.0
+        else:
+            agent.beliefs = np.zeros(agent.state_dim)
+            if state_idx < agent.state_dim:
+                agent.beliefs[state_idx] = 1.0
+
+        # 3. Persistence of learned derivative preferences
+        # Use dynamic home directory instead of hardcoded paths
+        base_dir = os.environ.get(
+            "HEGEMONIKON_DIR",
+            str(Path.home() / "oikos" / "mneme" / ".hegemonikon")
+        )
+
+        # Resolve path early
+        matrix_file = Path(base_dir) / "fep" / f"derivative_A_{theorem}.npy"
+
+        try:
+            matrix_file.parent.mkdir(parents=True, exist_ok=True)
+        except (PermissionError, OSError):
+            # Test or CI environment fallback
+            matrix_file = Path.home() / ".cache" / "hegemonikon_fep" / f"derivative_A_{theorem}.npy"
+            matrix_file.parent.mkdir(parents=True, exist_ok=True)
+
+        if matrix_file.exists():
+            agent.load_learned_A(str(matrix_file))
+
+        # 2. Observation encoding for derivative context
+        obs_tuple = encode_input(problem_context)
+
+        # Update A-matrix with Dirichlet learning
+        agent.update_A_dirichlet(observation=obs_tuple)
+
+        # Save updated preferences
+        agent.save_learned_A(str(matrix_file))
+
+        logger.debug(
+            f"Successfully recorded FEP feedback for {theorem}:{derivative}"
+        )
+    except Exception as e:
+        logger.error(f"Failed to record FEP feedback for derivative selector: {e}")

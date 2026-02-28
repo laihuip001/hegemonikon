@@ -37,7 +37,11 @@ LEARNED_A_METADATA_PATH = Path(
 # PURPOSE: Ensure the persistence directory exists.
 def ensure_persistence_dir() -> None:
     """Ensure the persistence directory exists."""
-    LEARNED_A_PATH.parent.mkdir(parents=True, exist_ok=True)
+    try:
+        LEARNED_A_PATH.parent.mkdir(parents=True, exist_ok=True)
+    except (PermissionError, OSError):
+        # Allow running in sandboxed or test environments where /home/makaron8426 is inaccessible
+        pass
 
 
 # PURPOSE: Save learned A matrix to file.

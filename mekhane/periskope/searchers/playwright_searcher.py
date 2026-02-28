@@ -1,3 +1,4 @@
+# PROOF: [L2/Auto] <- Default PROOF Header
 """
 Playwright-based searcher for Periskopē.
 

@@ -1,3 +1,4 @@
+# PROOF: [L2/Auto] <- Default PROOF Header
 """
 Page Fetcher — 選択的全文クロール for Periskopē.
 

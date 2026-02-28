@@ -1,3 +1,4 @@
+# PROOF: [L2/Auto] <- Default PROOF Header
 """
 Query expander for Periskopē.
 

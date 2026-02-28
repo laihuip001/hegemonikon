@@ -1,3 +1,4 @@
+# PROOF: [L2/Auto] <- Default PROOF Header
 """
 Semantic Scholar API client for Periskopē.
 

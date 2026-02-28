@@ -1,3 +1,4 @@
+# PROOF: [L3/Gateway] <- mekhane/periskope/synthesizer.py
 """
 Multi-model synthesizer for Periskopē.
 

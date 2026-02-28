@@ -1,3 +1,4 @@
+# PROOF: [L3/Gateway] <- mekhane/periskope/cli.py
 #!/usr/bin/env python3
 """
 Periskopē CLI — Deep Research from the command line.

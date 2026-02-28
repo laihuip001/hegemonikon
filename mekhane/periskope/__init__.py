@@ -1,3 +1,4 @@
+# PROOF: [L3/Gateway] <- mekhane/periskope/__init__.py
 """
 Periskopē — HGK Deep Research Engine
 

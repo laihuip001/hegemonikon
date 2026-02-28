@@ -1,3 +1,4 @@
+# PROOF: [L3/Gateway] <- mekhane/periskope/searchers/playwright_searcher.py
 """
 Playwright-based searcher for Periskopē.
 

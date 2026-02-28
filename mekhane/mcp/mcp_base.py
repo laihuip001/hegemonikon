@@ -1,3 +1,4 @@
+# PROOF: [L3/Gateway] <- mekhane/mcp/mcp_base.py
 #!/usr/bin/env python3
 """
 MCP Base Module — Hegemonikón MCP Server Common Infrastructure

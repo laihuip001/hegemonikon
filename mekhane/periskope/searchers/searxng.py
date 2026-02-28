@@ -1,3 +1,4 @@
+# PROOF: [L3/Gateway] <- mekhane/periskope/searchers/searxng.py
 """
 SearXNG search client for Periskopē.
 

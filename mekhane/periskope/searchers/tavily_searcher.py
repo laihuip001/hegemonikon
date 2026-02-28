@@ -1,3 +1,4 @@
+# PROOF: [L3/Gateway] <- mekhane/periskope/searchers/tavily_searcher.py
 """
 Tavily Search API client for Periskopē.
 

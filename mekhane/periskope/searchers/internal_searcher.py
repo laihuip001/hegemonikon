@@ -1,3 +1,4 @@
+# PROOF: [L3/Gateway] <- mekhane/periskope/searchers/internal_searcher.py
 """
 Internal knowledge searcher for Periskopē.
 

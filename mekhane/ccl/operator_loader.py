@@ -1,3 +1,4 @@
+# PROOF: [L1/定理] <- mekhane/ccl/ CCL→CCLパーサーが必要→operator_loader が担う
 """operators.md の SSOT パーサー。
 
 operators.md の Markdown テーブルから演算子定義を抽出し、
@@ -96,6 +97,10 @@ def load_operators(
             if sec_start < pos:
                 category = sec_name
                 break
+
+        # すでに同じ演算子が登録されている場合はスキップ
+        if symbol in operators:
+            continue
 
         # エスケープされたパイプを復元
         symbol = symbol.replace("\\|\\|", "||")

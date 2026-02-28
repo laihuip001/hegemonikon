@@ -29,8 +29,8 @@ async def main():
                     try:
                         buttons = await pg.query_selector_all("button.select-none")
                         agent_pages.append((pg, len(buttons)))
-                    except Exception:
-                        pass  # TODO: Add proper error handling
+                    except Exception as e:
+                        print(f"[!] Error querying buttons on page {pg.url}: {e}")
 
         if not agent_pages:
             print("[!] Agent Manager not found")
@@ -110,10 +110,10 @@ async def main():
                                     lines.append(
                                         f"        [{k}] <{gc_tag}> class='{gc_class[:50]}' text_len={gc_len}"
                                     )
-                                except Exception:
-                                    pass  # TODO: Add proper error handling
-                    except Exception:
-                        pass  # TODO: Add proper error handling
+                                except Exception as e:
+                                    print(f"[!] Error evaluating grandchild element at index {k}: {e}")
+                    except Exception as e:
+                        print(f"[!] Error evaluating child element at index {j}: {e}")
 
                 break  # 最初の大きなコンテナのみ
 

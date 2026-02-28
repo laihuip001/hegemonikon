@@ -291,90 +291,103 @@ async def run_slot_batch(
     total_failed = 0
     all_results = []
 
-    try:
-        for file_idx, target_file in enumerate(files, 1):
-            # 専門家プール選択
-            if basanos_bridge is not None and hybrid_ratio > 0 and hybrid_ratio < 1.0:
-                # Hybrid mode: basanos + specialist を比率で混合
-                basanos_specs = basanos_bridge.get_perspectives_as_specialists(
-                    domains=basanos_domains,
+    # To respect global limits and avoid bursting the API, limit the concurrency
+    # of file processing tasks. max_concurrent acts as our ceiling.
+    file_sem = asyncio.Semaphore(max_concurrent)
+    stop_flag = [False]
+
+    async def process_file(file_idx: int, target_file: str):
+        nonlocal total_started, total_failed
+
+        if stop_flag[0]:
+            return
+
+        # 専門家プール選択
+        if basanos_bridge is not None and hybrid_ratio > 0 and hybrid_ratio < 1.0:
+            # Hybrid mode: basanos + specialist を比率で混合
+            basanos_specs = basanos_bridge.get_perspectives_as_specialists(
+                domains=basanos_domains,
+            )
+            basanos_count = max(1, int(specialists_per_file * hybrid_ratio))
+            specialist_count = specialists_per_file - basanos_count
+            # basanos specs から basanos_count 個をサンプリング
+            sampled_basanos = random.sample(
+                basanos_specs, min(basanos_count, len(basanos_specs)),
+            )
+            # specialist pool から残りをサンプリング
+            pool = list(ALL_SPECIALISTS)
+            sampled_specialist = random.sample(
+                pool, min(specialist_count, len(pool)),
+            )
+            specs = sampled_basanos + sampled_specialist
+            random.shuffle(specs)  # 混合順序をランダム化
+        elif basanos_bridge is not None:
+            # Basanos mode: 構造化パースペクティブを使用
+            if use_dynamic:
+                # F10: ファイル特性に基づく動的 perspective
+                specs = basanos_bridge.get_dynamic_perspectives(
+                    file_path=target_file,
+                    audit_issues=audit_issue_codes,
+                    max_perspectives=specialists_per_file,
                 )
-                basanos_count = max(1, int(specialists_per_file * hybrid_ratio))
-                specialist_count = specialists_per_file - basanos_count
-                # basanos specs から basanos_count 個をサンプリング
-                sampled_basanos = random.sample(
-                    basanos_specs, min(basanos_count, len(basanos_specs)),
-                )
-                # specialist pool から残りをサンプリング
-                pool = list(ALL_SPECIALISTS)
-                sampled_specialist = random.sample(
-                    pool, min(specialist_count, len(pool)),
-                )
-                specs = sampled_basanos + sampled_specialist
-                random.shuffle(specs)  # 混合順序をランダム化
-            elif basanos_bridge is not None:
-                # Basanos mode: 構造化パースペクティブを使用
-                if use_dynamic:
-                    # F10: ファイル特性に基づく動的 perspective
-                    specs = basanos_bridge.get_dynamic_perspectives(
-                        file_path=target_file,
-                        audit_issues=audit_issue_codes,
-                        max_perspectives=specialists_per_file,
-                    )
-                    if not specs:
-                        # フォールバック: 静的 perspective
-                        specs = basanos_bridge.get_perspectives_as_specialists(
-                            domains=basanos_domains,
-                        )
-                else:
+                if not specs:
+                    # フォールバック: 静的 perspective
                     specs = basanos_bridge.get_perspectives_as_specialists(
                         domains=basanos_domains,
                     )
             else:
-                # Specialist mode: audit issue があれば adaptive、なければランダム
-                if audit_issue_codes:
-                    from audit_specialist_matcher import AuditSpecialistMatcher
-                    from specialist_v2 import get_specialists_by_category
-                    matcher = AuditSpecialistMatcher()
-                    categories = matcher.select_for_issues(
-                        audit_issue_codes, total_budget=specialists_per_file,
-                    )
-                    specs = []
-                    for cat in categories:
-                        cat_pool = get_specialists_by_category(cat)
-                        if cat_pool:
-                            specs.append(random.choice(cat_pool))
-                    # budget を満たさなければランダムで補充
-                    if len(specs) < specialists_per_file:
-                        pool = [s for s in ALL_SPECIALISTS if s not in specs]
-                        remaining = specialists_per_file - len(specs)
-                        specs.extend(random.sample(pool, min(remaining, len(pool))))
-                else:
-                    pool = list(ALL_SPECIALISTS)
-                    specs = random.sample(pool, min(specialists_per_file, len(pool)))
+                specs = basanos_bridge.get_perspectives_as_specialists(
+                    domains=basanos_domains,
+                )
+        else:
+            # Specialist mode: audit issue があれば adaptive、なければランダム
+            if audit_issue_codes:
+                from audit_specialist_matcher import AuditSpecialistMatcher
+                from specialist_v2 import get_specialists_by_category
+                matcher = AuditSpecialistMatcher()
+                categories = matcher.select_for_issues(
+                    audit_issue_codes, total_budget=specialists_per_file,
+                )
+                specs = []
+                for cat in categories:
+                    cat_pool = get_specialists_by_category(cat)
+                    if cat_pool:
+                        specs.append(random.choice(cat_pool))
+                # budget を満たさなければランダムで補充
+                if len(specs) < specialists_per_file:
+                    pool = [s for s in ALL_SPECIALISTS if s not in specs]
+                    remaining = specialists_per_file - len(specs)
+                    specs.extend(random.sample(pool, min(remaining, len(pool))))
+            else:
+                pool = list(ALL_SPECIALISTS)
+                specs = random.sample(pool, min(specialists_per_file, len(pool)))
 
-            # F14: 低品質 Perspective を実行時除外
-            if exclude_low_quality and specs:
-                try:
-                    from basanos_feedback import FeedbackStore as _FBStore
-                    _excluded_ids = set(_FBStore().get_low_quality_perspectives(threshold=0.1))
-                    if _excluded_ids:
-                        before = len(specs)
-                        specs = [s for s in specs if getattr(s, 'id', '') not in _excluded_ids]
-                        culled = before - len(specs)
-                        if culled > 0:
-                            print(f"    🗑️  F14: {culled} low-quality perspectives excluded")
-                except Exception:
-                    pass  # FeedbackStore 不在時はスキップ
+        # F14: 低品質 Perspective を実行時除外
+        if exclude_low_quality and specs:
+            try:
+                from basanos_feedback import FeedbackStore as _FBStore
+                _excluded_ids = set(_FBStore().get_low_quality_perspectives(threshold=0.1))
+                if _excluded_ids:
+                    before = len(specs)
+                    specs = [s for s in specs if getattr(s, 'id', '') not in _excluded_ids]
+                    culled = before - len(specs)
+                    if culled > 0:
+                        print(f"    🗑️  F14: {culled} low-quality perspectives excluded")
+            except Exception:
+                pass  # FeedbackStore 不在時はスキップ
 
-            if dry_run:
-                print(f"  [{file_idx}/{len(files)}] {target_file} × {len(specs)} specialists (DRY-RUN)")
-                all_results.append({
-                    "file": target_file,
-                    "specialists": len(specs),
-                    "dry_run": True,
-                })
-                continue
+        if dry_run:
+            print(f"  [{file_idx}/{len(files)}] {target_file} × {len(specs)} specialists (DRY-RUN)")
+            all_results.append({
+                "file": target_file,
+                "specialists": len(specs),
+                "dry_run": True,
+            })
+            return
+
+        async with file_sem:
+            if stop_flag[0]:
+                return
 
             print(f"  [{file_idx}/{len(files)}] {target_file} × {len(specs)} specialists")
             results = await run_batch(specs, target_file, max_concurrent)
@@ -409,11 +422,15 @@ async def run_slot_batch(
             total_attempted = total_started + total_failed
             if total_attempted > 10:
                 error_rate = total_failed / total_attempted
-                if error_rate > MAX_ERROR_RATE:
+                if error_rate > MAX_ERROR_RATE and not stop_flag[0]:
                     print(f"  ⚠️  Error rate {error_rate:.1%} > {MAX_ERROR_RATE:.0%}, stopping slot")
-                    break
+                    stop_flag[0] = True
 
             print(f"    → {started}/{len(specs)} started, {failed} failed")
+
+    try:
+        tasks = [process_file(idx, target_file) for idx, target_file in enumerate(files, 1)]
+        await asyncio.gather(*tasks)
 
     finally:
         # API キー復元

@@ -48,7 +48,34 @@ def _get_secret(key: str) -> Optional[str]:
     散在する os.environ.get を排除し、将来的な Secret Manager
     統合のフックポイントとする。
     """
-    # TODO: Secret Manager (GCP/AWS) 統合時はここを変更
+    # 1. GCP Secret Manager
+    if os.environ.get("USE_GCP_SECRET_MANAGER", "").lower() == "true":
+        try:
+            from google.cloud import secretmanager
+            project_id = os.environ.get("GOOGLE_CLOUD_PROJECT")
+            if project_id:
+                client = secretmanager.SecretManagerServiceClient()
+                name = f"projects/{project_id}/secrets/{key}/versions/latest"
+                response = client.access_secret_version(request={"name": name})
+                return response.payload.data.decode("UTF-8")
+        except Exception as e:
+            # Fallback on error or missing dependency
+            pass
+
+    # 2. AWS Secrets Manager
+    if os.environ.get("USE_AWS_SECRET_MANAGER", "").lower() == "true":
+        try:
+            import boto3
+            region = os.environ.get("AWS_REGION", "us-east-1")
+            client = boto3.client("secretsmanager", region_name=region)
+            response = client.get_secret_value(SecretId=key)
+            if "SecretString" in response:
+                return response["SecretString"]
+        except Exception as e:
+            # Fallback on error or missing dependency
+            pass
+
+    # 3. Local Environment Variables Fallback
     return os.environ.get(key)
 
 

@@ -1,3 +1,5 @@
+# PROOF: [L2/インフラ] <- Default Proof
+# PURPOSE: default file level purpose
 """
 Semantic Scholar API client for Periskopē.
 

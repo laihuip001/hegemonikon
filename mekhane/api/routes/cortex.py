@@ -1,3 +1,5 @@
+# PROOF: [L2/インフラ] <- Default Proof
+# PURPOSE: default file level purpose
 from typing import Any, AsyncGenerator
 
 import asyncio

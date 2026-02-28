@@ -1,3 +1,5 @@
+# PROOF: [L2/インフラ] <- Default Proof
+# PURPOSE: default file level purpose
 """
 S7: Falsification Condition Checker
 

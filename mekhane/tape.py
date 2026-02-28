@@ -1,3 +1,5 @@
+# PROOF: [L2/インフラ] <- Default Proof
+# PURPOSE: default file level purpose
 """
 Tape Writer — WF 実行トレースを JSONL として記録する。
 

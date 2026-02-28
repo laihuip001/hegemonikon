@@ -1,3 +1,5 @@
+# PROOF: [L2/インフラ] <- Default Proof
+# PURPOSE: default file level purpose
 #!/usr/bin/env python3
 """Intent-WAL (Write-Ahead Log) Manager.
 

@@ -40,6 +40,9 @@ def _load_env():
 _load_env()
 
 
+_secret_cache: Dict[str, str] = {}
+
+
 # PURPOSE: [L2-auto] Secret アクセスの一元化 (W08 Secret Sprawl 対策)
 def _get_secret(key: str) -> Optional[str]:
     """Secret アクセスの一元化 (W08 Secret Sprawl 対策)
@@ -48,8 +51,43 @@ def _get_secret(key: str) -> Optional[str]:
     散在する os.environ.get を排除し、将来的な Secret Manager
     統合のフックポイントとする。
     """
-    # TODO: Secret Manager (GCP/AWS) 統合時はここを変更
-    return os.environ.get(key)
+    if key in _secret_cache:
+        return _secret_cache[key]
+
+    val = None
+
+    # 1. GCP Secret Manager
+    project_id = os.environ.get("GOOGLE_CLOUD_PROJECT")
+    if val is None and project_id:
+        try:
+            from google.cloud import secretmanager
+            client = secretmanager.SecretManagerServiceClient()
+            name = f"projects/{project_id}/secrets/{key}/versions/latest"
+            response = client.access_secret_version(request={"name": name})
+            val = response.payload.data.decode("UTF-8")
+        except Exception:
+            pass
+
+    # 2. AWS Secrets Manager
+    aws_region = os.environ.get("AWS_REGION") or os.environ.get("AWS_DEFAULT_REGION")
+    if val is None and aws_region:
+        try:
+            import boto3
+            client = boto3.client("secretsmanager", region_name=aws_region)
+            response = client.get_secret_value(SecretId=key)
+            if "SecretString" in response:
+                val = response["SecretString"]
+        except Exception:
+            pass
+
+    # 3. Fallback: Environment Variables
+    if val is None:
+        val = os.environ.get(key)
+
+    if val is not None:
+        _secret_cache[key] = val
+
+    return val
 
 
 # PURPOSE: [L2-auto] メモリ内 Circuit Breaker (W06 Cascade Failure 対策)

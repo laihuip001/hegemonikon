@@ -2847,9 +2847,105 @@ def update_derivative_selector(
         problem_context: Problem description
         success: Whether the derivative was effective
     """
-    # TODO: Integrate with HegemonikónFEPAgent.update_A_dirichlet()
-    # This will require:
+    if not success:
+        # Currently, we only learn from successes (positive reinforcement)
+        # Extending to negative reinforcement is a future task.
+        return
+
+    derivatives = THEOREM_DERIVATIVES.get(theorem)
+    if not derivatives:
+        logger.warning(f"Unknown theorem {theorem} in update_derivative_selector")
+        return
+
+    if derivative not in derivatives:
+        logger.warning(
+            f"Derivative {derivative} not valid for theorem {theorem}"
+        )
+        return
+
     # 1. Derivative-specific state space in FEP
+    num_states = len(derivatives)
+
     # 2. Observation encoding for derivative context
-    # 3. Persistence of learned derivative preferences
-    pass
+    # encode_for_derivative_selection returns Tuple[int, int, int] (0-2 for each)
+    # Total observation space = 3 * 3 * 3 = 27
+    num_obs = 27
+
+    try:
+        import numpy as np
+        from mekhane.fep.fep_agent import HegemonikónFEPAgent, PYMDP_AVAILABLE
+        if not PYMDP_AVAILABLE:
+            return
+
+        from pymdp import utils
+
+        # Determine flat observation index
+        # Tuple is (abstraction_level, context_dependency, reflection_need)
+        abs_level, ctx_dep, ref_need = encode_for_derivative_selection(
+            problem_context, theorem if theorem in ["O1", "O2", "O3", "O4"] else "O1"
+        )
+        flat_obs = abs_level * 9 + ctx_dep * 3 + ref_need
+
+        # Check if saved A matrix exists
+        persist_dir = Path.home() / "oikos/mneme/.hegemonikon/fep/derivatives"
+        persist_dir.mkdir(parents=True, exist_ok=True)
+        persist_path = persist_dir / f"{theorem}_A.npy"
+
+        A = utils.obj_array_zeros([[num_obs, num_states]])
+        if persist_path.exists():
+            try:
+                loaded_A = np.load(str(persist_path))
+                # Validate shape
+                if loaded_A.shape == (num_obs, num_states):
+                    # Validate normalization
+                    col_sums = loaded_A.sum(axis=0)
+                    if not np.allclose(col_sums, 1.0):
+                        loaded_A = loaded_A / col_sums
+                    A[0] = loaded_A
+                else:
+                    A[0] = np.ones((num_obs, num_states)) / num_obs
+            except Exception as e:
+                logger.warning(f"Failed to load A matrix for {theorem}: {e}")
+                A[0] = np.ones((num_obs, num_states)) / num_obs
+        else:
+            A[0] = np.ones((num_obs, num_states)) / num_obs
+
+        # Initialize B, C, D to defaults
+        B = utils.obj_array_zeros([[num_states, num_states, 1]])
+        B[0][:, :, 0] = np.eye(num_states)
+
+        C = utils.obj_array_zeros([num_obs])
+
+        D = utils.obj_array_zeros([num_states])
+        D[0] = np.ones(num_states) / num_states
+
+        agent = HegemonikónFEPAgent(
+            A=A,
+            B=B,
+            C=C,
+            D=D,
+            use_defaults=False
+        )
+
+        # Set beliefs to the selected derivative (one-hot)
+        deriv_idx = derivatives.index(derivative)
+        belief = np.zeros(num_states)
+        belief[deriv_idx] = 1.0
+
+        # HegemonikónFEPAgent stores beliefs as an array or object array depending on pymdp format
+        if isinstance(agent.beliefs, np.ndarray) and agent.beliefs.dtype == object:
+            agent.beliefs[0] = belief
+        elif isinstance(agent.beliefs, list):
+            agent.beliefs[0] = belief
+        else:
+            agent.beliefs = belief
+
+        # Update A matrix using Dirichlet concentration update
+        agent.update_A_dirichlet(observation=flat_obs, learning_rate=5.0)
+
+        # 3. Persistence of learned derivative preferences
+        updated_A = agent.agent.A[0] if isinstance(agent.agent.A, np.ndarray) and agent.agent.A.dtype == object else (agent.agent.A[0] if isinstance(agent.agent.A, list) else agent.agent.A)
+        np.save(str(persist_path), updated_A)
+
+    except Exception as e:
+        logger.error(f"Error in update_derivative_selector: {e}")

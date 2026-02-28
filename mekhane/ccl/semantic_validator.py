@@ -11,10 +11,13 @@ Design decisions:
 - Graceful degradation if LLM unavailable
 """
 
+import logging
 import os
 from dataclasses import dataclass
 from typing import Optional, List
 from pathlib import Path
+
+logger = logging.getLogger(__name__)
 
 # Try to import LLM client
 try:
@@ -205,8 +208,8 @@ CCL は Hegemonikón システムの認知制御言語で、以下のワーク�
                     reasoning=data.get("reasoning", ""),
                     suggestions=data.get("suggestions", []),
                 )
-            except (json.JSONDecodeError, ValueError):
-                pass  # TODO: Add proper error handling
+            except (json.JSONDecodeError, ValueError) as e:
+                logger.warning(f"Failed to parse JSON from LLM response: {e}")
 
         # Fallback: try to infer from text
         aligned = "不一致" not in text and "aligned.*false" not in text.lower()

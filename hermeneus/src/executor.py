@@ -386,21 +386,26 @@ class WorkflowExecutor:
             consensus = verify_result.output if verify_result else None
             
             if consensus:
-                audit_id = record_verification(ccl, output, consensus)
+                audit_id = await asyncio.to_thread(
+                    record_verification, ccl, output, consensus
+                )
             else:
                 # 検証なしの場合はダミー記録
-                from .audit import AuditStore, AuditRecord
-                store = AuditStore()
-                record = AuditRecord(
-                    record_id="",
-                    ccl_expression=ccl,
-                    execution_result=output[:500],
-                    debate_summary="検証スキップ",
-                    consensus_accepted=True,
-                    confidence=0.5,
-                    dissent_reasons=[]
-                )
-                audit_id = store.record(record)
+                def _dummy_record():
+                    from .audit import AuditStore, AuditRecord
+                    store = AuditStore()
+                    record = AuditRecord(
+                        record_id="",
+                        ccl_expression=ccl,
+                        execution_result=output[:500],
+                        debate_summary="検証スキップ",
+                        consensus_accepted=True,
+                        confidence=0.5,
+                        dissent_reasons=[]
+                    )
+                    return store.record(record)
+
+                audit_id = await asyncio.to_thread(_dummy_record)
             
             return PhaseResult(
                 phase=ExecutionPhase.AUDIT,

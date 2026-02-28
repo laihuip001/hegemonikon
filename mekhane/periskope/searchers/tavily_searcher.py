@@ -1,3 +1,4 @@
+# PROOF: [Level/Category] <- mekhane/searchers/ A0->Auto->AddedByCI
 """
 Tavily Search API client for Periskopē.
 

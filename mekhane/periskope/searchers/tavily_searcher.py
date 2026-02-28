@@ -1,3 +1,4 @@
+# PROOF: [L2/機能] <- mekhane/periskope/searchers/
 """
 Tavily Search API client for Periskopē.
 

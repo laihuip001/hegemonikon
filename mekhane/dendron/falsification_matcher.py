@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] <- mekhane/dendron/ S4→品質保証の要求→falsification_matcher.py が担う
 """
 Falsification Matcher — 消化論文の主張と epistemic_status.yaml の反証条件を照合
 

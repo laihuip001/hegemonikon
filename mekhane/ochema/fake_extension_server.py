@@ -1,3 +1,4 @@
+# PROOF: [L2/言語基盤] <- mekhane/ochema/ S1→LSP連携の要求→fake_extension_server.py が担う
 """Fake Extension Server — ConnectRPC over HTTP.
 
 LS は ConnectRPC (extension_server_go_proto_connect) で Extension Server に接続する。

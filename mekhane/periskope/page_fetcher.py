@@ -1,3 +1,4 @@
+# PROOF: [L2/探索] <- mekhane/periskope/ O3→外部知識探索の要求→page_fetcher.py が担う
 """
 Page Fetcher — 選択的全文クロール for Periskopē.
 

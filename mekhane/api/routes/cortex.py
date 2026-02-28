@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] <- mekhane/api/routes/ O1→Web APIの要求→cortex.py が担う
 from typing import Any, AsyncGenerator
 
 import asyncio

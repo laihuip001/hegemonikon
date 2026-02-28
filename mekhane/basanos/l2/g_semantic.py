@@ -1,3 +1,4 @@
+# PROOF: [L2/審査] <- mekhane/basanos/l2/ A2→厳密な審査の要求→g_semantic.py が担う
 # PURPOSE: G_semantic — LLM で HGK 専門用語を一般学術用語に翻訳する
 # REASON: G = G_struct ∘ G_semantic の G_semantic 部分。外部比較のために HGK 語彙を汎化する
 """G_semantic: LLM-based translation of HGK terms to general academic terms.

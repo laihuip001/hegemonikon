@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] <- mekhane/dendron/ S4→品質保証の要求→falsification_checker.py が担う
 """
 S7: Falsification Condition Checker
 

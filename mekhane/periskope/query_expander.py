@@ -1,3 +1,4 @@
+# PROOF: [L2/探索] <- mekhane/periskope/ O3→外部知識探索の要求→query_expander.py が担う
 """
 Query expander for Periskopē.
 

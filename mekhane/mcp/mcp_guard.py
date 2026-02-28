@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] <- mekhane/mcp/ O4→ツール連携の要求→mcp_guard.py が担う
 """
 MCP Guard — ゾンビプロセス防止の自己防衛モジュール
 

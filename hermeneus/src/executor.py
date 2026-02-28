@@ -124,6 +124,16 @@ class WorkflowExecutor:
         self.audit_by_default = audit_by_default
         self.min_confidence = min_confidence
         self._tape = None
+        self._audit_store = None
+
+    # PURPOSE: 監査ストアを取得 (遅延初期化)
+    @property
+    def audit_store(self):
+        """監査ストアを取得 (遅延初期化)"""
+        if self._audit_store is None:
+            from hermeneus.src.audit import AuditStore
+            self._audit_store = AuditStore()
+        return self._audit_store
     
     # PURPOSE: レジストリを取得 (遅延初期化)
     @property
@@ -386,11 +396,12 @@ class WorkflowExecutor:
             consensus = verify_result.output if verify_result else None
             
             if consensus:
-                audit_id = record_verification(ccl, output, consensus)
+                audit_id = record_verification(
+                    ccl, output, consensus, store=self.audit_store
+                )
             else:
                 # 検証なしの場合はダミー記録
-                from .audit import AuditStore, AuditRecord
-                store = AuditStore()
+                from .audit import AuditRecord
                 record = AuditRecord(
                     record_id="",
                     ccl_expression=ccl,
@@ -400,7 +411,7 @@ class WorkflowExecutor:
                     confidence=0.5,
                     dissent_reasons=[]
                 )
-                audit_id = store.record(record)
+                audit_id = self.audit_store.record(record)
             
             return PhaseResult(
                 phase=ExecutionPhase.AUDIT,

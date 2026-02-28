@@ -1,3 +1,4 @@
+# PROOF: [L2/Auto] <- mekhane/searchers/
 """
 Brave Search API client for Periskopē.
 

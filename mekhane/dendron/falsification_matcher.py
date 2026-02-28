@@ -1,3 +1,5 @@
+# PROOF: [L2/Mekhane] <- mekhane/ A0->Existence
+
 """
 Falsification Matcher — 消化論文の主張と epistemic_status.yaml の反証条件を照合
 
@@ -19,6 +21,7 @@ PROJECT_ROOT = Path(__file__).parent.parent.parent
 REGISTRY_PATH = PROJECT_ROOT / "kernel" / "epistemic_status.yaml"
 
 
+# PURPOSE: Load the falsification registry.
 def load_registry() -> dict:
     """Load the epistemic status registry"""
     if not REGISTRY_PATH.exists():
@@ -27,6 +30,7 @@ def load_registry() -> dict:
         return yaml.safe_load(f) or {"patches": {}}
 
 
+# PURPOSE: Check if a document triggers any falsification conditions.
 def check_falsification(
     paper_text: str,
     paper_title: str = "",
@@ -95,6 +99,7 @@ def check_falsification(
     return alerts
 
 
+# PURPOSE: Format falsification alerts into a string.
 def format_alerts(alerts: list[dict], paper_title: str = "") -> str:
     """警告をフォーマットされたテキストに変換"""
     if not alerts:

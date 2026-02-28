@@ -1,3 +1,5 @@
+# PROOF: [L2/Mekhane] <- mekhane/ A0->Existence
+
 """
 Brave Search API client for Periskopē.
 

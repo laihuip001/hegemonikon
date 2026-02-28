@@ -41,6 +41,7 @@ import os
 import json
 import logging
 import yaml
+import numpy as np
 
 # -----------------------------------------------------------------------------
 # LLM Fallback Configuration (v3.1 新規)
@@ -2831,6 +2832,31 @@ def list_derivatives(theorem: str) -> List[str]:
 # =============================================================================
 
 
+# -----------------------------------------------------------------------------
+# FEP Integration for Derivative Selection
+# -----------------------------------------------------------------------------
+DERIVATIVE_FEP_DIR = SELECTION_LOG_PATH.parent / "derivative_fep"
+
+# PURPOSE: Encode text context to a flat observation index (0-26).
+def encode_derivative_context(problem_text: str, theorem: str) -> int:
+    """Encode text context to a flat observation index (0-26)."""
+    abs_lvl, ctx_dep, ref_need = encode_for_derivative_selection(problem_text, theorem)
+    # Ensure values are within 0-2 bounds just in case
+    abs_lvl = max(0, min(2, abs_lvl))
+    ctx_dep = max(0, min(2, ctx_dep))
+    ref_need = max(0, min(2, ref_need))
+    return abs_lvl * 9 + ctx_dep * 3 + ref_need
+
+# PURPOSE: Map a derivative string to its state index (0-2).
+def _get_derivative_index(theorem: str, derivative: str) -> int:
+    """Map a derivative string to its state index (0-2)."""
+    derivatives = list_derivatives(theorem)
+    if not derivatives:
+        raise ValueError(f"Unknown theorem: {theorem}")
+    if derivative not in derivatives:
+        raise ValueError(f"Derivative '{derivative}' not valid for theorem '{theorem}'")
+    return derivatives.index(derivative)
+
 # PURPOSE: Record feedback for derivative selection learning.
 def update_derivative_selector(
     theorem: str, derivative: str, problem_context: str, success: bool
@@ -2847,9 +2873,48 @@ def update_derivative_selector(
         problem_context: Problem description
         success: Whether the derivative was effective
     """
-    # TODO: Integrate with HegemonikónFEPAgent.update_A_dirichlet()
-    # This will require:
-    # 1. Derivative-specific state space in FEP
-    # 2. Observation encoding for derivative context
-    # 3. Persistence of learned derivative preferences
-    pass
+    # 1. Derivative-specific state space in FEP (3 states per theorem)
+    num_states = len(list_derivatives(theorem))
+    if num_states == 0:
+        return
+
+    # 2. Observation encoding for derivative context (27 possible observations)
+    num_obs = 27
+    obs_idx = encode_derivative_context(problem_context, theorem)
+
+    try:
+        state_idx = _get_derivative_index(theorem, derivative)
+    except ValueError:
+        return
+
+    # 3. Persistence of learned derivative preferences (Unnormalized Dirichlet counts pA)
+    DERIVATIVE_FEP_DIR.mkdir(parents=True, exist_ok=True)
+    pa_matrix_path = DERIVATIVE_FEP_DIR / f"pA_{theorem}.npy"
+
+    # Initialize with uniform prior concentration parameters (e.g., 1.0)
+    if pa_matrix_path.exists():
+        pA_matrix = np.load(str(pa_matrix_path))
+        # Validate shape in case states/obs definitions change
+        if pA_matrix.shape != (num_obs, num_states):
+            pA_matrix = np.ones((num_obs, num_states))
+    else:
+        pA_matrix = np.ones((num_obs, num_states))
+
+    # Update logic (Dirichlet)
+    # If success=True, increase count. We only do positive reinforcement.
+    # The FEP learning rule pA += eta * outer(o, s).
+    # Negative updates to Dirichlet parameters are mathematically unsound and can lead to <=0 counts.
+    if success:
+        eta = 50.0  # standard learning rate used in HegemonikónFEPAgent
+
+        obs_vector = np.zeros(num_obs)
+        obs_vector[obs_idx] = 1.0
+
+        state_vector = np.zeros(num_states)
+        state_vector[state_idx] = 1.0
+
+        update = eta * np.outer(obs_vector, state_vector)
+
+        pA_matrix += update
+
+        np.save(str(pa_matrix_path), pA_matrix)

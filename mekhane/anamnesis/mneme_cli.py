@@ -100,6 +100,7 @@ def cmd_ingest(args):
 
     # Chronos (Conversation History) - Not yet implemented
     if args.all or args.chronos:
+        results["chronos"] = 0
         try:
             from mekhane.symploke.chronos_ingest import (
                 get_conversation_files,

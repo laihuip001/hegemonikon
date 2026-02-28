@@ -23,14 +23,14 @@ from mekhane.symploke.indices.chronos import ChronosIndex
 DEFAULT_INDEX_PATH = Path(
     os.environ.get(
         "HGK_CHRONOS_INDEX",
-        str(Path(__file__).parent.parent.parent.parent / "mneme" / ".hegemonikon" / "indices" / "chronos.pkl"),
+        str(Path(__file__).parent.parent.parent / "mneme" / ".hegemonikon" / "indices" / "chronos.pkl"),
     )
 )
 
 HANDOFF_DIR = Path(
     os.environ.get(
         "HGK_SESSIONS_DIR",
-        str(Path(__file__).parent.parent.parent.parent / "mneme" / ".hegemonikon" / "sessions"),
+        str(Path(__file__).parent.parent.parent / "mneme" / ".hegemonikon" / "sessions"),
     )
 )
 

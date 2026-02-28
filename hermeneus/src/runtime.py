@@ -40,7 +40,7 @@ def _load_env():
 _load_env()
 
 
-_SECRET_CACHE: Dict[str, str] = {}
+_SECRET_CACHE: Dict[str, Optional[str]] = {}
 
 # PURPOSE: [L2-auto] Secret アクセスの一元化 (W08 Secret Sprawl 対策)
 def _get_secret(key: str) -> Optional[str]:

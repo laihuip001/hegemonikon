@@ -98,10 +98,45 @@ def cmd_ingest(args):
         except Exception as e:
             print(f"[Kairos] Error: {e}")
 
-    # Chronos (Conversation History) - Not yet implemented
+    # Chronos (Conversation History)
     if args.all or args.chronos:
-        # TODO: Implement when conversation history indexing is ready
-        results["chronos"] = 0
+        try:
+            from mekhane.symploke.chronos_ingest import (
+                get_chronos_files,
+                parse_handoff_for_chronos,
+                ingest_to_chronos,
+            )
+
+            # Use same DEFAULT_INDEX_PATH logic as Kairos/Sophia but for chronos.pkl
+            import os
+            from pathlib import Path
+            _PROJECT_ROOT = Path(__file__).parent.parent.parent
+            DEFAULT_CHRONOS_PATH = Path(
+                os.environ.get(
+                    "HGK_CHRONOS_INDEX",
+                    str(_PROJECT_ROOT.parent / "mneme" / ".hegemonikon" / "indices" / "chronos.pkl"),
+                )
+            )
+
+            files = get_chronos_files()
+            if files:
+                all_docs = []
+                for f in files:
+                    docs = parse_handoff_for_chronos(f)
+                    all_docs.extend(docs)
+
+                if all_docs:
+                    DEFAULT_CHRONOS_PATH.parent.mkdir(parents=True, exist_ok=True)
+                    count = ingest_to_chronos(all_docs, save_path=str(DEFAULT_CHRONOS_PATH))
+                    results["chronos"] = count
+                else:
+                    print("[Chronos] No chunks generated from handoff files")
+            else:
+                print("[Chronos] No handoff files found for conversation history")
+        except ImportError as e:
+            print(f"[Chronos] Import error: {e}")
+        except Exception as e:
+            print(f"[Chronos] Error: {e}")
 
     # Output in /boot expected format
     total = sum(results.values())
@@ -139,8 +174,25 @@ def cmd_stats(args):
     )
     print(f"Kairos: {handoff_count} handoff files")
 
-    # Chronos stats (placeholder)
-    print("Chronos: Not implemented")
+    # Chronos stats
+    import os
+    from pathlib import Path
+    _PROJECT_ROOT = Path(__file__).parent.parent.parent
+    DEFAULT_CHRONOS_PATH = Path(
+        os.environ.get(
+            "HGK_CHRONOS_INDEX",
+            str(_PROJECT_ROOT.parent / "mneme" / ".hegemonikon" / "indices" / "chronos.pkl"),
+        )
+    )
+    if DEFAULT_CHRONOS_PATH.exists():
+        try:
+            from mekhane.symploke.chronos_ingest import load_chronos_index
+            adapter = load_chronos_index(str(DEFAULT_CHRONOS_PATH))
+            print(f"Chronos: {adapter.count()} vectors")
+        except Exception as e:
+            print(f"Chronos: Error - {e}")
+    else:
+        print("Chronos: Not indexed")
 
     print("=" * 40)
     return 0

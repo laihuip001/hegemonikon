@@ -23,7 +23,6 @@ _PROJECT_ROOT = Path(__file__).resolve().parents[3]
 LOG_DIR = _PROJECT_ROOT / "logs" / "specialist_daily"
 
 
-# PURPOSE: 直近 N 件の scheduler ログからサマリーを生成する。
 @router.get("/scheduler/status")
 async def scheduler_status(limit: int = 5) -> dict:
     """直近 N 件の scheduler ログからサマリーを生成する。"""
@@ -110,7 +109,6 @@ async def scheduler_status(limit: int = 5) -> dict:
     }
 
 
-# PURPOSE: 直近 N 日間の日別成功率推移 (スパークライン用)。
 @router.get("/scheduler/trend")
 async def scheduler_trend(days: int = 14) -> dict:
     """直近 N 日間の日別成功率推移 (スパークライン用)。"""
@@ -160,7 +158,6 @@ async def scheduler_trend(days: int = 14) -> dict:
     return {"trend": trend, "days": days}
 
 
-# PURPOSE: Specialist 効果分析データ (Perspective ランキング + domain/axis 集計)。
 @router.get("/scheduler/analysis")
 async def scheduler_analysis() -> dict:
     """Specialist 効果分析データ (Perspective ランキング + domain/axis 集計)。"""
@@ -174,7 +171,6 @@ async def scheduler_analysis() -> dict:
         return {"ranking": [], "by_domain": [], "by_axis": [], "error": str(exc)}
 
 
-# PURPOSE: F17: Perspective 進化提案 (perspective_evolver)。
 @router.get("/scheduler/evolution")
 async def scheduler_evolution() -> dict:
     """F17: Perspective 進化提案 (perspective_evolver)。"""
@@ -188,7 +184,6 @@ async def scheduler_evolution() -> dict:
         return {"proposals": [], "applied": 0, "dry_run": True, "error": str(exc)}
 
 
-# PURPOSE: F18: 適応ローテーション現況 (adaptive_rotation)。
 @router.get("/scheduler/rotation")
 async def scheduler_rotation() -> dict:
     """F18: 適応ローテーション現況 (adaptive_rotation)。"""

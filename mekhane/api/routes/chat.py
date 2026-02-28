@@ -39,14 +39,12 @@ router = APIRouter(tags=["chat"])
 # --- Models ---
 
 
-# PURPOSE: Single message content
 class ChatContent(BaseModel):
     """Single message content."""
     role: str
     parts: list[dict[str, str]]
 
 
-# PURPOSE: Chat send request
 class ChatRequest(BaseModel):
     """Chat send request."""
     model: str = "gemini-3.1-pro-preview"
@@ -60,14 +58,12 @@ class ChatRequest(BaseModel):
     )
 
 
-# PURPOSE: Cortex generateChat history message
 class CortexChatMessage(BaseModel):
     """Cortex generateChat history message."""
     author: int  # 1 = USER, 2 = MODEL
     content: str
 
 
-# PURPOSE: Cortex generateChat request
 class CortexChatRequest(BaseModel):
     """Cortex generateChat request."""
     user_message: str
@@ -93,7 +89,6 @@ def _get_api_key() -> str:
 # --- Endpoints ---
 
 
-# PURPOSE: Gemini API にプロキシし、SSE をそのままフロントに流す。
 @router.post("/chat/send")
 async def chat_send(req: ChatRequest):
     """Gemini API にプロキシし、SSE をそのままフロントに流す。"""
@@ -132,7 +127,6 @@ async def chat_send(req: ChatRequest):
 
     logger.info("Chat request: model=%s, messages=%d", req.model, len(req.contents))
 
-    # PURPOSE: httpx で Gemini API に接続し、SSE チャンクをそのまま yield する。
     async def stream_proxy():
         """httpx で Gemini API に接続し、SSE チャンクをそのまま yield する。"""
         async with httpx.AsyncClient(timeout=120.0) as client:
@@ -198,7 +192,6 @@ async def _claude_chat_from_gemini_format(req: ChatRequest):
         req.model, len(user_message),
     )
 
-    # PURPOSE: OchemaService.ask_async() で Gemini SSE 互換レスポンスを返す。
     async def stream_claude():
         """OchemaService.ask_async() で Gemini SSE 互換レスポンスを返す。"""
         try:
@@ -263,7 +256,6 @@ async def _cortex_chat_from_gemini_format(
     return await cortex_chat(cortex_req)
 
 
-# PURPOSE: Cortex generateChat — 無課金 Gemini 2MB コンテキスト。
 @router.post("/chat/cortex")
 async def cortex_chat(req: CortexChatRequest):
     """Cortex generateChat — 無課金 Gemini 2MB コンテキスト。
@@ -301,7 +293,6 @@ async def cortex_chat(req: CortexChatRequest):
         req.model_config_id or "default", len(req.history), len(req.user_message),
     )
 
-    # PURPOSE: Cortex streamGenerateChat → Gemini SSE 互換形式に変換して yield。
     async def stream_cortex():
         """Cortex streamGenerateChat → Gemini SSE 互換形式に変換して yield。
 
@@ -374,7 +365,6 @@ async def cortex_chat(req: CortexChatRequest):
     )
 
 
-# PURPOSE: 利用可能なモデル一覧を返す。OchemaService に委譲。
 @router.get("/chat/models")
 async def chat_models() -> dict[str, Any]:
     """利用可能なモデル一覧を返す。OchemaService に委譲。"""

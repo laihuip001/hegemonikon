@@ -30,7 +30,6 @@ logger = logging.getLogger("hegemonikon.api.quota")
 
 # --- Response Models ---
 
-# PURPOSE: 個別モデルの Quota 情報。
 class QuotaModel(BaseModel):
     """個別モデルの Quota 情報。"""
     label: str
@@ -39,14 +38,12 @@ class QuotaModel(BaseModel):
     status: str = Field(description="green | yellow | orange | red")
 
 
-# PURPOSE: クレジット情報。
 class QuotaCredits(BaseModel):
     """クレジット情報。"""
     available: int
     monthly: int
 
 
-# PURPOSE: Quota 全体レスポンス。
 class QuotaResponse(BaseModel):
     """Quota 全体レスポンス。"""
     name: str = ""
@@ -290,7 +287,6 @@ def _fetch_quota_agq() -> QuotaResponse:
 router = APIRouter(prefix="/quota", tags=["quota"])
 
 
-# PURPOSE: Quota 情報を取得する。agq-check.sh → 直接 API の2段階フォールバック。
 @router.get("", response_model=QuotaResponse)
 async def get_quota() -> QuotaResponse:
     """Quota 情報を取得する。agq-check.sh → 直接 API の2段階フォールバック。"""

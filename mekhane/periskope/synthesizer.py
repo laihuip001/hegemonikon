@@ -1,4 +1,4 @@
-# PROOF: [Ousia/Logic] <- mekhane/periskope/
+# PROOF: [L2/Logic] <- mekhane/periskope/
 """
 Multi-model synthesizer for Periskopē.
 

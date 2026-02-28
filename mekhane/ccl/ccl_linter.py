@@ -1,4 +1,4 @@
-# PROOF: [Ousia/Logic] <- mekhane/ccl/
+# PROOF: [L2/Logic] <- mekhane/ccl/
 """CCL Linter — CCL 式の静的検証。
 
 operators.md (SSOT) に基づいて CCL 式を検証し、

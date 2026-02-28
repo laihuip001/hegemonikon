@@ -1,4 +1,4 @@
-# PROOF: [Ousia/Logic] <- mekhane/
+# PROOF: [L2/Logic] <- mekhane/
 """
 Tape Writer — WF 実行トレースを JSONL として記録する。
 

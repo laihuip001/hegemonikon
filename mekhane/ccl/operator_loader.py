@@ -1,4 +1,4 @@
-# PROOF: [Ousia/Logic] <- mekhane/ccl/
+# PROOF: [L2/Logic] <- mekhane/ccl/
 """operators.md の SSOT パーサー。
 
 operators.md の Markdown テーブルから演算子定義を抽出し、

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# PROOF: [Ousia/Logic] <- mekhane/mcp/
+# PROOF: [L2/Logic] <- mekhane/mcp/
 """
 MCP Base Module — Hegemonikón MCP Server Common Infrastructure
 

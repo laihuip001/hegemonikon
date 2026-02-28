@@ -1,4 +1,4 @@
-# PROOF: [Ousia/Logic] <- mekhane/dendron/
+# PROOF: [L2/Logic] <- mekhane/dendron/
 """
 S7: Falsification Condition Checker
 

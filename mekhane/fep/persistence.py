@@ -27,10 +27,13 @@ import numpy as np
 if TYPE_CHECKING:
     from .fep_agent import HegemonikónFEPAgent
 
+import os
+
 # Default persistence paths
-LEARNED_A_PATH = Path("/home/makaron8426/oikos/mneme/.hegemonikon/learned_A.npy")
+_base_dir = Path(__file__).parent.parent.parent / "mneme" / ".hegemonikon"
+LEARNED_A_PATH = Path(os.environ.get("HEGEMONIKON_LEARNED_A_PATH", _base_dir / "learned_A.npy"))
 LEARNED_A_METADATA_PATH = Path(
-    "/home/makaron8426/oikos/mneme/.hegemonikon/learned_A_meta.json"
+    os.environ.get("HEGEMONIKON_LEARNED_A_META_PATH", _base_dir / "learned_A_meta.json")
 )
 
 

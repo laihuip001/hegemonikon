@@ -1,0 +1,4 @@
+❌ Dendron: 0 files missing PROOF
+   Purpose: 2769 ok, 0 weak, 489 missing
+   TypeHints: 4261/4789 (89%), 7 short
+   Reason: 52/3804 (1%) [Dir:38/121 File:14/425 Func:0/3258]

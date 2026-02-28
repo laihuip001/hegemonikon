@@ -13,6 +13,7 @@ Usage:
 """
 
 import re
+from functools import cache
 from pathlib import Path
 from typing import Dict, Optional
 from dataclasses import dataclass
@@ -91,6 +92,7 @@ def parse_macro_file(path: Path) -> Optional[MacroDefinition]:
 
 
 # PURPOSE: ccl/macros/ から全マクロを読み込む
+@cache
 def load_standard_macros() -> Dict[str, MacroDefinition]:
     """ccl/macros/ から全マクロを読み込む"""
     macros = {}
@@ -107,6 +109,7 @@ def load_standard_macros() -> Dict[str, MacroDefinition]:
 
 
 # PURPOSE: .agent/workflows/ccl-*.md からマクロ展開形を読み込む
+@cache
 def load_workflow_macros() -> Dict[str, str]:
     """
     .agent/workflows/ccl-*.md からマクロ展開形を読み込む
@@ -215,6 +218,7 @@ BUILTIN_MACROS = {
 
 
 # PURPOSE: 全マクロを取得 (統合)
+@cache
 def get_all_macros() -> Dict[str, str]:
     """
     全マクロを取得 (統合)

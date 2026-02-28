@@ -141,7 +141,11 @@ try:
         GEMINI_CLIENT = genai.Client(api_key=api_key)
         GEMINI_AVAILABLE = True
 except ImportError:
-    pass  # TODO: Add proper error handling
+    logger.warning("google.genai module not found. LLM fallback will be disabled. Install with `pip install google-genai`.")
+    GEMINI_AVAILABLE = False
+except Exception as e:
+    logger.error(f"Failed to initialize Google GenAI client: {e}")
+    GEMINI_AVAILABLE = False
 
 
 # =============================================================================

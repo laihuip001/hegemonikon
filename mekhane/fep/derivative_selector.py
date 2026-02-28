@@ -2847,9 +2847,49 @@ def update_derivative_selector(
         problem_context: Problem description
         success: Whether the derivative was effective
     """
-    # TODO: Integrate with HegemonikónFEPAgent.update_A_dirichlet()
-    # This will require:
-    # 1. Derivative-specific state space in FEP
-    # 2. Observation encoding for derivative context
+    try:
+        from mekhane.fep.fep_agent import HegemonikónFEPAgent
+    except ImportError:
+        # FEP agent not available
+        return
+
+    # 1. Observation encoding for derivative context
+    # encode_for_derivative_selection expects O-series theorem
+    eff_theorem = theorem if theorem in ["O1", "O2", "O3", "O4"] else "O1"
+
+    # Get abstract, practical, reflection scores (0-2)
+    obs_tuple = encode_for_derivative_selection(problem_context, eff_theorem)
+    abstraction_level, context_dependency, reflection_need = obs_tuple
+
+    # Convert to FEP agent observation format:
+    # context_idx: 0 (concrete/mixed) or 1 (abstract)
+    context_idx = 1 if abstraction_level == 2 else 0
+
+    # urgency_idx (0-2): map directly from context_dependency
+    urgency_idx = min(int(context_dependency), 2)
+
+    # confidence_idx (0-2): map directly from reflection_need
+    confidence_idx = min(int(reflection_need), 2)
+
+    fep_obs = (context_idx, urgency_idx, confidence_idx)
+
+    # Instantiate agent
+    agent = HegemonikónFEPAgent(use_defaults=True)
+
     # 3. Persistence of learned derivative preferences
-    pass
+    # Load previously learned A matrix if it exists
+    agent.load_learned_A()
+
+    # Infer current state based on observation to establish beliefs
+    agent.infer_states(fep_obs)
+
+    # Define learning rate based on success
+    # If successful, reinforce the association strongly.
+    # If failed, penalize it slightly.
+    learning_rate = 50.0 if success else -10.0
+
+    # Update A matrix
+    agent.update_A_dirichlet(fep_obs, learning_rate)
+
+    # Save the updated A matrix
+    agent.save_learned_A()

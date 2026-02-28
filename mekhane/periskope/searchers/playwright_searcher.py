@@ -1,3 +1,4 @@
+# PROOF: [L2/Infra] <- mekhane/
 """
 Playwright-based searcher for Periskopē.
 

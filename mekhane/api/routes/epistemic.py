@@ -8,10 +8,12 @@ Dashboard カードおよび健全性チェックに使用。
 """
 
 from __future__ import annotations
+
+import asyncio
 from pathlib import Path
-from fastapi import APIRouter
 
 import yaml
+from fastapi import APIRouter
 
 router = APIRouter(prefix="/epistemic", tags=["epistemic"])
 
@@ -19,15 +21,24 @@ PROJECT_ROOT = Path.home() / "oikos" / "hegemonikon"
 REGISTRY_PATH = PROJECT_ROOT / "kernel" / "epistemic_status.yaml"
 
 
+def _load_registry_data() -> dict | None:
+    """Load and parse the YAML registry data synchronously.
+    Returns None if the registry file does not exist.
+    """
+    if not REGISTRY_PATH.exists():
+        return None
+    with open(REGISTRY_PATH, encoding="utf-8") as f:
+        return yaml.safe_load(f) or {}
+
+
 @router.get("/status")
 async def epistemic_status():
     """認識論的地位の全パッチ情報を返す"""
-    if not REGISTRY_PATH.exists():
-        return {"status": "no_data", "patches": [], "summary": {}}
-
     try:
-        with open(REGISTRY_PATH, encoding="utf-8") as f:
-            data = yaml.safe_load(f) or {}
+        data = await asyncio.to_thread(_load_registry_data)
+
+        if data is None:
+            return {"status": "no_data", "patches": [], "summary": {}}
 
         patches = data.get("patches", {})
 
@@ -63,12 +74,11 @@ async def epistemic_status():
 @router.get("/health")
 async def epistemic_health():
     """認識論的健全性スコアを計算"""
-    if not REGISTRY_PATH.exists():
-        return {"score": 0, "details": "Registry not found"}
-
     try:
-        with open(REGISTRY_PATH, encoding="utf-8") as f:
-            data = yaml.safe_load(f) or {}
+        data = await asyncio.to_thread(_load_registry_data)
+
+        if data is None:
+            return {"score": 0, "details": "Registry not found"}
 
         patches = data.get("patches", {})
         if not patches:

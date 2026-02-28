@@ -28,7 +28,10 @@ References:
 from typing import Dict, Tuple, Optional, Any
 from dataclasses import dataclass
 import os
+import logging
 import json
+
+logger = logging.getLogger(__name__)
 
 # Check for available LLM clients
 GEMINI_AVAILABLE = False
@@ -38,7 +41,7 @@ try:
 
     GEMINI_AVAILABLE = True
 except ImportError:
-    pass  # TODO: Add proper error handling
+    logger.warning("google.genai module not found. Gemini L2 evaluation will be unavailable.")
 
 
 # PURPOSE: の統一的インターフェースを実現する

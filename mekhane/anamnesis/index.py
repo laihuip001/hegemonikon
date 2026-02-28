@@ -16,9 +16,12 @@ Gnōsis Index - LanceDB統合 + 重複排除
 import os
 import sys
 import threading
+import logging
 from pathlib import Path
 from typing import Optional
 from mekhane.anamnesis.lancedb_compat import get_table_names
+
+logger = logging.getLogger(__name__)
 
 try:
     import lancedb
@@ -53,8 +56,8 @@ def _get_vector_dimension(table) -> int | None:
 if sys.platform == "win32":
     try:
         sys.stdout.reconfigure(encoding="utf-8")
-    except Exception:
-        pass  # TODO: Add proper error handling
+    except Exception as e:
+        logger.warning(f"Failed to reconfigure sys.stdout encoding to utf-8: {e}")
 
 
 # PURPOSE: Text embedding with automatic GPU acceleration.

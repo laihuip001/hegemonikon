@@ -1,3 +1,4 @@
+# PROOF: [L2/実装] <- mekhane/searchers/ A0->Auto->AddedByCI
 """
 Tavily Search API client for Periskopē.
 

@@ -1,3 +1,4 @@
+# PROOF: [L2/実装] <- mekhane/mcp/ A0->Auto->AddedByCI
 """
 MCP Guard — ゾンビプロセス防止の自己防衛モジュール
 

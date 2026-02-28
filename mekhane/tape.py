@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] <- mekhane/ tape / Context memory management
 """
 Tape Writer — WF 実行トレースを JSONL として記録する。
 

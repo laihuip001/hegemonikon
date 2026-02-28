@@ -349,6 +349,7 @@ class SchemaProver(ProverInterface):
         missing = [f for f in required if f not in data]
         
         if missing:
+            import time
             return ProofResult(
                 verified=False,
                 proof_type=ProofType.SCHEMA,
@@ -358,6 +359,7 @@ class SchemaProver(ProverInterface):
                 execution_time_ms=(time.time() - start) * 1000
             )
         
+        import time
         return ProofResult(
             verified=True,
             proof_type=ProofType.SCHEMA,

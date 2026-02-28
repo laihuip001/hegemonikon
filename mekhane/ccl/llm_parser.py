@@ -9,8 +9,11 @@ Migration: google.generativeai -> google.genai (deprecated Nov 2025)
 """
 
 import os
+import logging
 from typing import Optional
 from pathlib import Path
+
+logger = logging.getLogger(__name__)
 
 # Try new SDK first, fall back to legacy
 try:
@@ -71,8 +74,8 @@ class LLMParser:
                 else:
                     # Legacy SDK: google.generativeai
                     self.model = genai_legacy.GenerativeModel(model)
-            except Exception:
-                pass  # TODO: Add proper error handling
+            except Exception as e:
+                logger.warning(f"Failed to initialize LLM client: {e}")
 
     # PURPOSE: Load the CCL compiler prompt.
     def _load_system_prompt(self) -> str:
@@ -125,7 +128,7 @@ class LLMParser:
                     lines = ccl.split("\n")
                     ccl = "\n".join(lines[1:-1] if lines[-1] == "```" else lines[1:])
                 return ccl.strip()
-        except Exception:
-            pass  # TODO: Add proper error handling
+        except Exception as e:
+            logger.error(f"Failed to parse intent using LLM: {e}")
 
         return None

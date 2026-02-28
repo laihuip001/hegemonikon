@@ -1,22 +1,22 @@
---- mekhane/pks/tests/test_gateway_stats.py
-+++ mekhane/pks/tests/test_gateway_stats.py
-@@ -3,7 +3,11 @@
+--- mekhane/symploke/tests/test_api_connection.py
++++ mekhane/symploke/tests/test_api_connection.py
+@@ -13,7 +13,12 @@
+ # Add parent to path
+ sys.path.insert(0, "/home/makaron8426/oikos/hegemonikon")
 
- import pytest
- from unittest.mock import patch, MagicMock
--from fastapi.testclient import TestClient
+-from mekhane.symploke.jules_client import JulesClient
 +try:
-+    from fastapi.testclient import TestClient
-+    HAS_FASTAPI = True
++    import aiohttp
++    from mekhane.symploke.jules_client import JulesClient
++    HAS_AIOHTTP = True
 +except ImportError:
-+    HAS_FASTAPI = False
++    HAS_AIOHTTP = False
 
 
- @pytest.fixture
-@@ -13,6 +17,7 @@
-     return TestClient(app)
-
-
-+@pytest.mark.skipif(not HAS_FASTAPI, reason="FastAPI required for this test")
- class TestGatewayStatsEndpoint:
-     """GET /api/pks/gateway-stats のテスト。"""
+ # PURPOSE: Test API connection by listing sources
+@@ -21,6 +26,7 @@
+ @pytest.mark.skipif(not os.environ.get("JULES_API_KEY"), reason="JULES_API_KEY not set")
++@pytest.mark.skipif(not HAS_AIOHTTP, reason="aiohttp required for this test")
+ async def test_list_sources():
+     """
+     Test listing available sources from the API.

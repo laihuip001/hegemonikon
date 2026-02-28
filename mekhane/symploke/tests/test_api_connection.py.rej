@@ -1,0 +1,8 @@
+--- test_api_connection.py
++++ test_api_connection.py
+@@ -26,6 +31,7 @@
+ @pytest.mark.skipif(not os.environ.get("JULES_API_KEY"), reason="JULES_API_KEY not set")
++@pytest.mark.skipif(not HAS_AIOHTTP, reason="aiohttp required for this test")
+ async def test_list_sources():
+     """
+     Test listing available sources from the API.

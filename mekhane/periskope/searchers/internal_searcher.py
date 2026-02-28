@@ -1,3 +1,4 @@
+# PROOF: [L2/Infra] <- mekhane/
 """
 Internal knowledge searcher for Periskopē.
 

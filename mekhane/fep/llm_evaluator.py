@@ -29,6 +29,7 @@ from typing import Dict, Tuple, Optional, Any
 from dataclasses import dataclass
 import os
 import json
+import logging
 
 # Check for available LLM clients
 GEMINI_AVAILABLE = False
@@ -38,7 +39,7 @@ try:
 
     GEMINI_AVAILABLE = True
 except ImportError:
-    pass  # TODO: Add proper error handling
+    logging.warning("Google GenAI SDK not installed. Gemini evaluation (L2) will be disabled.")
 
 
 # PURPOSE: の統一的インターフェースを実現する

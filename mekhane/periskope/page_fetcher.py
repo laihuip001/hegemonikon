@@ -1,3 +1,4 @@
+# PROOF: [L2/Infra] <- mekhane/
 """
 Page Fetcher — 選択的全文クロール for Periskopē.
 

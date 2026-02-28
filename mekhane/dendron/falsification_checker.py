@@ -1,3 +1,4 @@
+# PROOF: [L2/定理] <- mekhane/dendron/ A0->Auto->AddedByCI
 """
 S7: Falsification Condition Checker
 

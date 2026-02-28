@@ -1,3 +1,4 @@
+# PROOF: [L2/定理] <- mekhane/searchers/ A0->Auto->AddedByCI
 """
 Semantic Scholar API client for Periskopē.
 

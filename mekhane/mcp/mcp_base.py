@@ -1,5 +1,16 @@
 #!/usr/bin/env python3
+# PROOF: [L2/インフラ] <- mekhane/mcp/mcp_base
 """
+PROOF: [L2/インフラ]
+
+P3 → 知識収集が必要
+   → MCP サーバーの基盤が必要
+   → mcp_base が担う
+
+Q.E.D.
+
+---
+
 MCP Base Module — Hegemonikón MCP Server Common Infrastructure
 
 All MCP servers share:
@@ -40,6 +51,7 @@ if sys.platform == "win32":
 _original_stdout = sys.stdout
 
 
+# PURPOSE: 標準出力の抑制
 class StdoutSuppressor:
     """Suppress stdout during imports to prevent MCP protocol pollution.
 
@@ -48,15 +60,18 @@ class StdoutSuppressor:
     a StringIO buffer during the suppressed block.
     """
 
+    # PURPOSE: 初期化
     def __init__(self):
         self._null = io.StringIO()
         self._old_stdout = None
 
+    # PURPOSE: enter処理
     def __enter__(self):
         self._old_stdout = sys.stdout
         sys.stdout = self._null
         return self
 
+    # PURPOSE: exit処理
     def __exit__(self, *args):
         sys.stdout = self._old_stdout
         captured = self._null.getvalue()
@@ -68,6 +83,7 @@ class StdoutSuppressor:
             )
 
 
+# PURPOSE: MCP基底クラス
 class MCPBase:
     """Common infrastructure for all Hegemonikón MCP servers.
 
@@ -79,6 +95,7 @@ class MCPBase:
       - Main run loop
     """
 
+    # PURPOSE: 初期化
     def __init__(self, name: str, version: str, instructions: str):
         self.name = name
         self.version = version
@@ -107,6 +124,7 @@ class MCPBase:
         )
         self._log("Server initialized")
 
+    # PURPOSE: パスのセットアップ
     def _setup_paths(self):
         """Add project root and mekhane dir to sys.path."""
         # mekhane/mcp/mcp_base.py → mekhane/ → hegemonikon/
@@ -118,10 +136,12 @@ class MCPBase:
             if p not in sys.path:
                 sys.path.insert(0, p)
 
+    # PURPOSE: ログ出力
     def _log(self, msg: str):
         """Log to stderr with server name prefix."""
         print(f"[{self.name}] {msg}", file=sys.stderr, flush=True)
 
+    # PURPOSE: logプロパティ
     @property
     def log(self):
         """Provide log function for external use."""
@@ -129,6 +149,7 @@ class MCPBase:
 
 
 
+    # PURPOSE: メインループ
     async def _main(self):
         """MCP server main loop."""
         self._log("Starting stdio server...")
@@ -144,6 +165,7 @@ class MCPBase:
             self._log(f"Server error: {e}")
             raise
 
+    # PURPOSE: サーバー実行
     def run(self):
         """Run the MCP server (blocking)."""
         self._log("Running main...")

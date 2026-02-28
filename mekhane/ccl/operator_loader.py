@@ -1,4 +1,15 @@
-"""operators.md の SSOT パーサー。
+# PROOF: [L2/インフラ] <- mekhane/ccl/operator_loader
+"""
+PROOF: [L2/インフラ]
+
+P3 → 知識収集が必要
+   → 演算子の読み込みが必要
+   → operator_loader が担う
+
+Q.E.D.
+
+---
+operators.md の SSOT パーサー。
 
 operators.md の Markdown テーブルから演算子定義を抽出し、
 spec_injector / failure_db が参照する統一辞書を提供する。

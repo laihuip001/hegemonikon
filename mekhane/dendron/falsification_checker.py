@@ -1,4 +1,15 @@
+# PROOF: [L2/インフラ] <- mekhane/dendron/falsification_checker
 """
+PROOF: [L2/インフラ]
+
+P3 → 知識収集が必要
+   → 反証条件のチェックが必要
+   → falsification_checker が担う
+
+Q.E.D.
+
+---
+
 S7: Falsification Condition Checker
 
 PURPOSE: epistemic_status.yaml に登録された反証条件を自動チェックし、
@@ -19,6 +30,7 @@ PROJECT_ROOT = Path(__file__).parent.parent.parent
 REGISTRY_PATH = PROJECT_ROOT / "kernel" / "epistemic_status.yaml"
 
 
+# PURPOSE: レジストリ読み込み
 def load_registry() -> dict:
     """Load the epistemic status registry"""
     if not REGISTRY_PATH.exists():
@@ -29,6 +41,7 @@ def load_registry() -> dict:
         return yaml.safe_load(f)
 
 
+# PURPOSE: 完全性チェック
 def check_completeness(registry: dict) -> list[str]:
     """Check that all patches have required fields"""
     issues = []
@@ -54,6 +67,7 @@ def check_completeness(registry: dict) -> list[str]:
     return issues
 
 
+# PURPOSE: ファイル参照チェック
 def check_file_references(registry: dict) -> list[str]:
     """Verify that claims exist in referenced files at specified lines"""
     issues = []
@@ -96,6 +110,7 @@ def check_file_references(registry: dict) -> list[str]:
     return issues
 
 
+# PURPOSE: 統計生成
 def summary_stats(registry: dict) -> dict:
     """Generate summary statistics"""
     patches = registry.get("patches", {})
@@ -109,6 +124,7 @@ def summary_stats(registry: dict) -> dict:
     }
 
 
+# PURPOSE: メイン処理
 def main():
     registry = load_registry()
     

@@ -9,6 +9,7 @@ Origin: 2026-01-31 CCL Execution Guarantee Architecture
 """
 
 import hashlib
+import time
 import json
 import sqlite3
 import subprocess

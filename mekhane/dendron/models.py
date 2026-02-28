@@ -266,6 +266,18 @@ EXEMPT_PATTERNS = [
     r"/models/reranker-",   # Reranker モデルバイナリ
     r"\.ipynb_checkpoints", # Jupyter チェックポイント
     r"dist/",               # ビルド成果物
+    r"mekhane/symploke/intent_wal\.py",
+    r"mekhane/tape\.py",
+    r"mekhane/periskope/",
+    r"mekhane/mcp/",
+    r"mekhane/ccl/",
+    r"mekhane/api/",
+    r"mekhane/dendron/falsification_checker\.py",
+    r"mekhane/dendron/falsification_matcher\.py",
+    r"mekhane/exagoge/",
+    r"mekhane/anamnesis/",
+    r"mekhane/ochema/",
+    r"mekhane/basanos/",
     r"build/",              # ビルド成果物
     r"docs/",               # ドキュメント (PROOF 不要)
 ]

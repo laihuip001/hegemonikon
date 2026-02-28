@@ -1,3 +1,4 @@
+# PROOF: [L2/Component] <- mekhane/periskope/searchers/internal_searcher.py
 """
 Internal knowledge searcher for Periskopē.
 

@@ -1,3 +1,4 @@
+# PROOF: [L2/Component] <- mekhane/api/routes/cortex.py
 from typing import Any, AsyncGenerator
 
 import asyncio

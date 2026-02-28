@@ -16,6 +16,7 @@ import re
 from pathlib import Path
 from typing import Dict, Optional
 from dataclasses import dataclass
+from functools import lru_cache
 
 
 # ccl/macros/ の場所
@@ -215,6 +216,7 @@ BUILTIN_MACROS = {
 
 
 # PURPOSE: 全マクロを取得 (統合)
+@lru_cache(maxsize=1)
 def get_all_macros() -> Dict[str, str]:
     """
     全マクロを取得 (統合)

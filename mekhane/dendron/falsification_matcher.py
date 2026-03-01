@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] <- mekhane/dendron/ falsification matcher
 """
 Falsification Matcher — 消化論文の主張と epistemic_status.yaml の反証条件を照合
 

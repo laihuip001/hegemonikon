@@ -2,8 +2,6 @@
 """F6c: Gateway Stats API endpoint tests."""
 
 import pytest
-pytest.importorskip("fastapi")
-
 from unittest.mock import patch, MagicMock
 from fastapi.testclient import TestClient
 

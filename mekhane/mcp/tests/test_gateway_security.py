@@ -67,22 +67,25 @@ async def test_c2_whitelist():
 
 
 # PURPOSE: Verify c3 size limit behaves correctly
-def test_c3_size_limit():
+def test_c3_size_limit(monkeypatch, tmp_path):
     """C-3: idea_capture サイズ制限"""
+    import mekhane.mcp.hgk_gateway as gw
+    monkeypatch.setattr(gw, "IDEA_DIR", tmp_path / "ideas")
+
     # 正常サイズ
-    result = hgk_idea_capture("Test idea", tags="test")
+    result = gw.hgk_idea_capture("Test idea", tags="test")
     assert "✅" in result, f"C-3: 正常サイズは成功すべき: {result[:100]}"
 
     # 巨大入力 (10,001文字)
     big_idea = "A" * 10_001
-    result = hgk_idea_capture(big_idea, tags="overflow")
+    result = gw.hgk_idea_capture(big_idea, tags="overflow")
     assert "❌" in result, f"C-3: 10K超過は拒否すべき: {result[:100]}"
     assert "10001" in result or "10,001" in result or "10001" in result, \
         "C-3: エラーメッセージに文字数が含まれるべき"
 
     # ちょうど10,000文字（境界値）
     exact = "B" * 10_000
-    result = hgk_idea_capture(exact, tags="boundary")
+    result = gw.hgk_idea_capture(exact, tags="boundary")
     assert "✅" in result, f"C-3: ちょうど10K文字は成功すべき: {result[:100]}"
 
     print("✅ C-3: サイズ制限 — 正常通過、10K超過拒否、境界値通過")

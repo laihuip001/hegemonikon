@@ -231,6 +231,7 @@ def _traced(fn):
     import functools
 
     @functools.wraps(fn)
+    # PURPOSE: ツール実行の時間を計測し結果をログに記録する
     def wrapper(*args: Any, **kwargs: Any) -> Any:
         _start = time.time()
         input_size = _estimate_input_size(*args, **kwargs)
@@ -1138,36 +1139,46 @@ def hgk_digest_check() -> str:
 
     lines = [f"## 📥 消化待ち候補: {len(files)} 件\n"]
 
-    for i, f in enumerate(files, 1):
+    # ⚡ Bolt: parallelize I/O and parse frontmatter line-by-line for performance
+    import concurrent.futures
+
+    def _process_digest(args: tuple[int, Path]) -> list[str]:
+        i, f = args
+        res = []
         try:
-            content = f.read_text(encoding="utf-8")
             title = "(タイトル不明)"
             score = ""
             topics_str = ""
 
             in_frontmatter = False
-            for line in content.split("\n"):
-                if line.strip() == "---":
+            with open(f, "r", encoding="utf-8") as file:
+                for line in file:
+                    if line.strip() == "---":
+                        if in_frontmatter:
+                            break
+                        in_frontmatter = True
+                        continue
                     if in_frontmatter:
-                        break
-                    in_frontmatter = True
-                    continue
-                if in_frontmatter:
-                    if line.startswith("title:"):
-                        title = line.split(":", 1)[1].strip().strip("\"'")
-                    elif line.startswith("score:"):
-                        score = line.split(":", 1)[1].strip()
-                    elif line.startswith("topics:"):
-                        topics_str = line.split(":", 1)[1].strip()
+                        if line.startswith("title:"):
+                            title = line.split(":", 1)[1].strip().strip("\"'")
+                        elif line.startswith("score:"):
+                            score = line.split(":", 1)[1].strip()
+                        elif line.startswith("topics:"):
+                            topics_str = line.split(":", 1)[1].strip()
 
-            lines.append(f"### {i}. {title}")
+            res.append(f"### {i}. {title}")
             if score:
-                lines.append(f"- **Score**: {score}")
+                res.append(f"- **Score**: {score}")
             if topics_str:
-                lines.append(f"- **Topics**: {topics_str}")
-            lines.append(f"- **File**: `{f.name}`\n")
+                res.append(f"- **Topics**: {topics_str}")
+            res.append(f"- **File**: `{f.name}`\n")
         except Exception as e:
-            lines.append(f"### {i}. {f.name} (読取エラー: {e})\n")
+            res.append(f"### {i}. {f.name} (読取エラー: {e})\n")
+        return res
+
+    with concurrent.futures.ThreadPoolExecutor() as executor:
+        for result in executor.map(_process_digest, enumerate(files, 1)):
+            lines.extend(result)
 
     # processed 件数も表示
     processed_count = len(list(PROCESSED_DIR.glob("eat_*.md"))) if PROCESSED_DIR.exists() else 0

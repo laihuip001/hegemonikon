@@ -1,3 +1,4 @@
+# PROOF: [L2/Infra] <- mekhane/periskope/
 """
 Citation verification agent for Periskopē.
 

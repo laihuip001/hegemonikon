@@ -45,7 +45,7 @@ jobs:
                   pip install torch --index-url https://download.pytorch.org/whl/cpu
                   pip install pytest pytest-asyncio pytest-timeout pyyaml pydantic lancedb numpy scipy \
                               networkx pandas tabulate requests httpx schedule \
-                              sentence-transformers fastapi uvicorn aiohttp python-dotenv hnswlib aioresponses
+                              sentence-transformers fastapi uvicorn aiohttp python-dotenv hnswlib aioresponses pymdp
                   # Install project in development mode if setup exists
                   pip install -e ".[test]" 2>/dev/null || true
 

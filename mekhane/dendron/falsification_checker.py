@@ -1,3 +1,4 @@
+# PROOF: [L2/検証] <- mekhane/dendron/ : 反証可能性の検証機構
 """
 S7: Falsification Condition Checker
 

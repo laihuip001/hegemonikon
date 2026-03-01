@@ -1,3 +1,4 @@
+# PROOF: [L2/安全] <- mekhane/mcp/ : MCP通信の安全性検証
 """
 MCP Guard — ゾンビプロセス防止の自己防衛モジュール
 

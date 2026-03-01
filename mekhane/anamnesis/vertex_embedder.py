@@ -1,3 +1,4 @@
+# PROOF: [L2/記憶] <- mekhane/anamnesis/ : 知識グラフの頂点埋め込み
 import os
 import logging
 from google import genai

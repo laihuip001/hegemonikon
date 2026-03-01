@@ -1,3 +1,4 @@
+# PROOF: [L2/API] <- mekhane/api/ : Cortex Gateway の API エンドポイント
 from typing import Any, AsyncGenerator
 
 import asyncio

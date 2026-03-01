@@ -1,3 +1,4 @@
+# PROOF: [L2/コア] <- mekhane/ : 記憶装置としてのテープロジック
 """
 Tape Writer — WF 実行トレースを JSONL として記録する。
 

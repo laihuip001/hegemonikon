@@ -1,3 +1,4 @@
+# PROOF: [L2/構文] <- mekhane/ccl/ : CCL演算子のロード機構
 """operators.md の SSOT パーサー。
 
 operators.md の Markdown テーブルから演算子定義を抽出し、

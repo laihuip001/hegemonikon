@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] <- mekhane/ccl/ ccl linter logic
 """CCL Linter — CCL 式の静的検証。
 
 operators.md (SSOT) に基づいて CCL 式を検証し、

@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] <- mekhane/ccl/ccl_linter.py: CCL expressions must be statically verified against operators.md to ensure grammatical correctness.
 """CCL Linter — CCL 式の静的検証。
 
 operators.md (SSOT) に基づいて CCL 式を検証し、

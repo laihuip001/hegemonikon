@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/インフラ] <- mekhane/mcp/mcp_base.py: Shared infrastructure for all MCP servers to ensure consistent configuration and logging.
 """
 MCP Base Module — Hegemonikón MCP Server Common Infrastructure
 

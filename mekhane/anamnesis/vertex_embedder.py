@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] <- mekhane/anamnesis/vertex_embedder.py: Provides Google Vertex AI embeddings integration.
 import os
 import logging
 from google import genai

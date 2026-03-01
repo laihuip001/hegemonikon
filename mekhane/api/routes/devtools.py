@@ -1,3 +1,4 @@
+# PROOF: [L3/統合] <- mekhane/api/routes/devtools.py: API routes for Developer Tools access to files, terminals, and Ochema endpoints.
 """
 DevTools API routes — ファイル操作・ターミナル・Ochema (AI) をフロントエンド DevTools ビューに提供。
 

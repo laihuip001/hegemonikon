@@ -1,3 +1,4 @@
+# PROOF: [L2/Auto] <- mekhane/auto/ A0->Auto->AddedByCI
 """
 Falsification Matcher — 消化論文の主張と epistemic_status.yaml の反証条件を照合
 
@@ -19,6 +20,7 @@ PROJECT_ROOT = Path(__file__).parent.parent.parent
 REGISTRY_PATH = PROJECT_ROOT / "kernel" / "epistemic_status.yaml"
 
 
+# PURPOSE: YAML ファイルから反証レジストリを安全に読み込み、後続のマッチング処理を可能にする
 def load_registry() -> dict:
     """Load the epistemic status registry"""
     if not REGISTRY_PATH.exists():
@@ -27,6 +29,7 @@ def load_registry() -> dict:
         return yaml.safe_load(f) or {"patches": {}}
 
 
+# PURPOSE: 消化された論文テキストが既存の反証条件に抵触するかどうかを判定し、知識の矛盾を防ぐ
 def check_falsification(
     paper_text: str,
     paper_title: str = "",
@@ -95,6 +98,7 @@ def check_falsification(
     return alerts
 
 
+# PURPOSE: 検出された反証アラートを読みやすいマークダウン形式に変換し、ユーザーへの通知を可能にする
 def format_alerts(alerts: list[dict], paper_title: str = "") -> str:
     """警告をフォーマットされたテキストに変換"""
     if not alerts:

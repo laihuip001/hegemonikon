@@ -1,3 +1,4 @@
+# PROOF: [L2/Auto] <- mekhane/auto/ A0->Auto->AddedByCI
 """
 Page Fetcher — 選択的全文クロール for Periskopē.
 

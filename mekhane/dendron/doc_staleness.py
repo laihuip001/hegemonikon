@@ -105,6 +105,7 @@ class DocStalenessChecker:
         self._results: List[StalenessResult] = []
         self._warnings: List[str] = []
 
+    # PURPOSE: Retrieve the list of warnings generated during the document staleness scan.
     @property
     def warnings(self) -> List[str]:
         """scan 時の警告 (doc_id 重複等)."""

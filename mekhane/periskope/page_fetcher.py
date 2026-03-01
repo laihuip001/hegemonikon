@@ -1,3 +1,4 @@
+# PROOF: [L1/定理] <- mekhane/periskope/
 """
 Page Fetcher — 選択的全文クロール for Periskopē.
 

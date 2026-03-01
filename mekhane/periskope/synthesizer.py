@@ -1,3 +1,4 @@
+# PROOF: [L1/定理] <- mekhane/periskope/
 """
 Multi-model synthesizer for Periskopē.
 

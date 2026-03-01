@@ -1,4 +1,3 @@
-# PROOF: [L2/メカニズム] <- mekhane/anamnesis/vertex_embedder.py: Vertex AI 埋め込み生成
 import os
 import logging
 from google import genai

@@ -1,4 +1,3 @@
-# PROOF: [L2/保護] <- mekhane/mcp/mcp_guard.py: MCPのゾンビプロセス防止
 """
 MCP Guard — ゾンビプロセス防止の自己防衛モジュール
 

@@ -1,4 +1,3 @@
-# PROOF: [L2/メカニズム] <- mekhane/tape.py: 記録の保存メカニズム
 """
 Tape Writer — WF 実行トレースを JSONL として記録する。
 

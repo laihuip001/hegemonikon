@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# PROOF: [L2/保護] <- mekhane/mcp/mcp_base.py: MCPの共通基盤
 """
 MCP Base Module — Hegemonikón MCP Server Common Infrastructure
 

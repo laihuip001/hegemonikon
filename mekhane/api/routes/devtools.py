@@ -1,4 +1,3 @@
-# PROOF: [L2/保護] <- mekhane/api/routes/devtools.py: APIルート: 開発ツール
 """
 DevTools API routes — ファイル操作・ターミナル・Ochema (AI) をフロントエンド DevTools ビューに提供。
 

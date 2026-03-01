@@ -255,13 +255,6 @@ EXEMPT_PATTERNS = [
     r"\.codex/",            # Codex 自動生成スクリプト
     r"\.agent/scripts/",    # エージェント補助スクリプト
     r"experiments/",        # 実験コード (PROOF 不要)
-    # 新規移行中のモジュールおよび自動生成ファイル
-    r"mekhane/periskope/",  # 新規移行中の検索エージェント
-    r"mekhane/basanos/",    # 新規移行中のL2評価システム
-    r"mekhane/ochema/",     # 新規移行中のLSシステム
-    r"__init__\.py$",       # メタファイル
-    r"__main__\.py$",       # メタファイル
-    r"_pb2.*\.py$",         # protobuf 自動生成ファイル
     # v3.4: データ/キャッシュ/モデルディレクトリの除外
     r"\.pytest_cache",      # pytest キャッシュ
     r"\.mypy_cache",        # mypy キャッシュ

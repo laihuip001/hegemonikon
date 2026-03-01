@@ -31,8 +31,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -46,11 +44,7 @@ jobs:
       - name: "L1: PROOF Header Check"
         run: |
           export PYTHONPATH=${{ github.workspace }}
-          if [ "${{ github.event_name }}" == "pull_request" ]; then
-            python -m mekhane.dendron.cli guard mekhane/ --since origin/${{ github.base_ref }}
-          else
-            python -m mekhane.dendron.cli check mekhane/ --ci --format ci
-          fi
+          python -m mekhane.dendron.cli check mekhane/ --ci --format ci
 
       # L2: Purpose Quality Check — mekhane/dendron/ (strict: WEAK = FAIL)
       - name: "L2: Purpose Check (dendron/ — strict)"

@@ -1,3 +1,4 @@
+# PROOF: [L2/検索] <- mekhane/anamnesis/
 import os
 import logging
 from google import genai

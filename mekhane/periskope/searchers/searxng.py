@@ -1,3 +1,4 @@
+# PROOF: [L1/定理] <- mekhane/periskope/searchers/
 """
 SearXNG search client for Periskopē.
 

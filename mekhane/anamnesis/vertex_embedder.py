@@ -1,3 +1,4 @@
+# PROOF: [L1/定理] <- mekhane/anamnesis/
 import os
 import logging
 from google import genai

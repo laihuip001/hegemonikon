@@ -1,3 +1,4 @@
+# PROOF: [L3/統合] <- mekhane/api/routes/cortex.py: API route for the Cortex gateway interactions.
 from typing import Any, AsyncGenerator
 
 import asyncio

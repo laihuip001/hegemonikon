@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] <- mekhane/tape.py: WF execution traces must be recorded systematically for review and learning.
 """
 Tape Writer — WF 実行トレースを JSONL として記録する。
 

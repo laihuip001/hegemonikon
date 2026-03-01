@@ -21,6 +21,7 @@ Origin: 2026-01-29 "自由と信頼についての対話"
 
 from dataclasses import dataclass, asdict
 from datetime import datetime
+import tempfile
 from pathlib import Path
 from typing import Optional, List
 import json
@@ -55,7 +56,13 @@ class MeaningfulTrace:
 
 def ensure_traces_dir() -> None:
     """Ensure the persistence directory exists."""
-    TRACES_PATH.parent.mkdir(parents=True, exist_ok=True)
+    global TRACES_PATH
+    try:
+        TRACES_PATH.parent.mkdir(parents=True, exist_ok=True)
+    except (PermissionError, OSError):
+        # Fallback to local temporary directory for CI/restricted environments
+        TRACES_PATH = Path(tempfile.gettempdir()) / ".hegemonikon" / "meaningful_traces.json"
+        TRACES_PATH.parent.mkdir(parents=True, exist_ok=True)
 # PURPOSE: Mark a moment as meaningful.
 
 

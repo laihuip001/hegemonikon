@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] <- mekhane/mcp/mcp_guard.py: Prevents zombie processes and duplicate server instances for MCP stability.
 """
 MCP Guard — ゾンビプロセス防止の自己防衛モジュール
 

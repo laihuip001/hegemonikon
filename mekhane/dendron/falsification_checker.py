@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] <- mekhane/dendron/falsification_checker.py: Falsification conditions must be continuously checked to maintain epistemic integrity.
 """
 S7: Falsification Condition Checker
 

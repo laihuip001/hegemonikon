@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] <- mekhane/ccl/operator_loader.py: Provides standardized parsing of operators.md for CCL execution logic.
 """operators.md の SSOT パーサー。
 
 operators.md の Markdown テーブルから演算子定義を抽出し、

@@ -1,0 +1,3 @@
+## 2024-03-24 - Optimizing hgk_digest_check in MCP Gateway
+**Learning:** `hgk_gateway.py`'s `hgk_digest_check` tool reads all digest candidates in `MNEME_DIR / "incoming"`. The original implementation read the entire file using `read_text()` and iterated sequentially. For large numbers of digests, this sequential full-file read blocks the event loop and uses excess memory.
+**Action:** When parsing frontmatter from markdown files in an MCP tool, use line-by-line reading with early termination (breaking after `---`) and parallelize I/O using `concurrent.futures.ThreadPoolExecutor` to ensure non-blocking execution and improve throughput.

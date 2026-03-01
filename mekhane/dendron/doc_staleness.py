@@ -105,6 +105,7 @@ class DocStalenessChecker:
         self._results: List[StalenessResult] = []
         self._warnings: List[str] = []
 
+    # PURPOSE: Expose non-fatal scanning issues like duplicate doc_ids for external reporting
     @property
     def warnings(self) -> List[str]:
         """scan 時の警告 (doc_id 重複等)."""

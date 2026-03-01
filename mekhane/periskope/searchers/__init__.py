@@ -1,3 +1,4 @@
+# PROOF: [L2/Infra] <- mekhane/periskope/searchers/__init__.py
 """
 Periskopē searchers — pluggable search source adapters.
 

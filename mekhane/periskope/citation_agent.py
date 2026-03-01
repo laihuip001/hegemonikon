@@ -1,3 +1,4 @@
+# PROOF: [L2/Infra] <- mekhane/periskope/citation_agent.py
 """
 Citation verification agent for Periskopē.
 

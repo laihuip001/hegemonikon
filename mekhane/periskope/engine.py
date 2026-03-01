@@ -1,3 +1,4 @@
+# PROOF: [L2/Infra] <- mekhane/periskope/engine.py
 """
 Periskopē Deep Research Engine — Orchestrator.
 

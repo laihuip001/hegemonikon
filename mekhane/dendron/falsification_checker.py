@@ -1,3 +1,4 @@
+# PROOF: [L2/Infra] <- mekhane/dendron/falsification_checker.py
 """
 S7: Falsification Condition Checker
 
@@ -19,6 +20,7 @@ PROJECT_ROOT = Path(__file__).parent.parent.parent
 REGISTRY_PATH = PROJECT_ROOT / "kernel" / "epistemic_status.yaml"
 
 
+# PURPOSE: レジストリ定義から最新の状態を読み込み、反証判定の基盤となる真実の構造を確保する
 def load_registry() -> dict:
     """Load the epistemic status registry"""
     if not REGISTRY_PATH.exists():
@@ -29,6 +31,7 @@ def load_registry() -> dict:
         return yaml.safe_load(f)
 
 
+# PURPOSE: 存在すべき定義が網羅されているかを検証し、構造的な抜け漏れによる不整合を未然に防ぐ
 def check_completeness(registry: dict) -> list[str]:
     """Check that all patches have required fields"""
     issues = []
@@ -54,6 +57,7 @@ def check_completeness(registry: dict) -> list[str]:
     return issues
 
 
+# PURPOSE: 実際のファイルとレジストリの参照が一致しているかを検証し、幽霊ファイルや未追跡の乖離をなくす
 def check_file_references(registry: dict) -> list[str]:
     """Verify that claims exist in referenced files at specified lines"""
     issues = []
@@ -96,6 +100,7 @@ def check_file_references(registry: dict) -> list[str]:
     return issues
 
 
+# PURPOSE: 検証結果の統計情報を算出し、全体的な健康状態と品質レベルの可視化を可能にする
 def summary_stats(registry: dict) -> dict:
     """Generate summary statistics"""
     patches = registry.get("patches", {})
@@ -109,6 +114,7 @@ def summary_stats(registry: dict) -> dict:
     }
 
 
+# PURPOSE: 反証検証プロセスのエントリーポイントとして機能し、コマンドラインからの実行を処理する
 def main():
     registry = load_registry()
     

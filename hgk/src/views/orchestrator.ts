@@ -469,7 +469,7 @@ export async function renderOrchestratorView(): Promise<void> {
                         </select>
                     </div>
                     <div class="orch-chat-actions">
-                        <button id="orch-clear-chat" class="orch-icon-btn" title="チャットをクリア">🗑️</button>
+                        <button id="orch-clear-chat" class="orch-icon-btn" title="チャットをクリア" aria-label="チャットをクリア">🗑️</button>
                     </div>
                 </div>
                 <div id="orch-chat-messages" class="orch-chat-messages"></div>
@@ -477,7 +477,7 @@ export async function renderOrchestratorView(): Promise<void> {
                     <textarea id="orch-chat-input" class="orch-chat-input"
                               placeholder="AI に指示を送る... (Enter で送信、Shift+Enter で改行)"
                               rows="2"></textarea>
-                    <button id="orch-send-btn" class="orch-send-btn" title="送信">
+                    <button id="orch-send-btn" class="orch-send-btn" title="送信" aria-label="メッセージを送信">
                         <span class="orch-send-icon">➤</span>
                     </button>
                 </div>

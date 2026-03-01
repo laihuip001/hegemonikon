@@ -7,6 +7,7 @@ Tests the Active Inference implementation for O1 Noēsis and O2 Boulēsis.
 
 import pytest
 import numpy as np
+from unittest.mock import patch, PropertyMock
 
 
 # PURPOSE: Test suite for HegemonikónFEPAgent
@@ -204,20 +205,27 @@ class TestPersistence:
     """Test suite for A matrix persistence."""
 
     # PURPOSE: save_learned_A saves A matrix to file
-    def test_save_learned_A(self, tmp_path):
+    @patch("mekhane.fep.persistence.LEARNED_A_PATH", new_callable=PropertyMock)
+    @patch("mekhane.fep.persistence.ensure_persistence_dir")
+    def test_save_learned_A(self, mock_ensure, mock_path, tmp_path):
         """save_learned_A saves A matrix to file."""
         from mekhane.fep import HegemonikónFEPAgent
 
         agent = HegemonikónFEPAgent(use_defaults=True)
 
         save_path = tmp_path / "test_A.npy"
+        mock_path.return_value = save_path
+        mock_ensure.return_value = None
+
         saved_path = agent.save_learned_A(str(save_path))
 
         assert save_path.exists()
         assert saved_path == str(save_path)
 
     # PURPOSE: load_learned_A loads A matrix from file
-    def test_load_learned_A(self, tmp_path):
+    @patch("mekhane.fep.persistence.LEARNED_A_PATH", new_callable=PropertyMock)
+    @patch("mekhane.fep.persistence.ensure_persistence_dir")
+    def test_load_learned_A(self, mock_ensure, mock_path, tmp_path):
         """load_learned_A loads A matrix from file."""
         from mekhane.fep import HegemonikónFEPAgent
         import numpy as np
@@ -226,6 +234,9 @@ class TestPersistence:
 
         # Save first
         save_path = tmp_path / "test_A.npy"
+        mock_path.return_value = save_path
+        mock_ensure.return_value = None
+
         agent.save_learned_A(str(save_path))
 
         # Create new agent and load
@@ -247,7 +258,9 @@ class TestPersistence:
         assert loaded is False
 
     # PURPOSE: A matrix survives save/load cycle
-    def test_persistence_roundtrip(self, tmp_path):
+    @patch("mekhane.fep.persistence.LEARNED_A_PATH", new_callable=PropertyMock)
+    @patch("mekhane.fep.persistence.ensure_persistence_dir")
+    def test_persistence_roundtrip(self, mock_ensure, mock_path, tmp_path):
         """A matrix survives save/load cycle."""
         from mekhane.fep import HegemonikónFEPAgent
         import numpy as np
@@ -261,6 +274,9 @@ class TestPersistence:
 
         # Save
         save_path = tmp_path / "roundtrip_A.npy"
+        mock_path.return_value = save_path
+        mock_ensure.return_value = None
+
         agent.save_learned_A(str(save_path))
 
         # Modify A
@@ -454,11 +470,16 @@ class TestFEPWithLearning:
     """Test suite for run_fep_with_learning and should_trigger_epoche."""
 
     # PURPOSE: run_fep_with_learning returns valid result dict
-    def test_run_fep_with_learning_returns_result(self, tmp_path):
+    @patch("mekhane.fep.persistence.LEARNED_A_PATH", new_callable=PropertyMock)
+    @patch("mekhane.fep.persistence.ensure_persistence_dir")
+    def test_run_fep_with_learning_returns_result(self, mock_ensure, mock_path, tmp_path):
         """run_fep_with_learning returns valid result dict."""
         from mekhane.fep.encoding import run_fep_with_learning
 
         a_path = tmp_path / "test_A.npy"
+        mock_path.return_value = a_path
+        mock_ensure.return_value = None
+
         result = run_fep_with_learning(
             obs_tuple=(1, 0, 2),  # clear, low, high
             a_matrix_path=str(a_path),
@@ -470,21 +491,30 @@ class TestFEPWithLearning:
         assert result["action_name"] in ["observe", "act"]
 
     # PURPOSE: run_fep_with_learning saves A-matrix to file
-    def test_run_fep_with_learning_saves_a_matrix(self, tmp_path):
+    @patch("mekhane.fep.persistence.LEARNED_A_PATH", new_callable=PropertyMock)
+    @patch("mekhane.fep.persistence.ensure_persistence_dir")
+    def test_run_fep_with_learning_saves_a_matrix(self, mock_ensure, mock_path, tmp_path):
         """run_fep_with_learning saves A-matrix to file."""
         from mekhane.fep.encoding import run_fep_with_learning
 
         a_path = tmp_path / "learned_A.npy"
+        mock_path.return_value = a_path
+        mock_ensure.return_value = None
+
         run_fep_with_learning(obs_tuple=(0, 1, 1), a_matrix_path=str(a_path))
 
         assert a_path.exists()
 
     # PURPOSE: run_fep_with_learning loads existing A-matrix
-    def test_run_fep_with_learning_loads_existing(self, tmp_path):
+    @patch("mekhane.fep.persistence.LEARNED_A_PATH", new_callable=PropertyMock)
+    @patch("mekhane.fep.persistence.ensure_persistence_dir")
+    def test_run_fep_with_learning_loads_existing(self, mock_ensure, mock_path, tmp_path):
         """run_fep_with_learning loads existing A-matrix."""
         from mekhane.fep.encoding import run_fep_with_learning
 
         a_path = tmp_path / "learned_A.npy"
+        mock_path.return_value = a_path
+        mock_ensure.return_value = None
 
         # First run - creates file
         run_fep_with_learning(obs_tuple=(1, 0, 2), a_matrix_path=str(a_path))

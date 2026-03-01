@@ -12,7 +12,7 @@ and commented it out, causing 11 production bugs across the codebase.
 import json
 import tempfile
 from pathlib import Path
-from unittest.mock import patch, MagicMock, AsyncMock
+from unittest.mock import patch, MagicMock, AsyncMock, PropertyMock
 from dataclasses import asdict
 import pytest
 
@@ -82,7 +82,9 @@ class TestMeaningfulTraceContextRegression:
         assert restored.context == "survives roundtrip"
 
     # PURPOSE: Verify save load preserves context behaves correctly
-    def test_save_load_preserves_context(self):
+    @patch("mekhane.fep.meaningful_traces.TRACES_PATH", new_callable=PropertyMock)
+    @patch("mekhane.fep.meaningful_traces.ensure_traces_dir")
+    def test_save_load_preserves_context(self, mock_ensure, mock_path):
         """context must survive save -> load cycle."""
         from mekhane.fep.meaningful_traces import (
             mark_meaningful,
@@ -93,6 +95,8 @@ class TestMeaningfulTraceContextRegression:
 
         with tempfile.TemporaryDirectory() as tmpdir:
             path = Path(tmpdir) / "traces.json"
+            mock_path.return_value = path
+            mock_ensure.return_value = None
 
             # Write a trace with context
             clear_session_traces()

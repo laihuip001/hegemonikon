@@ -62,7 +62,8 @@ class TestChreos:
     def test_valid_todo(self):
         """正しい形式のTODO"""
         gate = QualityGate()
-        lines = ["# TODO(Creator, 2026-03-01): Implement feature"]
+        # Ensure the date is comfortably in the future so it resolves to 'healthy'
+        lines = ["# TODO(Creator, 2030-03-01): Implement feature"]
         items = gate.check_chreos(lines)
         assert len(items) == 1
         assert items[0].owner == "Creator"

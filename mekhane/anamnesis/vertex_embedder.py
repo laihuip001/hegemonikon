@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] <- mekhane/anamnesis/ : Vertex AI を用いたエンベッディングの代替実装
 import os
 import logging
 from google import genai

@@ -1,3 +1,4 @@
+# PROOF: [L2/構文] <- mekhane/ccl/operator_loader.py: CCL演算子のSSOT読み込み
 """operators.md の SSOT パーサー。
 
 operators.md の Markdown テーブルから演算子定義を抽出し、

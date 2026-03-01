@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/メカニズム] <- mekhane/symploke/intent_wal.py: 意思決定のWAL記録
 """Intent-WAL (Write-Ahead Log) Manager.
 
 Manages session intent WAL files for crash recovery and context continuity.

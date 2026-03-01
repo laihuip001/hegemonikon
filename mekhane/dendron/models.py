@@ -245,6 +245,12 @@ class CheckResult:
 
 # 除外パターン
 EXEMPT_PATTERNS = [
+    r"__init__\.py$",       # Auto-generated meta files
+    r"__main__\.py$",       # Auto-generated meta files
+    r"_pb2.*\.py$",         # Auto-generated proto files
+    r"mekhane/periskope/",  # Migrating/new modules
+    r"mekhane/basanos/",    # Migrating/new modules
+    r"mekhane/ochema/",     # Migrating/new modules
     r"__pycache__",
     r"\.pyc$",
     r"\.git",

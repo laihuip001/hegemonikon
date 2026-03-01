@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/統合] <- mekhane/mcp/ : MCPサーバーの基底機能
 """
 MCP Base Module — Hegemonikón MCP Server Common Infrastructure
 

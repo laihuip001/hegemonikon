@@ -1,3 +1,4 @@
+# PROOF: [L1/解析] <- mekhane/ccl/operator_loader.py : 演算子ロード機能
 """operators.md の SSOT パーサー。
 
 operators.md の Markdown テーブルから演算子定義を抽出し、

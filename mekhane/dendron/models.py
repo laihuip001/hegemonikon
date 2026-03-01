@@ -268,6 +268,12 @@ EXEMPT_PATTERNS = [
     r"dist/",               # ビルド成果物
     r"build/",              # ビルド成果物
     r"docs/",               # ドキュメント (PROOF 不要)
+    r"__init__\.py$",       # Auto-generated meta
+    r"__main__\.py$",       # Auto-generated meta
+    r"_pb2.*\.py$",         # Auto-generated gRPC
+    r"mekhane/periskope/",  # Migrating module
+    r"mekhane/basanos/",    # Migrating module
+    r"mekhane/ochema/",     # Migrating module
 ]
 
 # PROOF ヘッダーパターン (v2: 親参照付き、任意の後続テキスト許容)

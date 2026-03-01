@@ -1,3 +1,4 @@
+# PROOF: [L1/解析] <- mekhane/ccl/ccl_linter.py : CCL解析機能
 """CCL Linter — CCL 式の静的検証。
 
 operators.md (SSOT) に基づいて CCL 式を検証し、

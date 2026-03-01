@@ -14,6 +14,11 @@ from unittest.mock import patch
 
 import pytest
 
+try:
+    import fastapi
+except ImportError:
+    pytestmark = pytest.mark.skip("fastapi not installed")
+
 
 # === テスト用ログデータ ===
 

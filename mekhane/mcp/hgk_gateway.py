@@ -497,7 +497,7 @@ mcp = FastMCP(
 )
 
 # Paths
-MNEME_DIR = PROJECT_ROOT.parent / "mneme" / ".hegemonikon"
+MNEME_DIR = Path(os.getenv("HGK_MNEME", str(Path.home() / "oikos/mneme/.hegemonikon")))
 SESSIONS_DIR = MNEME_DIR / "sessions"
 DOXA_DIR = MNEME_DIR / "doxa"
 SOP_OUTPUT_DIR = MNEME_DIR / "workflows"

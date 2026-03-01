@@ -37,7 +37,7 @@ class TestLoadSelEnforcement:
 class TestListAll:
     def test_list_returns_many(self):
         all_sel = list_all_sel_enforcement()
-        assert len(all_sel) >= 37, f"Expected >=37 WFs with sel_enforcement, got {len(all_sel)}"
+        assert len(all_sel) >= 39, f"Expected >=39 WFs with sel_enforcement, got {len(all_sel)}"
 
 
 class TestCheckRequirements:
@@ -73,18 +73,13 @@ class TestPostcheck:
     def test_dia_plus_pass(self):
         content = """
 ## 証拠 (Evidence)
-実験データ: 39WF中5WFに sel_enforcement がなかった。具体的データを引用。
+実験データ: 39WF中5WFに sel_enforcement がなかった。
 
 ## 論拠 (Reasoning)
 推論の連鎖: 環境強制なし → 意志依存 → 堕落。
 
 ## 反論
 最も強い反論: 「LLM は毎回異なるので環境強制も万全ではない」
-
-## CoVe
-- CONFLICT-Q: 何が対立しているか？
-- CONFLICT-A: 環境強制とLLMの自律性
-- CONFLICT-S: どのように統合するか？
 
 確信度: 推定 (MEDIUM)
 """

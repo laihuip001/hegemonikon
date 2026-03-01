@@ -23,82 +23,64 @@ class TestE2ELoop:
     def test_clear_input_produces_dispatch(self):
         """明確な入力 → WF dispatch が生成される"""
         from mekhane.fep.e2e_loop import run_loop
-        import mekhane.fep.persistence
 
-        orig_ensure = mekhane.fep.persistence.ensure_persistence_dir
-        mekhane.fep.persistence.ensure_persistence_dir = lambda: None
-        try:
-            result = run_loop(
-                "なぜこのプロジェクトは存在するのか",
-                cycles=1,
-                force_cpu=True,
-            )
+        result = run_loop(
+            "なぜこのプロジェクトは存在するのか",
+            cycles=1,
+            force_cpu=True,
+        )
 
-            assert len(result.cycles) == 1
-            c = result.cycles[0]
+        assert len(result.cycles) == 1
+        c = result.cycles[0]
 
-            # Encoding 成功
-            assert len(c.observation) == 3
-            assert all(isinstance(v, int) for v in c.observation)
+        # Encoding 成功
+        assert len(c.observation) == 3
+        assert all(isinstance(v, int) for v in c.observation)
 
-            # FEP 推論成功
-            assert c.fep_action in ("act", "observe")
-            assert c.fep_entropy >= 0
+        # FEP 推論成功
+        assert c.fep_action in ("act", "observe")
+        assert c.fep_entropy >= 0
 
-            # A-matrix 更新
-            assert c.a_matrix_updated is True
-        finally:
-            mekhane.fep.persistence.ensure_persistence_dir = orig_ensure
+        # A-matrix 更新
+        assert c.a_matrix_updated is True
 
     # PURPOSE: Attractor が WF を推薦する
     def test_dispatch_resolves_workflow(self):
         """Attractor が WF を推薦する"""
         from mekhane.fep.e2e_loop import run_loop
-        import mekhane.fep.persistence
 
-        orig_ensure = mekhane.fep.persistence.ensure_persistence_dir
-        mekhane.fep.persistence.ensure_persistence_dir = lambda: None
-        try:
-            result = run_loop(
-                "この設計の品質を批判的に評価してほしい",
-                cycles=1,
-                force_cpu=True,
-            )
+        result = run_loop(
+            "この設計の品質を批判的に評価してほしい",
+            cycles=1,
+            force_cpu=True,
+        )
 
-            c = result.cycles[0]
-            # Attractor should find a matching Series
-            # (might be A-series for judgment/evaluation)
-            if c.dispatch_wf is not None:
-                assert c.dispatch_series in ("O", "S", "H", "P", "K", "A")
-                assert c.dispatch_wf.startswith("/")
-        finally:
-            mekhane.fep.persistence.ensure_persistence_dir = orig_ensure
+        c = result.cycles[0]
+        # Attractor should find a matching Series
+        # (might be A-series for judgment/evaluation)
+        if c.dispatch_wf is not None:
+            assert c.dispatch_series in ("O", "S", "H", "P", "K", "A")
+            assert c.dispatch_wf.startswith("/")
 
     # PURPOSE: 2サイクルで学習証明が生成される
     def test_two_cycles_produce_learning_proof(self):
         """2サイクルで学習証明が生成される"""
         from mekhane.fep.e2e_loop import run_loop
-        import mekhane.fep.persistence
 
-        orig_ensure = mekhane.fep.persistence.ensure_persistence_dir
-        mekhane.fep.persistence.ensure_persistence_dir = lambda: None
-        try:
-            result = run_loop(
-                "プロジェクトの方向性を明確にしたい",
-                cycles=2,
-                force_cpu=True,
-            )
+        result = run_loop(
+            "プロジェクトの方向性を明確にしたい",
+            cycles=2,
+            force_cpu=True,
+        )
 
-            assert len(result.cycles) == 2
-            assert result.learning_proof is not None
-            assert len(result.learning_proof) > 0
+        assert len(result.cycles) == 2
+        assert result.learning_proof is not None
+        assert len(result.learning_proof) > 0
 
-            # Summary contains both cycles
-            summary = result.summary
-            assert "Cycle 0" in summary
-            assert "Cycle 1" in summary
-        finally:
-            mekhane.fep.persistence.ensure_persistence_dir = orig_ensure
+        # Summary contains both cycles
+        summary = result.summary
+        assert "Cycle 0" in summary
+        assert "Cycle 1" in summary
 
     # PURPOSE: FEP が observe を返す時、dispatch が抑制される
     def test_observe_mode_suppresses_dispatch(self):
@@ -172,28 +154,22 @@ class TestE2ELoop:
     def test_a_matrix_isolation(self):
         """各テストが独立したA行列を使用する"""
         from mekhane.fep.e2e_loop import run_loop
-        import mekhane.fep.persistence
 
-        orig_ensure = mekhane.fep.persistence.ensure_persistence_dir
-        mekhane.fep.persistence.ensure_persistence_dir = lambda: None
+        # カスタムA行列パスで分離
+        with tempfile.NamedTemporaryFile(suffix="_test_A.npy", delete=False) as f:
+            a_path = f.name
+
+        # Unlink so it starts fresh (np.load fails on empty files)
+        Path(a_path).unlink(missing_ok=True)
+
         try:
-            # カスタムA行列パスで分離
-            with tempfile.NamedTemporaryFile(suffix="_test_A.npy", delete=False) as f:
-                a_path = f.name
-
-            # Unlink so it starts fresh (np.load fails on empty files)
-            Path(a_path).unlink(missing_ok=True)
-
-            try:
-                result = run_loop(
-                    "テスト",
-                    cycles=1,
-                    a_matrix_path=a_path,
-                    force_cpu=True,
-                )
-                assert result.cycles[0].a_matrix_updated
-                assert Path(a_path).exists()
-            finally:
-                Path(a_path).unlink(missing_ok=True)
+            result = run_loop(
+                "テスト",
+                cycles=1,
+                a_matrix_path=a_path,
+                force_cpu=True,
+            )
+            assert result.cycles[0].a_matrix_updated
+            assert Path(a_path).exists()
         finally:
-            mekhane.fep.persistence.ensure_persistence_dir = orig_ensure
+            Path(a_path).unlink(missing_ok=True)

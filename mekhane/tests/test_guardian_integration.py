@@ -84,7 +84,6 @@ class TestMeaningfulTraceContextRegression:
     # PURPOSE: Verify save load preserves context behaves correctly
     def test_save_load_preserves_context(self):
         """context must survive save -> load cycle."""
-        import mekhane.fep.meaningful_traces
         from mekhane.fep.meaningful_traces import (
             mark_meaningful,
             save_traces,
@@ -95,34 +94,23 @@ class TestMeaningfulTraceContextRegression:
         with tempfile.TemporaryDirectory() as tmpdir:
             path = Path(tmpdir) / "traces.json"
 
-            # Patch TRACES_PATH and ensure_traces_dir to prevent FileNotFoundError
-            orig_path = mekhane.fep.meaningful_traces.TRACES_PATH
-            mekhane.fep.meaningful_traces.TRACES_PATH = path
+            # Write a trace with context
+            clear_session_traces()
+            mark_meaningful(
+                reason="persist context",
+                intensity=2,
+                context="must persist to disk",
+            )
+            save_traces(path)
 
-            orig_ensure = mekhane.fep.meaningful_traces.ensure_traces_dir
-            mekhane.fep.meaningful_traces.ensure_traces_dir = lambda: None
+            # Load and verify
+            loaded = load_traces(path)
+            assert len(loaded) >= 1
+            found = [t for t in loaded if t.reason == "persist context"]
+            assert len(found) == 1
+            assert found[0].context == "must persist to disk"
 
-            try:
-                # Write a trace with context
-                clear_session_traces()
-                mark_meaningful(
-                    reason="persist context",
-                    intensity=2,
-                    context="must persist to disk",
-                )
-                save_traces(path)
-
-                # Load and verify
-                loaded = load_traces(path)
-                assert len(loaded) >= 1
-                found = [t for t in loaded if t.reason == "persist context"]
-                assert len(found) == 1
-                assert found[0].context == "must persist to disk"
-            finally:
-                clear_session_traces()
-                # Restore original values
-                mekhane.fep.meaningful_traces.TRACES_PATH = orig_path
-                mekhane.fep.meaningful_traces.ensure_traces_dir = orig_ensure
+            clear_session_traces()
 
 
 # ============ 2. FailureDB — resolution regression ============

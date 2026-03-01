@@ -9,14 +9,6 @@ Tools: list_candidates, run_digestor, get_topics, check_incoming,
 
 import sys
 from pathlib import Path
-
-# Add project root and mekhane to path to allow direct execution
-_mekhane_dir = Path(__file__).parent.parent
-_project_root = _mekhane_dir.parent
-for _p in (_mekhane_dir, _project_root):
-    if str(_p) not in sys.path:
-        sys.path.insert(0, str(_p))
-
 from mekhane.mcp.mcp_base import MCPBase, StdoutSuppressor
 
 # Initialize via shared infrastructure

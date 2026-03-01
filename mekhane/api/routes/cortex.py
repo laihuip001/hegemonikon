@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] <- mekhane/api/routes/cortex.py : Cortexルーター機能
 from typing import Any, AsyncGenerator
 
 import asyncio

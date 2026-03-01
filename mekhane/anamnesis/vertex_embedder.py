@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] <- mekhane/anamnesis/vertex_embedder.py : 埋め込み機能
 import os
 import logging
 from google import genai

@@ -20,6 +20,7 @@ PROJECT_ROOT = Path(__file__).parent.parent.parent
 REGISTRY_PATH = PROJECT_ROOT / "kernel" / "epistemic_status.yaml"
 
 
+# PURPOSE: epistemic_status.yaml を読み込み、照合用の反証条件やパッチ情報を取得する
 def load_registry() -> dict:
     """Load the epistemic status registry"""
     if not REGISTRY_PATH.exists():
@@ -28,6 +29,7 @@ def load_registry() -> dict:
         return yaml.safe_load(f) or {"patches": {}}
 
 
+# PURPOSE: 新規の論文や文書の内容から、既存の反証条件に抵触する可能性のある記述をキーワードベースで自動的に検出し、リスクを可視化する
 def check_falsification(
     paper_text: str,
     paper_title: str = "",
@@ -96,6 +98,7 @@ def check_falsification(
     return alerts
 
 
+# PURPOSE: 検知した反証条件のアラートを、ユーザーが直感的に確認・判断できるように可読性の高いマークダウン形式のレポートに変換する
 def format_alerts(alerts: list[dict], paper_title: str = "") -> str:
     """警告をフォーマットされたテキストに変換"""
     if not alerts:

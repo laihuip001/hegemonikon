@@ -1,4 +1,3 @@
-# PROOF: [L2/Periskope] <- mekhane/periskope/models.py
 """
 Periskopē data models.
 

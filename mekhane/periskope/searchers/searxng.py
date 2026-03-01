@@ -1,4 +1,3 @@
-# PROOF: [L2/Periskope] <- mekhane/periskope/searchers/searxng.py
 """
 SearXNG search client for Periskopē.
 

@@ -28,10 +28,8 @@ if TYPE_CHECKING:
     from .fep_agent import HegemonikónFEPAgent
 
 # Default persistence paths
-LEARNED_A_PATH = Path("/home/makaron8426/oikos/mneme/.hegemonikon/learned_A.npy")
-LEARNED_A_METADATA_PATH = Path(
-    "/home/makaron8426/oikos/mneme/.hegemonikon/learned_A_meta.json"
-)
+LEARNED_A_PATH = Path.home() / "oikos" / "mneme" / ".hegemonikon" / "learned_A.npy"
+LEARNED_A_METADATA_PATH = Path.home() / "oikos" / "mneme" / ".hegemonikon" / "learned_A_meta.json"
 
 
 # PURPOSE: Ensure the persistence directory exists.

@@ -105,6 +105,7 @@ class DocStalenessChecker:
         self._results: List[StalenessResult] = []
         self._warnings: List[str] = []
 
+    # PURPOSE: scan 時の警告を返す
     @property
     def warnings(self) -> List[str]:
         """scan 時の警告 (doc_id 重複等)."""
@@ -133,7 +134,11 @@ class DocStalenessChecker:
 
     # PURPOSE: YAML frontmatter から doc_id/version/depends_on を抽出し DocInfo を生成する
     def _parse_frontmatter(self, path: Path) -> Optional[DocInfo]:
-        """YAML frontmatter をパースして DocInfo を返す. frontmatter なしは None."""
+        """YAML frontmatter をパースして DocInfo を返す. frontmatter なしは None.
+
+        Args:
+            path: Path to the markdown file to parse
+        """
         try:
             content = path.read_text(encoding="utf-8")
         except (OSError, UnicodeDecodeError):

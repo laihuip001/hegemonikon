@@ -5,6 +5,8 @@ Quick API connection test for Jules API.
 Tests if the API key is valid and can connect to Jules.
 """
 
+import pytest
+pytest.importorskip("aiohttp")
 import asyncio
 import os
 import sys

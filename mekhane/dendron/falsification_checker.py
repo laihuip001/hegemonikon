@@ -1,3 +1,4 @@
+# PROOF: [L2/Auto] <- mekhane/dendron/ A0->Auto->AddedByCI
 """
 S7: Falsification Condition Checker
 
@@ -19,6 +20,7 @@ PROJECT_ROOT = Path(__file__).parent.parent.parent
 REGISTRY_PATH = PROJECT_ROOT / "kernel" / "epistemic_status.yaml"
 
 
+# PURPOSE: レジストリデータを読み込み、後続の検証処理に渡す。
 def load_registry() -> dict:
     """Load the epistemic status registry"""
     if not REGISTRY_PATH.exists():
@@ -29,6 +31,7 @@ def load_registry() -> dict:
         return yaml.safe_load(f)
 
 
+# PURPOSE: 登録された各パッチが必須フィールドを満たしているか検証し、データの完全性を担保する。
 def check_completeness(registry: dict) -> list[str]:
     """Check that all patches have required fields"""
     issues = []
@@ -54,6 +57,7 @@ def check_completeness(registry: dict) -> list[str]:
     return issues
 
 
+# PURPOSE: 参照されたファイルと行番号にソースが含まれているか確認し、反証条件の正確性を担保する。
 def check_file_references(registry: dict) -> list[str]:
     """Verify that claims exist in referenced files at specified lines"""
     issues = []
@@ -96,6 +100,7 @@ def check_file_references(registry: dict) -> list[str]:
     return issues
 
 
+# PURPOSE: レジストリ内のパッチについてステータス分布などの統計情報を生成し、現状の把握を支援する。
 def summary_stats(registry: dict) -> dict:
     """Generate summary statistics"""
     patches = registry.get("patches", {})
@@ -109,6 +114,7 @@ def summary_stats(registry: dict) -> dict:
     }
 
 
+# PURPOSE: CLIエントリーポイントとして各種検証プロセスを順次実行し、結果を標準出力へ報告する。
 def main():
     registry = load_registry()
     

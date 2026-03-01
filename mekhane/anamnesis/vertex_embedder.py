@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] <- mekhane/anamnesis/ Vertex AI によるEmbedding生成
 import os
 import logging
 from google import genai

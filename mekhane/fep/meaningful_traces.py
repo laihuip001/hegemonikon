@@ -53,9 +53,18 @@ class MeaningfulTrace:
 # PURPOSE: Ensure the persistence directory exists.
 
 
+import tempfile
+
 def ensure_traces_dir() -> None:
     """Ensure the persistence directory exists."""
-    TRACES_PATH.parent.mkdir(parents=True, exist_ok=True)
+    global TRACES_PATH
+    try:
+        TRACES_PATH.parent.mkdir(parents=True, exist_ok=True)
+    except (PermissionError, OSError):
+        # Fallback to a local temporary directory if permission denied
+        fallback_dir = Path(tempfile.gettempdir()) / '.hegemonikon'
+        fallback_dir.mkdir(parents=True, exist_ok=True)
+        TRACES_PATH = fallback_dir / 'meaningful_traces.json'
 # PURPOSE: Mark a moment as meaningful.
 
 

@@ -1,3 +1,4 @@
+# PROOF: [L2/Anamnesis] <- FEP: Embedding memory vertices
 import os
 import logging
 from google import genai

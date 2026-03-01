@@ -1,3 +1,4 @@
+# PROOF: [L3/API] <- FEP: Cortex agent routing endpoint
 from typing import Any, AsyncGenerator
 
 import asyncio

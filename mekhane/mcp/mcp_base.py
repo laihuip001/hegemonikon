@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/MCP] <- FEP: Base MCP server capability
 """
 MCP Base Module — Hegemonikón MCP Server Common Infrastructure
 

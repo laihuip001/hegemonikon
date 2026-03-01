@@ -457,7 +457,7 @@ def generate_fep_feedback_markdown(
 # PURPOSE: Execute FEP inference + Dirichlet learning + persistence in one flow.
 def run_fep_with_learning(
     obs_tuple: Tuple[int, int, int],
-    a_matrix_path: Optional[str] = None,
+    a_matrix_path: str = "/home/makaron8426/oikos/mneme/.hegemonikon/fep/learned_A.npy",
     learning_rate: float = 50.0,
 ) -> Dict:
     """Execute FEP inference + Dirichlet learning + persistence in one flow.
@@ -484,10 +484,6 @@ def run_fep_with_learning(
     """
     from mekhane.fep import HegemonikónFEPAgent
     import os
-    from pathlib import Path
-
-    if a_matrix_path is None:
-        a_matrix_path = str(Path.home() / "oikos" / "mneme" / ".hegemonikon" / "fep" / "learned_A.npy")
 
     agent = HegemonikónFEPAgent(use_defaults=True)
 

@@ -1,4 +1,3 @@
-# PROOF: [L2/Infra] <- mekhane/periskope/
 """
 Periskopē data models.
 

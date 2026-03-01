@@ -55,12 +55,16 @@ LLM_DERIVATIVE_MODEL = "gemini-2.0-flash-lite"  # Free tier model
 # Selection Logging Configuration (v3.2 新規 - 学習基盤)
 # -----------------------------------------------------------------------------
 SELECTION_LOG_ENABLED = True
-SELECTION_LOG_PATH = Path.home() / "oikos/mneme/.hegemonikon/derivative_selections.yaml"
+SELECTION_LOG_PATH = Path(
+    "/home/makaron8426/oikos/mneme/.hegemonikon/derivative_selections.yaml"
+)
 
 # -----------------------------------------------------------------------------
 # L2 Evolution Engine Integration (v3.3 新規)
 # -----------------------------------------------------------------------------
-EVOLVED_WEIGHTS_PATH = Path.home() / "oikos/mneme/.hegemonikon/evolved_weights.json"
+EVOLVED_WEIGHTS_PATH = Path(
+    "/home/makaron8426/oikos/mneme/.hegemonikon/evolved_weights.json"
+)
 EVOLVED_WEIGHTS_ENABLED = True  # Set to False to disable GA weight boosting
 
 logger = logging.getLogger(__name__)

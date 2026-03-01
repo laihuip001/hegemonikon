@@ -25,7 +25,6 @@ References:
 - A-series Akribeia (confidence)
 """
 
-from pathlib import Path
 from typing import Dict, Tuple, Optional, List
 import re
 
@@ -458,7 +457,7 @@ def generate_fep_feedback_markdown(
 # PURPOSE: Execute FEP inference + Dirichlet learning + persistence in one flow.
 def run_fep_with_learning(
     obs_tuple: Tuple[int, int, int],
-    a_matrix_path: str = str(Path.home() / "oikos/mneme/.hegemonikon/fep/learned_A.npy"),
+    a_matrix_path: str = "/home/makaron8426/oikos/mneme/.hegemonikon/fep/learned_A.npy",
     learning_rate: float = 50.0,
 ) -> Dict:
     """Execute FEP inference + Dirichlet learning + persistence in one flow.

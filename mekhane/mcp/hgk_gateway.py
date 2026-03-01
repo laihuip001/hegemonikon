@@ -231,6 +231,7 @@ def _traced(fn):
     import functools
 
     @functools.wraps(fn)
+    # PURPOSE: ツール実行の時間を計測し結果をログに記録する
     def wrapper(*args: Any, **kwargs: Any) -> Any:
         _start = time.time()
         input_size = _estimate_input_size(*args, **kwargs)
@@ -497,7 +498,7 @@ mcp = FastMCP(
 )
 
 # Paths
-MNEME_DIR = Path(os.getenv("HGK_MNEME", str(Path.home() / "oikos/mneme/.hegemonikon")))
+MNEME_DIR = PROJECT_ROOT.parent / "mneme" / ".hegemonikon"
 SESSIONS_DIR = MNEME_DIR / "sessions"
 DOXA_DIR = MNEME_DIR / "doxa"
 SOP_OUTPUT_DIR = MNEME_DIR / "workflows"

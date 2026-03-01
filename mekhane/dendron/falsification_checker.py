@@ -1,3 +1,4 @@
+# PROOF: [L2/Dendron] <- FEP: Structural falsification check
 """
 S7: Falsification Condition Checker
 

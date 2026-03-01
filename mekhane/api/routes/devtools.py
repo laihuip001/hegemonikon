@@ -1,3 +1,4 @@
+# PROOF: [L3/API] <- FEP: DevTools dashboard endpoint
 """
 DevTools API routes — ファイル操作・ターミナル・Ochema (AI) をフロントエンド DevTools ビューに提供。
 

@@ -1,3 +1,4 @@
+# PROOF: [L2/MCP] <- FEP: Safety guard for MCP calls
 """
 MCP Guard — ゾンビプロセス防止の自己防衛モジュール
 

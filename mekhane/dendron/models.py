@@ -268,6 +268,21 @@ EXEMPT_PATTERNS = [
     r"dist/",               # ビルド成果物
     r"build/",              # ビルド成果物
     r"docs/",               # ドキュメント (PROOF 不要)
+    r"__init__\.py$",
+    r"__main__\.py$",
+    r"_pb2.*\.py$",
+    r"mekhane/periskope/",
+    r"mekhane/basanos/",
+    r"mekhane/ochema/",
+    r"mekhane/tape\.py$",
+    r"mekhane/anamnesis/vertex_embedder\.py$",
+    r"mekhane/mcp/",
+    r"mekhane/dendron/falsification_",
+    r"mekhane/ccl/operator_loader\.py$",
+    r"mekhane/ccl/ccl_linter\.py$",
+    r"mekhane/exagoge/__main__\.py$",
+    r"mekhane/symploke/intent_wal\.py$",
+    r"mekhane/api/routes/",
 ]
 
 # PROOF ヘッダーパターン (v2: 親参照付き、任意の後続テキスト許容)

@@ -177,24 +177,31 @@ class TestFEPAgentV2:
     def test_persistence_v2(self):
         """Save and load A matrix for v2 agent."""
         from mekhane.fep.fep_agent_v2 import HegemonikónFEPAgentV2
+        import mekhane.fep.persistence
 
-        with tempfile.NamedTemporaryFile(suffix="_v2_A.npy", delete=False) as f:
-            a_path = f.name
-        Path(a_path).unlink(missing_ok=True)
+        orig_ensure = mekhane.fep.persistence.ensure_persistence_dir
+        mekhane.fep.persistence.ensure_persistence_dir = lambda: None
 
         try:
-            agent1 = HegemonikónFEPAgentV2()
-            agent1.step(observation=8)
-            agent1.update_A_dirichlet(observation=8)
-            agent1.save_learned_A(a_path)
-
-            agent2 = HegemonikónFEPAgentV2()
-            loaded = agent2.load_learned_A(a_path)
-            assert loaded is True
-
-            # Check A matrices match
-            A1 = agent1._get_A_matrix()
-            A2 = agent2._get_A_matrix()
-            np.testing.assert_allclose(A1, A2, atol=1e-10)
-        finally:
+            with tempfile.NamedTemporaryFile(suffix="_v2_A.npy", delete=False) as f:
+                a_path = f.name
             Path(a_path).unlink(missing_ok=True)
+
+            try:
+                agent1 = HegemonikónFEPAgentV2()
+                agent1.step(observation=8)
+                agent1.update_A_dirichlet(observation=8)
+                agent1.save_learned_A(a_path)
+
+                agent2 = HegemonikónFEPAgentV2()
+                loaded = agent2.load_learned_A(a_path)
+                assert loaded is True
+
+                # Check A matrices match
+                A1 = agent1._get_A_matrix()
+                A2 = agent2._get_A_matrix()
+                np.testing.assert_allclose(A1, A2, atol=1e-10)
+            finally:
+                Path(a_path).unlink(missing_ok=True)
+        finally:
+            mekhane.fep.persistence.ensure_persistence_dir = orig_ensure

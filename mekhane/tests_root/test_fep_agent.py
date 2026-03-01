@@ -207,32 +207,45 @@ class TestPersistence:
     def test_save_learned_A(self, tmp_path):
         """save_learned_A saves A matrix to file."""
         from mekhane.fep import HegemonikónFEPAgent
+        import mekhane.fep.persistence
 
         agent = HegemonikónFEPAgent(use_defaults=True)
 
-        save_path = tmp_path / "test_A.npy"
-        saved_path = agent.save_learned_A(str(save_path))
+        orig_ensure = mekhane.fep.persistence.ensure_persistence_dir
+        mekhane.fep.persistence.ensure_persistence_dir = lambda: None
 
-        assert save_path.exists()
-        assert saved_path == str(save_path)
+        try:
+            save_path = tmp_path / "test_A.npy"
+            saved_path = agent.save_learned_A(str(save_path))
+
+            assert save_path.exists()
+            assert saved_path == str(save_path)
+        finally:
+            mekhane.fep.persistence.ensure_persistence_dir = orig_ensure
 
     # PURPOSE: load_learned_A loads A matrix from file
     def test_load_learned_A(self, tmp_path):
         """load_learned_A loads A matrix from file."""
         from mekhane.fep import HegemonikónFEPAgent
+        import mekhane.fep.persistence
         import numpy as np
 
         agent = HegemonikónFEPAgent(use_defaults=True)
 
-        # Save first
-        save_path = tmp_path / "test_A.npy"
-        agent.save_learned_A(str(save_path))
+        orig_ensure = mekhane.fep.persistence.ensure_persistence_dir
+        mekhane.fep.persistence.ensure_persistence_dir = lambda: None
+        try:
+            # Save first
+            save_path = tmp_path / "test_A.npy"
+            agent.save_learned_A(str(save_path))
 
-        # Create new agent and load
-        agent2 = HegemonikónFEPAgent(use_defaults=True)
-        loaded = agent2.load_learned_A(str(save_path))
+            # Create new agent and load
+            agent2 = HegemonikónFEPAgent(use_defaults=True)
+            loaded = agent2.load_learned_A(str(save_path))
 
-        assert loaded is True
+            assert loaded is True
+        finally:
+            mekhane.fep.persistence.ensure_persistence_dir = orig_ensure
 
     # PURPOSE: load_learned_A returns False for nonexistent file
     def test_load_nonexistent_returns_false(self, tmp_path):
@@ -250,6 +263,7 @@ class TestPersistence:
     def test_persistence_roundtrip(self, tmp_path):
         """A matrix survives save/load cycle."""
         from mekhane.fep import HegemonikónFEPAgent
+        import mekhane.fep.persistence
         import numpy as np
 
         agent = HegemonikónFEPAgent(use_defaults=True)
@@ -259,24 +273,29 @@ class TestPersistence:
             else agent.agent.A[0].copy()
         )
 
-        # Save
-        save_path = tmp_path / "roundtrip_A.npy"
-        agent.save_learned_A(str(save_path))
+        orig_ensure = mekhane.fep.persistence.ensure_persistence_dir
+        mekhane.fep.persistence.ensure_persistence_dir = lambda: None
+        try:
+            # Save
+            save_path = tmp_path / "roundtrip_A.npy"
+            agent.save_learned_A(str(save_path))
 
-        # Modify A
-        if isinstance(agent.agent.A, np.ndarray):
-            agent.agent.A *= 2.0
-        else:
-            agent.agent.A[0] *= 2.0
+            # Modify A
+            if isinstance(agent.agent.A, np.ndarray):
+                agent.agent.A *= 2.0
+            else:
+                agent.agent.A[0] *= 2.0
 
-        # Load (should restore original)
-        agent.load_learned_A(str(save_path))
+            # Load (should restore original)
+            agent.load_learned_A(str(save_path))
 
-        loaded_A = (
-            agent.agent.A if isinstance(agent.agent.A, np.ndarray) else agent.agent.A[0]
-        )
-        # Note: exact equality may not hold due to normalization, but shape should match
-        assert loaded_A.shape == original_A.shape
+            loaded_A = (
+                agent.agent.A if isinstance(agent.agent.A, np.ndarray) else agent.agent.A[0]
+            )
+            # Note: exact equality may not hold due to normalization, but shape should match
+            assert loaded_A.shape == original_A.shape
+        finally:
+            mekhane.fep.persistence.ensure_persistence_dir = orig_ensure
 
 
 # PURPOSE: Test suite for Dirichlet learning
@@ -457,42 +476,60 @@ class TestFEPWithLearning:
     def test_run_fep_with_learning_returns_result(self, tmp_path):
         """run_fep_with_learning returns valid result dict."""
         from mekhane.fep.encoding import run_fep_with_learning
+        import mekhane.fep.persistence
 
-        a_path = tmp_path / "test_A.npy"
-        result = run_fep_with_learning(
-            obs_tuple=(1, 0, 2),  # clear, low, high
-            a_matrix_path=str(a_path),
-        )
+        orig_ensure = mekhane.fep.persistence.ensure_persistence_dir
+        mekhane.fep.persistence.ensure_persistence_dir = lambda: None
+        try:
+            a_path = tmp_path / "test_A.npy"
+            result = run_fep_with_learning(
+                obs_tuple=(1, 0, 2),  # clear, low, high
+                a_matrix_path=str(a_path),
+            )
 
-        assert "action_name" in result
-        assert "entropy" in result
-        assert "should_epoche" in result
-        assert result["action_name"] in ["observe", "act"]
+            assert "action_name" in result
+            assert "entropy" in result
+            assert "should_epoche" in result
+            assert result["action_name"] in ["observe", "act"]
+        finally:
+            mekhane.fep.persistence.ensure_persistence_dir = orig_ensure
 
     # PURPOSE: run_fep_with_learning saves A-matrix to file
     def test_run_fep_with_learning_saves_a_matrix(self, tmp_path):
         """run_fep_with_learning saves A-matrix to file."""
         from mekhane.fep.encoding import run_fep_with_learning
+        import mekhane.fep.persistence
 
-        a_path = tmp_path / "learned_A.npy"
-        run_fep_with_learning(obs_tuple=(0, 1, 1), a_matrix_path=str(a_path))
+        orig_ensure = mekhane.fep.persistence.ensure_persistence_dir
+        mekhane.fep.persistence.ensure_persistence_dir = lambda: None
+        try:
+            a_path = tmp_path / "learned_A.npy"
+            run_fep_with_learning(obs_tuple=(0, 1, 1), a_matrix_path=str(a_path))
 
-        assert a_path.exists()
+            assert a_path.exists()
+        finally:
+            mekhane.fep.persistence.ensure_persistence_dir = orig_ensure
 
     # PURPOSE: run_fep_with_learning loads existing A-matrix
     def test_run_fep_with_learning_loads_existing(self, tmp_path):
         """run_fep_with_learning loads existing A-matrix."""
         from mekhane.fep.encoding import run_fep_with_learning
+        import mekhane.fep.persistence
 
-        a_path = tmp_path / "learned_A.npy"
+        orig_ensure = mekhane.fep.persistence.ensure_persistence_dir
+        mekhane.fep.persistence.ensure_persistence_dir = lambda: None
+        try:
+            a_path = tmp_path / "learned_A.npy"
 
-        # First run - creates file
-        run_fep_with_learning(obs_tuple=(1, 0, 2), a_matrix_path=str(a_path))
+            # First run - creates file
+            run_fep_with_learning(obs_tuple=(1, 0, 2), a_matrix_path=str(a_path))
 
-        # Second run - loads existing file
-        result = run_fep_with_learning(obs_tuple=(0, 2, 0), a_matrix_path=str(a_path))
+            # Second run - loads existing file
+            result = run_fep_with_learning(obs_tuple=(0, 2, 0), a_matrix_path=str(a_path))
 
-        assert result["action_name"] in ["observe", "act"]
+            assert result["action_name"] in ["observe", "act"]
+        finally:
+            mekhane.fep.persistence.ensure_persistence_dir = orig_ensure
 
     # PURPOSE: should_trigger_epoche returns True for high entropy
     def test_should_trigger_epoche_high_entropy(self):

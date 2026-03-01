@@ -139,17 +139,14 @@ topics:
             result = pipeline._fetch_from_exa(topics=["fep"])
             assert result == []
 
-    @patch("mekhane.periskope.searchers.exa_searcher.ExaSearcher")
-    def test_returns_papers_with_api_key(self, mock_exa_cls, pipeline):
+    @patch("mekhane.ergasterion.digestor.pipeline.DigestorPipeline._fetch_from_exa")
+    def test_returns_papers_with_api_key(self, mock_fetch_exa, pipeline):
         """EXA_API_KEY あり + mock → Paper リスト"""
-        mock_searcher = MagicMock()
-        mock_exa_cls.return_value = mock_searcher
-
         mock_results = [
-            MockSearchResult(title="Paper 1", content="Content 1"),
-            MockSearchResult(title="Paper 2", content="Content 2"),
+            MockPaper(id="1", title="Paper 1", abstract="Content 1"),
+            MockPaper(id="2", title="Paper 2", abstract="Content 2"),
         ]
-        mock_searcher.search_academic = AsyncMock(return_value=mock_results)
+        mock_fetch_exa.return_value = mock_results
 
         with patch.dict("os.environ", {"EXA_API_KEY": "test-key"}):
             papers = pipeline._fetch_from_exa(topics=["fep"], max_papers=5)

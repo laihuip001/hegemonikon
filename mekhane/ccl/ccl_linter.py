@@ -1,4 +1,3 @@
-# PROOF: [L2/インフラ] <- mekhane/ccl/ S1→解釈の基盤→ccl_linter が担う
 """CCL Linter — CCL 式の静的検証。
 
 operators.md (SSOT) に基づいて CCL 式を検証し、

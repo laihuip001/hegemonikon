@@ -268,13 +268,6 @@ EXEMPT_PATTERNS = [
     r"dist/",               # ビルド成果物
     r"build/",              # ビルド成果物
     r"docs/",               # ドキュメント (PROOF 不要)
-    r"__init__\.py$",       # パッケージ初期化 (自動生成・空が多い)
-    r"__main__\.py$",       # エントリポイント
-    r"_pb2.*\.py$",         # Protobuf 自動生成コード
-    r"mekhane/periskope/",  # 新規/移行中サブシステム
-    r"mekhane/basanos/",    # 新規/移行中サブシステム
-    r"mekhane/ochema/",     # 新規/移行中サブシステム
-    r"mekhane/api/",        # 新規/移行中サブシステム
 ]
 
 # PROOF ヘッダーパターン (v2: 親参照付き、任意の後続テキスト許容)

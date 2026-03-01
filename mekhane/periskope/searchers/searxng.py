@@ -1,3 +1,4 @@
+# PROOF: [L2/Auto] <- mekhane/auto/ A0->Auto->AddedByCI
 """
 SearXNG search client for Periskopē.
 

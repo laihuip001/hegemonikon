@@ -1,3 +1,4 @@
+# PROOF: [L2/Integration] <- mekhane/periskope/
 """
 Query expander for Periskopē.
 

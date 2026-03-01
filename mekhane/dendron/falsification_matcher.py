@@ -1,3 +1,4 @@
+# PROOF: [L2/保護] <- mekhane/dendron/falsification_matcher.py: 論文主張の反証照合
 """
 Falsification Matcher — 消化論文の主張と epistemic_status.yaml の反証条件を照合
 

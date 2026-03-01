@@ -1,3 +1,4 @@
+# PROOF: [L2/保護] <- mekhane/dendron/falsification_checker.py: 反証条件チェック
 """
 S7: Falsification Condition Checker
 

@@ -1,3 +1,4 @@
+# PROOF: [L2/保護] <- mekhane/api/routes/cortex.py: APIルート: AIモデル
 from typing import Any, AsyncGenerator
 
 import asyncio

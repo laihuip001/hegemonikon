@@ -46,7 +46,7 @@ jobs:
           export PYTHONPATH=${{ github.workspace }}
           if [ "${{ github.event_name }}" = "pull_request" ]; then
             git fetch origin ${{ github.base_ref }}
-            python -m mekhane.dendron.cli guard mekhane/ --since origin/${{ github.base_ref }} --ci --format ci
+            python -m mekhane.dendron.cli guard mekhane/ --since origin/${{ github.base_ref }}
           else
             python -m mekhane.dendron.cli check mekhane/ --ci --format ci
           fi

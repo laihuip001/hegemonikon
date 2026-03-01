@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] <- mekhane/ H4→ログと記憶の維持→tape が担う
 """
 Tape Writer — WF 実行トレースを JSONL として記録する。
 

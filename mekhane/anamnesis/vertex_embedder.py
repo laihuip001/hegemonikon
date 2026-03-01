@@ -1,3 +1,5 @@
+# PROOF: [L2/インフラ] <- mekhane/anamnesis/ K3→記憶の想起→vertex_embedder が担う
+
 import os
 import logging
 from google import genai

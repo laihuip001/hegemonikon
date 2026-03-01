@@ -1,3 +1,4 @@
+# PROOF: [L2/インフラ] <- mekhane/dendron/ A2→判定機能→falsification_checker が担う
 """
 S7: Falsification Condition Checker
 

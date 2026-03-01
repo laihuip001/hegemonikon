@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# PROOF: [L2/インフラ] <- mekhane/symploke/ S3→計画の持続性→intent_wal が担う
 """Intent-WAL (Write-Ahead Log) Manager.
 
 Manages session intent WAL files for crash recovery and context continuity.

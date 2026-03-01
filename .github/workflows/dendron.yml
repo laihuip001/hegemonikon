@@ -41,10 +41,15 @@ jobs:
         run: pip install pyyaml
 
       # L1: PROOF Header Check (blocking)
+      # On PRs, validate only changed files using `guard`. On push, check everything.
       - name: "L1: PROOF Header Check"
         run: |
           export PYTHONPATH=${{ github.workspace }}
-          python -m mekhane.dendron.cli check mekhane/ --ci --format ci
+          if [ "${{ github.event_name }}" == "pull_request" ]; then
+            python -m mekhane.dendron.cli guard mekhane/ --since origin/${{ github.base_ref }}
+          else
+            python -m mekhane.dendron.cli check mekhane/ --ci --format ci
+          fi
 
       # L2: Purpose Quality Check — mekhane/dendron/ (strict: WEAK = FAIL)
       - name: "L2: Purpose Check (dendron/ — strict)"

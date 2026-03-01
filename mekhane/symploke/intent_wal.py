@@ -1,5 +1,5 @@
-# PROOF: [L2/Symploke] <- FEP: Session intent write-ahead log
 #!/usr/bin/env python3
+# PROOF: [L2/Symploke] <- FEP: Session intent write-ahead log
 """Intent-WAL (Write-Ahead Log) Manager.
 
 Manages session intent WAL files for crash recovery and context continuity.
